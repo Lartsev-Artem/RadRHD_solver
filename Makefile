@@ -1,3 +1,6 @@
+# defining project config 
+DEFCONF 		= CLASTER SOLVE #USE_CUDA #BUILD MAKE
+
 # defining working directories
 SRCDIR          = src src/fun_src
 INCLUDESDIR     = include include/fun_inc
@@ -18,13 +21,22 @@ SRCS 			= $(foreach dir,$(SRCDIR),$(wildcard $(dir)/*.cpp))
 OBJS            = $(patsubst %.cpp, %.o, $(notdir $(SRCS)))
 DEP_FILES       = $(patsubst %.o, %.d, $(OBJS))
 INCLUDE_DIRS    = $(addprefix -I ,$(INCLUDESDIR))
+DEF_SET 		= $(addprefix -D , $(DEFCONF))
 
-# configuring the compiler
+#######################################################################
+################ CONFIGURING THE COMPILER #############################
+#######################################################################
+
 CXX             = mpic++
-CPPFLAGS        = 
+CPPFLAGS        = $(DEF_SET)  #-fPIE -Ofast -fopenmp
 CXXFLAGS        = -g #-Wall -Wextra -std=c++11
+
+NVCC 				= nvcc
+NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp"
+NVCC_FLAGS 			= $(DEF_SET) -O2 -gencode arch=compute_70,code=sm_70 -dc $(NVCC_OTHER_FLAGS)
+
 PROGRAM         = run
-#TARGET_ARCH		=
+#TARGET_ARCH	=
 
 COMPILE.cpp     = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
 
