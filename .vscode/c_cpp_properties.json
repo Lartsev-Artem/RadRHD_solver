@@ -5,9 +5,10 @@
       "includePath": [
         "${workspaceFolder}/**",
         "${workspaceFolder}/include",
+        "${workspaceFolder}/lib",
         "/usr/lib/x86_64-linux-gnu/openmpi/include"
       ],
-      "defines": ["CLASTER", "SOLVE"],
+      "defines": ["DEBUG", "LINUX", "SOLVERS", "USE_MPI"],
       "compilerPath": "/usr/bin/mpic++",
       "cStandard": "c17",
       "cppStandard": "gnu++17",

@@ -2,19 +2,19 @@
 DEFCONF 		= CLASTER SOLVE #USE_CUDA #BUILD MAKE
 
 # defining working directories
-SRCDIR          = src src/fun_src
-INCLUDESDIR     = include include/fun_inc
+SRCDIR          = src
+INCLUDESDIR     = include lib/json include/global_config
 BUILDDIR        = build
 OBJDIR          = $(BUILDDIR)/objs
 
 # specify the list of directories in which the search should be performed.
-vpath %.cpp 	$(SRCDIR) 
-vpath %.h 		$(INCLUDESDIR)
-vpath %.o 		$(OBJDIR)
-vpath %.d 		$(BUILDDIR)
+vpath %.cpp 		$(SRCDIR) 
+vpath %.h %.hpp 	$(INCLUDESDIR)
+vpath %.o 			$(OBJDIR)
+vpath %.d 			$(BUILDDIR)
 
-.SUFFIXES:					# Delete the default suffixes
-.SUFFIXES: .cpp .h .o .d	# Define our suffix list
+.SUFFIXES:						# Delete the default suffixes
+.SUFFIXES: .cpp .h .o .d .hpp	# Define our suffix list
 
 
 SRCS 			= $(foreach dir,$(SRCDIR),$(wildcard $(dir)/*.cpp))

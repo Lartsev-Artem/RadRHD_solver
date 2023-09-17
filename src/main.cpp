@@ -9,7 +9,6 @@ int main( int argc, char *argv[])
     
     printf("Rank: %d/%d\n", rank, size);
     
-    MPI_Finalize();
-    
+    MPI_Finalize();    
     return 0;
 }

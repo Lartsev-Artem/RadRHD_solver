@@ -1,1 +1,5 @@
 token
+build
+.vscode/configurationCache.log
+.vscode/dryrun.log
+.vscode/targets.log
