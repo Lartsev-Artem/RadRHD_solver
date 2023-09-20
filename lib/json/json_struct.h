@@ -33,8 +33,8 @@ static void from_json(const nlohmann::json& j, hllc_value_t& p) {
 #define SOLVE_MODE_T\
     X(int, class_vtk)  /*тип сетки (и данных на ней)*/\
     X(int, max_number_of_iter) /*предел итераций по излучению*/\
-    X(double, accuracy)    /*критерий сходимости залачи излучения*/\
-	X(int, start_point)  /*начальная итерация газоводой динамики*/
+    X(double, accuracy)    /*критерий сходимости задачи излучения*/\
+	X(int, start_point)  /*начальная итерация газовой динамики*/
 
 struct solve_mode_t
 {
