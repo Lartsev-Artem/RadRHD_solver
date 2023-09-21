@@ -10,10 +10,43 @@
 namespace files_sys{
 namespace json{
 
-int ReadFileJson(const std::string& file, global_files_t& st);
-int ReadFileJson(const std::string& file, solve_mode_t& st);
-int ReadFileJson(const std::string& file, hllc_value_t& st);
+/**
+ * @brief Чтение файла со структурой проекта (путей  файлов)
+ * 
+ * @param[in] file полное имя файла с расширением 
+ * @param[out] st структура путей
+ * @return int ::e_type_completion
+ */
+int Read(const std::string& file, global_files_t& st);
 
+/**
+ * @brief Чтение файла настройкой глобального решателя
+ * 
+ * @param[in] file полное имя файла с расширением 
+ * @param[out] st структура данных
+ * @return int ::e_type_completion
+ */
+int Read(const std::string& file, solve_mode_t& st);
+
+/**
+ * @brief Чтение файла настройкой газодинамического решателя
+ * 
+ * @param[in] file полное имя файла с расширением 
+ * @param[out] st структура данных
+ * @return int ::e_type_completion
+ */
+int Read(const std::string& file, hllc_value_t& st);
+
+/**
+ * @brief Чтение общей конфигурации проекта
+ * 
+ * @tparam file символный тип данных
+ * @param[in] file_set полное имя файла с расширением
+ * @param[out] glb_files структура путей
+ * @param[out] solve_mode структура настройки глобального решателя
+ * @param[out] hllc_conf структура настройки газодинамического решателя
+ * @return int ::e_type_completion
+ */
 template <typename file>
 int ReadStartSettings(file file_set, global_files_t& glb_files, solve_mode_t* solve_mode = nullptr, hllc_value_t* hllc_conf = nullptr)
 {		
@@ -32,12 +65,12 @@ int ReadStartSettings(file file_set, global_files_t& glb_files, solve_mode_t* so
 
 	if (solve_mode != nullptr)
 	{
-		if (ReadFileJson(glb_files.solve_configuration, *solve_mode)) return 1;
+		if (Read(glb_files.solve_configuration, *solve_mode)) return e_completion_fail;
 	}
 
 	if (hllc_conf != nullptr)
 	{
-		if (ReadFileJson(glb_files.name_file_hllc_set, *hllc_conf)) return 1;
+		if (Read(glb_files.name_file_hllc_set, *hllc_conf)) return  e_completion_fail;
 	}
 	return e_completion_success;
 }

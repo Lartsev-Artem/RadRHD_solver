@@ -11,6 +11,7 @@ typedef double hllc_value_type;
 	X(hllc_value_type, save_timer) /*интервал времени сохранения решения*/\
 	X(hllc_value_type, tau)        /*шаг по времени*/
 
+
 struct hllc_value_t
 {
 #define X(type, name) type name;

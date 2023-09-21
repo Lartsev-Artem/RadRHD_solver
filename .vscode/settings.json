@@ -1,4 +1,6 @@
 {
+  "editor.formatOnSave": true,
+  "clang-format.executable": "clang-format",
   "C_Cpp_Runner.cCompilerPath": "/usr/bin/mpic++",
   "C_Cpp_Runner.cppCompilerPath": "mpic++",
   "C_Cpp_Runner.debuggerPath": "gdb",

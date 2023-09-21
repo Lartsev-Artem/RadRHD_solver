@@ -1,47 +1,57 @@
 #ifndef READER_TXT
 #define READER_TXT
 
+#include <fstream>
+#include <string>
+#include <vector>
+
 #include "../global_def.h"
+#include "geo_types.h"
 
-template<typename Str_Type, typename T>
-size_t ReadSimpleFileTxt(const Str_Type name_file, std::vector<T>& data_array) {
-	// Файл должен содержать в первой строке число элементов. Далее последовательные данные
+namespace files_sys {
+namespace txt {
 
-	std::ifstream ifile;
-	OPEN_FSTREAM(ifile, name_file);
+/**
+ * @brief Чтение текстового файла
+ *
+ * @tparam Str_Type символьны тип
+ * @tparam T тип считываемых данных
+ * @param[in] name_file полное имя файла с расширением
+ * @param[out] data массив std::vector
+ * @note Файл должен содержать в первой строке число элементов. Далее
+ * последовательные данные.
+ * @return size_t ::e_type_completion
+ */
+template <typename Str_Type, typename T>
+size_t ReadSimple(const Str_Type name_file, std::vector<T> &data) {
 
-	int size;
-	ifile >> size;
-	data_array.resize(size);
+  std::ifstream ifile;
+  OPEN_FSTREAM(ifile, name_file);
 
-	for (int i = 0; i < size; i++)
-	{
-		ifile >> data_array[i];
-	}
+  int size;
+  ifile >> size;
+  data.resize(size);
 
-	ifile.close();
-	return 0;
+  for (int i = 0; i < size; i++) {
+    ifile >> data[i];
+  }
+
+  ifile.close();
+  return e_completion_success;
 }
 
-template<typename Str_Type, typename T>
-size_t WriteSimpleFileTxt(const Str_Type name_file, std::vector<T>& data_array) {
-	// Файл должен содержать в первой строке число элементов. Далее последовательные данные
+/**
+ * @brief Чтение файла со сферой направлений
+ *
+ * @param[in] file_sphere_direction
+ * @param[out] grid_direction
+ * @note файл должен содержать размерность N, 3 координаты по каждому из N
+ * направлений, дискретную площадь сферы
+ * @return int ::e_type_completion
+ */
+int ReadSphereDirectionСartesian(const std::string &file_sphere_direction,
+                                 grid_directions_t &grid_direction);
 
-	std::ofstream ofile;
-	OPEN_FSTREAM(ofile, name_file.c_str());
-	
-	ofile << data_array.size()<<'\n';
-
-	for (int i = 0; i < data_array.size(); i++)
-	{
-		ofile << data_array[i] << '\n';
-	}
-
-	ofile.close();
-	return 0;
-}
-
-int ReadSphereDirectionDecart(const std::string name_file_sphere_direction, std::vector<Vector3>& directions_all);
-size_t ReadSphereDirectionDecartToSpherical(const std::string& name_file_sphere_direction, grid_directions_t& grid_direction);
-
+} // namespace txt
+} // namespace files_sys
 #endif // !READER_TXT

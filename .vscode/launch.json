@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/artem/projects/solver/include",
-      "program": "/home/artem/projects/solver/include/build/Debug/outDebug",
+      "cwd": "/home/artem/projects/solver",
+      "program": "/home/artem/projects/solver/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

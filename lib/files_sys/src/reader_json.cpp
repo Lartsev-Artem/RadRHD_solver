@@ -25,7 +25,7 @@ if (j.is_null()) \
 	RETURN_ERR("Error : j.is_null\n"); \
 } \
 st = j; \
-return 0; \
+return e_completion_success; \
 
 int Read(const std::string& file, global_files_t& st)
 {
