@@ -4,54 +4,52 @@
 
 #define READER_VTK
 
-#include "../global_def.h"
-
-#include <vtk-9.1/vtkUnstructuredGrid.h>
 #include <vtk-9.1/vtkCellData.h>
 #include <vtk-9.1/vtkGenericDataObjectReader.h>
 #include <vtk-9.1/vtkGenericDataObjectWriter.h>
+#include <vtk-9.1/vtkUnstructuredGrid.h>
 
-namespace files_sys{
-namespace vtk{
+#include "../global_def.h"
+
+
+namespace files_sys {
+namespace vtk {
 
 /**
  * @brief Чтение файла с сеткой в формате vtk
- * 
- * @tparam vtk_grid тип сетки 
+ *
+ * @tparam vtk_grid тип сетки
  * @param[in] name_file полное имя файла с расширением
  * @param[out] grid сетка
  * @warning только тип сетки vtkUnstructuredGrid!
  * @return int ::e_type_completion
  */
-template<typename vtk_grid>
+template <typename vtk_grid>
 int ReadFileVtk(const std::string& name_file, vtkSmartPointer<vtk_grid>& grid) {
-	
-	vtkSmartPointer<vtkGenericDataObjectReader> reader_vtk =
-		vtkSmartPointer<vtkGenericDataObjectReader>::New();
-	reader_vtk->ReadAllScalarsOn();
-	reader_vtk->SetFileName(name_file.c_str());
-	reader_vtk->Update();
+  vtkSmartPointer<vtkGenericDataObjectReader> reader_vtk =
+      vtkSmartPointer<vtkGenericDataObjectReader>::New();
+  reader_vtk->ReadAllScalarsOn();
+  reader_vtk->SetFileName(name_file.c_str());
+  reader_vtk->Update();
 
-	if (reader_vtk->IsFileUnstructuredGrid()) 
-	{
-		grid = reader_vtk->GetUnstructuredGridOutput();
-		grid->Modified();
-	}
-	else
-	{
-		RETURN_ERR("Error read file_vtk\n file: %s is not UnstructuredGrid\n", name_file_vtk.c_str());
-	}
-	
-	reader_vtk->GetOutput()->GlobalReleaseDataFlagOn();
+  if (reader_vtk->IsFileUnstructuredGrid()) {
+    grid = reader_vtk->GetUnstructuredGridOutput();
+    grid->Modified();
+  } else {
+    RETURN_ERR("Error read file_vtk\n file: %s is not UnstructuredGrid\n",
+               name_file_vtk.c_str());
+  }
 
-	std::cout << "Grid has Cell: " << grid->GetNumberOfCells() << '\n';
-	return e_completion_success;
+  reader_vtk->GetOutput()->GlobalReleaseDataFlagOn();
+
+  std::cout << "Grid has Cell: " << grid->GetNumberOfCells() << '\n';
+  return e_completion_success;
 }
 
 /**
- * @brief 
- * 
- * @tparam vtk_grid тип сетки 
+ * @brief
+ *
+ * @tparam vtk_grid тип сетки
  * @param[in] class_file_vtk конфигурация читаемых данных ::e_grid_vtk_config_t
  * @param[in] name_file_vtk полное имя файла с расширением
  * @param[out] unstructured_grid сетка
@@ -62,43 +60,46 @@ int ReadFileVtk(const std::string& name_file, vtkSmartPointer<vtk_grid>& grid) {
  * @return int ::e_type_completion
  * @warning имена поля данных задаются в ручную!!!
  */
-template<typename vtk_grid>int ReadFileVtk(const size_t class_file_vtk, const std::string& name_file_vtk, vtkSmartPointer<vtk_grid>& unstructured_grid, 
-vtkDataArray*& density, vtkDataArray*& absorp_coef, vtkDataArray*& rad_en_loose_rate, const bool is_print=false) 
-{
-	ReadFileVtk(name_file_vtk, unstructured_grid);	
+template <typename vtk_grid>
+int ReadFileVtk(const size_t class_file_vtk, const std::string& name_file_vtk,
+                vtkSmartPointer<vtk_grid>& unstructured_grid,
+                vtkDataArray*& density, vtkDataArray*& absorp_coef,
+                vtkDataArray*& rad_en_loose_rate, const bool is_print = false) {
+  ReadFileVtk(name_file_vtk, unstructured_grid);
 
-	switch (class_file_vtk) 
-	{
-	case e_grid_cfg_default:
-		density = NULL;
-		absorp_coef = NULL;
-		rad_en_loose_rate = NULL;
-		break;
+  switch (class_file_vtk) {
+    case e_grid_cfg_default:
+      density = NULL;
+      absorp_coef = NULL;
+      rad_en_loose_rate = NULL;
+      break;
 
-	case e_grid_cfg_radiation:
-		density = unstructured_grid->GetCellData()->GetScalars("density");
-		absorp_coef = unstructured_grid->GetCellData()->GetScalars("absorp_coef");
-		rad_en_loose_rate = unstructured_grid->GetCellData()->GetScalars("radEnLooseRate");
-		break;
-	
-	default:
-		RETURN_ERR("Bad type vtk\n");
-	}
+    case e_grid_cfg_radiation:
+      density = unstructured_grid->GetCellData()->GetScalars("density");
+      absorp_coef = unstructured_grid->GetCellData()->GetScalars("absorp_coef");
+      rad_en_loose_rate =
+          unstructured_grid->GetCellData()->GetScalars("radEnLooseRate");
+      break;
 
-	if (is_print) 
-	{
-		std::cout << "Grid has " << unstructured_grid->GetNumberOfPoints() << " points.\n";
-		std::cout << "Grid has " << unstructured_grid->GetNumberOfCells() << " cells.\n";
-		if (class_file_vtk) {
-			std::cout << "density_Size: " << density->GetSize() << '\n';
-			std::cout << "absorp_coef_Size: " << absorp_coef->GetSize() << '\n';
-			std::cout << "Q_Size: " << rad_en_loose_rate->GetSize() << '\n';
-		}
-	}
-	
-	return e_completion_success;
+    default:
+      RETURN_ERR("Bad type vtk\n");
+  }
+
+  if (is_print) {
+    std::cout << "Grid has " << unstructured_grid->GetNumberOfPoints()
+              << " points.\n";
+    std::cout << "Grid has " << unstructured_grid->GetNumberOfCells()
+              << " cells.\n";
+    if (class_file_vtk) {
+      std::cout << "density_Size: " << density->GetSize() << '\n';
+      std::cout << "absorp_coef_Size: " << absorp_coef->GetSize() << '\n';
+      std::cout << "Q_Size: " << rad_en_loose_rate->GetSize() << '\n';
+    }
+  }
+
+  return e_completion_success;
 }
-} // namespace vtk
-}//namespace files_sys
+}  // namespace vtk
+}  // namespace files_sys
 
-#endif //USE_VTK && !READER_VTK
+#endif  // USE_VTK && !READER_VTK

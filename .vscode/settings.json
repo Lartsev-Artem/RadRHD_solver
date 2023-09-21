@@ -1,4 +1,5 @@
 {
+  "clang-format.fallbackStyle": "Google", //{ BasedOnStyle: Google, ColumnLimit: 0}",
   "editor.formatOnSave": true,
   "clang-format.executable": "clang-format",
   "C_Cpp_Runner.cCompilerPath": "/usr/bin/mpic++",

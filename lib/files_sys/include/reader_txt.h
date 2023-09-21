@@ -24,7 +24,6 @@ namespace txt {
  */
 template <typename Str_Type, typename T>
 size_t ReadSimple(const Str_Type name_file, std::vector<T> &data) {
-
   std::ifstream ifile;
   OPEN_FSTREAM(ifile, name_file);
 
@@ -52,6 +51,6 @@ size_t ReadSimple(const Str_Type name_file, std::vector<T> &data) {
 int ReadSphereDirectionСartesian(const std::string &file_sphere_direction,
                                  grid_directions_t &grid_direction);
 
-} // namespace txt
-} // namespace files_sys
-#endif // !READER_TXT
+}  // namespace txt
+}  // namespace files_sys
+#endif  // !READER_TXT
