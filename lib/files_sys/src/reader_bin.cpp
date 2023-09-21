@@ -1,5 +1,7 @@
 #include "reader_bin.h"
 
+#include <iostream>
+
 #include "global_def.h"
 #include "global_value.h"
 

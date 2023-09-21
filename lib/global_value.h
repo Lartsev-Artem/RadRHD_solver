@@ -1,11 +1,11 @@
 #ifndef GLOBAL_VALUE
 #define GLOBAL_VALUE
 
+#include <iostream>
 #include <string>
 
 #include "global_def.h"
 #include "prj_config.h"
-
 
 #define PI 3.14159265358979323846
 

@@ -1,6 +1,12 @@
 #include <mpi.h>
 
+#include "reader_bin.h"
+global_files_t glb_files;
+
 int main(int argc, char* argv[]) {
+  std::vector<int> a;
+  files_sys::bin::ReadSimple("foo.bin", a);
+
   int rank, size;
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);

@@ -7,7 +7,6 @@
 #include "dbgdef.h"
 #include "geo_types.h"
 
-
 namespace files_sys {
 namespace bin {
 

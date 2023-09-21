@@ -1,4 +1,7 @@
+#include <cstdint>
+
 #ifdef USE_MPI
+
 #include "mpi.h"
 
 static int8_t id = -1;

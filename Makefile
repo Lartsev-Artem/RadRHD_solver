@@ -1,9 +1,9 @@
 # defining project config 
-DEFCONF 		= CLASTER SOLVE #USE_CUDA #BUILD MAKE
+DEFCONF 		= CLASTER SOLVERS #USE_CUDA #BUILD MAKE
 
 # defining working directories
-SRCDIR          = src
-INCLUDESDIR     = include lib/json include/global_config
+SRCDIR          = src lib/files_sys/src lib/geometry lib/mpi_extension
+INCLUDESDIR     = include lib lib/json lib/files_sys/include lib/Eigen lib/geometry lib/mpi_extension
 BUILDDIR        = build
 OBJDIR          = $(BUILDDIR)/objs
 
@@ -40,10 +40,12 @@ PROGRAM         = run
 
 COMPILE.cpp     = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
 
+
 all: $(PROGRAM)
 
+#Make executable file. Early was $(addprefix $(OBJDIR)/, $^)
 $(PROGRAM): %: $(OBJS)
-	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix $(OBJDIR)/, $^) $(LOADLIBES) $(LDLIBS) -o $@
+	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./, $^) $(LOADLIBES) $(LDLIBS) -o $@ 
 
 
 # Building rule for .o files and its .c/.cpp in combination with all .h
@@ -65,3 +67,4 @@ clean:
 	$(RM) $(BUILDDIR) -r
 	$(RM) *~ 
 	$(RM) $(PROGRAM)
+	$(RM) "File_Logs.txt"

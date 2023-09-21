@@ -32,9 +32,7 @@
     char buf[1024];                              \
     sprintf(buf, __VA_ARGS__);                   \
     std::ofstream out(Files_log, std::ios::app); \
-    \  
-    out << buf                                   \
-        << "\n";                                 \
+    out << buf << "\n";                          \
     out.close();                                 \
   }
 
