@@ -4,11 +4,10 @@
 #include "../json/json_struct.h"
 #include "global_def.h"
 
-
 namespace files_sys {
 namespace json {
 
-static int ReadFileJson(nlohmann::json& j, const std::string& file) {
+static int ReadFileJson(nlohmann::json &j, const std::string &file) {
   std::ifstream ifile(file);
   OPEN_FSTREAM(ifile, file.c_str());
 
@@ -26,8 +25,8 @@ static int ReadFileJson(nlohmann::json& j, const std::string& file) {
   st = j;                              \
   return e_completion_success;
 
-int Read(const std::string& file, global_files_t& st) { READ_JSON; }
-int Read(const std::string& file, solve_mode_t& st) { READ_JSON; }
-int Read(const std::string& file, hllc_value_t& st) { READ_JSON; }
-}  // namespace json
-}  // namespace files_sys
+int Read(const std::string &file, global_files_t &st) { READ_JSON; }
+int Read(const std::string &file, solve_mode_t &st) { READ_JSON; }
+int Read(const std::string &file, hllc_value_t &st) { READ_JSON; }
+} // namespace json
+} // namespace files_sys

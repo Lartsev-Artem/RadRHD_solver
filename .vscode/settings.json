@@ -1,4 +1,5 @@
 {
+  "clang-format.style": "{ColumnLimit: 0 }",
   "clang-format.fallbackStyle": "Google",
   "editor.formatOnSave": true,
   "clang-format.executable": "clang-format",
@@ -139,7 +140,8 @@
     "__hash_table": "cpp",
     "__tree": "cpp",
     "__tuple": "cpp",
-    "filesystem": "cpp"
+    "filesystem": "cpp",
+    "*.inc": "cpp"
   },
   "cSpell.words": [
     "ifile",

@@ -2,7 +2,7 @@
 DEFCONF 		= CLASTER SOLVERS #USE_CUDA #BUILD MAKE
 
 # defining working directories
-SRCDIR          = src lib/files_sys/src lib/geometry lib/mpi_extension
+SRCDIR          = src lib/files_sys/src lib/geometry lib/mpi_extension lib/json
 INCLUDESDIR     = include lib lib/json lib/files_sys/include lib/Eigen lib/geometry lib/mpi_extension
 BUILDDIR        = build
 OBJDIR          = $(BUILDDIR)/objs

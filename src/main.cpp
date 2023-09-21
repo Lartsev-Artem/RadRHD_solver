@@ -1,9 +1,8 @@
 #include <mpi.h>
 
 #include "reader_bin.h"
-global_files_t glb_files;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   std::vector<int> a;
   files_sys::bin::ReadSimple("foo.bin", a);
 
@@ -20,8 +19,8 @@ int main(int argc, char* argv[]) {
 
 #ifdef OST_BIN_READER
 //#ifdef SOLVERS
-int ReadGeometryGrid(const std::string& file_cells,
-                     const std::string& file_faces, grid_t& grid) {
+int ReadGeometryGrid(const std::string &file_cells,
+                     const std::string &file_faces, grid_t &grid) {
   ReadGridGeo(file_faces, grid.faces);
   ReadGridGeo(file_cells, grid.cells);
 
@@ -33,13 +32,13 @@ int ReadGeometryGrid(const std::string& file_cells,
 
 //#if defined HLLC || defined RHLLC
 template <typename T>
-int ReadValueGrid(const T main_dir, grid_t& grid) {
+int ReadValueGrid(const T main_dir, grid_t &grid) {
   READ_FILE(std::string(main_dir + "phys_val.bin").c_str(), grid.cells,
             phys_val);
   return 0;
 }
 template <typename T>
-int ReadHllcInit(const T file_init_value, std::vector<elem_t>& cells) {
+int ReadHllcInit(const T file_init_value, std::vector<elem_t> &cells) {
   READ_FILE(std::string(file_init_value).c_str(), cells, phys_val);
   return 0;
 }

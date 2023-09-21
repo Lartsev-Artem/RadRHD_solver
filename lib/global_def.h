@@ -1,84 +1,93 @@
+/**
+ * @file global_def.h
+ * @brief Файл содержит глобальные макросы
+ *
+ */
 #ifndef GLOBAL_DEF
 #define GLOBAL_DEF
 
 #include "dbgdef.h"
 #include "prj_config.h"
 
-
+/**
+ * @brief Число граней элемента
+ *
+ */
 #define CELL_SIZE (NUMBER_OF_MEASUREMENTS + 1)
 
 #define CONVERT_TO_STRING(s, ...) #s #__VA_ARGS__
 
+/**
+ * @brief Безопасное открытие файлового потока
+ *
+ */
 #define OPEN_FSTREAM(file, namefile) \
   file.open(namefile);               \
-  if (!file.is_open()) RETURN_ERR("Error : file %s is not open", namefile);
+  if (!file.is_open())               \
+    RETURN_ERR("Error : file %s is not open", namefile);
 
+/**
+ * @brief Безопасное открытие файла
+ *
+ */
 #define OPEN_FILE(file, namefile, mod) \
   file = fopen(namefile, mod);         \
-  if (!file) RETURN_ERR("Error : file %s is not open", namefile);
+  if (!file)                           \
+    RETURN_ERR("Error : file %s is not open", namefile);
 
-#define check_bit(word, idx) (((word) >> (idx)) & 0x1)  // проверка i-го бита
-#define clear_bit(word, idx) ((word) & (~(1 << (idx))))  // выключение i-го бита
-#define set_bit(word, idx) ((word) | (1 << (idx)))  // установка i-го бита
+/**
+ * @brief проверка i-го бита
+ *
+ */
+#define CHECK_BIT(word, idx) (((word) >> (idx)) & 0x1)
 
+/**
+ * @brief выключение i-го бита
+ *
+ */
+#define CLEAR_BIT(word, idx) ((word) & (~(1 << (idx))))
+
+/**
+ * @brief  установка i-го бита
+ *
+ */
+#define SET_BIT(word, idx) ((word) | (1 << (idx)))
+
+/**
+ * @brief Знак величины
+ *
+ */
 #define SIGN(a) (a < 0.0 ? -1.0 : 1.0)
 
+/**
+ * @brief Быстрое создание структуры с элементами одного типа
+ *
+ */
 #define CREATE_STRUCT(name, type, ...) \
   struct name {                        \
     type __VA_ARGS__;                  \
   }
 
-#define PRINT_STRUCT(st, type)                           \
-  type* str = (type*)&st;                                \
-  while (str < (type*)&st + sizeof(st) / sizeof(type)) { \
-    std::cout << *str++ << '\n';                         \
+/**
+ * @brief Быстрая печать структуры с элементами одного типа
+ *
+ */
+#define PRINT_STRUCT(st, type)                            \
+  type *str = (type *)&st;                                \
+  while (str < (type *)&st + sizeof(st) / sizeof(type)) { \
+    std::cout << *str++ << '\n';                          \
   }
 
-#define FILL_STRUCT(st, type, val)                         \
-  {                                                        \
-    type* str = (type*)&st;                                \
-    while (str < (type*)&st + sizeof(st) / sizeof(type)) { \
-      *str++ = val;                                        \
-    }                                                      \
-  }
-
-///\todo: file module
-
-#define WRITE_FILE_VECTOR(name_file, data, value)         \
-  {                                                       \
-    FILE* f;                                              \
-    int n = data.size();                                  \
-    f = fopen(name_file, "wb");                           \
-    if (!f) RETURN_ERRS("file %s not open\n", name_file); \
-    fwrite(&n, sizeof(int), 1, f);                        \
-    for (auto& el : data) {                               \
-      fwrite(&el.value, sizeof(el.value), 1, f);          \
-    }                                                     \
-    fclose(f);                                            \
-  }
-
-#define WRITE_FILE(name_file, data, n)                    \
-  {                                                       \
-    FILE* f;                                              \
-    f = fopen(name_file, "wb");                           \
-    if (!f) RETURN_ERRS("file %s not open\n", name_file); \
-    fwrite(&n, sizeof(int), 1, f);                        \
-    fwrite(data, sizeof(data[0]), n, f);                  \
-    fclose(f);                                            \
-  }
-
-#define WRITE_FILE_PHYS(name_file, data, value, type, param) \
-  {                                                          \
-    FILE* f;                                                 \
-    int n = data.size();                                     \
-    f = fopen(name_file, "wb");                              \
-    if (!f) RETURN_ERRS("file %s not open\n", name_file);    \
-    fwrite(&n, sizeof(int), 1, f);                           \
-    for (auto& el : data) {                                  \
-      type x = el.value * param;                             \
-      fwrite(&x, sizeof(x), 1, f);                           \
-    }                                                        \
-    fclose(f);                                               \
+/**
+ * @brief Быстрое заполнение структуры с элементами одного типа
+ *
+ */
+#define FILL_STRUCT(st, type, val)                          \
+  {                                                         \
+    type *str = (type *)&st;                                \
+    while (str < (type *)&st + sizeof(st) / sizeof(type)) { \
+      *str++ = val;                                         \
+    }                                                       \
   }
 
 #endif

@@ -1,3 +1,9 @@
+/**
+ * @file reader_bin.h
+ * @brief Чтение бинарных данных
+ *
+ */
+
 #ifndef READER_BIN
 #define READER_BIN
 
@@ -7,7 +13,18 @@
 #include "dbgdef.h"
 #include "geo_types.h"
 
+/*! \addtogroup file_sys Файловый модуль
+    \brief Модуль содержит функции работы с  файлами в различных форматах
+    \note поддерживаются txt, bin, json, vtk форматы
+    @{
+*/
+
 namespace files_sys {
+
+/**
+ * @brief Пространство имён подмодуля бинарных файлов
+ *
+ */
 namespace bin {
 
 /**
@@ -22,8 +39,8 @@ namespace bin {
  * @return size_t - ::e_type_completion
  */
 template <typename T>
-size_t ReadSimple(const std::string& name_file, std::vector<T>& data) {
-  FILE* f;
+size_t ReadSimple(const std::string &name_file, std::vector<T> &data) {
+  FILE *f;
   OPEN_FILE(f, name_file.c_str(), "rb");
 
   int n;
@@ -44,14 +61,14 @@ size_t ReadSimple(const std::string& name_file, std::vector<T>& data) {
  * @return size_t - ::e_type_completion
  */
 template <typename geo_elem>
-size_t ReadGridGeo(const std::string& name_file, std::vector<geo_elem>& data) {
-  FILE* f;
+size_t ReadGridGeo(const std::string &name_file, std::vector<geo_elem> &data) {
+  FILE *f;
   OPEN_FILE(f, name_file.c_str(), "rb");
 
   int n;
   fread(&n, sizeof(int), 1, f);
   data.resize(n);
-  for (auto& el : data) {
+  for (auto &el : data) {
     fread(&el.geo, sizeof(el.geo), 1, f);
   }
   fclose(f);
@@ -67,8 +84,8 @@ size_t ReadGridGeo(const std::string& name_file, std::vector<geo_elem>& data) {
  * @param[out] normals массив структур ::Normals
  * @return int ::e_type_completion
  */
-int ReadNormals(const std::string& name_file_normals,
-                std::vector<Normals>& normals);
+int ReadNormals(const std::string &name_file_normals,
+                std::vector<Normals> &normals);
 
 /**
  * @brief Чтение данных, распределённых по ячейкам сетки
@@ -85,10 +102,10 @@ int ReadNormals(const std::string& name_file_normals,
  * @note массивы могут не заполняться. В зависимости от class_file_vtk.
  * @return int ::e_type_completion
  */
-int ReadData(const size_t class_file_vtk, const std::string& main_dir,
-             std::vector<Type>& density, std::vector<Type>& absorp_coef,
-             std::vector<Type>& rad_en_loose_rate,
-             std::vector<Vector3>& velocity, std::vector<Type>& pressure,
+int ReadData(const size_t class_file_vtk, const std::string &main_dir,
+             std::vector<Type> &density, std::vector<Type> &absorp_coef,
+             std::vector<Type> &rad_en_loose_rate,
+             std::vector<Vector3> &velocity, std::vector<Type> &pressure,
              const bool is_print = false);
 
 #ifdef ILLUM
@@ -100,8 +117,8 @@ int ReadData(const size_t class_file_vtk, const std::string& main_dir,
  * @param[out] grid структура сетки
  * @return int ::e_type_completion
  */
-int ReadData(const solve_mode_t& mode, const std::string& main_dir,
-             grid_t& grid);
+int ReadData(const solve_mode_t &mode, const std::string &main_dir,
+             grid_t &grid);
 
 /**
  * @brief Чтение результатов трассировки.
@@ -118,15 +135,15 @@ int ReadData(const solve_mode_t& mode, const std::string& main_dir,
  * @param[out] vec_res_bound массив с предрасчитамм граничными значениями
  * @return int ::e_type_completion
  */
-int ReadRadiationTrace(const int count_dir, const global_files_t& gbl_files,
-                       std::vector<BasePointTetra>& vec_x,
-                       std::vector<std::vector<int>>& face_states,
-                       std::vector<std::vector<cell_local>>& vec_x0,
-                       std::vector<std::vector<int>>& sorted_id_cell,
-                       std::vector<Type>& vec_res_bound);
-#endif  //! ILLUM
+int ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
+                       std::vector<BasePointTetra> &vec_x,
+                       std::vector<std::vector<int>> &face_states,
+                       std::vector<std::vector<cell_local>> &vec_x0,
+                       std::vector<std::vector<int>> &sorted_id_cell,
+                       std::vector<Type> &vec_res_bound);
+#endif //! ILLUM
 
-}  // namespace bin
-}  // namespace files_sys
+} // namespace bin
+} // namespace files_sys
 
-#endif  //! READER_BIN
+#endif //! READER_BIN

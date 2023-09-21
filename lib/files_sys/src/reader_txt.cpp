@@ -1,7 +1,10 @@
 #include "reader_txt.h"
 
-int ReadSphereDirectionСartesian(const std::string& file_sphere_direction,
-                                 grid_directions_t& grid_direction) {
+namespace files_sys {
+namespace txt {
+
+int ReadSphereDirectionСartesian(const std::string &file_sphere_direction,
+                                 grid_directions_t &grid_direction) {
   std::ifstream ifile;
   OPEN_FSTREAM(ifile, file_sphere_direction.c_str());
 
@@ -22,3 +25,6 @@ int ReadSphereDirectionСartesian(const std::string& file_sphere_direction,
 
   return e_completion_success;
 }
+
+} // namespace txt
+} // namespace files_sys

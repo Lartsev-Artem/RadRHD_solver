@@ -1,3 +1,9 @@
+/**
+ * @file reader_json.h
+ * @brief Чтение json данных
+ *
+ */
+
 #ifndef READER_JSON
 #define READER_JSON
 
@@ -6,8 +12,15 @@
 #include "../json/json_struct.h"
 #include "global_value.h"
 
-
+/*! \addtogroup file_sys Файловый модуль
+    @{
+*/
 namespace files_sys {
+
+/**
+ * @brief Пространство имён подмодуля json файлов
+ *
+ */
 namespace json {
 
 /**
@@ -17,7 +30,7 @@ namespace json {
  * @param[out] st структура путей
  * @return int ::e_type_completion
  */
-int Read(const std::string& file, global_files_t& st);
+int Read(const std::string &file, global_files_t &st);
 
 /**
  * @brief Чтение файла настройкой глобального решателя
@@ -26,7 +39,7 @@ int Read(const std::string& file, global_files_t& st);
  * @param[out] st структура данных
  * @return int ::e_type_completion
  */
-int Read(const std::string& file, solve_mode_t& st);
+int Read(const std::string &file, solve_mode_t &st);
 
 /**
  * @brief Чтение файла настройкой газодинамического решателя
@@ -35,7 +48,7 @@ int Read(const std::string& file, solve_mode_t& st);
  * @param[out] st структура данных
  * @return int ::e_type_completion
  */
-int Read(const std::string& file, hllc_value_t& st);
+int Read(const std::string &file, hllc_value_t &st);
 
 /**
  * @brief Чтение общей конфигурации проекта
@@ -48,9 +61,9 @@ int Read(const std::string& file, hllc_value_t& st);
  * @return int ::e_type_completion
  */
 template <typename file>
-int ReadStartSettings(file file_set, global_files_t& glb_files,
-                      solve_mode_t* solve_mode = nullptr,
-                      hllc_value_t* hllc_conf = nullptr) {
+int ReadStartSettings(file file_set, global_files_t &glb_files,
+                      solve_mode_t *solve_mode = nullptr,
+                      hllc_value_t *hllc_conf = nullptr) {
   if (ReadFileJson(file_set, glb_files)) {
     return e_completion_fail;
   }
@@ -75,6 +88,7 @@ int ReadStartSettings(file file_set, global_files_t& glb_files,
   return e_completion_success;
 }
 
-}  // namespace json
-}  // namespace files_sys
-#endif  // !READER_JSON
+} // namespace json
+} // namespace files_sys
+
+#endif // !READER_JSON

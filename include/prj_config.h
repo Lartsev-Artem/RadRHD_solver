@@ -1,16 +1,28 @@
+/**
+ * @file prj_config.h
+ * @brief Файл конфигурации проекта
+ * @details
+ * Available compiling (make) keys:
+ * @arg CLASTER/LINUX/WINDOWS --- целевая платформа (сборка под кластер/linux/windows)
+ * @arg BUILD_GRAPH           --- собирать модуль построения графов
+ * @arg BUILD_DATA_TO_ILLUM   --- собирать модуль трассировки лучей
+ * @arg SOLVERS               --- собирать модуль решателей
+ * @arg UTILS                 --- собирать модуль утилит
+ * @arg USE_CUDA              --- подключение технологии cuda
+ * @arg USE_MPI               --- подключение технологии mpi
+ * @arg DEBUG                 --- сборка с логами
+ *===============================================================* /
+ * @version 0.1
+ * @date 2023-09-21
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
+
 #ifndef PRJ_CONFIG
 #define PRJ_CONFIG
 
-/* ============== Available compiling (make) keys ===============
- * CLASTER/LINUX/WINDOWS --- целевая платформа (сборка под
- *кластер/linux/windows) BUILD_GRAPH          --- собирать модуль построения
- *графов BUILD_DATA_TO_ILLUM  --- собирать модуль трассировки лучей SOLVERS ---
- *собирать модуль решателей UTILS                --- собирать модуль утилит
- * USE_CUDA             --- подключение технологии cuda
- * USE_MPI              --- подключение технологии mpi
- *===============================================================*/
-
-#define NUMBER_OF_MEASUREMENTS 3  // размерность решателей
+#define NUMBER_OF_MEASUREMENTS 3 ///< размерность решателей
 
 /* ============== Available geometry forms =============== */
 #define Cube
@@ -25,30 +37,29 @@
 
 #if !defined CLASTER && !defined LINUX
 #if !__NVCC__
-//#define USE_VTK	  // использование vtk для вывода результатов в виде
+//#define USE_VTK	  ///< использование vtk для вывода результатов в виде
 //сетки
 #endif
 #endif
 
 #if __NVCC__
-#undef USE_MPI  // компилятор nvcc не поддерживает mpi
+#undef USE_MPI //! компилятор nvcc не поддерживает mpi
 #endif
 
 #if defined BUILD_GRAPH || defined BUILD_DATA_TO_ILLUM
-#define ONLY_GEO_DATA  // конфигурировать только геометричеcкие файлы, без
-                       // трассировки
+#define ONLY_GEO_DATA ///< конфигурировать только геометричеcкие файлы, без трассировки
 #endif
 
 #ifdef DEBUG
 
-#define WRITE_GLOBAL_LOG  // писать лог файл
+#define WRITE_GLOBAL_LOG ///< писать лог файл
 
 #ifdef USE_MPI
-#define WRITE_MPI_LOG  // писать mpi лог файл
+#define WRITE_MPI_LOG // писать mpi лог файл
 #endif
 //#define DEBUG_MPI_RHLLC
 
-#endif  // DEBUG
+#endif // DEBUG
 
 /// \todo: delete it!!!
 // #if defined UTILS && !defined SOLVERS
@@ -74,4 +85,4 @@
 #error "use only one platform!!!"
 #endif
 
-#endif  // PRJ_CONFIG
+#endif // PRJ_CONFIG

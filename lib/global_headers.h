@@ -1,4 +1,4 @@
-#ifndef GLOBAL_HEADERS
+#if 0 // ndef GLOBAL_HEADERS
 #define GLOBAL_HEADERS
 
 #include <inttypes.h>
@@ -18,7 +18,6 @@
 #include <vector>
 
 #include "prj_config.h"
-
 
 #ifdef USE_MPI
 #include "mpi.h"
@@ -47,7 +46,7 @@
 #include <vtk-9.0\vtkUnsignedCharArray.h>
 #include <vtk-9.0\vtkUnstructuredGrid.h>
 
-#endif  // USE_VTK
+#endif // USE_VTK
 
 #if !defined CLASTER && !defined LINUX
 #include <direct.h>
@@ -56,20 +55,19 @@
 #endif
 
 #if defined BUILD_GRAPH
-int RunBuildModule(const std::string& name_file_settings);
-#endif  // BUILD_GRAPH
+int RunBuildModule(const std::string &name_file_settings);
+#endif // BUILD_GRAPH
 
 #if defined BUILD_DATA_TO_ILLUM
 int RunMakeModule(std::string name_file_settings, int a, int b);
-#endif  // BUILD_DATA_TO_ILLUM
+#endif // BUILD_DATA_TO_ILLUM
 
 #if defined SOLVERS
-int RunSolveModule(int argc, char* argv[],
-                   const std::string& name_file_settings);
-#endif  // SOLVERS
+int RunSolveModule(int argc, char *argv[], const std::string &name_file_settings);
+#endif // SOLVERS
 
 #if defined UTILS
-int RunUtilsModule(int argc, char* argv[]);
-#endif  // UTILS
+int RunUtilsModule(int argc, char *argv[]);
+#endif // UTILS
 
-#endif  // GLOBAL_HEADERS
+#endif // GLOBAL_HEADERS

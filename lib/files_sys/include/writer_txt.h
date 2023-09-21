@@ -1,8 +1,18 @@
+/**
+ * @file writer_txt.h
+ * @brief Запись файлов в текстовом формате
+ *
+ */
+
 #ifndef WRITER_TXT
 #define WRITER_TXT
 
 #include <fstream>
 #include <vector>
+
+/*! \addtogroup file_sys Файловый модуль
+    @{
+*/
 
 namespace files_sys {
 namespace txt {
@@ -19,7 +29,7 @@ namespace txt {
  * @return size_t ::e_type_completion
  */
 template <typename Str_Type, typename T>
-size_t WriteSimple(const Str_Type name_file, std::vector<T>& data) {
+size_t WriteSimple(const Str_Type name_file, std::vector<T> &data) {
   std::ofstream ofile;
   OPEN_FSTREAM(ofile, name_file.c_str());
 
@@ -33,6 +43,7 @@ size_t WriteSimple(const Str_Type name_file, std::vector<T>& data) {
   return e_completion_success;
 }
 
-}  // namespace txt
-}  // namespace files_sys
-#endif  // !WRITER_TXT
+} // namespace txt
+} // namespace files_sys
+
+#endif // !WRITER_TXT

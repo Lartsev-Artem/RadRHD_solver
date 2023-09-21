@@ -1,3 +1,10 @@
+/**
+ * @file reader_vtk.h
+ * @brief Чтение vtk данных
+ * @warning требуется подключенная поддержка VTK
+ *
+ */
+
 #include "prj_config.h"
 
 #if (!defined READER_VTK && defined USE_VTK)
@@ -11,8 +18,16 @@
 
 #include "../global_def.h"
 
+/*! \addtogroup file_sys Файловый модуль
+    @{
+*/
 
 namespace files_sys {
+
+/**
+ * @brief Пространство имён подмодуля vtk файлов
+ *
+ */
 namespace vtk {
 
 /**
@@ -25,7 +40,7 @@ namespace vtk {
  * @return int ::e_type_completion
  */
 template <typename vtk_grid>
-int ReadFileVtk(const std::string& name_file, vtkSmartPointer<vtk_grid>& grid) {
+int ReadFileVtk(const std::string &name_file, vtkSmartPointer<vtk_grid> &grid) {
   vtkSmartPointer<vtkGenericDataObjectReader> reader_vtk =
       vtkSmartPointer<vtkGenericDataObjectReader>::New();
   reader_vtk->ReadAllScalarsOn();
@@ -61,28 +76,28 @@ int ReadFileVtk(const std::string& name_file, vtkSmartPointer<vtk_grid>& grid) {
  * @warning имена поля данных задаются в ручную!!!
  */
 template <typename vtk_grid>
-int ReadFileVtk(const size_t class_file_vtk, const std::string& name_file_vtk,
-                vtkSmartPointer<vtk_grid>& unstructured_grid,
-                vtkDataArray*& density, vtkDataArray*& absorp_coef,
-                vtkDataArray*& rad_en_loose_rate, const bool is_print = false) {
+int ReadFileVtk(const size_t class_file_vtk, const std::string &name_file_vtk,
+                vtkSmartPointer<vtk_grid> &unstructured_grid,
+                vtkDataArray *&density, vtkDataArray *&absorp_coef,
+                vtkDataArray *&rad_en_loose_rate, const bool is_print = false) {
   ReadFileVtk(name_file_vtk, unstructured_grid);
 
   switch (class_file_vtk) {
-    case e_grid_cfg_default:
-      density = NULL;
-      absorp_coef = NULL;
-      rad_en_loose_rate = NULL;
-      break;
+  case e_grid_cfg_default:
+    density = NULL;
+    absorp_coef = NULL;
+    rad_en_loose_rate = NULL;
+    break;
 
-    case e_grid_cfg_radiation:
-      density = unstructured_grid->GetCellData()->GetScalars("density");
-      absorp_coef = unstructured_grid->GetCellData()->GetScalars("absorp_coef");
-      rad_en_loose_rate =
-          unstructured_grid->GetCellData()->GetScalars("radEnLooseRate");
-      break;
+  case e_grid_cfg_radiation:
+    density = unstructured_grid->GetCellData()->GetScalars("density");
+    absorp_coef = unstructured_grid->GetCellData()->GetScalars("absorp_coef");
+    rad_en_loose_rate =
+        unstructured_grid->GetCellData()->GetScalars("radEnLooseRate");
+    break;
 
-    default:
-      RETURN_ERR("Bad type vtk\n");
+  default:
+    RETURN_ERR("Bad type vtk\n");
   }
 
   if (is_print) {
@@ -99,7 +114,7 @@ int ReadFileVtk(const size_t class_file_vtk, const std::string& name_file_vtk,
 
   return e_completion_success;
 }
-}  // namespace vtk
-}  // namespace files_sys
+} // namespace vtk
+} // namespace files_sys
 
-#endif  // USE_VTK && !READER_VTK
+#endif // USE_VTK && !READER_VTK

@@ -7,9 +7,9 @@
 static int8_t id = -1;
 static int8_t np = -1;
 
-static void init_value(const MPI_Comm& comm) {
-  MPI_Comm_rank(comm, (int*)&id);
-  MPI_Comm_size(comm, (int*)&np);
+static void init_value(const MPI_Comm &comm) {
+  MPI_Comm_rank(comm, (int *)&id);
+  MPI_Comm_size(comm, (int *)&np);
 }
 
 int8_t get_mpi_id() {
@@ -35,4 +35,4 @@ MPI_Datatype MPI_flux_elem_t;
 #else
 int8_t get_mpi_id() { return 0; }
 int8_t get_mpi_np() { return 1; }
-#endif  // USE_MPI
+#endif // USE_MPI

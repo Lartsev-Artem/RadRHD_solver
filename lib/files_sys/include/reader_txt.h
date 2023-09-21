@@ -1,3 +1,9 @@
+/**
+ * @file reader_txt.h
+ * @brief Чтение текстовых данных
+ *
+ */
+
 #ifndef READER_TXT
 #define READER_TXT
 
@@ -8,7 +14,20 @@
 #include "../global_def.h"
 #include "geo_types.h"
 
+/*! \addtogroup file_sys Файловый модуль
+    @{
+*/
+
+/**
+ * @brief Пространство имён файлового модуля
+ *
+ */
 namespace files_sys {
+
+/**
+ * @brief Пространство имён подмодуля текстовых файлов
+ *
+ */
 namespace txt {
 
 /**
@@ -51,6 +70,7 @@ size_t ReadSimple(const Str_Type name_file, std::vector<T> &data) {
 int ReadSphereDirectionСartesian(const std::string &file_sphere_direction,
                                  grid_directions_t &grid_direction);
 
-}  // namespace txt
-}  // namespace files_sys
-#endif  // !READER_TXT
+} // namespace txt
+} // namespace files_sys
+
+#endif // !READER_TXT

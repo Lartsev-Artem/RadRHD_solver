@@ -8,8 +8,7 @@
 namespace files_sys {
 namespace bin {
 
-int ReadNormals(const std::string &name_file_normals,
-                std::vector<Normals> &normals) {
+int ReadNormals(const std::string &name_file_normals, std::vector<Normals> &normals) {
   FILE *f;
   OPEN_FILE(f, name_file_normals.c_str(), "rb");
 
@@ -35,24 +34,24 @@ int ReadData(const size_t class_file_vtk, const std::string &main_dir,
              std::vector<Vector3> &velocity, std::vector<Type> &pressure,
              const bool is_print /*=false*/) {
   switch (class_file_vtk) {
-    case e_grid_cfg_radiation:
-      ReadSimple(main_dir + F_DENSITY, density);
-      ReadSimple(main_dir + F_ABSORPCOEF, absorp_coef);
-      ReadSimple(main_dir + F_RADLOOSERATE, rad_en_loose_rate);
-      break;
+  case e_grid_cfg_radiation:
+    ReadSimple(main_dir + F_DENSITY, density);
+    ReadSimple(main_dir + F_ABSORPCOEF, absorp_coef);
+    ReadSimple(main_dir + F_RADLOOSERATE, rad_en_loose_rate);
+    break;
 
-    case e_grid_cfg_full_init:
-      ReadSimple(main_dir + F_DENSITY, density);
-      ReadSimple(main_dir + F_ABSORPCOEF, absorp_coef);
-      ReadSimple(main_dir + F_RADLOOSERATE, rad_en_loose_rate);
+  case e_grid_cfg_full_init:
+    ReadSimple(main_dir + F_DENSITY, density);
+    ReadSimple(main_dir + F_ABSORPCOEF, absorp_coef);
+    ReadSimple(main_dir + F_RADLOOSERATE, rad_en_loose_rate);
 
-      ReadSimple(main_dir + F_VELOCITY, velocity);
-      ReadSimple(main_dir + F_PRESSURE, pressure);
-      break;
+    ReadSimple(main_dir + F_VELOCITY, velocity);
+    ReadSimple(main_dir + F_PRESSURE, pressure);
+    break;
 
-    default:
-      printf("Grid without data\n");
-      return e_completion_success;
+  default:
+    printf("Grid without data\n");
+    return e_completion_success;
   }
 
   if (is_print) {
@@ -86,38 +85,38 @@ int ReadData(const size_t class_file_vtk, const std::string &main_dir,
   }
 
 //! Не использовать такую структура чтения!. resize cells не нужен!!!. При
-//! излучении данные распределны по массивам?
+//! излучении данные распределены по массивам?
 int ReadData(const solve_mode_t &mode, const std::string &main_dir,
              grid_t &grid) {
   switch (mode.class_vtk) {
-    case 1:  // test grid
-      READ_FILE((main_dir + "alpha.bin").c_str(), grid.cells, phys_val.d);
-      READ_FILE((main_dir + "alpha.bin").c_str(), grid.cells,
-                illum_val.absorp_coef);
-      READ_FILE((main_dir + "Q.bin").c_str(), grid.cells,
-                illum_val.rad_en_loose_rate);
-      break;
+  case 1: // test grid
+    READ_FILE((main_dir + "alpha.bin").c_str(), grid.cells, phys_val.d);
+    READ_FILE((main_dir + "alpha.bin").c_str(), grid.cells,
+              illum_val.absorp_coef);
+    READ_FILE((main_dir + "Q.bin").c_str(), grid.cells,
+              illum_val.rad_en_loose_rate);
+    break;
 
-    case 2:  // main grid to illum
-      READ_FILE((main_dir + "density.bin").c_str(), grid.cells, phys_val.d);
-      READ_FILE((main_dir + "AbsorpCoef.bin").c_str(), grid.cells,
-                illum_val.absorp_coef);
-      READ_FILE((main_dir + "radEnLooseRate.bin").c_str(), grid.cells,
-                illum_val.rad_en_loose_rate);
-      break;
+  case 2: // main grid to illum
+    READ_FILE((main_dir + "density.bin").c_str(), grid.cells, phys_val.d);
+    READ_FILE((main_dir + "AbsorpCoef.bin").c_str(), grid.cells,
+              illum_val.absorp_coef);
+    READ_FILE((main_dir + "radEnLooseRate.bin").c_str(), grid.cells,
+              illum_val.rad_en_loose_rate);
+    break;
 
-    case 3:  // full_test_grid
-      READ_FILE((main_dir + "density.bin").c_str(), grid.cells, phys_val.d);
-      READ_FILE((main_dir + "alpha.bin").c_str(), grid.cells,
-                illum_val.absorp_coef);
-      READ_FILE((main_dir + "Q.bin").c_str(), grid.cells,
-                illum_val.rad_en_loose_rate);
-      READ_FILE((main_dir + "velocity.bin").c_str(), grid.cells, phys_val.v);
-      READ_FILE((main_dir + "pressure.bin").c_str(), grid.cells, phys_val.p);
-      break;
-    default:
-      printf("Grid without data\n");
-      return 0;
+  case 3: // full_test_grid
+    READ_FILE((main_dir + "density.bin").c_str(), grid.cells, phys_val.d);
+    READ_FILE((main_dir + "alpha.bin").c_str(), grid.cells,
+              illum_val.absorp_coef);
+    READ_FILE((main_dir + "Q.bin").c_str(), grid.cells,
+              illum_val.rad_en_loose_rate);
+    READ_FILE((main_dir + "velocity.bin").c_str(), grid.cells, phys_val.v);
+    READ_FILE((main_dir + "pressure.bin").c_str(), grid.cells, phys_val.p);
+    break;
+  default:
+    printf("Grid without data\n");
+    return 0;
   }
 
   return 0;
@@ -129,7 +128,8 @@ int ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
                        std::vector<std::vector<cell_local>> &vec_x0,
                        std::vector<std::vector<int>> &sorted_id_cell,
                        std::vector<Type> &vec_res_bound) {
-  if (ReadSimple(gbl_files.name_file_x, vec_x)) return e_completion_fail;
+  if (ReadSimple(gbl_files.name_file_x, vec_x))
+    return e_completion_fail;
   if (ReadSimple(gbl_files.name_file_res, vec_res_bound))
     return e_completion_fail;
 
@@ -170,7 +170,7 @@ int ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
 
   return 0;
 }
-#endif  //! ILLUM
+#endif //! ILLUM
 
-}  // namespace bin
-}  // namespace files_sys
+} // namespace bin
+} // namespace files_sys
