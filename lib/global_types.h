@@ -8,8 +8,8 @@
 
 #include <Eigen/Dense>
 
-#include "global_def.h"
-#include "json/json_struct.h"
+//#include "global_def.h"
+//#include "json/json_struct.h"
 
 typedef Eigen::Vector3d Vector3;
 typedef Eigen::Vector2d Vector2;
@@ -55,6 +55,18 @@ enum e_grid_vtk_config_t {
 enum e_type_completion {
   e_completion_success = 0, ///< процесс завершился успешно
   e_completion_fail = 1     ///< процесс завершился с ошибкой
+};
+
+/**
+ * @brief код cuda потока
+ *
+ */
+enum e_cuda_stream_id_t {
+  e_сuda_scattering_1 = 0, ///< первая часть интеграла рассеяния
+  e_сuda_scattering_2 = 1, ///< вторая часть интеграла рассеяния
+  e_сuda_params = 2,       ///<  расчёт физических величин (потоки, импульсы)
+  // e_сuda_sender,
+  e_сuda_count ///< общее число потоков
 };
 
 #endif // GLB_TYPES

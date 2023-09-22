@@ -52,25 +52,26 @@ struct grid_directions_t {
   Type full_area;
 };
 
-struct BasePointTetra  //узлы интерполяции всех тетраэдров // В перспективе
-                       //можно уйти к граням
+struct BasePointTetra //узлы интерполяции всех тетраэдров // В перспективе
+                      //можно уйти к граням
 {
   Vector3 x[CELL_SIZE][NUMBER_OF_MEASUREMENTS];
 
   Vector3 operator()(const int i, const int j) const { return x[i][j]; }
 };
-struct cell_local  // для каждой ячейки и каждого направления
+struct cell_local // для каждой ячейки и каждого направления
 {
-  Type s;      //расстояние x0-x
-  Vector2 x0;  //локальная координата входного узла для интерполяции
-  ShortId in_face_id;  // id выходной грани
+  Type s;             //расстояние x0-x
+  Vector2 x0;         //локальная координата входного узла для интерполяции
+  ShortId in_face_id; // id выходной грани
 
   friend std::ostream &operator<<(std::ostream &out, const cell_local &point);
 };
 
+#include "solvers_types.h"
 struct grid_t {
   struct elem_t {
-    int a;
+    flux_t phys_val;
   };
 
   struct face_t {
@@ -84,4 +85,4 @@ struct grid_t {
   /// \todo all config!
 };
 
-#endif  // GEO_TYPES
+#endif // GEO_TYPES

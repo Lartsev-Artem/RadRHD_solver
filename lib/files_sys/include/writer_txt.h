@@ -7,6 +7,7 @@
 #ifndef WRITER_TXT
 #define WRITER_TXT
 
+#include "dbgdef.h"
 #include <fstream>
 #include <vector>
 

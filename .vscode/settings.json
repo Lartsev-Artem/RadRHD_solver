@@ -152,6 +152,7 @@
     "RHLLC",
     "решателей",
     "nvcc",
-    "namefile"
+    "namefile",
+    "cuda"
   ]
 }

@@ -16,7 +16,7 @@
 #include <vtk-9.1/vtkGenericDataObjectWriter.h>
 #include <vtk-9.1/vtkUnstructuredGrid.h>
 
-#include "../global_def.h"
+#include "global_def.h"
 
 /*! \addtogroup file_sys Файловый модуль
     @{
@@ -66,7 +66,7 @@ int ReadFileVtk(const std::string &name_file, vtkSmartPointer<vtk_grid> &grid) {
  *
  * @tparam vtk_grid тип сетки
  * @param[in] class_file_vtk конфигурация читаемых данных ::e_grid_vtk_config_t
- * @param[in] name_file_vtk полное имя файла с расширением
+ * @param[in] name_file_vtk полное имя файла с расширением vtk
  * @param[out] unstructured_grid сетка
  * @param[out] density массив плотности
  * @param[out] absorp_coef массив коэф. поглащения

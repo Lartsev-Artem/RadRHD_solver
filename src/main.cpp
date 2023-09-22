@@ -1,10 +1,12 @@
 #include <mpi.h>
 
 #include "reader_bin.h"
+#include "writer_bin.h"
 
 int main(int argc, char *argv[]) {
   std::vector<int> a;
   files_sys::bin::ReadSimple("foo.bin", a);
+  files_sys::bin::WriteSimple("build/foo.bin", a);
 
   int rank, size;
   MPI_Init(&argc, &argv);
