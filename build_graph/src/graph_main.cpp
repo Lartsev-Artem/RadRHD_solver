@@ -1,0 +1,208 @@
+#if defined BUILD_GRAPH
+#include "dbgdef.h"
+#include "geo_types.h"
+#include "graph_config.h"
+#include "mpi_ext.h"
+#include "reader_bin.h"
+#include "reader_json.h"
+#include "reader_txt.h"
+#include "writer_bin.h"
+
+#include "graph_calc_no_omp.h"
+#include "graph_init_state.h"
+
+#include <omp.h>
+
+namespace graph {
+
+int RunGraphModule() {
+
+  WRITE_LOG("OMP num_threads: %d\n", omp_get_num_threads());
+
+  int np = get_mpi_np();
+  int myid = get_mpi_id();
+  double t = -omp_get_wtime();
+
+  std::vector<IntId> neighbours;          ///< соседние ячейки
+  std::set<IntId> inter_boundary_face_id; ///< id внутренних граней [i * CELL_SIZE + j]
+  std::vector<Normals> normals;           ///< нормали
+  std::map<IntId, FaceCell> inter_faces;  ///< внутренние грани с ключом-номером ячейки
+  grid_directions_t grid_dir;             ///< сфера направлений
+
+  uint32_t err = 0;
+  err |= files_sys::bin::ReadSimple(glb_files.name_file_neigh, neighbours);
+  err |= files_sys::txt::ReadSimple(glb_files.base_address + F_INTERNAL_BOUND, inter_boundary_face_id);
+  err |= files_sys::bin::ReadNormals(glb_files.base_address + F_NORMALS, normals);
+  err |= files_sys::txt::ReadInitBoundarySetInFaces(glb_files.base_address + F_FACE_ID, inter_faces);
+  err |= files_sys::txt::ReadSphereDirectionСartesian(glb_files.name_file_sphere_direction, grid_dir);
+
+  if (err != 0) {
+    RETURN_ERR("error during reading\n");
+  }
+  t += omp_get_wtime();
+
+  WRITE_LOG("Inner boundary has %d faces\n", inter_boundary_face_id.size());
+  WRITE_LOG("Time reading in main proccess: %lf\n", t);
+
+  t = -omp_get_wtime();
+
+  const int num_cells = normals.size();
+
+  std::vector<State> count_in_face(num_cells, 0);  ///< число входящих граней ячейки
+  std::vector<State> count_def_face(num_cells, 0); ///< число определённых граней ячейки
+  std::vector<IntId> graph(num_cells, 0);          ///< упорядоченный набор ячеек
+
+  std::set<IntId> inner_part; ///< часть граничных ячеек через которые луч покидай расчётную область
+  std::set<IntId> outer_part; ///< часть граничных ячеек через которые луч возвращается в расчётную область
+
+  std::vector<State> faces_state; ///< состояние граней (определена не определена)
+
+  bool flag = true;
+  int count = 0;
+
+#ifdef USE_OMP
+  std::list<IntId> cur_el_OMP;         ///<текущая границы
+  std::vector<IntId> next_step_el_OMP; ///< кандидаты на следующую границу
+#else
+  std::vector<IntId> cur_el;    ///<текущая границы
+  std::set<IntId> next_step_el; ///< кандидаты на следующую границу
+#endif // USE_OMP
+
+#if defined ONLY_ONE_DIRECTION
+  for (int cur_direction = 0; cur_direction < 1; cur_direction++)
+#else
+  for (int cur_direction = myid; cur_direction < grid_dir.size; cur_direction += np)
+#endif // ONLY_ONE_DIRECTION
+  {
+
+    WRITE_LOG("Direction #: %d\n", cur_direction);
+
+    flag = true;
+    InitFacesState(neighbours, inter_faces, faces_state);
+    Vector3 direction = grid_dir.directions[cur_direction].dir;
+
+    DivideInnerBoundary(direction, normals, inter_boundary_face_id, inner_part, outer_part);
+
+    // id_try_surface.clear();
+    // dist_try_surface.clear();
+    // x_try_surface.clear();
+
+    // x_try_surface.reserve(outer_part.size() * 3);
+    // id_try_surface.reserve(outer_part.size() * 3);
+    // dist_try_surface.reserve(outer_part.size() * 3);
+
+    //-------------------------------------
+#ifdef USE_OMP
+    FindNumberOfAllInnerFaceAndKnew(direction, normals, faces_state, count_in_face, count_def_face, next_step_el_OMP);
+#else
+    FindNumberOfAllInAndDefFaces(direction, normals, faces_state, count_in_face, count_def_face, next_step_el);
+#endif // USE_OMP
+       //-------------------------------------
+
+    int count_graph = 0;         // число ячеек вошедших в граф
+    graph.assign(num_cells, -1); // для отлавливания ошибочных направлений
+    bool try_restart = true;
+
+#ifdef USE_OMP
+    while (next_step_el_OMP.size() && flag)
+#else
+    while (next_step_el.size() && flag)
+#endif // USE_OMP
+    {
+
+#ifdef USE_OMP
+
+#ifdef GRID_WITH_INNER_BOUNDARY
+      IntId id_cell = FindCurCellWithHole(next_step_el_OMP, count_in_face, count_def_face, cur_el_OMP, inner_part, outter_part,
+                                          inter_faces, neighbours, direction, normals);
+#else
+      IntId id_cell = FindCurCell(next_step_el_OMP, count_in_face, count_def_face, cur_el_OMP);
+#endif // GRID_WITH_INNER_BOUNDARY
+
+#else // no use omp
+
+#ifdef GRID_WITH_INNER_BOUNDARY
+      IntId id_cell = FindCurCellWithHole(next_step_el, count_in_face, count_def_face, cur_el, inner_part, outter_part,
+                                          inter_faces, neighbours, direction, normals);
+#else
+      IntId id_cell = FindCurFront(next_step_el, count_in_face, count_def_face, cur_el);
+#endif // GRID_WITH_INNER_BOUNDARY
+#endif // USE_OMP
+
+      if (id_cell != e_completion_success) {
+        WRITE_LOG("Warning proc: %d, dir= %d, processed %d cells", myid, cur_direction, count_graph);
+        flag = false; // break;
+      }
+
+#ifdef USE_OMP
+
+      NewStep(neighbours, count_in_face, count_def_face, cur_el_OMP, next_step_el_OMP);
+
+      for (auto el : cur_el_OMP) {
+        graph[count_graph] = el;
+        count_graph++;
+      }
+#else
+      NewStep(neighbours, count_in_face, cur_el, count_def_face, next_step_el);
+
+      for (auto el : cur_el) {
+        graph[count_graph] = el;
+        count_graph++;
+      }
+#endif // USE_OMP
+
+      if (count_graph < graph.size() && next_step_el.size() == 0 && try_restart) {
+        try_restart = !try_restart;
+
+        flag = true;
+
+#ifdef GRID_WITH_INNER_BOUNDARY
+        if (outer_part.size() != 0) {
+          cur_el.clear();
+          next_step_el.clear();
+          next_step_el.insert(outer_part.begin(), outer_part.end());
+
+          //пытаться определять внутреннюю границу до последнего
+          static int cc = 0;
+          if (cc++ < 10)
+            try_restart = !try_restart;
+
+          WRITE_LOG("Warning! try_short_restart %d dir\n", cur_direction);
+          continue;
+        }
+#endif // GRID_WITH_INNER_BOUNDARY
+
+        WRITE_LOG("Warning! try_restart %d dir\n", cur_direction);
+
+        cur_el.clear();
+        next_step_el.clear();
+
+        for (int i = 0; i < num_cells; i++) {
+          if (count_in_face[i] > count_def_face[i]) {
+            next_step_el.emplace(i); // ячейка была изменена, проверить ее готовность на следующем шаге
+          }
+        }
+      } // restart block
+
+    } // while
+
+    DIE_IF_ACTION(count_graph < graph.size(), WRITE_LOG_ERR("Error size graph[%d] %d\n", cur_direction, count_graph));
+
+    try_restart = !try_restart;
+
+    if (files_sys::bin::WriteSimple(glb_files.graph_address + std::to_string(cur_direction) + ".bin", graph)) {
+      RETURN_ERR("file_graph is not opened for writing\n");
+    }
+
+    WRITE_LOG("Id_proc: %d. Graph construction in the direction %d is completed, t= %lf c. \n", myid, cur_direction,
+              t + omp_get_wtime());
+  }
+
+  t += omp_get_wtime();
+  WRITE_LOG("Full time: %lf\n", t);
+
+  return e_completion_success;
+}
+
+} // namespace graph
+#endif //! BUILD_GRAPH

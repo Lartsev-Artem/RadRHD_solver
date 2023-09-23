@@ -25,19 +25,19 @@
 #define NUMBER_OF_MEASUREMENTS 3 ///< размерность решателей
 
 /* ============== Available geometry forms =============== */
-#define Cube
-#define Step
-#define Cone
-#define Cone_JET
-#define Sphere
-#define Cylinder
+#define Cube 1
+#define Step 2
+#define Cone 3
+#define Cone_JET 4
+#define Sphere 5
+#define Cylinder 6
 /*=======================================================*/
 
 #define GEOMETRY_TYPE Sphere
 
-#if !defined CLASTER && !defined LINUX
+#if !defined CLASTER
 #if !__NVCC__
-//#define USE_VTK	  ///< использование vtk для вывода результатов в виде
+#define USE_VTK ///< использование vtk для вывода результатов в виде
 //сетки
 #endif
 #endif
@@ -47,7 +47,7 @@
 #endif
 
 #if defined BUILD_GRAPH || defined BUILD_DATA_TO_ILLUM
-#define ONLY_GEO_DATA ///< конфигурировать только геометричеcкие файлы, без трассировки
+//#define ONLY_GEO_DATA ///< конфигурировать только геометричеcкие файлы, без трассировки
 #endif
 
 #ifdef DEBUG

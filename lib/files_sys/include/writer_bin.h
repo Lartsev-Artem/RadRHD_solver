@@ -91,6 +91,15 @@ int WriteGridGeo(const std::string &name_file, const std::vector<geo_elem> &data
 }
 
 /**
+ * @brief Запись структуры нормалей в файл
+ *
+ * @param[in] name_file_normals полное имя файла с расширением
+ * @param[in] normals
+ * @return int ::e_type_completion
+ */
+int WriteNormals(const std::string &name_file_normals, std::vector<Normals> &normals);
+
+/**
  * @brief Запись файлов решения
  *
  * @param[in] main_dir путь к выходной директории

@@ -1,4 +1,5 @@
 #include "reader_txt.h"
+#include <map>
 
 namespace files_sys {
 namespace txt {
@@ -23,6 +24,26 @@ int ReadSphereDirectionСartesian(const std::string &file_sphere_direction,
   ifile >> grid_direction.full_area;
   ifile.close();
 
+  return e_completion_success;
+}
+
+int ReadInitBoundarySetInFaces(const std::string &file_face_id, std::map<IntId, FaceCell> &inter_faces) {
+
+  std::ifstream ifile;
+  OPEN_FSTREAM(ifile, file_face_id.c_str());
+
+  int N;
+  ifile >> N;
+
+  inter_faces.clear();
+
+  FaceCell face;
+  for (int i = 0; i < N; ++i) {
+    ifile >> face;
+    inter_faces.emplace(face.face_id / 4, face);
+  }
+
+  ifile.close();
   return e_completion_success;
 }
 

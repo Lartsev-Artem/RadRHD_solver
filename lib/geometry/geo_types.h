@@ -14,6 +14,7 @@ typedef Eigen::Matrix4d Matrix4;
 typedef Eigen::MatrixXd MatrixX;
 typedef double Type;
 typedef uint8_t ShortId;
+typedef int IntId;
 
 ///\todo: d в новый файл  с классами
 struct Normals {
@@ -32,6 +33,10 @@ struct Face {
     C = face.C;
     return *this;
   }
+
+  Vector3 &operator[](const int i) {
+    return *((Vector3 *)((uint8_t *)&A + sizeof(Vector3) * i));
+  }
 };
 
 struct FaceCell {
@@ -40,6 +45,8 @@ struct FaceCell {
   FaceCell(const int id = 0, const Face &face_init = Face())
       : face_id(id), face(face_init) {}
 };
+std::ostream &operator<<(std::ostream &os, const FaceCell &f);
+std::istream &operator>>(std::istream &is, FaceCell &f);
 
 struct direction_s {
   Vector3 dir;
@@ -83,6 +90,26 @@ struct grid_t {
   std::vector<face_t> faces;
 
   /// \todo all config!
+};
+
+/**
+ * @brief Тип соседней ячейки к грани текущей
+ * @note величины от 0 до N обозначают номер соседнего элемента
+ *
+ */
+enum e_neighbor_code_t {
+  e_neigh_code_undef = -5,     ///< сосед не определён
+  e_neigh_code_in_bound = -2,  ///< внутрення граница области
+  e_neigh_code_out_bound = -1, ///< внешняя граница
+};
+
+/**
+ * @brief тип грани ячейки по отношению к направлению
+ *
+ */
+enum e_face_in_out_type_t {
+  e_face_type_out = 0, /// <выходящая грань
+  e_face_type_in = 1   ///< входящая грань
 };
 
 #endif // GEO_TYPES

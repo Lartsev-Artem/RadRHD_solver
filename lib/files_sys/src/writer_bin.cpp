@@ -13,6 +13,20 @@
 namespace files_sys {
 namespace bin {
 
+int WriteNormals(const std::string &name_file_normals, std::vector<Normals> &normals) {
+  FILE *f;
+  OPEN_FILE(f, name_file_normals.c_str(), "wb");
+
+  int n = normals.size();
+  fwrite(&n, sizeof(int), 1, f);
+  for (size_t i = 0; i < n; i++) {
+    for (size_t j = 0; j < CELL_SIZE; j++) {
+      fwrite(&normals[i].n[j], sizeof(Vector3), 1, f);
+    }
+  }
+  fclose(f);
+}
+
 // поэлементная запись данных в файл
 #define WRITE_FILE_ELEM(name_file, data, value)  \
   {                                              \

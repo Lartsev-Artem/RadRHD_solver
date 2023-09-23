@@ -4,6 +4,9 @@
 #include "writer_bin.h"
 
 int main(int argc, char *argv[]) {
+
+  remove((std::string(glb_files.base_address) + F_LOG).c_str());
+
   std::vector<int> a;
   files_sys::bin::ReadSimple("foo.bin", a);
   files_sys::bin::WriteSimple("build/foo.bin", a);

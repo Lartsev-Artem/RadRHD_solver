@@ -23,11 +23,11 @@ constexpr double kGamma_g = kGamma1 / (kGamma1 - 1);
 
 //! (в случае сплошной области задаётся так, чтобы сфера не пересекала расчётную область)
 #ifdef Sphere
-const Vector3 center_point(0, 0, 0);  ///< центр внутренней сферы на сетке
-constexpr double inner_radius = 0.51; ///< радиус внутренней сферы (с запасом)
+const Vector3 kCenterPoint(0, 0, 0);     ///< центр внутренней сферы на сетке
+constexpr double kInternalRadius = 0.51; ///< радиус внутренней сферы (с запасом)
 #else
-const Vector3 center_point(10, 0, 0); ///< центр внутренней сферы на сетке
-constexpr double inner_radius = 0.12; ///< радиус внутренней сферы (с запасом)
+const Vector3 kCenterPoint(10, 0, 0);    ///< центр внутренней сферы на сетке
+constexpr double kInternalRadius = 0.12; ///< радиус внутренней сферы (с запасом)
 #endif
 
 constexpr double kEarthMass = (5.9722 * 1e25); ///< масса Земли в кг
@@ -71,9 +71,9 @@ constexpr double m_hydrogen = 1.6735575 * 1e-27; ///< масса водород�
 #define F_GRAPH "graph"
 #define F_CENTERS "centers.bin"
 #define F_NORMALS "normals.bin"
-#define F_SQUARES "squares.bin"
+#define F_AREAS "areas.bin"
 #define F_VOLUME "volume.bin"
-
+#define F_NEIGHBOR "neighbors.bin"
 #define F_CENTER_FACE "center_face.bin"
 
 #define F_X0_LOC "LocX0"
@@ -84,7 +84,11 @@ constexpr double m_hydrogen = 1.6735575 * 1e-27; ///< масса водород�
 #define F_DIST_TRY "dist_defining_faces"
 #define F_ID_TRY "id_defining_faces"
 #define F_RES "ResBound"
-#define F_NEIB "pairs.bin"
+
+//-------Файлы для построения графа --------------------//
+#define F_INTERNAL_BOUND "internal_boundary.txt"
+#define F_INIT_BOUND "init_boundary.txt"
+#define F_FACE_ID "face_id.txt"
 
 //--------------------------Файлы геометрии-----------------------------//
 #define F_GEO_FACES "geo_faces.bin"

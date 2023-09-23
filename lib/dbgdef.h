@@ -51,6 +51,11 @@
   if (_cond)          \
     D_LD;
 
+#define DIE_IF_ACTION(_cond, _act) \
+  _act;                            \
+  if (_cond)                       \
+    D_LD;
+
 /**
  * @brief Лог ошибок. вывод в файл
  * \note Лог ошибок включен всегда
@@ -104,12 +109,14 @@
  * @brief Вывод лога в отдельный для каждого узла файл
  *
  */
-#define WRITE_LOG(str)                                            \
+#define WRITE_LOG(...)                                            \
   {                                                               \
+    char buf[1024];                                               \
+    sprintf(buf, __VA_ARGS__);                                    \
     std::ofstream ofile;                                          \
     ofile.open(Files_log + std::to_string(get_mpi_id()) + ".txt", \
                std::ios::app);                                    \
-    ofile << str;                                                 \
+    ofile << buf;                                                 \
     ofile.close();                                                \
   }
 
@@ -126,5 +133,5 @@
 #endif // WRITE_GLOBAL_LOG
 
 //#undef Files_log
-#undef WRITE_POS
+// #undef WRITE_POS
 #endif // DBG_DEF

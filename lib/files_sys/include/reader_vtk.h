@@ -40,7 +40,7 @@ namespace vtk {
  * @return int ::e_type_completion
  */
 template <typename vtk_grid>
-int ReadFileVtk(const std::string &name_file, vtkSmartPointer<vtk_grid> &grid) {
+int Read(const std::string &name_file, vtkSmartPointer<vtk_grid> &grid) {
   vtkSmartPointer<vtkGenericDataObjectReader> reader_vtk =
       vtkSmartPointer<vtkGenericDataObjectReader>::New();
   reader_vtk->ReadAllScalarsOn();
@@ -76,11 +76,11 @@ int ReadFileVtk(const std::string &name_file, vtkSmartPointer<vtk_grid> &grid) {
  * @warning имена поля данных задаются в ручную!!!
  */
 template <typename vtk_grid>
-int ReadFileVtk(const size_t class_file_vtk, const std::string &name_file_vtk,
-                vtkSmartPointer<vtk_grid> &unstructured_grid,
-                vtkDataArray *&density, vtkDataArray *&absorp_coef,
-                vtkDataArray *&rad_en_loose_rate, const bool is_print = false) {
-  ReadFileVtk(name_file_vtk, unstructured_grid);
+int Read(const size_t class_file_vtk, const std::string &name_file_vtk,
+         vtkSmartPointer<vtk_grid> &unstructured_grid,
+         vtkDataArray *&density, vtkDataArray *&absorp_coef,
+         vtkDataArray *&rad_en_loose_rate, const bool is_print = false) {
+  Read(name_file_vtk, unstructured_grid);
 
   switch (class_file_vtk) {
   case e_grid_cfg_default:

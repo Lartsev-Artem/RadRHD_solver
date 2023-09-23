@@ -131,7 +131,7 @@ struct global_files_t {
   std::string name_file_dist_try;
   std::string name_file_id_try;
   std::string name_file_res;
-  std::string name_file_neib;
+  std::string name_file_neigh;
 
 #if 0
 	//--------------------------Файлы сдвигов по направлениям в расчётных файлах---------------------//

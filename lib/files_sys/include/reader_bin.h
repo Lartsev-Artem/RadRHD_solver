@@ -84,8 +84,7 @@ size_t ReadGridGeo(const std::string &name_file, std::vector<geo_elem> &data) {
  * @param[out] normals массив структур ::Normals
  * @return int ::e_type_completion
  */
-int ReadNormals(const std::string &name_file_normals,
-                std::vector<Normals> &normals);
+int ReadNormals(const std::string &name_file_normals, std::vector<Normals> &normals);
 
 /**
  * @brief Чтение данных, распределённых по ячейкам сетки

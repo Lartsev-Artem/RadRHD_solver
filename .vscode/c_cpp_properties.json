@@ -1,24 +1,26 @@
 {
-  "configurations": [
-    {
-      "name": "linux-clang-x64",
-      "includePath": [
-        "${workspaceFolder}/**",
-        "${workspaceFolder}/include",
-        "/usr/lib/x86_64-linux-gnu/openmpi/include"
-      ],
-      "defines": [
-        "DEBUG",
-        "LINUX",
-        "SOLVERS",
-        "USE_MPI"
-      ],
-      "compilerPath": "/usr/bin/mpic++",
-      "cStandard": "c17",
-      "cppStandard": "gnu++17",
-      "intelliSenseMode": "linux-clang-x64",
-      "configurationProvider": "ms-vscode.makefile-tools"
-    }
-  ],
-  "version": 4
+    "configurations": [
+        {
+            "name": "linux-clang-x64",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "/usr/lib/x86_64-linux-gnu/openmpi/include",
+                "/usr/include/vtk-9.1"
+            ],
+            "defines": [
+                "BUILD_GRAPH",
+                "DEBUG",
+                "LINUX",
+                "SOLVERS",
+                "USE_MPI"
+            ],
+            "compilerPath": "/usr/bin/mpic++",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-clang-x64",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        }
+    ],
+    "version": 4
 }
