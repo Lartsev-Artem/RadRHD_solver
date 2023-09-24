@@ -11,10 +11,10 @@
 
 #define READER_VTK
 
-#include <vtk-9.1/vtkCellData.h>
-#include <vtk-9.1/vtkGenericDataObjectReader.h>
-#include <vtk-9.1/vtkGenericDataObjectWriter.h>
-#include <vtk-9.1/vtkUnstructuredGrid.h>
+#include <vtkCellData.h>
+#include <vtkGenericDataObjectReader.h>
+#include <vtkGenericDataObjectWriter.h>
+#include <vtkUnstructuredGrid.h>
 
 #include "global_def.h"
 
@@ -51,8 +51,7 @@ int Read(const std::string &name_file, vtkSmartPointer<vtk_grid> &grid) {
     grid = reader_vtk->GetUnstructuredGridOutput();
     grid->Modified();
   } else {
-    RETURN_ERR("Error read file_vtk\n file: %s is not UnstructuredGrid\n",
-               name_file_vtk.c_str());
+    RETURN_ERR("Error read file_vtk\n file: %s is not UnstructuredGrid\n", name_file.c_str());
   }
 
   reader_vtk->GetOutput()->GlobalReleaseDataFlagOn();

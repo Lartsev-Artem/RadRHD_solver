@@ -71,7 +71,7 @@ size_t ReadSimple(const Str_Type name_file, std::vector<T> &data) {
 template <typename Str_Type, typename T>
 size_t ReadSimple(const Str_Type name_file, std::set<T> &data) {
   std::ifstream ifile;
-  OPEN_FSTREAM(ifile, name_file);
+  OPEN_FSTREAM(ifile, std::string(name_file).c_str());
 
   int size;
   T buf;

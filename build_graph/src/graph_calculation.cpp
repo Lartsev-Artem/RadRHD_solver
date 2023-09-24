@@ -1,4 +1,4 @@
-#ifdef BUILD_GRAPH
+#if 0 // def BUILD_GRAPH
 #include "graph_calculation.h"
 #include "graph_struct.h"
 #include "intersections.h"
@@ -98,6 +98,7 @@ static int FindIdCellInBoundary(const Vector3 &direction,
 
   return 0;
 }
+
 int FindInAndOutFaces(const Vector3 &direction, const int number_cell, const std::vector<Normals> &normals, std::bitset<4> &face_state) {
   // face_state  -0=> выходящая грань,  1=> входящая  face_state.size=4!!!
 
@@ -175,8 +176,8 @@ int FindCurCellWithHole(const std::vector<IntId> &next_step_el, const std::vecto
 
   if (cur_el.size() == 0) {
 
-    // плохо, но как есть. Если не смогли найти ни одну ячейку кандидата \
-		попробовать пройти отдельно по внутренней границе,
+    // плохо, но как есть. Если не смогли найти ни одну ячейку кандидата 
+		//попробовать пройти отдельно по внутренней границе,
 
     std::list<IntId> buf_erase;
 
@@ -368,8 +369,8 @@ int FindCurCellWithHole(const std::set<IntId> &next_step_el, const std::vector<I
 
   if (cur_el.size() == 0) {
 
-    // плохо, но как есть. Если не смогли найти ни одну ячейку кандидата \
-		попробовать пройти отдельно по внутренней границе,
+    // плохо, но как есть. Если не смогли найти ни одну ячейку кандидата 
+		//попробовать пройти отдельно по внутренней границе,
 
     std::list<IntId> buf_erase;
 

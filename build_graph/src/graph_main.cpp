@@ -41,7 +41,7 @@ int RunGraphModule() {
   }
   t += omp_get_wtime();
 
-  WRITE_LOG("Inner boundary has %d faces\n", inter_boundary_face_id.size());
+  WRITE_LOG("Inner boundary has %d faces\n", (int)inter_boundary_face_id.size());
   WRITE_LOG("Time reading in main proccess: %lf\n", t);
 
   t = -omp_get_wtime();
@@ -106,7 +106,7 @@ int RunGraphModule() {
 #ifdef USE_OMP
     while (next_step_el_OMP.size() && flag)
 #else
-    while (next_step_el.size() && flag)
+    while (next_step_el.size())
 #endif // USE_OMP
     {
 
@@ -122,16 +122,20 @@ int RunGraphModule() {
 #else // no use omp
 
 #ifdef GRID_WITH_INNER_BOUNDARY
-      IntId id_cell = FindCurCellWithHole(next_step_el, count_in_face, count_def_face, cur_el, inner_part, outter_part,
-                                          inter_faces, neighbours, direction, normals);
+      int cur_ret = FindCurFrontWithHole(direction, normals, inter_faces, next_step_el,
+                                         count_in_face, inner_part, cur_el, count_def_face, outer_part);
 #else
-      IntId id_cell = FindCurFront(next_step_el, count_in_face, count_def_face, cur_el);
+      int cur_ret = FindCurFront(next_step_el, count_in_face, count_def_face, cur_el);
 #endif // GRID_WITH_INNER_BOUNDARY
 #endif // USE_OMP
 
-      if (id_cell != e_completion_success) {
+      if (cur_ret != e_completion_success) {
         WRITE_LOG("Warning proc: %d, dir= %d, processed %d cells", myid, cur_direction, count_graph);
-        flag = false; // break;
+
+        if (TryRestart(count_in_face, count_def_face, outer_part, cur_el, next_step_el) == e_completion_success) {
+          WRITE_LOG("\n\n Warning!!! try_restart %d \n\n", cur_direction);
+          continue;
+        }
       }
 
 #ifdef USE_OMP
@@ -150,39 +154,6 @@ int RunGraphModule() {
         count_graph++;
       }
 #endif // USE_OMP
-
-      if (count_graph < graph.size() && next_step_el.size() == 0 && try_restart) {
-        try_restart = !try_restart;
-
-        flag = true;
-
-#ifdef GRID_WITH_INNER_BOUNDARY
-        if (outer_part.size() != 0) {
-          cur_el.clear();
-          next_step_el.clear();
-          next_step_el.insert(outer_part.begin(), outer_part.end());
-
-          //пытаться определять внутреннюю границу до последнего
-          static int cc = 0;
-          if (cc++ < 10)
-            try_restart = !try_restart;
-
-          WRITE_LOG("Warning! try_short_restart %d dir\n", cur_direction);
-          continue;
-        }
-#endif // GRID_WITH_INNER_BOUNDARY
-
-        WRITE_LOG("Warning! try_restart %d dir\n", cur_direction);
-
-        cur_el.clear();
-        next_step_el.clear();
-
-        for (int i = 0; i < num_cells; i++) {
-          if (count_in_face[i] > count_def_face[i]) {
-            next_step_el.emplace(i); // ячейка была изменена, проверить ее готовность на следующем шаге
-          }
-        }
-      } // restart block
 
     } // while
 

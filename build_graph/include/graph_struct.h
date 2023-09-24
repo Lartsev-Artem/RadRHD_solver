@@ -15,28 +15,12 @@
  */
 namespace graph {
 
-extern std::vector<int> id_try_surface;            // id граней, определяющих внутренюю границу
-extern std::vector<double> dist_try_surface;       // расстояния между точками (через полость внутри)
-extern std::vector<Eigen::Vector3d> x_try_surface; // x точка выхода
-
-extern uint64_t id_try_size;
-extern uint64_t dist_try_size;
-extern uint64_t x_try_size;
-
-struct try_solve_t {
-  int id_1;
-  int id_2;
-  int id_3;
-
-  double s_1;
-  double s_2;
-  double s_3;
-
-  Eigen::Vector3d x1;
-  Eigen::Vector3d x2;
-  Eigen::Vector3d x3;
+struct boundary_trace_t {
+  int id[3];            ///< номер грани в глобальной индексации, определяющей i-ый узел граничной грани
+  double s[3];          ///< расстояние пройденное лучём от определяющей точки
+  Eigen::Vector3d x[3]; ///< точка определяющей грани (в глобальных координатах)
 };
-extern try_solve_t buf_try;
+extern std::vector<boundary_trace_t> bound_trace;
 
 /**
  * @brief код состояние грани

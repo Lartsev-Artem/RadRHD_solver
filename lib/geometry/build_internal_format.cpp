@@ -112,7 +112,7 @@ static int WriteNormalAndAreas(const std::string &name_file_normals, const std::
 
   std::vector<Normals> normals;
   std::vector<Type> areas;
-#ifdef NUMBER_OF_MEASUREMENTS == 3
+#if NUMBER_OF_MEASUREMENTS == 3
   if (GetNormalAndAreas3D(unstructured_grid, normals, areas))
 #elif NUMBER_OF_MEASUREMENTS == 2
   if (GetNormalAndAreas3D(unstructured_grid, normals, areas))
@@ -130,7 +130,7 @@ static int WriteVolume(const std::string name_file_volume, vtkSmartPointer<vtkUn
 
   std::vector<Type> volumes;
 
-#ifdef NUMBER_OF_MEASUREMENTS == 3
+#if NUMBER_OF_MEASUREMENTS == 3
   if (GetVolume3D(unstructured_grid, volumes))
 #elif NUMBER_OF_MEASUREMENTS == 2
   if (GetVolume2D(unstructured_grid, volumes))
@@ -144,7 +144,7 @@ static int WriteCentersOfCells(const std::string name_file_centers, const vtkSma
 
   std::vector<Vector3> centers;
 
-#ifdef NUMBER_OF_MEASUREMENTS == 3
+#if NUMBER_OF_MEASUREMENTS == 3
   if (GetCentersOfCells3D(unstructured_grid, centers))
 #elif NUMBER_OF_MEASUREMENTS == 2
   if (GetCentersOfCells2D(unstructured_grid, centers))

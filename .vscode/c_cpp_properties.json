@@ -6,7 +6,18 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/include",
                 "/usr/lib/x86_64-linux-gnu/openmpi/include",
-                "/usr/include/vtk-9.1"
+                "/home/artem/projects/VTK9.3/VTK/Common/Core",
+                "/home/artem/projects/VTK9.3/VTK/Common/DataModel",
+                "/home/artem/projects/VTK9.3/VTK/Utilities/KWIML",
+                "/home/artem/projects/VTK9.3/VTK/IO/Legacy",
+                "/home/artem/projects/VTK9.3/VTK/Common/ExecutionModel",
+                "/home/artem/projects/VTK9.3/VTK/IO/Core",
+                "/home/artem/projects/VTK9.3/VTK-build/Common/Core",
+                "/home/artem/projects/VTK9.3/VTK-build/Common/DataModel",
+                "/home/artem/projects/VTK9.3/VTK-build/Utilities/KWSys",
+                "/home/artem/projects/VTK9.3/VTK-build/IO/Legacy",
+                "/home/artem/projects/VTK9.3/VTK-build/Common/ExecutionModel",
+                "/home/artem/projects/VTK9.3/VTK-build/IO/Core"
             ],
             "defines": [
                 "BUILD_GRAPH",
@@ -20,7 +31,7 @@
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-clang-x64",
             "configurationProvider": "ms-vscode.makefile-tools"
-        }
+        },
     ],
     "version": 4
 }

@@ -14,8 +14,8 @@
 #include <set>
 #include <vector>
 
-#include <vtk-9.1/vtkSmartPointer.h>
-#include <vtk-9.1/vtkUnstructuredGrid.h>
+#include <vtkSmartPointer.h>
+#include <vtkUnstructuredGrid.h>
 
 #include "geo_types.h"
 

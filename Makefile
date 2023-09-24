@@ -1,9 +1,9 @@
 # defining project config 
-DEFCONF 		= CLASTER SOLVERS #USE_CUDA #BUILD MAKE
+DEFCONF 		= SOLVERS BUILD_GRAPH USE_MPI DEBUG LINUX
 
 # defining working directories
-SRCDIR          = src lib/files_sys/src lib/geometry lib/mpi_extension lib/json
-INCLUDESDIR     = include lib lib/json lib/files_sys/include lib/Eigen lib/geometry lib/mpi_extension lib/solvers_types
+SRCDIR          = src lib/files_sys/src lib/geometry lib/mpi_extension lib/json build_graph/src
+INCLUDESDIR     = include lib lib/json lib/files_sys/include lib/Eigen lib/geometry lib/mpi_extension lib/solvers_types build_graph/include
 BUILDDIR        = build
 OBJDIR          = $(BUILDDIR)/objs
 
@@ -28,7 +28,7 @@ DEF_SET 		= $(addprefix -D , $(DEFCONF))
 #######################################################################
 
 CXX             = mpic++
-CPPFLAGS        = $(DEF_SET)  #-fPIE -Ofast -fopenmp
+CPPFLAGS        = $(DEF_SET) -fopenmp #-fPIE -Ofast -fopenmp
 CXXFLAGS        = -g #-Wall -Wextra -std=c++11
 
 NVCC 				= nvcc

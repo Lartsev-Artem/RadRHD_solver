@@ -3,9 +3,13 @@
 #include "reader_bin.h"
 #include "writer_bin.h"
 
+#include "build_internal_format.h"
+
 int main(int argc, char *argv[]) {
 
   remove((std::string(glb_files.base_address) + F_LOG).c_str());
+
+  BuildDataFromVTK(glb_files);
 
   std::vector<int> a;
   files_sys::bin::ReadSimple("foo.bin", a);

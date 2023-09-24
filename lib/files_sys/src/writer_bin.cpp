@@ -25,6 +25,8 @@ int WriteNormals(const std::string &name_file_normals, std::vector<Normals> &nor
     }
   }
   fclose(f);
+
+  return e_completion_success;
 }
 
 // поэлементная запись данных в файл

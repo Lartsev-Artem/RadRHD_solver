@@ -1,5 +1,6 @@
 #ifdef BUILD_GRAPH
 #include "graph_calculation.h"
+#include "graph_config.h"
 #include "graph_struct.h"
 #include "intersections.h"
 
@@ -9,14 +10,28 @@ namespace graph {
 
 #ifdef GRID_WITH_INNER_BOUNDARY
 namespace in = intersection;
-static int FindIdCellInBoundary(const Vector3 &direction,
-                                const std::set<IntId> &inner_bound,
-                                const std::map<IntId, FaceCell> &inner_cells,
-                                const std::vector<Normals> &normals,
-                                const int cur_cell, int *id) {
+
+/**
+ * @brief Функция ищет пересечения луча из выходящей части внутренней границы с входящей
+ *
+ * @param[in] out_cell номер ячейки на выходящей части
+ * @param[in] direction направление
+ * @param[in] inner_part часть определяющей границы
+ * @param[in] inner_faces все граничные грани(внутренней границы)
+ * @param[in] normals нормали
+ * @param[out] trace параметры луча
+ * @return int число найденных пересечений
+ * @warning не проверят известна ли inner_part на данный момент. Проверяет только геометрию
+ */
+static int FindCellOnInnerPartBoundary(const int out_cell,
+                                       const Vector3 &direction,
+                                       const std::set<IntId> &inner_part,
+                                       const std::map<IntId, FaceCell> &inner_faces,
+                                       const std::vector<Normals> &normals,
+                                       boundary_trace_t &trace) {
 
   // вершины треугольника.
-  Face face = inner_cells.find(cur_cell)->second.face;
+  Face face = inner_faces.find(out_cell)->second.face;
   Vector3 P1(face.A.data());
   Vector3 P2(face.B.data());
   Vector3 P3(face.C.data());
@@ -27,180 +42,96 @@ static int FindIdCellInBoundary(const Vector3 &direction,
   Vector3 P33 = (P2 + P1) / 2;
 
   // точки на медианах
-  Vector3 vertex1 = P1 + (P11 - P1) / 3;
-  Vector3 vertex2 = P2 + (P22 - P2) / 3;
-  Vector3 vertex3 = P3 + (P33 - P3) / 3;
+  Vector3 vertex[3] = {P1 + (P11 - P1) / 3,
+                       P2 + (P22 - P2) / 3,
+                       P3 + (P33 - P3) / 3};
 
-  // ищем пересечения vertex->direction c гранями внутренней границы
-  // Vector3 intersect_point1;  //buf_try.x1
-  // Vector3 intersect_point2;  //buf_try.x2
-  // Vector3 intersect_point3;  //buf_try.x3
+  int count_intersection = 0;
 
-  FaceCell plane_face;
-  for (auto &in_id : inner_bound) {
-    plane_face = inner_cells.find(in_id)->second;
-    in::IntersectionWithPlane(plane_face.face, vertex1, direction, buf_try.x1);
-    if (in::InTriangle(plane_face.face_id, plane_face.face, normals[in_id], buf_try.x1))
-    // if (in_id != cur_cell && ((intersect_point - vertex1).dot(direction) < 0))
-    {
-      /*	std::bitset<4>id;
-              FindInAndOutFaces(direction, in_id, normals, id);
-              if (id[plane_face.face_id % 4] == 0) break;*/
+  /// \note обратная трассировка. Ищем пересечение от точки вхождения до выхождения
+  for (int i = 0; i < 3; i++) {
+    for (auto &in_cell : inner_part) {
 
-      buf_try.id_1 = plane_face.face_id;
-      id[0] = in_id;
-      break;
+      FaceCell start_face = inner_faces.find(in_cell)->second; //грань на противолежащей стороне
+
+      in::IntersectionWithPlane(start_face.face, vertex[i], -direction, trace.x[i]);
+      if (in::InTriangle(start_face.face_id, start_face.face, normals[in_cell], trace.x[i])) {
+        trace.id[i] = start_face.face_id;
+        trace.s[i] = (vertex[i] - trace.x[i]).norm();
+        count_intersection++;
+        break;
+      }
     }
   }
-
-  if (id[0] == -1)
-    return 1;
-
-  for (auto &in_id : inner_bound) {
-    plane_face = inner_cells.find(in_id)->second;
-    in::IntersectionWithPlane(plane_face.face, vertex2, direction, buf_try.x2);
-    if (in::InTriangle(plane_face.face_id, plane_face.face, normals[in_id], buf_try.x2))
-    // if (in_id != cur_cell && ((intersect_point - vertex2).dot(direction) < 0))
-    {
-      /*	std::bitset<4>id;
-              FindInAndOutFaces(direction, in_id, normals, id);
-              if (id[plane_face.face_id % 4] == 0) break;*/
-      id[1] = in_id;
-      buf_try.id_2 = plane_face.face_id;
-      break;
-    }
-  }
-
-  if (id[1] == -1)
-    return 1;
-
-  for (auto &in_id : inner_bound) {
-    plane_face = inner_cells.find(in_id)->second;
-    in::IntersectionWithPlane(plane_face.face, vertex3, direction, buf_try.x3);
-    if (in::InTriangle(plane_face.face_id, plane_face.face, normals[in_id], buf_try.x3))
-    // if (in_id != cur_cell && ((intersect_point - vertex3).dot(direction) < 0))
-    {
-      /*	std::bitset<4>id;
-              FindInAndOutFaces(direction, in_id, normals, id);
-              if (id[plane_face.face_id % 4] == 0) break;*/
-      id[2] = in_id;
-      buf_try.id_3 = plane_face.face_id;
-      break;
-    }
-  }
-
-  if (id[2] == -1)
-    return 1;
-
-  buf_try.s_1 = (vertex1 - buf_try.x1).norm();
-  buf_try.s_2 = (vertex2 - buf_try.x2).norm();
-  buf_try.s_3 = (vertex3 - buf_try.x3).norm();
-
-  return 0;
+  return count_intersection;
 }
 
-int FindCurCellWithHole(const Vector3 &direction,
-                        const std::vector<Normals> &normals,
-                        const std::map<IntId, FaceCell> &inner_faces,
-                        const std::set<IntId> &next_step_el,
-                        const std::vector<State> &count_in_face,
-                        const std::set<IntId> &inner_part,
-                        std::vector<IntId> &cur_front,
-                        std::vector<State> &count_def_face,
-                        std::set<IntId> &outer_part) {
+int FindCurFrontWithHole(const Vector3 &direction,
+                         const std::vector<Normals> &normals,
+                         const std::map<IntId, FaceCell> &inner_faces,
+                         const std::set<IntId> &next_candidates,
+                         const std::vector<State> &count_in_face,
+                         const std::set<IntId> &inner_part,
+                         std::vector<IntId> &cur_front,
+                         std::vector<State> &count_def_face,
+                         std::set<IntId> &outer_part) {
 
   cur_front.clear(); // очищаем текущую границу
 
-  for (auto cell : next_step_el) {
-    if (outer_part.count(cell) != 0) {
+  for (auto cell_id : next_candidates) {
 
-      // граница не определена
-      if (count_in_face[cell] == count_def_face[cell] + 1) {
+    // ячейка на границе выхода луча из подобласти
+    if (outer_part.count(cell_id) != 0) {
 
-        IntId try_id[3] = {-1, -1, -1};
+      // граница не определена, но осталась последняя граничная часть
+      if (count_in_face[cell_id] == count_def_face[cell_id] + 1) {
 
-        if (FindIdCellInBoundary(direction, inner_part, inner_faces, normals, cell, try_id))
-          continue;
+        boundary_trace_t trace;
 
-        if (count_in_face[try_id[0]] == count_def_face[try_id[0]] &&
-            count_in_face[try_id[1]] == count_def_face[try_id[1]] &&
-            count_in_face[try_id[2]] == count_def_face[try_id[2]]) { // если грань на другом конце определена
+        if (FindCellOnInnerPartBoundary(cell_id, direction, inner_part, inner_faces, normals, trace) != 3) {
+          D_LD; //!не нашли определяющей геометрии
+        }
 
-          // id_try_surface.push_back(buf_try.id_1);
-          // id_try_surface.push_back(buf_try.id_2);
-          // id_try_surface.push_back(buf_try.id_3);
+        int count = 0;
+        for (int i = 0; i < 3; i++) {
+          int cell_id = trace.id[i] / CELL_SIZE;
+          count += (count_in_face[cell_id] == count_def_face[cell_id]);
+        }
 
-          // x_try_surface.push_back(buf_try.x1);
-          // x_try_surface.push_back(buf_try.x2);
-          // x_try_surface.push_back(buf_try.x3);
+        // если грань на другом конце полностью определена
+        if (count == 3) {
 
-          // dist_try_surface.push_back(buf_try.s_1);
-          // dist_try_surface.push_back(buf_try.s_2);
-          // dist_try_surface.push_back(buf_try.s_3);
-
-          cur_front.push_back(cell);
-          outer_part.erase(cell);
-          count_def_face[cell]++;
+          bound_trace.push_back(trace);
+          cur_front.push_back(cell_id);
+          outer_part.erase(cell_id);
+          count_def_face[cell_id]++;
           continue;
         }
-      } else if (count_in_face[cell] == count_def_face[cell]) { // граница определена
-        cur_front.push_back(cell);
-        outer_part.erase(cell);
       }
-    } else if (count_in_face[cell] == count_def_face[cell]) {
-      cur_front.push_back(cell);
+      //! не должно быть так.  // граница определена
+      // else if (count_in_face[cell_id] == count_def_face[cell_id]) {
+      //   cur_front.push_back(cell_id);
+      //   outer_part.erase(cell_id);
+      //}
+    } else if (count_in_face[cell_id] == count_def_face[cell_id]) {
+      cur_front.push_back(cell_id);
     }
   }
 
-  if (cur_front.size() == 0) {
-
-    // плохо, но как есть. Если не смогли найти ни одну ячейку кандидата \
-		попробовать пройти отдельно по внутренней границе,
-
-    std::list<IntId> buf_erase;
-
-    for (auto cell : outer_part) {
-      if (count_in_face[cell] == count_def_face[cell] + 1) { // граница не определена
-        IntId try_id[3] = {-1, -1, -1};
-        FindIdCellInBoundary(direction, inner_part, inner_faces, normals, cell, try_id);
-        if (try_id[0] == -1 || try_id[1] == -1 || try_id[2] == -1)
-          continue;
-        if (count_in_face[try_id[0]] == count_def_face[try_id[0]] &&
-            count_in_face[try_id[1]] == count_def_face[try_id[1]] &&
-            count_in_face[try_id[2]] == count_def_face[try_id[2]]) { // если грань на другом конце определена
-
-          cur_front.push_back(cell);
-          count_def_face[cell]++;
-          buf_erase.push_back(cell); // outer_part.erase(cell);
-          continue;
-        }
-      } else if (count_in_face[cell] == count_def_face[cell]) {
-        buf_erase.push_back(cell); // outer_part.erase(cell);
-        cur_front.push_back(cell);
-      }
-    }
-
-    for (auto el : buf_erase)
-      outer_part.erase(el);
-
-    if (cur_front.size() == 0) {
-      std::cout << "NextCell is -1\n";
-      return -1;
-    }
-  }
-
-  return 0;
+  if (cur_front.size() == 0)
+    return e_completion_fail;
+  return e_completion_success;
 }
 
 #endif
-int FindCurFront(const std::set<IntId> &next_step_el,
+int FindCurFront(const std::set<IntId> &next_candidates,
                  const std::vector<State> &count_in_face,
                  const std::vector<State> &count_def_face,
                  std::vector<IntId> &cur_front) {
 
-  cur_front.clear();
+  cur_front.clear(); // очищаем текущую границу
 
-  for (auto cell : next_step_el) {
+  for (auto cell : next_candidates) {
     if (count_in_face[cell] == count_def_face[cell])
       cur_front.push_back(cell);
   }

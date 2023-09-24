@@ -18,14 +18,14 @@
  *
  * @return int8_t id
  */
-inline int8_t get_mpi_id();
+/*inline*/ int8_t get_mpi_id();
 
 /**
  * @brief Get the mpi count nodes
  *
  * @return int8_t count nodes
  */
-inline int8_t get_mpi_np();
+/*inline*/ int8_t get_mpi_np();
 
 extern MPI_Datatype MPI_flux_t;            ///< mpi-тип для перессылки структуры ::flux_t
 extern MPI_Datatype MPI_flux_illum_elem_t; ///< mpi-тип для перессылки структуры

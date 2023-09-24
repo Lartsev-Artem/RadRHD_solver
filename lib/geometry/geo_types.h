@@ -45,6 +45,7 @@ struct FaceCell {
   FaceCell(const int id = 0, const Face &face_init = Face())
       : face_id(id), face(face_init) {}
 };
+std::ostream &operator<<(std::ostream &os, const std::pair<const int, FaceCell> &f); ///< ключ не выводим
 std::ostream &operator<<(std::ostream &os, const FaceCell &f);
 std::istream &operator>>(std::istream &is, FaceCell &f);
 

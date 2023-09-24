@@ -9,6 +9,12 @@
 #include <set>
 
 namespace graph {
+int TryRestart(const std::vector<State> &count_in_face,
+               const std::vector<State> &count_def_face,
+               const std::set<IntId> &outer_part,
+               std::vector<IntId> &cur_front,
+               std::set<IntId> &next_candidate);
+
 /**
  * @brief Функция определяет состояние граней по отношению к границе
  *

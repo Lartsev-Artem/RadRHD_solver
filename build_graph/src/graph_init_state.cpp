@@ -3,11 +3,50 @@
 #include "graph_struct.h"
 #include "intersections.h"
 
+#include "graph_config.h"
+
 namespace graph {
+
+#define GRAPH_MAX_RESTART 5          ///< максимальное число рестартов на направление
+static uint32_t restart_counter = 0; ///< счетчик рестартов (для попытки перестроить граф не с нуля)
+
+int TryRestart(const std::vector<State> &count_in_face,
+               const std::vector<State> &count_def_face,
+               const std::set<IntId> &outer_part,
+               std::vector<IntId> &cur_front,
+               std::set<IntId> &next_candidate) {
+
+  restart_counter++;
+  cur_front.clear();
+  next_candidate.clear();
+
+#ifdef GRID_WITH_INNER_BOUNDARY
+  if (outer_part.size() != 0) {
+
+    next_candidate.insert(outer_part.begin(), outer_part.end());
+
+    //пытаться определять внутреннюю границу (в надежде на трассировку)
+    if (restart_counter < GRAPH_MAX_RESTART / 2)
+      return e_completion_success;
+  }
+#endif
+
+  for (int i = 0; i < count_in_face.size(); i++) {
+    if (count_in_face[i] > count_def_face[i]) {
+      next_candidate.emplace(i); // все неопределённые ячейки
+    }
+  }
+
+  if (restart_counter > GRAPH_MAX_RESTART)
+    return e_completion_fail;
+  return e_completion_success;
+}
 
 void InitFacesState(const std::vector<IntId> &neighbours,
                     const std::map<IntId, FaceCell> &inter_faces,
                     std::vector<State> &faces_state) {
+
+  restart_counter = 0; /// сброс на каждом направлении
 
   const int n = neighbours.size();
   faces_state.assign(n, e_face_state_undef); //инициализируем состояние

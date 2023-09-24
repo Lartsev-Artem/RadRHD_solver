@@ -12,10 +12,10 @@
 
 #ifdef USE_VTK
 
-#include <vtk-9.1/vtkCellData.h>
-#include <vtk-9.1/vtkGenericDataObjectReader.h>
-#include <vtk-9.1/vtkGenericDataObjectWriter.h>
-#include <vtk-9.1/vtkUnstructuredGrid.h>
+#include <vtkCellData.h>
+#include <vtkGenericDataObjectReader.h>
+#include <vtkGenericDataObjectWriter.h>
+#include <vtkUnstructuredGrid.h>
 
 /*! \addtogroup file_sys Файловый модуль
     @{

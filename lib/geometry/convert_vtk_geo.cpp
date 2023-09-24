@@ -1,8 +1,8 @@
 #include "convert_vtk_geo.h"
 #ifdef USE_VTK
-#include <vtk-9.1/vtkCell.h>
-#include <vtk-9.1/vtkIdList.h>
-#include <vtk-9.1/vtkPoints.h>
+#include <vtkCell.h>
+#include <vtkIdList.h>
+#include <vtkPoints.h>
 
 int GetBoundaryCells(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::set<IntId> &boundary_cells) {
 
@@ -115,7 +115,7 @@ int GetNeighborFace3D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_g
         int id_neighbor_face = GetNumberNeighborFace(id_a, id_b, id_c, unstructured_grid->GetCell(id_neighbor_cell));
 
         if (id_neighbor_face == e_neigh_code_undef) {
-          RETURN_ERR("neighbor %d not found\n", num_cell);
+          RETURN_ERR("neighbor %d not found\n", (int)num_cell);
         }
 
         neighbors[face] = id_neighbor_cell * CELL_SIZE + id_neighbor_face;
