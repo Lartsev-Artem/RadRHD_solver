@@ -17,7 +17,8 @@
                 "/home/artem/projects/VTK9.3/VTK-build/Utilities/KWSys",
                 "/home/artem/projects/VTK9.3/VTK-build/IO/Legacy",
                 "/home/artem/projects/VTK9.3/VTK-build/Common/ExecutionModel",
-                "/home/artem/projects/VTK9.3/VTK-build/IO/Core"
+                "/home/artem/projects/VTK9.3/VTK-build/IO/Core",
+                "${workspaceFolder}/lib/geometry/include"
             ],
             "defines": [
                 "BUILD_GRAPH",
@@ -31,7 +32,7 @@
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-clang-x64",
             "configurationProvider": "ms-vscode.makefile-tools"
-        },
+        }
     ],
     "version": 4
 }

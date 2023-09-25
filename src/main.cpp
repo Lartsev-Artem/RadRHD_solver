@@ -1,28 +1,41 @@
-#include <mpi.h>
+//#include <mpi.h>
 
-#include "reader_bin.h"
-#include "writer_bin.h"
+// #include "build_internal_format.h"
+// #include "reader_bin.h"
 
-#include "build_internal_format.h"
+// #include "writer_bin.h"
+
+#include "graph_main.h"
+#include "mpi_ext.h"
+#include "reader_json.h"
+
+int SetScalarDataVtkFromFile(int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
 
-  remove((std::string(glb_files.base_address) + F_LOG).c_str());
+  MPI_START(argc, argv);
 
-  BuildDataFromVTK(glb_files);
+  // files_sys::json::ReadStartSettings("/home/artem/projects/solver/config/directories_cfg.json", glb_files);
 
-  std::vector<int> a;
-  files_sys::bin::ReadSimple("foo.bin", a);
-  files_sys::bin::WriteSimple("build/foo.bin", a);
+  // BuildDataFromVTK(glb_files);
 
-  int rank, size;
-  MPI_Init(&argc, &argv);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  SetScalarDataVtkFromFile(argc, argv);
 
-  printf("Rank: %d/%d\n", rank, size);
+  /*
+  graph test
+  DataArray->SetNumberOfTuples(n);
+  for (size_t i = 0; i < n; i++) {
+    DataArray->SetTuple1(vector_data[i], i);
+  }
+  */
+  //  graph::RunGraphModule();
+  // return 0;
 
-  MPI_Finalize();
+  // std::vector<int> a;
+  // files_sys::bin::ReadSimple("foo.bin", a);
+  // files_sys::bin::WriteSimple("build/foo.bin", a);
+
+  MPI_END;
   return 0;
 }
 

@@ -7,16 +7,16 @@
 int GetBoundaryCells(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::set<IntId> &boundary_cells) {
 
   boundary_cells.clear();
-  size_t N = unstructured_grid->GetNumberOfCells();
+  vtkIdType N = unstructured_grid->GetNumberOfCells();
 
   vtkSmartPointer<vtkIdList> idc = vtkSmartPointer<vtkIdList>::New();
 
-  for (size_t i = 0; i < N; ++i) {
+  for (vtkIdType i = 0; i < N; ++i) {
 
-    for (size_t j = 0; j < CELL_SIZE; ++j) {
+    for (vtkIdType j = 0; j < CELL_SIZE; ++j) {
       unstructured_grid->GetCellNeighbors(i, unstructured_grid->GetCell(i)->GetFace(j)->GetPointIds(), idc);
       if (idc->GetNumberOfIds() == 0) {
-        boundary_cells.emplace(i);
+        boundary_cells.emplace((IntId)i);
         break;
       } else if (idc->GetNumberOfIds() > 1)
         RETURN_ERR("More than 1 neighbor????\n");
@@ -62,7 +62,7 @@ int GetNeighborFace3D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_g
   auto GetNumberNeighborFace{[](const int a, const int b, const int c, vtkCell *neighbor_cell) {
     vtkIdList *idc;
 
-    int x, y, z;
+    vtkIdType x, y, z;
     for (int i = 0; i < CELL_SIZE; i++) {
       idc = neighbor_cell->GetFace(i)->GetPointIds();
       x = idc->GetId(0);

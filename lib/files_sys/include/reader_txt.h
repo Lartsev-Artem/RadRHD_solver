@@ -19,10 +19,6 @@
     @{
 */
 
-/**
- * @brief Пространство имён файлового модуля
- *
- */
 namespace files_sys {
 
 /**
@@ -40,12 +36,12 @@ namespace txt {
  * @param[out] data массив std::vector
  * @note Файл должен содержать в первой строке число элементов. Далее
  * последовательные данные.
- * @return size_t ::e_type_completion
+ * @return int ::e_type_completion
  */
 template <typename Str_Type, typename T>
-size_t ReadSimple(const Str_Type name_file, std::vector<T> &data) {
+int ReadSimple(const Str_Type name_file, std::vector<T> &data) {
   std::ifstream ifile;
-  OPEN_FSTREAM(ifile, name_file);
+  OPEN_FSTREAM(ifile, std::string(name_file).c_str());
 
   int size;
   ifile >> size;
@@ -66,10 +62,10 @@ size_t ReadSimple(const Str_Type name_file, std::vector<T> &data) {
  * @tparam T тип считываемых данных
  * @param[in] name_file полное имя файла с расширением
  * @param[out] data набор std::set
- * @return size_t ::e_type_completion
+ * @return int ::e_type_completion
  */
 template <typename Str_Type, typename T>
-size_t ReadSimple(const Str_Type name_file, std::set<T> &data) {
+int ReadSimple(const Str_Type name_file, std::set<T> &data) {
   std::ifstream ifile;
   OPEN_FSTREAM(ifile, std::string(name_file).c_str());
 

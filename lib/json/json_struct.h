@@ -117,7 +117,7 @@ static void from_json(const nlohmann::json &j, illum_timer_t &p) {
 struct global_files_t {
 
 #define X(type, name) type name;
-  STRUCT_FILES_T;
+  STRUCT_FILES_T
 #undef X
 
   std::string name_file_settings;

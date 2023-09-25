@@ -5,16 +5,13 @@
 
 #include "graph_config.h"
 
-namespace graph {
-
-#define GRAPH_MAX_RESTART 5          ///< максимальное число рестартов на направление
 static uint32_t restart_counter = 0; ///< счетчик рестартов (для попытки перестроить граф не с нуля)
 
-int TryRestart(const std::vector<State> &count_in_face,
-               const std::vector<State> &count_def_face,
-               const std::set<IntId> &outer_part,
-               std::vector<IntId> &cur_front,
-               std::set<IntId> &next_candidate) {
+int graph::TryRestart(const std::vector<State> &count_in_face,
+                      const std::vector<State> &count_def_face,
+                      const std::set<IntId> &outer_part,
+                      std::vector<IntId> &cur_front,
+                      std::set<IntId> &next_candidate) {
 
   restart_counter++;
   cur_front.clear();
@@ -42,9 +39,9 @@ int TryRestart(const std::vector<State> &count_in_face,
   return e_completion_success;
 }
 
-void InitFacesState(const std::vector<IntId> &neighbours,
-                    const std::map<IntId, FaceCell> &inter_faces,
-                    std::vector<State> &faces_state) {
+void graph::InitFacesState(const std::vector<IntId> &neighbours,
+                           const std::map<IntId, FaceCell> &inter_faces,
+                           std::vector<State> &faces_state) {
 
   restart_counter = 0; /// сброс на каждом направлении
 
@@ -61,11 +58,11 @@ void InitFacesState(const std::vector<IntId> &neighbours,
     faces_state[el.second.face_id] = e_face_state_undef;
 }
 
-void DivideInnerBoundary(const Vector3 &direction,
-                         const std::vector<Normals> &normals,
-                         const std::set<IntId> &inter_boundary_face_id,
-                         std::set<IntId> &inner_part,
-                         std::set<IntId> &outer_part) {
+void graph::DivideInnerBoundary(const Vector3 &direction,
+                                const std::vector<Normals> &normals,
+                                const std::set<IntId> &inter_boundary_face_id,
+                                std::set<IntId> &inner_part,
+                                std::set<IntId> &outer_part) {
   inner_part.clear();
   outer_part.clear();
 
@@ -85,12 +82,12 @@ void DivideInnerBoundary(const Vector3 &direction,
   }
 }
 
-void FindNumberOfAllInAndDefFaces(const Vector3 &dir,
-                                  const std::vector<Normals> &normals,
-                                  const std::vector<State> &faces_state,
-                                  std::vector<State> &count_in_face,
-                                  std::vector<State> &count_def_face,
-                                  std::set<IntId> &next_step_el) {
+void graph::FindNumberOfAllInAndDefFaces(const Vector3 &dir,
+                                         const std::vector<Normals> &normals,
+                                         const std::vector<State> &faces_state,
+                                         std::vector<State> &count_in_face,
+                                         std::vector<State> &count_def_face,
+                                         std::set<IntId> &next_step_el) {
 
   const int N = normals.size(); // число ячеек
 
@@ -116,6 +113,4 @@ void FindNumberOfAllInAndDefFaces(const Vector3 &dir,
     }
   }
 }
-
-} // namespace graph
 #endif //!#if defined BUILD_GRAPH

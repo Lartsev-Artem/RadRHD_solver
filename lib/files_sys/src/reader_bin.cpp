@@ -5,10 +5,7 @@
 #include "global_def.h"
 #include "global_value.h"
 
-namespace files_sys {
-namespace bin {
-
-int ReadNormals(const std::string &name_file_normals, std::vector<Normals> &normals) {
+int files_sys::bin::ReadNormals(const std::string &name_file_normals, std::vector<Normals> &normals) {
   FILE *f;
   OPEN_FILE(f, name_file_normals.c_str(), "rb");
 
@@ -17,7 +14,7 @@ int ReadNormals(const std::string &name_file_normals, std::vector<Normals> &norm
   normals.resize(n);
 
   Normals norm(CELL_SIZE);
-  for (size_t i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     for (int j = 0; j < CELL_SIZE; j++)
       fread(&norm.n[j], sizeof(Vector3), 1, f);
 
@@ -28,11 +25,11 @@ int ReadNormals(const std::string &name_file_normals, std::vector<Normals> &norm
   return e_completion_success;
 }
 
-int ReadData(const size_t class_file_vtk, const std::string &main_dir,
-             std::vector<Type> &density, std::vector<Type> &absorp_coef,
-             std::vector<Type> &rad_en_loose_rate,
-             std::vector<Vector3> &velocity, std::vector<Type> &pressure,
-             const bool is_print /*=false*/) {
+int files_sys::bin::ReadData(const size_t class_file_vtk, const std::string &main_dir,
+                             std::vector<Type> &density, std::vector<Type> &absorp_coef,
+                             std::vector<Type> &rad_en_loose_rate,
+                             std::vector<Vector3> &velocity, std::vector<Type> &pressure,
+                             const bool is_print /*=false*/) {
   switch (class_file_vtk) {
   case e_grid_cfg_radiation:
     ReadSimple(main_dir + F_DENSITY, density);
@@ -60,9 +57,9 @@ int ReadData(const size_t class_file_vtk, const std::string &main_dir,
     std::cout << "Q_Size: " << rad_en_loose_rate.size() << '\n';
   }
 
-  const int a = density.size();
-  const int b = rad_en_loose_rate.size();
-  const int c = absorp_coef.size();
+  const size_t a = density.size();
+  const size_t b = rad_en_loose_rate.size();
+  const size_t c = absorp_coef.size();
   if (a == b && a == c && b == c) {
     return e_completion_success;
   }
@@ -86,8 +83,8 @@ int ReadData(const size_t class_file_vtk, const std::string &main_dir,
 
 //! Не использовать такую структура чтения!. resize cells не нужен!!!. При
 //! излучении данные распределены по массивам?
-int ReadData(const solve_mode_t &mode, const std::string &main_dir,
-             grid_t &grid) {
+int files_sys::bin::ReadData(const solve_mode_t &mode, const std::string &main_dir,
+                             grid_t &grid) {
   switch (mode.class_vtk) {
   case 1: // test grid
     READ_FILE((main_dir + "alpha.bin").c_str(), grid.cells, phys_val.d);
@@ -122,12 +119,12 @@ int ReadData(const solve_mode_t &mode, const std::string &main_dir,
   return 0;
 }
 
-int ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
-                       std::vector<BasePointTetra> &vec_x,
-                       std::vector<std::vector<int>> &face_states,
-                       std::vector<std::vector<cell_local>> &vec_x0,
-                       std::vector<std::vector<int>> &sorted_id_cell,
-                       std::vector<Type> &vec_res_bound) {
+int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
+                                       std::vector<BasePointTetra> &vec_x,
+                                       std::vector<std::vector<int>> &face_states,
+                                       std::vector<std::vector<cell_local>> &vec_x0,
+                                       std::vector<std::vector<int>> &sorted_id_cell,
+                                       std::vector<Type> &vec_res_bound) {
   if (ReadSimple(gbl_files.name_file_x, vec_x))
     return e_completion_fail;
   if (ReadSimple(gbl_files.name_file_res, vec_res_bound))
@@ -171,6 +168,3 @@ int ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
   return 0;
 }
 #endif //! ILLUM
-
-} // namespace bin
-} // namespace files_sys

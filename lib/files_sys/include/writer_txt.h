@@ -31,7 +31,7 @@ namespace txt {
  * @return size_t ::e_type_completion
  */
 template <typename Str_Type, typename stdT>
-size_t WriteSimple(const Str_Type name_file, const stdT &data) {
+int WriteSimple(const Str_Type name_file, const stdT &data) {
   std::ofstream ofile;
   OPEN_FSTREAM(ofile, std::string(name_file).c_str());
 

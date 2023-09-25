@@ -64,7 +64,7 @@ template <typename file>
 int ReadStartSettings(file file_set, global_files_t &glb_files,
                       solve_mode_t *solve_mode = nullptr,
                       hllc_value_t *hllc_conf = nullptr) {
-  if (ReadFileJson(file_set, glb_files)) {
+  if (Read(file_set, glb_files)) {
     return e_completion_fail;
   }
 

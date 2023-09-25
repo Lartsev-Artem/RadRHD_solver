@@ -2,8 +2,8 @@
 DEFCONF 		= SOLVERS BUILD_GRAPH USE_MPI DEBUG LINUX
 
 # defining working directories
-SRCDIR          = src lib/files_sys/src lib/geometry lib/mpi_extension lib/json build_graph/src
-INCLUDESDIR     = include lib lib/json lib/files_sys/include lib/Eigen lib/geometry lib/mpi_extension lib/solvers_types build_graph/include
+SRCDIR          = src lib/files_sys/src lib/geometry lib/mpi_extension lib/json build_graph/src lib/geometry/src utils
+INCLUDESDIR     = include lib utils lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension lib/solvers_types build_graph/include
 BUILDDIR        = build
 OBJDIR          = $(BUILDDIR)/objs
 
@@ -40,7 +40,6 @@ PROGRAM         = run
 
 COMPILE.cpp     = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
 
-
 all: $(PROGRAM)
 
 #Make executable file. Early was $(addprefix $(OBJDIR)/, $^)
@@ -68,3 +67,19 @@ clean:
 	$(RM) *~ 
 	$(RM) $(PROGRAM)
 	$(RM) "File_Logs.txt"
+
+
+## попытка собирать только утилиты. с линковкой к библиотеке
+# SRCDIR_UTILS         = src lib/files_sys/src lib/geometry lib/mpi_extension lib/json lib/geometry/src utils/netgen_to_vtk
+# SRCS_UTILS 			= $(foreach dir,$(SRCDIR_UTILS),$(wildcard $(dir)/*.cpp))
+# OBJS_UTILS            = $(patsubst %.cpp, %.o, $(notdir $(SRCS_UTILS)))
+
+# UTIL = util
+
+# utils: $(UTIL)
+
+# $(UTIL): %: $(OBJS_UTILS)
+# 	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./, $^) $(LOADLIBES) $(LDLIBS) -o $@ 
+
+# test:
+# 	make clean

@@ -19,6 +19,8 @@
  *
  */
 
+/// \todo if UTILS -> LOG_file -> log_screen
+
 #ifndef PRJ_CONFIG
 #define PRJ_CONFIG
 
@@ -51,6 +53,8 @@
 #endif
 
 #ifdef DEBUG
+
+//#define LOG_OUT_TO_SCREEN ///<выводить лог не в файл, а на экран
 
 #define WRITE_GLOBAL_LOG ///< писать лог файл
 

@@ -1,21 +1,23 @@
 #if defined BUILD_GRAPH
+#include "graph_main.h"
+
 #include "dbgdef.h"
-#include "geo_types.h"
 #include "graph_config.h"
 #include "mpi_ext.h"
 #include "reader_bin.h"
-#include "reader_json.h"
 #include "reader_txt.h"
 #include "writer_bin.h"
 
-#include "graph_calc_no_omp.h"
+#include "graph_calc.h"
 #include "graph_init_state.h"
+#include "graph_struct.h"
 
 #include <omp.h>
 
 namespace graph {
-
-int RunGraphModule() {
+std::vector<boundary_trace_t> bound_trace; ///< данные перетрассировки луча сквозь внутреннюю область
+}
+int graph::RunGraphModule() {
 
   WRITE_LOG("OMP num_threads: %d\n", omp_get_num_threads());
 
@@ -46,7 +48,8 @@ int RunGraphModule() {
 
   t = -omp_get_wtime();
 
-  const int num_cells = normals.size();
+  const size_t num_cells = normals.size();
+  WRITE_LOG("num_cells= %d\n", num_cells);
 
   std::vector<State> count_in_face(num_cells, 0);  ///< число входящих граней ячейки
   std::vector<State> count_def_face(num_cells, 0); ///< число определённых граней ячейки
@@ -83,13 +86,8 @@ int RunGraphModule() {
 
     DivideInnerBoundary(direction, normals, inter_boundary_face_id, inner_part, outer_part);
 
-    // id_try_surface.clear();
-    // dist_try_surface.clear();
-    // x_try_surface.clear();
-
-    // x_try_surface.reserve(outer_part.size() * 3);
-    // id_try_surface.reserve(outer_part.size() * 3);
-    // dist_try_surface.reserve(outer_part.size() * 3);
+    bound_trace.clear();
+    bound_trace.reserve(outer_part.size() * 3); // потенциально в массив могут войдут все ячейки внутренней границы
 
     //-------------------------------------
 #ifdef USE_OMP
@@ -169,11 +167,12 @@ int RunGraphModule() {
               t + omp_get_wtime());
   }
 
+  bound_trace.clear();
+
   t += omp_get_wtime();
   WRITE_LOG("Full time: %lf\n", t);
 
   return e_completion_success;
 }
 
-} // namespace graph
 #endif //! BUILD_GRAPH

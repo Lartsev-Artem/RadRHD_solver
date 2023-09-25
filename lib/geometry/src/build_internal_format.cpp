@@ -14,7 +14,7 @@ static int SetTypeOfBound(const std::vector<Vector3> &centers,
   for (size_t num_cell = 0; num_cell < n; num_cell++) {
     Vector3 P = centers[num_cell];
     for (size_t num_face = 0; num_face < CELL_SIZE; num_face++) {
-      const int id = num_cell * CELL_SIZE + num_face;
+      const size_t id = num_cell * CELL_SIZE + num_face;
 
       if (neighbors[id] < 0) // граница
       {
@@ -119,7 +119,7 @@ static int WriteNormalAndAreas(const std::string &name_file_normals, const std::
 #endif
     RETURN_ERR("normals wasn't found\n");
 
-  if (files_sys::bin::WriteSimple(name_file_areas, areas)) {
+  if (files_sys::bin::WriteSimple(name_file_areas, areas) == e_completion_success) {
     return files_sys::bin::WriteNormals(name_file_normals, normals);
   }
 

@@ -28,15 +28,15 @@ namespace bin {
  * @param[in] name_file полное имя файла с расширением
  * @param[in] data массив std::vector
  * \note  Файл содержит в первой строке число элементов. Далее последовательные данные
- * @return size_t ::e_type_completion
+ * @return int ::e_type_completion
  */
 template <typename Str_Type, typename T>
-size_t WriteSimple(const Str_Type name_file, const std::vector<T> &data) {
+int WriteSimple(const Str_Type name_file, const std::vector<T> &data) {
 
   FILE *f;
   OPEN_FILE(f, std::string(name_file).c_str(), "wb");
 
-  int n = data.size();
+  int n = (int)data.size();
   fwrite(&n, sizeof(int), 1, f);
   fwrite(data.data(), sizeof(T), n, f);
 
@@ -52,10 +52,10 @@ size_t WriteSimple(const Str_Type name_file, const std::vector<T> &data) {
  * @param[in] name_file полное имя файла с расширением
  * @param[in] n размерность массива
  * @param[in] data массив T*
- * @return size_t
+ * @return int  ::e_type_completion
  */
 template <typename Str_Type, typename T>
-size_t WriteSimple(const Str_Type name_file, const int n, const T *data) {
+int WriteSimple(const Str_Type name_file, const int n, const T *data) {
 
   FILE *f;
   OPEN_FILE(f, std::string(name_file).c_str(), "wb");
@@ -80,7 +80,7 @@ int WriteGridGeo(const std::string &name_file, const std::vector<geo_elem> &data
   FILE *f;
   OPEN_FILE(f, name_file.c_str(), "wb");
 
-  int n = data.size();
+  int n = (int)data.size();
   fwrite(&n, sizeof(int), 1, f);
   for (auto &el : data) {
     fwrite(&el.geo, sizeof(el.geo), 1, f);
@@ -104,9 +104,9 @@ int WriteNormals(const std::string &name_file_normals, std::vector<Normals> &nor
  *
  * @param[in] main_dir путь к выходной директории
  * @param[in] grid сетка
- * @return size_t  ::e_type_completion
+ * @return int  ::e_type_completion
  */
-size_t WriteSolution(const std::string &main_dir, const grid_t &grid);
+int WriteSolution(const std::string &main_dir, const grid_t &grid);
 
 /// \todo CHECK THIS!!!
 #ifdef RHLLC_MPI

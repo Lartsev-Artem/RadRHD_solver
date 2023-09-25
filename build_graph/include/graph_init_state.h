@@ -1,3 +1,12 @@
+/**
+ * @file graph_init_state.h
+ * @brief Функции инициализации структур по выбранному направлению
+ * @bug для сеток с внутренней границей алгоритм может завершаться
+ * до окончания построения графа. В качестве исправления предлагается вызывать функцию
+ * ::TryRestart, которая заново инициализирует текущую границу и запускает алгоритм с
+ * точки завершения. число рестартов ограничено
+ */
+
 #if defined BUILD_GRAPH
 #ifndef GRAPH_INIT_STATE_H
 #define GRAPH_INIT_STATE_H
@@ -8,7 +17,14 @@
 #include <map>
 #include <set>
 
+/*! \addtogroup graph Модуль построения графов
+    @{
+*/
+
 namespace graph {
+
+constexpr int GRAPH_MAX_RESTART = 5; ///< максимальное число рестартов на направление
+
 int TryRestart(const std::vector<State> &count_in_face,
                const std::vector<State> &count_def_face,
                const std::set<IntId> &outer_part,

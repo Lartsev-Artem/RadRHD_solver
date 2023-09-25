@@ -41,21 +41,30 @@
  * @brief Прерывание работы программы с указанием места
  *
  */
-#define D_LD WRITE_POS(Files_log, "DIE: ") abort();
+#define D_LD                      \
+  {                               \
+    WRITE_POS(Files_log, "DIE: ") \
+    abort();                      \
+  }
 
 /**
  * @brief Условное прерывание работы программы с указанием места
  *
  */
 #define DIE_IF(_cond) \
-  if (_cond)          \
-    D_LD;
+  if (_cond) {        \
+    D_LD;             \
+  }
 
 #define DIE_IF_ACTION(_cond, _act) \
-  _act;                            \
-  if (_cond)                       \
-    D_LD;
+  if (_cond) {                     \
+    _act;                          \
+    D_LD;                          \
+  }
 
+#ifdef LOG_OUT_TO_SCREEN
+#define WRITE_LOG_ERR(...) printf(__VA_ARGS__);
+#else
 /**
  * @brief Лог ошибок. вывод в файл
  * \note Лог ошибок включен всегда
@@ -68,6 +77,7 @@
     out << buf << "\n";                          \
     out.close();                                 \
   }
+#endif
 
 /**
  * @brief Лог ошибок. вывод на экран

@@ -14,8 +14,6 @@
 #include "geo_types.h"
 
 /*! \addtogroup file_sys Файловый модуль
-    \brief Модуль содержит функции работы с  файлами в различных форматах
-    \note поддерживаются txt, bin, json, vtk форматы
     @{
 */
 

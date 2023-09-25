@@ -6,21 +6,14 @@
 #include "solvers_config.h"
 #include "solvers_types.h"
 
-/*! \addtogroup file_sys Файловый модуль
-    @{
-*/
-
-namespace files_sys {
-namespace bin {
-
-int WriteNormals(const std::string &name_file_normals, std::vector<Normals> &normals) {
+int files_sys::bin::WriteNormals(const std::string &name_file_normals, std::vector<Normals> &normals) {
   FILE *f;
   OPEN_FILE(f, name_file_normals.c_str(), "wb");
 
-  int n = normals.size();
+  int n = (int)normals.size();
   fwrite(&n, sizeof(int), 1, f);
-  for (size_t i = 0; i < n; i++) {
-    for (size_t j = 0; j < CELL_SIZE; j++) {
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < CELL_SIZE; j++) {
       fwrite(&normals[i].n[j], sizeof(Vector3), 1, f);
     }
   }
@@ -46,7 +39,7 @@ int WriteNormals(const std::string &name_file_normals, std::vector<Normals> &nor
 #ifdef RHLLC_MPI
 #error "todo module"
 #include "../solve_module/MPI_utils.h"
-static inline size_t WriteFileSolutionMPI(const std::string &main_dir, const grid_t &grid, const bound_size_t &size) {
+static inline size_t files_sys::bin::WriteFileSolutionMPI(const std::string &main_dir, const grid_t &grid, const bound_size_t &size) {
   // int np, myid; MPI_GET_INF(np, myid);
   int myid = claster_cfg.id_hllc;
   int left = size.left;
@@ -90,7 +83,7 @@ static inline size_t WriteFileSolutionMPI(const std::string &main_dir, const gri
   return 0;
 }
 
-static inline size_t WriteFileSolutionSplit(const std::string &main_dir, const grid_t &grid, const bound_size_t &size) {
+static inline size_t files_sys::bin::WriteFileSolutionSplit(const std::string &main_dir, const grid_t &grid, const bound_size_t &size) {
   // int np, myid; MPI_GET_INF(np, myid);
   int myid = claster_cfg.id_hllc;
   int left = size.left;
@@ -135,7 +128,11 @@ static inline size_t WriteFileSolutionSplit(const std::string &main_dir, const g
 
 #else
 
-static inline size_t WriteFileSolutionOrder(const std::string &main_dir, const grid_t &grid) {
+// не видет параметры под макросом
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid_t &grid) {
 
 #ifdef ILLUM
 #include "../solve_module/illum/illum_utils.h"
@@ -179,9 +176,10 @@ static inline size_t WriteFileSolutionOrder(const std::string &main_dir, const g
   return 0;
 }
 
+#pragma GCC diagnostic pop
 #endif
 
-size_t WriteFileSolution(const std::string &main_dir, const grid_t &grid) {
+int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &grid) {
 
 #ifdef RHLLC_MPI
   return WriteFileSolutionMPI(main_dir, grid, hllc_loc_size[claster_cfg.id_hllc]);
@@ -192,6 +190,3 @@ size_t WriteFileSolution(const std::string &main_dir, const grid_t &grid) {
 #endif
   return e_completion_success;
 }
-
-} // namespace bin
-} // namespace files_sys

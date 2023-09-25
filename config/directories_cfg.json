@@ -1,0 +1,11 @@
+{
+    "base_address": "/home/artem/projects/grid_data/sphere_test/",
+    "graph_address": "/home/artem/projects/grid_data/sphere_test/graph/graph",
+    "hllc_init_value": "/home/artem/projects/grid_data/sphere_test/config/no.bin",
+    "illum_geo_address": "/home/artem/projects/grid_data/sphere_test/illum_geo/",
+    "name_file_hllc_set": "/home/artem/projects/grid_data/sphere_test/config/hllc_cfg.json",
+    "name_file_sphere_direction": "/home/artem/projects/grid_data/directions/surface_126_dir.txt",
+    "name_file_vtk": "/home/artem/projects/grid_data/sphere_test/sphere.vtk",
+    "solve_address": "/home/artem/projects/grid_data/sphere_test/Solve/Solve",
+    "solve_configuration": "/home/artem/projects/grid_data/sphere_test/config/solve_cfg.json"
+}

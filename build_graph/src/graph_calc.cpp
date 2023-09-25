@@ -1,12 +1,9 @@
 #ifdef BUILD_GRAPH
-#include "graph_calculation.h"
+#include "graph_calc.h"
+
 #include "graph_config.h"
 #include "graph_struct.h"
 #include "intersections.h"
-
-#include <list>
-
-namespace graph {
 
 #ifdef GRID_WITH_INNER_BOUNDARY
 namespace in = intersection;
@@ -28,7 +25,7 @@ static int FindCellOnInnerPartBoundary(const int out_cell,
                                        const std::set<IntId> &inner_part,
                                        const std::map<IntId, FaceCell> &inner_faces,
                                        const std::vector<Normals> &normals,
-                                       boundary_trace_t &trace) {
+                                       graph::boundary_trace_t &trace) {
 
   // вершины треугольника.
   Face face = inner_faces.find(out_cell)->second.face;
@@ -66,15 +63,15 @@ static int FindCellOnInnerPartBoundary(const int out_cell,
   return count_intersection;
 }
 
-int FindCurFrontWithHole(const Vector3 &direction,
-                         const std::vector<Normals> &normals,
-                         const std::map<IntId, FaceCell> &inner_faces,
-                         const std::set<IntId> &next_candidates,
-                         const std::vector<State> &count_in_face,
-                         const std::set<IntId> &inner_part,
-                         std::vector<IntId> &cur_front,
-                         std::vector<State> &count_def_face,
-                         std::set<IntId> &outer_part) {
+int graph::FindCurFrontWithHole(const Vector3 &direction,
+                                const std::vector<Normals> &normals,
+                                const std::map<IntId, FaceCell> &inner_faces,
+                                const std::set<IntId> &next_candidates,
+                                const std::vector<State> &count_in_face,
+                                const std::set<IntId> &inner_part,
+                                std::vector<IntId> &cur_front,
+                                std::vector<State> &count_def_face,
+                                std::set<IntId> &outer_part) {
 
   cur_front.clear(); // очищаем текущую границу
 
@@ -123,11 +120,11 @@ int FindCurFrontWithHole(const Vector3 &direction,
   return e_completion_success;
 }
 
-#endif
-int FindCurFront(const std::set<IntId> &next_candidates,
-                 const std::vector<State> &count_in_face,
-                 const std::vector<State> &count_def_face,
-                 std::vector<IntId> &cur_front) {
+#else
+int graph::FindCurFront(const std::set<IntId> &next_candidates,
+                        const std::vector<State> &count_in_face,
+                        const std::vector<State> &count_def_face,
+                        std::vector<IntId> &cur_front) {
 
   cur_front.clear(); // очищаем текущую границу
 
@@ -142,11 +139,13 @@ int FindCurFront(const std::set<IntId> &next_candidates,
 
   return e_completion_success;
 }
-void NewStep(const std::vector<IntId> &neighbours,
-             const std::vector<State> &count_in_face,
-             const std::vector<IntId> &cur_front,
-             std::vector<State> &count_def_face,
-             std::set<IntId> &next_candidate) {
+
+#endif
+void graph::NewStep(const std::vector<IntId> &neighbours,
+                    const std::vector<State> &count_in_face,
+                    const std::vector<IntId> &cur_front,
+                    std::vector<State> &count_def_face,
+                    std::set<IntId> &next_candidate) {
 
   next_candidate.clear(); //очищаем список кандидатов
 
@@ -167,5 +166,4 @@ void NewStep(const std::vector<IntId> &neighbours,
   }
 }
 
-} // namespace graph
 #endif //! BUILD_GRAPH

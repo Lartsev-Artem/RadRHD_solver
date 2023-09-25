@@ -1,3 +1,7 @@
+/**
+ * @file graph_struct.h
+ * @brief Объявления внутренних структур модуля
+ */
 #if !defined GRAPH_STRUCT_H && defined BUILD_GRAPH
 #define GRAPH_STRUCT_H
 
@@ -5,14 +9,9 @@
 #include <vector>
 
 /*! \addtogroup graph Модуль построения графов
-    \brief Модуль содержит функции построения графов для маршевого алгоритма расчёта излучения
     @{
 */
 
-/**
- * @brief Пространство имён модуля построения графов
- *
- */
 namespace graph {
 
 struct boundary_trace_t {

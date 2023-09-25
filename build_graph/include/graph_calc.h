@@ -1,8 +1,19 @@
-#ifdef BUILD_GRAPH
+/**
+ * @file graph_calc.h
+ * @brief Функции расчёта фронта и формирования нового шага
+ */
+
+#if !defined GRAPH_CALC_H && defined BUILD_GRAPH
+#define GRAPH_CALC_H
+
+#include "geo_types.h"
 #include "global_types.h"
-#include <geo_types.h>
 #include <map>
 #include <set>
+
+/*! \addtogroup graph Модуль построения графов
+    @{
+*/
 
 namespace graph {
 
@@ -24,7 +35,7 @@ int FindCurFront(const std::set<IntId> &next_step_el,
                  std::vector<IntId> &cur_front);
 
 /**
- * @brief @brief Функция определяет текущий фронт определённой границы для сетки с вырезанной областью
+ * @brief Функция определяет текущий фронт определённой границы для сетки с вырезанной областью
  *
  * @details Проходим по всем кандидатам,
  * если число входящих сравнялось с числом определённых,

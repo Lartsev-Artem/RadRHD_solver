@@ -37,6 +37,9 @@ struct Face {
   Vector3 &operator[](const int i) {
     return *((Vector3 *)((uint8_t *)&A + sizeof(Vector3) * i));
   }
+
+  Face() {}
+  Face(const Face &f) : A(f.A), B(f.B), C(f.C) {}
 };
 
 struct FaceCell {
