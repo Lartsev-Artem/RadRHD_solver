@@ -1,8 +1,7 @@
 #include "global_def.h"
-#include <string>
-#include <vector>
+#include "utils.h"
 
-namespace utils {
+#include <vector>
 
 static int ReadNetgenGrid(const std::string &name_file_in, std::vector<Eigen::Vector3d> &point, std::vector<Eigen::Vector4i> &cell, const size_t size = 3) {
 
@@ -71,7 +70,7 @@ static int WriteVtkFile(const std::string &name_file_out, const std::vector<Vect
   return e_completion_success;
 }
 
-int ReBuildNetgenToVTK(int argc, char *argv[]) {
+int FUNC_NAME(ReBuildNetgenToVTK)(int argc, char *argv[]) {
   std::string name_file_in = "";
   std::string name_file_out = "";
   int size = 0;
@@ -96,4 +95,3 @@ int ReBuildNetgenToVTK(int argc, char *argv[]) {
 
   return e_completion_success;
 }
-} // namespace utils

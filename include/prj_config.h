@@ -39,7 +39,7 @@
 
 #if !defined CLASTER
 #if !__NVCC__
-// #define USE_VTK ///< использование vtk для вывода результатов в виде
+//#define USE_VTK ///< использование vtk для вывода результатов в виде
 //сетки
 #endif
 #endif

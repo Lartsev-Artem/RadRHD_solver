@@ -396,7 +396,7 @@ int RunGraphModule() {
 
     try_restart = !try_restart;
 
-    if (files_sys::bin::WriteSimple(glb_files.graph_address + std::to_string(cur_direction) + ".bin", graph)) {
+    if (files_sys::bin::WriteSimple(glb_files.graph_address + F_GRAPH + std::to_string(cur_direction) + ".bin", graph)) {
       RETURN_ERR("file_graph is not opened for writing\n");
     }
 

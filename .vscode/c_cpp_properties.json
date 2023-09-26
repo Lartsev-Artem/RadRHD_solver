@@ -27,7 +27,8 @@
                 "DEBUG",
                 "LINUX",
                 "SOLVERS",
-                "USE_MPI"
+                "USE_MPI",
+                "USE_VTK"
             ],
             "compilerPath": "/usr/bin/mpic++",
             "cStandard": "c17",

@@ -49,7 +49,6 @@ int graph::RunGraphModule() {
   t = -omp_get_wtime();
 
   const size_t num_cells = normals.size();
-  WRITE_LOG("num_cells= %d\n", num_cells);
 
   std::vector<State> count_in_face(num_cells, 0);  ///< число входящих граней ячейки
   std::vector<State> count_def_face(num_cells, 0); ///< число определённых граней ячейки
@@ -159,7 +158,7 @@ int graph::RunGraphModule() {
 
     try_restart = !try_restart;
 
-    if (files_sys::bin::WriteSimple(glb_files.graph_address + std::to_string(cur_direction) + ".bin", graph)) {
+    if (files_sys::bin::WriteSimple(glb_files.graph_address + F_GRAPH + std::to_string(cur_direction) + ".bin", graph)) {
       RETURN_ERR("file_graph is not opened for writing\n");
     }
 

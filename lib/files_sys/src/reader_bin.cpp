@@ -10,13 +10,17 @@ int files_sys::bin::ReadNormals(const std::string &name_file_normals, std::vecto
   OPEN_FILE(f, name_file_normals.c_str(), "rb");
 
   int n;
-  fread(&n, sizeof(int), 1, f);
+  if (fread(&n, sizeof(int), 1, f) != 1) {
+    return e_completion_fail;
+  }
   normals.resize(n);
 
   Normals norm(CELL_SIZE);
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < CELL_SIZE; j++)
-      fread(&norm.n[j], sizeof(Vector3), 1, f);
+      if (fread(&norm.n[j], sizeof(Vector3), 1, f) != 1) {
+        return e_completion_fail;
+      }
 
     normals[i] = norm;
   }

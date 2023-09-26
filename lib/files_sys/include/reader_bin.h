@@ -42,9 +42,13 @@ size_t ReadSimple(const std::string &name_file, std::vector<T> &data) {
   OPEN_FILE(f, name_file.c_str(), "rb");
 
   int n;
-  fread(&n, sizeof(int), 1, f);
+  if (fread(&n, sizeof(int), 1, f) != 1) {
+    return e_completion_fail;
+  }
   data.resize(n);
-  fread(data.data(), sizeof(T), n, f);
+  if (fread(data.data(), sizeof(T), n, f) != n) {
+    return e_completion_fail;
+  }
 
   fclose(f);
   return e_completion_success;
@@ -64,10 +68,14 @@ size_t ReadGridGeo(const std::string &name_file, std::vector<geo_elem> &data) {
   OPEN_FILE(f, name_file.c_str(), "rb");
 
   int n;
-  fread(&n, sizeof(int), 1, f);
+  if (fread(&n, sizeof(int), 1, f) != 1)
+    return e_completion_fail;
+
   data.resize(n);
   for (auto &el : data) {
-    fread(&el.geo, sizeof(el.geo), 1, f);
+    if (fread(&el.geo, sizeof(el.geo), 1, f) != 1) {
+      return e_completion_fail;
+    }
   }
   fclose(f);
 

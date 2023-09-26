@@ -50,10 +50,10 @@ static int WriteDataToGrid(file name_file_grid, file name_file_data, file name_f
   return files_sys::vtk::WriteVtkGrid(name_file_output, unstructured_grid);
 }
 
-int FUNC_NAME(SetScalarDataVtkFromBinFile)(int argc, char *argv[]) {
-  if (argc < 4) {
+int FUNC_NAME(AddScalarDataVtkFromBinFile)(int argc, char *argv[]) {
+  if (argc < 3) {
     printf("Error input data!\n");
-    printf("Input Format: path\\file.vtk,  path\\data.bin,  path\\outfile.vtk\n");
+    printf("Input Format: path\\file.vtk,  path\\data.bin");
     printf("Additional parameters: name_field_data");
     printf("Data format: size a b c ... \n");
     return 1;
@@ -61,14 +61,13 @@ int FUNC_NAME(SetScalarDataVtkFromBinFile)(int argc, char *argv[]) {
 
   std::string file_grid = argv[1];
   std::string file_data = argv[2];
-  std::string file_out = argv[3];
   std::string name_data = "data";
 
-  if (argc > 4) {
-    name_data = argv[4];
+  if (argc > 3) {
+    name_data = argv[3];
   }
 
-  if (WriteDataToGrid(file_grid, file_data, file_out, name_data)) {
+  if (WriteDataToGrid(file_grid, file_data, file_grid, name_data)) {
     RETURN_ERR("Error write data to vtk grid\n");
   }
 

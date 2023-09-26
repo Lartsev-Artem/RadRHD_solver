@@ -9,8 +9,6 @@
 #ifndef MPI_EXTENSION
 #define MPI_EXTENSION
 
-#include <mpi.h>
-
 #include <cstdint>
 
 /**
@@ -27,6 +25,9 @@
  */
 /*inline*/ int8_t get_mpi_np();
 
+#ifdef USE_MPI
+#include <mpi.h>
+
 extern MPI_Datatype MPI_flux_t;            ///< mpi-тип для перессылки структуры ::flux_t
 extern MPI_Datatype MPI_flux_illum_elem_t; ///< mpi-тип для перессылки структуры
 extern MPI_Datatype MPI_hllc_value_t;      ///< mpi-тип для перессылки структуры
@@ -36,4 +37,5 @@ extern MPI_Datatype MPI_flux_elem_t;       ///< mpi-тип для перессы
 #define MPI_START(argc, argv) MPI_Init(&argc, &argv);
 #define MPI_END MPI_Finalize();
 
+#endif
 #endif // MPI_EXTENSION
