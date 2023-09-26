@@ -18,7 +18,9 @@
                 "/home/artem/projects/VTK9.3/VTK-build/IO/Legacy",
                 "/home/artem/projects/VTK9.3/VTK-build/Common/ExecutionModel",
                 "/home/artem/projects/VTK9.3/VTK-build/IO/Core",
-                "${workspaceFolder}/lib/geometry/include"
+                "${workspaceFolder}/lib/geometry/include",
+                "${workspaceFolder}/tests",
+                "${workspaceFolder}/tests/build_graph"
             ],
             "defines": [
                 "BUILD_GRAPH",

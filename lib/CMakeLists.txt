@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_COMPILER mpic++)
 
-project(solver VERSION 1.0) 
+project(lib VERSION 1.0) 
 
 if(NOT CMAKE_CXX_EXTENSIONS)
     set(CMAKE_CXX_EXTENSIONS OFF)
@@ -16,25 +16,6 @@ endif()
 add_compile_options(    
     -fopenmp    
     -g       
-    -D BUILD_GRAPH 
-    # -Og
-
-    # -Werror
-    # -pedantic-errors
-
-    # -Wall
-    # -Wextra    
-    # -Wpedantic
-
-    # -Wcast-align
-    
-    # -Wconversion    
-    # -Wenum-compare
-    # -Wfloat-equal    
-    # -Woverloaded-virtual
-    # -Wredundant-decls    
-    # -Wsign-promo
-
 
     # json. \todo: add ignore local diagnostic
     -Wno-unused-function
@@ -59,13 +40,12 @@ include_directories("${MAIN_DIR}/lib/Eigen")
 #find_package(VTK REQUIRED) 
 
 set(MAIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(MAIN_DIR_INC "${MAIN_DIR}/include")
-set(MAIN_DIR_SRC "${MAIN_DIR}/src")
-set(GRAPH_DIR "${MAIN_DIR}/build_graph")
-set(LIB_DIR "${MAIN_DIR}/lib")
-set(UTILS_DIR "${MAIN_DIR}/utils")
+set(LIB_DIR "${MAIN_DIR}")
+set(INC_DIR "${MAIN_DIR}/../include")
 
-set(SOURCES_DIR ${MAIN_DIR_INC} ${MAIN_DIR_SRC} ${GRAPH_DIR} ${LIB_DIR} ${UTILS_DIR})
+include_directories(${INC_DIR})
+
+set(SOURCES_DIR ${MAIN_DIR}  ${INC_DIR} ${LIB_DIR} )
 
 
 #поиск поддиректорий
@@ -111,7 +91,7 @@ ENDFOREACH()
 
 file( GLOB SOURCES ${src_files})
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 #target_link_libraries(${PROJECT_NAME}  ${VTK_LIBRARIES})
 

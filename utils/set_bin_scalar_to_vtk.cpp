@@ -1,5 +1,6 @@
-#include "global_def.h"
 #include "prj_config.h"
+#ifdef USE_VTK
+#include "global_def.h"
 
 #include "reader_bin.h"
 #include "reader_txt.h"
@@ -11,7 +12,6 @@
 typedef const std::string &file;
 typedef int data_type;
 
-#ifdef USE_VTK
 static int WriteDataToGrid(file name_file_grid, file name_file_data, file name_file_output, file name_data) {
   vtkSmartPointer<vtkUnstructuredGrid> unstructured_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
 

@@ -132,14 +132,14 @@
 
 #else
 
-#define WRITE_LOG(str) WRITE_LOG_ERR(str)
+#define WRITE_LOG(...) WRITE_LOG_ERR(__VA_ARGS__)
 
 #endif // WRITE_MPI_LOG
 
 #else
 #define CONVERT_TO_STRING(s, ...) #s #__VA_ARGS__
-#define WRITE_LOG(str) \
-  { CONVERT_TO_STRING(str); }
+#define WRITE_LOG(...) \
+  { CONVERT_TO_STRING(__VA_ARGS__); }
 #endif // WRITE_GLOBAL_LOG
 
 //#undef Files_log

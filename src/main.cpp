@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 
   // BuildDataFromVTK(glb_files);
 
-  SetScalarDataVtkFromFile(argc, argv);
+  // SetScalarDataVtkFromFile(argc, argv);
 
   /*
   graph test
@@ -28,7 +28,8 @@ int main(int argc, char *argv[]) {
     DataArray->SetTuple1(vector_data[i], i);
   }
   */
-  //  graph::RunGraphModule();
+  graph::RunGraphModule();
+
   // return 0;
 
   // std::vector<int> a;
