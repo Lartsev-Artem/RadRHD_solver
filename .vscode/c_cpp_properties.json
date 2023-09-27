@@ -20,7 +20,8 @@
                 "/home/artem/projects/VTK9.3/VTK-build/IO/Core",
                 "${workspaceFolder}/lib/geometry/include",
                 "${workspaceFolder}/tests",
-                "${workspaceFolder}/tests/build_graph"
+                "${workspaceFolder}/graph/include",
+                "${workspaceFolder}/graph"
             ],
             "defines": [
                 "BUILD_GRAPH",

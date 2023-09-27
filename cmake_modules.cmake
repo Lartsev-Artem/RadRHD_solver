@@ -1,3 +1,7 @@
+set(VTK_DIR "/home/artem/projects/VTK9.3/VTK-build")
+set(EIGEN_DIR "/home/artem/projects/solver/lib/Eigen")
+set (exclude_list "build" "Eigen" "data")
+
 #поиск поддиректорий
 MACRO(SUBDIRLIST result curdir)
   FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
@@ -44,41 +48,62 @@ MACRO(INCLUDE_SRC_IN_PRJ SOURCES_DIR src_files)
 ENDMACRO()
 
 
-set(VTK_DIR "/home/artem/projects/VTK9.3/VTK-build")
-set(EIGEN_DIR "/home/artem/projects/solver/lib/Eigen")
+function(get_all_files mask filelist)
+
+	file(GLOB_RECURSE file_list ${mask})
+#ifndef CRYPTO_MODEL_UNIFY
+	#message("Hdr list:" ${file_list})
+	if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_LESS "3.6")
+		foreach(fn ${file_list})		
+			foreach(del ${exclude_list})				
+				string(FIND ${fn} "${del}" fn_remove)
+				if(NOT "${fn_remove}" STREQUAL "-1")
+					list(REMOVE_ITEM file_list ${fn})
+				endif()
+			endforeach()
+		endforeach()
+	else()
+	foreach(del ${exclude_list})
+		list(FILTER file_list EXCLUDE REGEX ".+\\${del}")
+	endforeach()
+	endif()
+	#message("Hdr list no _na_:" ${file_list})
+#endif
+        set(${filelist} "${file_list}" PARENT_SCOPE)
+endfunction(get_all_files)
+
+function(get_dirs_from_files files dirs)	
+	set(dir_list "")
+	foreach(file_path ${files})
+	   if (NOT ${file_path} EQUAL "")
+	   	get_filename_component(dir_path ${file_path} PATH)
+	   	set(dir_list ${dir_list} ${dir_path})
+	   endif()
+	endforeach()
+	list(REMOVE_DUPLICATES dir_list)
+	set(${dirs} ${dir_list} PARENT_SCOPE)
+endfunction(get_dirs_from_files)
 
 
-##! Не рабоатет
+function(get_all_files_exc mask filelist exc_list)
 
-# # Рекурсивная функция для добавления всех подкаталогов
-# function(add_subdirs subdir depth exclude_list)
-#   # Получаем список всех элементов в текущем каталоге
-#   file(GLOB items RELATIVE ${MAIN_DIR}/${subdir} ${MAIN_DIR}/${subdir}/*)
-  
-#   # Перебираем все элементы
-#   foreach(item ${items})
-#     if(IS_DIRECTORY ${MAIN_DIR}/${subdir}/${item})
-#       # Если это действительно каталог и глубина не превышает заданное значение,
-#       # и каталог не находится в списке исключений, то добавляем его к списку подкаталогов 
-#       # и рекурсивно вызываем эту же функцию для каждого вложенного каталога      
-#       if((depth LESS_EQUAL ${MAX_DEPTH}) AND (NOT item IN_LIST exclude_list))
-#         list(APPEND subdirs_list ${subdir}/${item})
-#         MATH(EXPR depth "${depth}+1")
-
-#         include_directories("${MAIN_DIR}/${subdir}/${item}")
-#         message(WARNING ${MAIN_DIR}/${subdir}/${item} )
-
-#         add_subdirs(${subdir}/${item} ${depth} exclude_list)
-#       endif()    
-#     endif()
-#   endforeach()
-# endfunction()
-
-# # Список каталогов, которые необходимо исключить
-# set(EXCLUDE_LIST "Eigen")
-# set(MAX_DEPTH 3) # задаем максимальную глубину вложенности
-
-# # Вызываем функцию для начального каталога с начальной глубиной 0 и списком исключений
-# add_subdirs("lib" 0 ${EXCLUDE_LIST})
-# add_subdirs("build_graph" 0 ${EXCLUDE_LIST})
-# add_subdirs("include" 0 ${EXCLUDE_LIST})
+foreach(f ${exc_list})
+	message(WARNING ${f})
+endforeach()
+	file(GLOB_RECURSE file_list ${mask})
+#ifndef CRYPTO_MODEL_UNIFY
+	#message("Hdr list:" ${file_list})
+	if("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" VERSION_LESS "3.6")
+		foreach(fn ${file_list})
+			string(FIND ${fn} "_na_" fn_remove)
+			if(NOT "${fn_remove}" STREQUAL "-1")
+				list(REMOVE_ITEM file_list ${fn})
+			endif()
+		endforeach()
+	else()
+		list(FILTER file_list EXCLUDE REGEX ".+\\_na_")
+	endif()
+	#message("Hdr list no _na_:" ${file_list})
+#endif
+        set(${filelist} "${file_list}" PARENT_SCOPE)
+endfunction(get_all_files)

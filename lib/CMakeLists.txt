@@ -6,15 +6,15 @@ get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 
 option(DEBUG_COMPILER "compilation with debugging" OFF)
 
+include("../cmake_modules.cmake")  # функции cmake    
+include_directories("../include") #путь к файлу prj_config.h
+
 # задаём собственную конфигурацию
 if(NOT IS_SUBPROJECT)
     message(WARNING "building the library separately from the project")
     
-    set(CMAKE_CXX_COMPILER g++) #компилятор
-        
-    include("${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules.cmake")  # функции cmake    
-    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../include") #путь к файлу prj_config.h
-
+    set(CMAKE_CXX_COMPILER /usr/bin/g++) #компилятор
+            
     if(DEBUG_COMPILER) 
     add_compile_options(   
     -g           
@@ -51,6 +51,20 @@ if(NOT IS_SUBPROJECT)
     
 endif() #IS_SUBPROJECT
 
+
+get_all_files("${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" ${PROJECT_NAME}_FILES_CXX)
+get_all_files("${CMAKE_CURRENT_SOURCE_DIR}/*.h" ${PROJECT_NAME}_FILES_H)
+
+get_dirs_from_files("${${PROJECT_NAME}_FILES_H}" ${PROJECT_NAME}_DIR_H)
+include_directories(${PROJECT_NAME} ${${PROJECT_NAME}_DIR_H})
+
+#если это подпроект добавить пути в глобальную область видимости
+if(IS_SUBPROJECT)
+    set(${PROJECT_NAME}_INCLUDE_DIR ${${PROJECT_NAME}_DIR_H} PARENT_SCOPE)
+endif()
+
+
+#подключение библиотек
 include_directories(${EIGEN_DIR}) # библиотека Eigen
 
 find_package(VTK REQUIRED)
@@ -61,15 +75,8 @@ else()
     message(WARNING "vtk wasn't found")
 endif()
 
-set(SOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}_FILES_CXX}  ${${PROJECT_NAME}_FILES_H})
 
-FOREACH(dir_to_inc ${SOURCES_DIR})
-    INCLUDE_SRC_IN_PRJ(${dir_to_inc} src_files)
-ENDFOREACH()
-
-file( GLOB SOURCES ${src_files})
-
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 if(VTK_FOUND)
      target_link_libraries(${PROJECT_NAME} PUBLIC  ${VTK_LIBRARIES})
