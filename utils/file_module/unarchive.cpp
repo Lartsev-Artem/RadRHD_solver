@@ -6,8 +6,8 @@
 
 int FUNC_NAME(UnArchive)(int argc, char **argv) {
   utils::UtilsHelp(argc, argv, "Функция извлекает из архива файлы,"
-                        "архив должен содержать файлы типа Solve0.vtk и Solve{last_idx}.vtk и файлы данных data.bin"
-                        "затем вызывается процедура генерации сеток\n");
+                               "архив должен содержать файлы типа Solve0.vtk и Solve{last_idx}.vtk и файлы данных data.bin"
+                               "затем вызывается процедура генерации сеток\n");
 
   std::string archive_name = ""; // "D:\\Desktop\\FilesCourse\\UtilsTest\\Solve.7z";
 

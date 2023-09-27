@@ -72,7 +72,7 @@ void graph::DivideInnerBoundary(const Vector3 &direction,
     //здесь мы определяем все грани в ячейке, но фактически нас интересует только граничная
     intersection::FindInAndOutFaces(direction, normals[id / 4], state);
 
-    /// \note грань входящая -> граница выходящая
+    /// \warning грань "входящая" -> граница "выходящая" (не путать обозначения!)
     /// (т.е. определяется через пересечения аккретора и диска или трассировки)
 
     if (CHECK_BIT(state, id % 4) == e_face_type_in)

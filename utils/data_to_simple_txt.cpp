@@ -20,7 +20,7 @@ int FUNC_NAME(DataToSimpleTxt)(int argc, char **argv) {
     printf("Input:\n");
     printf("path\\data.txt\n");
     printf("path\\out_simple_format.txt\n");
-    return 1;
+    return e_completion_fail;
   }
 
   std::string file_data = argv[1];

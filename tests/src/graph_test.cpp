@@ -7,7 +7,7 @@
  * \details тест из файла vtk и сферы направлений строит граф обхода и создает новую сетку
  * со скалярными полями где значение --- позиция ячейки в графе
  *
- * \note требуется поддержка VTK и собранный build утилит
+ * \note требуется поддержка VTK
  *
  */
 
@@ -23,10 +23,12 @@
 #ifdef USE_VTK
 int main(int argc, char **argv) {
 
-  glb_files.base_address = "/home/artem/projects/solver/tests/build/";
-  glb_files.graph_address = "/home/artem/projects/solver/tests/build/graph/";
-  glb_files.name_file_sphere_direction = "/home/artem/projects/solver/tests/data/surface_26_dir.txt";
-  glb_files.name_file_vtk = "/home/artem/projects/solver/tests/data/sphere.vtk";
+  std::string prj_dir = "/home/artem/projects/solver/";
+
+  glb_files.base_address = prj_dir + " tests/build/";
+  glb_files.graph_address = prj_dir + "tests/build/graph/";
+  glb_files.name_file_sphere_direction = prj_dir + "tests/data/surface_26_dir.txt";
+  glb_files.name_file_vtk = prj_dir + "tests/data/sphere.vtk";
   glb_files.Build();
   std::string file_vtk_out = glb_files.base_address + "graph_test.vtk";
 
