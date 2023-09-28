@@ -25,7 +25,7 @@
     @{
 */
 
-//#define GENERATE_UTILS  ///<генерировать исполняемые файлы из утилит
+//#define GENERATE_UTILS ///<генерировать исполняемые файлы из утилит
 
 #ifdef GENERATE_UTILS
 #define FUNC_NAME(_name) main
@@ -95,5 +95,10 @@ int AddScalarDataVtkFromBinFile(int argc, char **argv);
 #endif
 
 } // namespace utils
+
+/**
+ * \todo добавить утилиты предсборки, а не функциями
+ *
+ */
 
 #endif //! UTILS_H

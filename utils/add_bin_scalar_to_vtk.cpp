@@ -1,4 +1,5 @@
 #ifdef USE_VTK
+#include "utils.h"
 #include "write_data_to_vtk.h"
 
 int FUNC_NAME(AddScalarDataVtkFromBinFile)(int argc, char *argv[]) {
@@ -18,7 +19,7 @@ int FUNC_NAME(AddScalarDataVtkFromBinFile)(int argc, char *argv[]) {
     name_data = argv[3];
   }
 
-  if (WriteDataToGrid(file_grid, file_data, file_grid, name_data)) {
+  if (utils::WriteDataToGrid(file_grid, file_data, file_grid, name_data)) {
     RETURN_ERR("Error write data to vtk grid\n");
   }
 

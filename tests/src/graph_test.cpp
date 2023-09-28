@@ -11,8 +11,8 @@
  *
  */
 
-#include "build_internal_format.h"
 #include "graph_main.h"
+#include "make_internal_format.h"
 
 #include "global_value.h"
 #include "reader_bin.h"

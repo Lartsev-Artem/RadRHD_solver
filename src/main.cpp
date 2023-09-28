@@ -1,6 +1,6 @@
 //#include <mpi.h>
 
-// #include "build_internal_format.h"
+// #include "make_internal_format.h"
 // #include "reader_bin.h"
 
 // #include "writer_bin.h"

@@ -2,8 +2,11 @@
 DEFCONF 		= SOLVERS BUILD_GRAPH USE_MPI DEBUG LINUX
 
 # defining working directories
-SRCDIR          = src lib/files_sys/src lib/geometry lib/mpi_extension lib/json graph/src lib/geometry/src utils
-INCLUDESDIR     = include lib utils lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension lib/solvers_types graph/include
+LIB_DIR lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension lib/solvers_types
+LIB_SRC lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometry/src
+
+SRCDIR          = src graph/src make_trace/include utils ${LIB_SRC}
+INCLUDESDIR     = include graph/include make_trace/src utils ${LIB_DIR}
 BUILDDIR        = build
 OBJDIR          = $(BUILDDIR)/objs
 

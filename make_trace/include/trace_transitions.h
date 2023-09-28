@@ -37,7 +37,7 @@ void FromLocalToGlobalTetra(const Eigen::Matrix4d &vertex_tetra, const Vector3 &
  * @param[in] tetra_coord точка в координатах тетраэдра
  * @param[out] plane_coord точка в координатах плоскости
  */
-inline void FromTetraToPlane(const Matrix3 &transform_matrix, const Vector3 &start_point, const Vector3 &tetra_coord, Vector3 &plane_coord);
+void FromTetraToPlane(const Matrix3 &transform_matrix, const Vector3 &start_point, const Vector3 &tetra_coord, Vector3 &plane_coord);
 
 /**
  * @brief Функция преобразует точку из координат плоскости-грани в координаты тетраэдра
@@ -49,7 +49,7 @@ inline void FromTetraToPlane(const Matrix3 &transform_matrix, const Vector3 &sta
  * @param[in] plane_coord точка в координатах плоскости
  * @param[out] tetra_coord точка в координатах тетраэдра
  */
-inline void FromPlaneToTetra(const Matrix3 &inverse_transform_matrix, const Vector3 &start_point, const Vector3 &plane_coord, Vector3 &tetra_coord);
+void FromPlaneToTetra(const Matrix3 &inverse_transform_matrix, const Vector3 &start_point, const Vector3 &plane_coord, Vector3 &tetra_coord);
 
 /**
  * @brief Функция возвращает коэффициенты интерполяции для представления решения в виде   ax+by+c
@@ -60,7 +60,7 @@ inline void FromPlaneToTetra(const Matrix3 &inverse_transform_matrix, const Vect
  * @return Vector3 коэффициенты
  * \warning эти функции не используются. Описание требует проверки!!!
  */
-inline Vector3 GetInterpolationCoef(const Matrix3 &interpolation_nodes, const Vector3 &function_value);
+Vector3 GetInterpolationCoef(const Matrix3 &interpolation_nodes, const Vector3 &function_value);
 
 /**
  * @brief Функция возвращает значения функции по коэффициентам интерполяции ax+by+c
@@ -71,7 +71,7 @@ inline Vector3 GetInterpolationCoef(const Matrix3 &interpolation_nodes, const Ve
  * @return Vector3 коэффициенты
  * \warning эти функции не используются. Описание требует проверки!!!
  */
-inline Vector3 GetInterpolationCoefInverse(const Matrix3 &interpolation_nodes, const Vector3 &function_value);
+Vector3 GetInterpolationCoefInverse(const Matrix3 &interpolation_nodes, const Vector3 &function_value);
 
 } // namespace trace
 #endif //! TRACE_CALC_H

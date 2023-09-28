@@ -6,11 +6,13 @@ get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 
 option(DEBUG_COMPILER "compilation with debugging" OFF)
 
-include("../cmake_modules.cmake")  # функции cmake    
-include_directories("../include") #путь к файлу prj_config.h
-
 # задаём собственную конфигурацию
 if(NOT IS_SUBPROJECT)
+
+    include("../cmake_modules.cmake")  # функции cmake    
+    include_directories("../include") #путь к файлу prj_config.h
+
+
     message(WARNING "building the library separately from the project")
     
     set(CMAKE_CXX_COMPILER /usr/bin/g++) #компилятор

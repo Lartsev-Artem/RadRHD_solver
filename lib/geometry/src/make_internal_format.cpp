@@ -1,4 +1,4 @@
-#include "build_internal_format.h"
+#include "make_internal_format.h"
 #ifdef USE_VTK
 
 #include "reader_bin.h"

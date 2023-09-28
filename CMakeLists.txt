@@ -15,9 +15,9 @@ endif()
 include("cmake_modules.cmake")   
 
 set(PRJ_NAME_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(MAIN_SUB_DIRS "include" "src" "graph")
+set(MAIN_SUB_DIRS "include" "src" "lib" "graph" "make_trace")
 
-add_definitions(-DBUILD_GRAPH -DUSE_MPI -DDEBUG)
+add_definitions(-DBUILD_GRAPH -DUSE_MPI -DDEBUG -DMAKE_TRACE)
 
 add_compile_options(    
     -fopenmp    
@@ -73,8 +73,8 @@ find_package(OpenMP)
 
 include_directories(${EIGEN_DIR}) # библиотека Eigen
 
-add_subdirectory(lib)
-include_directories(${lib_INCLUDE_DIR}) # добавляем пути из подпроекта
+# add_subdirectory(lib)
+# include_directories(${lib_INCLUDE_DIR}) # добавляем пути из подпроекта
 
 add_executable(${PROJECT_NAME}  ${SRC_CXX}  ${SRC_H})
 
@@ -83,4 +83,4 @@ if(OpenMP_CXX_FOUND)
   target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE lib)
+# target_link_libraries(${PROJECT_NAME} PRIVATE lib)

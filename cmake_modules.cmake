@@ -1,4 +1,4 @@
-set(VTK_DIR "/home/artem/projects/VTK9.3/build")
+set(VTK_DIR "/home/artem/projects/VTK9.3/VTK-build")
 set(EIGEN_DIR "/home/artem/projects/solver/lib/Eigen")
 set (exclude_list "build" "Eigen" "data")
 

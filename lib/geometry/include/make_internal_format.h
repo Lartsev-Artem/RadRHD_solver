@@ -1,5 +1,5 @@
-#ifndef BUILD_INTERNAL_FORMAT_H
-#define BUILD_INTERNAL_FORMAT_H
+#ifndef MAKE_INTERNAL_FORMAT_H
+#define MAKE_INTERNAL_FORMAT_H
 
 #include "prj_config.h"
 #ifdef USE_VTK
@@ -10,4 +10,4 @@ int BuildDataFromVTK(const global_files_t &glb_files);
 
 #endif
 
-#endif //! BUILD_INTERNAL_FORMAT_H
+#endif //! MAKE_INTERNAL_FORMAT_H
