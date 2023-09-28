@@ -4,6 +4,21 @@
 #include <vtkIdList.h>
 #include <vtkPoints.h>
 
+int GetFacesPoints(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<Face> &faces) {
+
+  const vtkIdType n = unstructured_grid->GetNumberOfCells();
+  faces.resize(n * CELL_SIZE);
+
+  for (vtkIdType i = 0; i < n; i++) {
+    for (vtkIdType j = 0; j < CELL_SIZE; j++) {
+      for (vtkIdType k = 0; k < CELL_SIZE - 1; k++)
+        faces[i * CELL_SIZE + j][k] = Vector3(unstructured_grid->GetCell(i)->GetFace(j)->GetPoints()->GetPoint(k));
+    }
+  }
+
+  return e_completion_success;
+}
+
 int GetBoundaryCells(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::set<IntId> &boundary_cells) {
 
   boundary_cells.clear();

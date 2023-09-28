@@ -63,8 +63,8 @@ struct grid_directions_t {
   Type full_area;
 };
 
-struct BasePointTetra //узлы интерполяции всех тетраэдров // В перспективе
-                      //можно уйти к граням
+//это узлы интерполяции на гранях
+struct BasePointTetra //узлы интерполяции всех тетраэдров // В перспективе можно уйти к граням
 {
   Vector3 x[CELL_SIZE][NUMBER_OF_MEASUREMENTS];
 

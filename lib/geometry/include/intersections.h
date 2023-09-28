@@ -20,5 +20,15 @@ int InTriangle(int number_face, const Face &cell_face, const Normals &normals_ce
  * @param face_type[out] тип ячейки ::e_face_in_out_type_t
  */
 void FindInAndOutFaces(const Vector3 &direction, const Normals &normals_cell, bits_flag_t &face_type);
+
+/**
+ * @brief Поиск пересечений луча с диско сферой вне расчетной области
+ *
+ * @param X0
+ * @param n
+ * @param res
+ * @warning не использовать. Нужна проверка
+ */
+int IntersectionWithPlaneDisk(const Vector3 &X0, const Vector3 &n, Vector3 &res);
 } // namespace intersection
 #endif //! INTERSECTIONS_H

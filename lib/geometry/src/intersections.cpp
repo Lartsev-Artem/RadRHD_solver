@@ -1,7 +1,5 @@
 #include "intersections.h"
 
-namespace intersection {
-
 /**
  * @brief Построение локального базиса плоскости
  *
@@ -62,7 +60,7 @@ static void TransformTo2d(const Vector3 &start, const Matrix3 &local_basis,
   }
 }
 
-int IntersectionWithPlaneDisk(const Vector3 &X0, const Vector3 &n, Vector3 &res) {
+int intersection::IntersectionWithPlaneDisk(const Vector3 &X0, const Vector3 &n, Vector3 &res) {
 
   //  ----------полный расчет. Т.к. диск задается постоянной плоскостью, параметры можно задатб явно--------------
   /*
@@ -114,7 +112,7 @@ int IntersectionWithPlaneDisk(const Vector3 &X0, const Vector3 &n, Vector3 &res)
   return 0;
 }
 
-void IntersectionWithPlane(const Face &face, const Vector3 &start_point, const Vector3 &direction, Vector3 &result) {
+void intersection::IntersectionWithPlane(const Face &face, const Vector3 &start_point, const Vector3 &direction, Vector3 &result) {
 
   Type a, b, c, d; // параметры уравнения плоскости
   Type t;
@@ -130,7 +128,7 @@ void IntersectionWithPlane(const Face &face, const Vector3 &start_point, const V
     result[i] = (direction[i] * t + start_point[i]); // точка пересечения луча  (start->direction) с плоскостью!!! face
 }
 
-int InTriangle(int number_face, const Face &cell_face, const Normals &normals_cell, const Vector3 &XX) {
+int intersection::InTriangle(int number_face, const Face &cell_face, const Normals &normals_cell, const Vector3 &XX) {
   /*face --- треугольник, X --- точка для проверки*/
 
   Vector3 A, B, C, X; // новые точки на плоскости
@@ -157,7 +155,7 @@ int InTriangle(int number_face, const Face &cell_face, const Normals &normals_ce
     return false;
 }
 
-void FindInAndOutFaces(const Vector3 &direction, const Normals &normals_cell, bits_flag_t &face_type) {
+void intersection::FindInAndOutFaces(const Vector3 &direction, const Normals &normals_cell, bits_flag_t &face_type) {
   face_type = 0;
   for (int i = 0; i < CELL_SIZE; ++i) {
     if (normals_cell.n[i].dot(direction) < -1e-10) {
@@ -165,4 +163,3 @@ void FindInAndOutFaces(const Vector3 &direction, const Normals &normals_cell, bi
     }
   }
 }
-} // namespace intersection

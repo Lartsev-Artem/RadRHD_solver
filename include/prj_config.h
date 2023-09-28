@@ -5,7 +5,7 @@
  * Available compiling (make) keys:
  * @arg CLASTER/LINUX/WINDOWS --- целевая платформа (сборка под кластер/linux/windows)
  * @arg BUILD_GRAPH           --- собирать модуль построения графов
- * @arg BUILD_DATA_TO_ILLUM   --- собирать модуль трассировки лучей
+ * @arg MAKE_TRACE            --- собирать модуль трассировки лучей
  * @arg SOLVERS               --- собирать модуль решателей
  * @arg UTILS                 --- собирать модуль утилит
  * @arg USE_CUDA              --- подключение технологии cuda

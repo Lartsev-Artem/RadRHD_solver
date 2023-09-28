@@ -21,7 +21,8 @@
                 "${workspaceFolder}/lib/geometry/include",
                 "${workspaceFolder}/tests",
                 "${workspaceFolder}/graph/include",
-                "${workspaceFolder}/graph"
+                "${workspaceFolder}/graph",
+                "${workspaceFolder}/make_trace"
             ],
             "defines": [
                 "BUILD_GRAPH",
@@ -29,7 +30,8 @@
                 "LINUX",
                 "SOLVERS",
                 "USE_MPI",
-                "USE_VTK"
+                "USE_VTK",
+                "MAKE_TRACE"
             ],
             "compilerPath": "/usr/bin/mpic++",
             "cStandard": "c17",

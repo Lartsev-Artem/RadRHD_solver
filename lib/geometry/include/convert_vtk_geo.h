@@ -20,6 +20,15 @@
 #include "geo_types.h"
 
 /**
+ * @brief Get the Faces Points object
+ *
+ * @param[in] unstructured_grid сетка в формате vtk
+ * @param[out] faces массив с гранями по всем ячейкам (в глобальной нумерации (size_cell*number_of_cell + face))
+ * @return int ::e_type_completion
+ */
+int GetFacesPoints(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<Face> &faces);
+
+/**
  * @brief Функция переводит заданные грани из vtk формата во внутренний
  *
  * @tparam stdT
