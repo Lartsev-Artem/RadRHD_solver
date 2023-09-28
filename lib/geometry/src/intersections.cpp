@@ -128,14 +128,15 @@ void intersection::IntersectionWithPlane(const Face &face, const Vector3 &start_
     result[i] = (direction[i] * t + start_point[i]); // точка пересечения луча  (start->direction) с плоскостью!!! face
 }
 
-int intersection::InTriangle(int number_face, const Face &cell_face, const Normals &normals_cell, const Vector3 &XX) {
-  /*face --- треугольник, X --- точка для проверки*/
+bool intersection::InTriangle(const Face &cell_face, const Vector3 &normal, const Vector3 &XX) {
+  /*face --- треугольник, X --- точка для проверки,
+   Vector3 n = normals_cell.n[number_face % 4];*/
 
   Vector3 A, B, C, X; // новые точки на плоскости
   {
     Eigen::Matrix3d basis;
-    Vector3 n = normals_cell.n[number_face % 4];
-    SetBasis(n, basis);
+
+    SetBasis(normal, basis);
     TransformTo2d(cell_face.A, basis, cell_face.A, A);
     TransformTo2d(cell_face.A, basis, cell_face.B, B);
     TransformTo2d(cell_face.A, basis, cell_face.C, C);

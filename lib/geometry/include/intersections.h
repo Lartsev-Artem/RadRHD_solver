@@ -1,3 +1,7 @@
+/**
+ * @file intersections.h
+ * @brief Функции поиска пересечений геометрических объектов
+ */
 #ifndef INTERSECTIONS_H
 #define INTERSECTIONS_H
 #include "geo_types.h"
@@ -9,8 +13,25 @@
  */
 namespace intersection {
 
+/**
+ * @brief Функция определяет точку пересечения луча с плоскостью, заданной 3 точками
+ *
+ * @param[in] face плоскость
+ * @param[in] start_point начало луча
+ * @param[in] direction направление
+ * @param[out] result точка пересечения
+ */
 void IntersectionWithPlane(const Face &face, const Vector3 &start_point, const Vector3 &direction, Vector3 &result);
-int InTriangle(int number_face, const Face &cell_face, const Normals &normals_cell, const Vector3 &XX);
+
+/**
+ * @brief Функция проверяет пересечение треугольника и точки на плоскости
+ *
+ * @param[in] cell_face плоскость
+ * @param[in] normal внешняя нормаль к плоскости грани
+ * @param[in] XX проверочная точка
+ * @return bool признак принадлежности
+ */
+bool InTriangle(const Face &cell_face, const Vector3 &normal, const Vector3 &XX);
 
 /**
  * @brief Определяет типы граней ячейки по отношению к направлению

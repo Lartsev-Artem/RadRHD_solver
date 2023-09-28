@@ -101,7 +101,7 @@ int trace::RunTracesModule() {
   Vector3 direction;
 
   // массивы записи в файл:
-  std::vector<int> face_states(count_cells, 0); //битовое поле: 0=> выходящая грань,  1=> входящая
+  std::vector<bits_flag_t> face_states(count_cells, 0); //битовое поле: 0=> выходящая грань,  1=> входящая
   std::vector<cell_local> vec_x0;
   std::vector<Type> vec_res_bound;
 
@@ -124,9 +124,9 @@ int trace::RunTracesModule() {
       for (ShortId num_out_face = 0; num_out_face < CELL_SIZE; ++num_out_face) {
         if (!CHECK_BIT(face_state, num_out_face)) // выходящие грани
         {
-          GetNodes(num_cell, grid, num_out_face, vertexs[num_cell],
-                   face_state, direction, normals, neighbours,
-                   vec_x[num_cell], vec_res_bound, vec_x0);
+          GetLocNodes(num_cell, num_out_face, grid, vertexs[num_cell],
+                      face_state, direction, normals[num_cell], neighbours,
+                      vec_x[num_cell], vec_res_bound, vec_x0);
         }
       }
     }

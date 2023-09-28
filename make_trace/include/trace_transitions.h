@@ -1,3 +1,8 @@
+/**
+ * @file trace_transitions.h
+ * @brief Функции перехода между системами координат
+ *
+ */
 #if !defined TRACE_CALC_H && defined MAKE_TRACE
 #define TRACE_CALC_H
 

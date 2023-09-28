@@ -53,7 +53,7 @@ static int FindIdCellInBoundary(const Vector3 &direction,
   for (auto &in_id : inner_bound) {
     plane_face = inner_cells.find(in_id)->second;
     in::IntersectionWithPlane(plane_face.face, vertex1, direction, buf_try.x[0]);
-    if (in::InTriangle(plane_face.face_id, plane_face.face, normals[in_id], buf_try.x[0]))
+    if (in::InTriangle(plane_face.face, normals[in_id].n[plane_face.face_id%SIZE_CELL], buf_try.x[0]))
     // if (in_id != cur_cell && ((intersect_point - vertex1).dot(direction) < 0))
     {
       /*	std::bitset<4>id;
@@ -72,7 +72,7 @@ static int FindIdCellInBoundary(const Vector3 &direction,
   for (auto &in_id : inner_bound) {
     plane_face = inner_cells.find(in_id)->second;
     in::IntersectionWithPlane(plane_face.face, vertex2, direction, buf_try.x[1]);
-    if (in::InTriangle(plane_face.face_id, plane_face.face, normals[in_id], buf_try.x[1]))
+    if (in::InTriangle(plane_face.face, normals[in_id].n[plane_face.face_id%SIZE_CELL], buf_try.x[1]))
     // if (in_id != cur_cell && ((intersect_point - vertex2).dot(direction) < 0))
     {
       /*	std::bitset<4>id;
@@ -90,7 +90,7 @@ static int FindIdCellInBoundary(const Vector3 &direction,
   for (auto &in_id : inner_bound) {
     plane_face = inner_cells.find(in_id)->second;
     in::IntersectionWithPlane(plane_face.face, vertex3, direction, buf_try.x[2]);
-    if (in::InTriangle(plane_face.face_id, plane_face.face, normals[in_id], buf_try.x[2]))
+    if (in::InTriangle(plane_face.face, normals[in_id].n[plane_face.face_id%SIZE_CELL], buf_try.x[2]))
     // if (in_id != cur_cell && ((intersect_point - vertex3).dot(direction) < 0))
     {
       /*	std::bitset<4>id;

@@ -1,6 +1,6 @@
 /**
  * @file trace_struct.h
- * @brief
+ * @brief Локальные структуры для модуля трассировки
  *
  */
 
@@ -11,6 +11,11 @@
 
 namespace trace {
 
+/**
+ * @brief Структура описывающая стандартный тетраэдр с
+ * единичными размерами и прямыми углами и началом в точке {0,0,0}
+ *
+ */
 struct BaseTetra_t {
   Vector3 start_point_plane_coord;  ///< начало координат плоскости
   Matrix3 transform_matrix;         ///< матрица перехода из базового тетраэдра в плоскость
@@ -60,15 +65,10 @@ struct BaseTetra_t {
     straight_face_inverse = straight_face.inverse(); // в решении
   }
 };
-const BaseTetra_t base_tetra_geo;
 
 // параметры диска и внутренней сферы:
-const Type Rsphere = 0.001;
-const Type R1disk = 0.001;
-const Type R2disk = 0.09;
-
-extern std::vector<Vector3> x_try_surface;
-extern std::vector<int> id_try_surface;
-
+constexpr double kRsphere = 0.001; ///< радиус аккретора
+constexpr double kR1disk = 0.001;  ///< внутренний радиус диска
+constexpr double kR2disk = 0.09;   ///< внешний радиус диска
 } // namespace trace
 #endif //! TRACE_STRUCT_H

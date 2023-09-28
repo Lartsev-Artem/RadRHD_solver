@@ -83,4 +83,4 @@ if(OpenMP_CXX_FOUND)
   target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
 endif()
 
-target_link_libraries(${PROJECT_NAME} lib)
+target_link_libraries(${PROJECT_NAME} PRIVATE lib)
