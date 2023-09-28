@@ -71,7 +71,7 @@ int files_sys::bin::ReadData(const size_t class_file_vtk, const std::string &mai
   RETURN_ERR("Error size data\n");
 }
 
-#ifdef ILLUM
+#if 0 // def ILLUM
 #define READ_FILE(name_file, data, value)       \
   {                                             \
     FILE *f;                                    \
@@ -122,12 +122,13 @@ int files_sys::bin::ReadData(const solve_mode_t &mode, const std::string &main_d
 
   return 0;
 }
-
+#endif
+#ifdef ILLUM
 int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
                                        std::vector<BasePointTetra> &vec_x,
-                                       std::vector<std::vector<int>> &face_states,
+                                       std::vector<std::vector<State>> &face_states,
                                        std::vector<std::vector<cell_local>> &vec_x0,
-                                       std::vector<std::vector<int>> &sorted_id_cell,
+                                       std::vector<std::vector<IntId>> &sorted_id_cell,
                                        std::vector<Type> &vec_res_bound) {
   if (ReadSimple(gbl_files.name_file_x, vec_x))
     return e_completion_fail;
@@ -137,10 +138,9 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
   std::vector<int> disp;
   std::vector<int> send;
 
-#ifdef USE_MPI
-  int np = claster_cfg.np_illum;
-  int myid = claster_cfg.id_illum;
-  // MPI_GET_INF(np, myid);
+#if 0 /// def USE_MPI
+  int np = get_mpi_np();
+  int myid = get_mpi_id();
 
   GetDisp(np, count_dir, disp);
   GetSend(np, count_dir, send);

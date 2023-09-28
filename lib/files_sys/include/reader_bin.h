@@ -122,8 +122,7 @@ int ReadData(const size_t class_file_vtk, const std::string &main_dir,
  * @param[out] grid структура сетки
  * @return int ::e_type_completion
  */
-int ReadData(const solve_mode_t &mode, const std::string &main_dir,
-             grid_t &grid);
+int ReadData(const solve_mode_t &mode, const std::string &main_dir, grid_t &grid);
 
 /**
  * @brief Чтение результатов трассировки.
@@ -142,9 +141,9 @@ int ReadData(const solve_mode_t &mode, const std::string &main_dir,
  */
 int ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
                        std::vector<BasePointTetra> &vec_x,
-                       std::vector<std::vector<int>> &face_states,
+                       std::vector<std::vector<State>> &face_states,
                        std::vector<std::vector<cell_local>> &vec_x0,
-                       std::vector<std::vector<int>> &sorted_id_cell,
+                       std::vector<std::vector<IntId>> &sorted_id_cell,
                        std::vector<Type> &vec_res_bound);
 #endif //! ILLUM
 

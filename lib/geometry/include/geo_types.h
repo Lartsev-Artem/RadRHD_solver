@@ -79,23 +79,6 @@ struct cell_local // для каждой ячейки и каждого напр
   friend std::ostream &operator<<(std::ostream &out, const cell_local &point);
 };
 
-#include "solvers_types.h"
-struct grid_t {
-  struct elem_t {
-    flux_t phys_val;
-  };
-
-  struct face_t {
-    int a;
-  };
-
-  int size;
-  std::vector<elem_t> cells;
-  std::vector<face_t> faces;
-
-  /// \todo all config!
-};
-
 /**
  * @brief Тип соседней ячейки к грани текущей
  * @note величины от 0 до N обозначают номер соседнего элемента

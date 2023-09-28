@@ -18,3 +18,8 @@ std::istream &operator>>(std::istream &is, FaceCell &f) {
          f.face.B[0] >> f.face.B[1] >> f.face.B[2] >>
          f.face.C[0] >> f.face.C[1] >> f.face.C[2];
 }
+
+std::ostream &operator<<(std::ostream &out, const cell_local &p) {
+  out << (int)p.in_face_id << ' ' << p.s << ' ' << p.x0[0] << ' ' << p.x0[1] << '\n';
+  return out;
+}

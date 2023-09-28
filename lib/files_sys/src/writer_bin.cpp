@@ -4,7 +4,7 @@
 
 #include "mpi_ext.h"
 #include "solvers_config.h"
-#include "solvers_types.h"
+#include "solvers_struct.h"
 
 int files_sys::bin::WriteNormals(const std::string &name_file_normals, std::vector<Normals> &normals) {
   FILE *f;
@@ -131,14 +131,33 @@ static inline size_t files_sys::bin::WriteFileSolutionSplit(const std::string &m
 // не видет параметры под макросом
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+/*! Пересчет излучения с грани в ячейку в заданном направлении
+num_dir - номер направления
+illum_on_face - излучение на гранях по всем направлениям
+*/
+
+int GetDirectionIllumFromFace(const int size_grid, const int num_dir, const Type *illum_on_face, std::vector<Type> &illum_in_cell) {
+  // if (illum_on_face.size() < size_grid* CELL_SIZE +size_grid * num_dir * CELL_SIZE) RETURN_ERR("illum_on_face hasn't enough data\n");
+  if (illum_on_face == nullptr)
+    RETURN_ERR("illum_on_face hasn't enough data\n");
+
+  illum_in_cell.resize(size_grid, 0);
+  for (size_t j = 0; j < size_grid; j++) {
+    const int N = num_dir * CELL_SIZE * size_grid + j * CELL_SIZE;
+    for (size_t k = 0; k < CELL_SIZE; k++) {
+      illum_in_cell[j] += illum_on_face[N + k];
+    }
+    illum_in_cell[j] /= CELL_SIZE;
+  }
+  return 0;
+}
 
 static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid_t &grid) {
 
 #ifdef ILLUM
-#include "../solve_module/illum/illum_utils.h"
   std::vector<Type> illum;
   GetDirectionIllumFromFace(grid.size, 0, grid.Illum, illum);
-  WriteSimpleFileBin(main_dir + "Illum.bin", illum);
+  files_sys::bin::WriteSimple(main_dir + "Illum.bin", illum);
 
 #if !defined USE_CUDA
   WRITE_FILE_ELEM((main_dir + "energy.bin").c_str(), grid.cells, illum_val.energy);
