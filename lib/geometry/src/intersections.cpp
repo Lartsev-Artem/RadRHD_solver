@@ -164,3 +164,39 @@ void intersection::FindInAndOutFaces(const Vector3 &direction, const Normals &no
     }
   }
 }
+
+Type intersection::RayIntersectsTriangle(const Vector3 &ray_orig, const Vector3 &ray_dir, const Face &triangle, Vector3 &intersection) {
+
+  constexpr double eps = 1e-10;
+  Vector3 edge1 = triangle.B - triangle.A;
+  Vector3 edge2 = triangle.C - triangle.A;
+  Vector3 h = ray_dir.cross(edge2);
+
+  Type det = edge1.dot(h);
+
+  if (det > -eps && det < eps)
+    return -1; // луч параллелен плоскости
+
+  Type inv_det = 1.0 / det;
+  Vector3 s = ray_orig - triangle.A;
+  Type u = inv_det * s.dot(h);
+
+  if (u < 0.0 || u > 1.0)
+    return -1;
+
+  Vector3 q = s.cross(edge1);
+  Type v = inv_det * ray_dir.dot(q);
+
+  if (v < 0.0 || u + v > 1.0)
+    return -1;
+
+  Type dist = inv_det * edge2.dot(q); // расстояние до плоскости
+
+  if (dist > 0.0) // ray intersection
+  {
+    intersection = ray_orig + ray_dir * dist;
+    return dist;
+  }
+
+  return -1; //Это означает, что линия пересекла треугольник против хода луча
+}

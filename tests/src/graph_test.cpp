@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
   std::string prj_dir = "/home/artem/projects/solver/";
 
-  glb_files.base_address = prj_dir + " tests/build/";
+  glb_files.base_address = prj_dir + "tests/build/";
   glb_files.graph_address = prj_dir + "tests/build/graph/";
   glb_files.name_file_sphere_direction = prj_dir + "tests/data/surface_26_dir.txt";
   glb_files.name_file_vtk = prj_dir + "tests/data/sphere.vtk";
