@@ -1,4 +1,3 @@
-#ifdef SOLVERS
 #include "solvers_struct.h"
 
 #include "dbgdef.h"
@@ -136,5 +135,3 @@ grid_t::~grid_t() {
 }
 #endif
 #endif // NOT USE_CUDA
-
-#endif //! SOLVERS

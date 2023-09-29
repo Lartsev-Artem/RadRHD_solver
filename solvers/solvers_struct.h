@@ -1,10 +1,9 @@
-#if !defined SOLVERS_STRUCT_H && defined SOLVERS
+#if !defined SOLVERS_STRUCT_H
 #define SOLVERS_STRUCT_H
 
 #include "global_def.h"
 #include "global_types.h"
 
-extern std::vector<bound_size_t> hllc_loc_size;
 extern solve_mode_t _solve_mode;
 
 /**
@@ -119,16 +118,15 @@ struct grid_t {
   Type *Illum;
   Type *scattering;
 
-  void InitMemory(const uint32_t num_cells, const uint32_t num_directions);
-
   grid_t() : size(0), Illum(nullptr), scattering(nullptr) {}
   ~grid_t();
 
-  //  ILLUM
 #else
   grid_t() { size = 0; }
 #endif
+  void InitMemory(const uint32_t num_cells, const uint32_t num_directions);
 };
 
+extern std::vector<bound_size_t> hllc_loc_size;
 #endif // USE_CUDA
 #endif //! SOLVERS_STRUCT_H

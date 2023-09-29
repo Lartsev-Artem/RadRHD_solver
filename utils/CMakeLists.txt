@@ -11,7 +11,7 @@ option(INSTALL "install executable files" OFF)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(MAIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
-set(MAIN_SUB_DIRS "include" "lib")
+set(MAIN_SUB_DIRS "include" "lib" "solvers" "make_trace")
 
 include_directories("${MAIN_DIR}/include") #путь к файлу prj_config.h
 include("${MAIN_DIR}/cmake_modules.cmake")  # функции cmake    

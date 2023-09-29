@@ -114,6 +114,7 @@ int ReadData(const size_t class_file_vtk, const std::string &main_dir,
              const bool is_print = false);
 
 #ifdef ILLUM
+#include "solvers_struct.h"
 /**
  * @brief Чтение данных, распределённых по ячейкам сетки
  * @warning НЕ ИСПОЛЬЗОВАТЬ!!!!

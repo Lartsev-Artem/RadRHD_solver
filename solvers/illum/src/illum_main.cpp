@@ -1,3 +1,4 @@
+#ifdef SOLVERS
 #include "illum_main.h"
 
 #include "global_types.h"
@@ -49,3 +50,5 @@ int illum::RunIllumModule() {
 
   return files_sys::bin::WriteSolution(glb_files.solve_address, grid);
 }
+
+#endif //! SOLVERS

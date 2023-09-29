@@ -38,3 +38,4 @@ void ConvertBinToGeo(std::vector<IntId> &neighbours_id_faces,
       cc++;
     }
   }
+}
