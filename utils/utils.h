@@ -92,6 +92,34 @@ int DataToSimpleTxt(int argc, char **argv);
  * @return int ::e_type_completion
  */
 int AddScalarDataVtkFromBinFile(int argc, char **argv);
+
+/**
+ * @brief Функция на основе бинарных файлов геометрии формирует два файла с геометрией в формате ::face_t ::elem_t
+ *
+ * @param[in] argc кол-во аргументов (требуется 1)
+ * @param[in] argv массив char** содержит {адрес с файлами геометрии}
+ * @return int ::e_type_completion
+ */
+int ReWriteBinToGeo(int argc, char **argv);
+
+/**
+ * @brief Функция строит сетку vtk из бинарный файлов
+ *
+ * @param argc кол-во аргументов (требуется 3)
+ * @param argv массив char** содержит {файл vtk сетки, адрес с файлами решения, число сеток}
+ * @return int ::e_type_completion
+ * @note адрес задаётся с включение главного имени без индекса
+ */
+int RebuildSolve(int argc, char **argv);
+
+/**
+ * @brief Функция строит для всех модулей геометрические настроечные файлы из vtk сетки
+ *
+ * @param argc кол-во аргументов (требуется 3)
+ * @param argv
+ * @return int ::e_type_completion
+ */
+int MakeAllGeoData(int argc, char **argv);
 #endif
 
 } // namespace utils

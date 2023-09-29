@@ -16,6 +16,7 @@ typedef int data_type;
 
 template <typename file>
 int WriteDataToGrid(file name_file_grid, file name_file_data, file name_file_output, file name_data) {
+
   vtkSmartPointer<vtkUnstructuredGrid> unstructured_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
 
   if (files_sys::vtk::Read(name_file_grid, unstructured_grid))

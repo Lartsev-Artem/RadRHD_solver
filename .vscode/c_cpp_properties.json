@@ -25,7 +25,9 @@
                 "${workspaceFolder}/make_trace",
                 "${workspaceFolder}/solvers",
                 "${workspaceFolder}/solvers/illum",
-                "${workspaceFolder}/solvers/illum/include"
+                "${workspaceFolder}/solvers/illum/include",
+                "${workspaceFolder}/lib",
+                "${workspaceFolder}/lib/mpi_extension"
             ],
             "defines": [
                 "BUILD_GRAPH",
