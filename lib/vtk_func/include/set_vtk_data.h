@@ -3,6 +3,8 @@
 
 #include "dbgdef.h"
 #include <typeinfo>
+#include <vtkCellData.h>
+#include <vtkDoubleArray.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 
@@ -26,14 +28,14 @@ int SetDoubleVtkData(const std::string &name_data, const std::vector<Type> &data
   switch (sizeof(Type) / sizeof(double)) {
   case 1:
     for (auto el : data) {
-      data_vtk->InsertNextTuple(el);
+      data_vtk->InsertNextTuple((double *)&el);
     }
     u_grid->GetCellData()->AddArray(data_vtk);
     break;
 
   case 3:
     for (auto &el : data) {
-      data_vtk->InsertNextTuple(el.data());
+      data_vtk->InsertNextTuple((double *)&el);
     }
     u_grid->GetCellData()->SetActiveVectors(name_data.c_str());
     u_grid->GetCellData()->SetVectors(data_vtk);
@@ -42,7 +44,7 @@ int SetDoubleVtkData(const std::string &name_data, const std::vector<Type> &data
 
   case 9:
     for (auto &el : data) {
-      data_vtk->InsertNextTuple(el.data());
+      data_vtk->InsertNextTuple((double *)&el);
     }
     u_grid->GetCellData()->SetActiveTensors(name_data.c_str());
     u_grid->GetCellData()->SetTensors(data_vtk);

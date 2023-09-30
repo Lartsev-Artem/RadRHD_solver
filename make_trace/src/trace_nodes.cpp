@@ -221,6 +221,8 @@ static int CalculateNodeValue(const int num_cell, const Normals &normal, const s
 
     intersection::IntersectionWithPlane(grid[face_id], x, direction, x0);
 
+    // intersection::RayIntersectsTriangle(x, -direction, grid[face_id], x0);
+
     if (intersection::InTriangle(grid[face_id], normal.n[num_in_face], x0)) {
       cell_local x0_local;
       x0_local.s = (x - x0).norm();

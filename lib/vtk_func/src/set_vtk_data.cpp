@@ -1,3 +1,4 @@
+#ifdef USE_VTK
 #include "set_vtk_data.h"
 #include "reader_bin.h"
 #include <filesystem>
@@ -25,21 +26,22 @@ int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointe
 
   for (auto &str : name_data3) {
     if (fs::exists(address_solution + str)) {
-      if (files_sys::bin::ReadSimple(address_solution + str, data)) {
+      if (files_sys::bin::ReadSimple(address_solution + str, data3)) {
         return e_completion_fail;
       }
-      SetDoubleVtkData(fs::path(str).replace_extension(), data, u_grid);
+      SetDoubleVtkData(fs::path(str).replace_extension(), data3, u_grid);
     }
   }
 
   for (auto &str : name_data9) {
     if (fs::exists(address_solution + str)) {
-      if (files_sys::bin::ReadSimple(address_solution + str, data)) {
+      if (files_sys::bin::ReadSimple(address_solution + str, data9)) {
         return e_completion_fail;
       }
-      SetDoubleVtkData(fs::path(str).replace_extension(), data, u_grid);
+      SetDoubleVtkData(fs::path(str).replace_extension(), data9, u_grid);
     }
   }
 
   return e_completion_success;
 }
+#endif //! USE_VTK

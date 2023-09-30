@@ -4,7 +4,7 @@
  *
  */
 
-#if !defined TRACE_PREBUILD_H && defined MAKE_TRACE
+#if !defined TRACE_PREBUILD_H
 #define TRACE_PREBUILD_H
 
 #include "json_struct.h"

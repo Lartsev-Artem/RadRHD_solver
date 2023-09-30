@@ -1,20 +1,21 @@
 # defining project config 
-DEFCONF 		= SOLVERS BUILD_GRAPH USE_MPI DEBUG LINUX
+DEFCONF 		= SOLVERS BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI DEBUG LINUX 
 
 # defining working directories
-LIB_DIR lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension lib/solvers_types
-LIB_SRC lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometry/src
+LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension
+LIB_SRC = lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometry/src
 
-SRCDIR          = src graph/src make_trace/include utils ${LIB_SRC}
-INCLUDESDIR     = include graph/include make_trace/src utils ${LIB_DIR}
+SRCDIR          = src graph/src make_trace/src  ${LIB_SRC} solvers/illum/src solvers
+INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR} solvers/illum/include solvers
 BUILDDIR        = build
 OBJDIR          = $(BUILDDIR)/objs
+DEPDIR          = $(BUILDDIR)/dep
 
 # specify the list of directories in which the search should be performed.
 vpath %.cpp 		$(SRCDIR) 
 vpath %.h %.hpp 	$(INCLUDESDIR)
 vpath %.o 			$(OBJDIR)
-vpath %.d 			$(BUILDDIR)
+vpath %.d 			$(DEPDIR)
 
 .SUFFIXES:						# Delete the default suffixes
 .SUFFIXES: .cpp .h .o .d .hpp	# Define our suffix list
@@ -31,8 +32,8 @@ DEF_SET 		= $(addprefix -D , $(DEFCONF))
 #######################################################################
 
 CXX             = mpic++
-CPPFLAGS        = $(DEF_SET) -fopenmp #-fPIE -Ofast -fopenmp
-CXXFLAGS        = -g #-Wall -Wextra -std=c++11
+CPPFLAGS        = $(DEF_SET) -fopenmp  -Ofast #-fPIE
+CXXFLAGS        = #-g #-Wall -Wextra -std=c++11
 
 NVCC 				= nvcc
 NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp"
@@ -48,6 +49,7 @@ all: $(PROGRAM)
 #Make executable file. Early was $(addprefix $(OBJDIR)/, $^)
 $(PROGRAM): %: $(OBJS)
 	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./, $^) $(LOADLIBES) $(LDLIBS) -o $@ 
+	mv $(PROGRAM) $(BUILDDIR)
 
 
 # Building rule for .o files and its .c/.cpp in combination with all .h
@@ -57,7 +59,8 @@ $(PROGRAM): %: $(OBJS)
 # Creates the dependecy rules
 %.d: %.cpp
 	mkdir -p $(OBJDIR)
-	$(COMPILE.cpp) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(BUILDDIR)/$@
+	mkdir -p $(DEPDIR)
+	$(COMPILE.cpp) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@
 
 # Includes all .h files
 include $(DEP_FILES)

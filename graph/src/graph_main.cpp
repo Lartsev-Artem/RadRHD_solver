@@ -13,7 +13,9 @@
 #include "graph_struct.h"
 
 #include <chrono>
+#include <filesystem>
 namespace tick = std::chrono;
+namespace fs = std::filesystem;
 
 namespace graph {
 std::vector<boundary_trace_t> bound_trace; ///< данные перетрассировки луча сквозь внутреннюю область
@@ -43,6 +45,11 @@ int graph::RunGraphModule() {
   }
   WRITE_LOG("Reading time graph prebuild %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
   WRITE_LOG("Inner boundary has %d faces\n", (int)inter_boundary_face_id.size());
+
+  if (!fs::exists(glb_files.graph_address)) {
+    WRITE_LOG("Create directory to graph");
+    fs::create_directory(glb_files.base_address + "graph/");
+  }
 
   const size_t num_cells = normals.size();
 

@@ -61,7 +61,7 @@ static Type GetS(const int N_cell, const int num_cell, const Vector3 &direction,
 
 static int CalculateIntCPU(const int num_cells, const grid_directions_t &grid_direction, grid_t grid) {
 
-#pragma omp parallel default(none) shared(num_cells, illum, grid_direction, int_scattering)
+#pragma omp parallel default(none) shared(grid, num_cells, grid_direction)
   {
     Vector3 direction;
     const int num_directions = grid_direction.size;
@@ -80,12 +80,12 @@ static Type GetCurIllum(const Vector3 x, const Type s, const Type I_0, const Typ
   switch (_solve_mode.class_vtk) {
   case 0: // без интеграла рассеивания  (излучающий шар)
   {
-    Type Q = 0;
+    Type Q = 1;
     Type alpha = 2;
     Type betta = 1;
     Type S = int_scattering; // 0;
 
-    if ((x - Vector3(1, 0, 0)).norm() > 0.09) {
+    if ((x - Vector3(0, 0, 0)).norm() > 0.09) {
       Q = 0;
       alpha = 0.5;
       betta = 0.5;
@@ -347,14 +347,14 @@ int illum::CalculateIllum(const grid_directions_t &grid_direction, const std::ve
     norm = -1;
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
 
-#pragma omp parallel default(none) shared(sorted_id_cell, pairs, face_states, vec_x0, vec_x, grid, int_scattering, Illum, norm, inter_coef_all)
+#pragma omp parallel default(none) shared(count_directions, count_cells, sorted_id_cell, pairs, face_states, vec_x0, vec_x, grid, norm, inter_coef_all)
     {
       Type loc_norm = -1;
       // std::vector<Vector3> inter_coef(count_cells * CELL_SIZE);
       const int num = omp_get_thread_num();
       std::vector<Vector3> *inter_coef = &inter_coef_all[num];
 #pragma omp for
-      for (register int num_direction = 0; num_direction < count_directions; ++num_direction) {
+      for (int num_direction = 0; num_direction < count_directions; ++num_direction) {
         /*---------------------------------- далее FOR по ячейкам----------------------------------*/
         int posX0 = 0;
         Vector3 I;

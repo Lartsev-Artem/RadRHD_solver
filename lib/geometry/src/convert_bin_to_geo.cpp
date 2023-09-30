@@ -38,4 +38,9 @@ void ConvertBinToGeo(std::vector<IntId> &neighbours_id_faces,
       cc++;
     }
   }
+
+  for (int i = 0; i < N; i++) {
+    cells[i].geo.center = centers[i];
+    cells[i].geo.V = volume[i];
+  }
 }

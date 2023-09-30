@@ -21,20 +21,24 @@ int FUNC_NAME(MakeAllGeoData)(int argc, char **argv) {
   files.name_file_vtk = argv[2];
   files.Build();
 
+  fs::create_directory(files.base_address + "graph");
+  fs::create_directory(files.base_address + "illum_geo");
+  fs::create_directory(files.base_address + "Solve");
+
   if (!fs::exists(files.base_address) || !fs::exists(files.name_file_vtk)) {
     RETURN_ERR("bad input address\n");
   }
 
   if (BuildDataFromVTK(files) != e_completion_success) {
-    return e_completion_fail;
+    RETURN_ERR("don't build start format\n");
   }
 
   if (trace::PreBuild(files) != e_completion_success) {
-    return e_completion_fail;
+    RETURN_ERR("don't build trace struct\n");
   }
 
   if (BinToGeo(files.base_address) != e_completion_success) {
-    return e_completion_fail;
+    RETURN_ERR("don't build geo format\n");
   }
 
   return e_completion_success;

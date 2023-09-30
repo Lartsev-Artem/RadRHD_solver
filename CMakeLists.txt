@@ -15,9 +15,9 @@ endif()
 include("cmake_modules.cmake")   
 
 set(PRJ_NAME_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-set(MAIN_SUB_DIRS "include" "src" "lib" "graph" "make_trace")
+set(MAIN_SUB_DIRS "include" "src" "lib" "graph" "make_trace" "solvers")
 
-add_definitions(-DBUILD_GRAPH -DUSE_MPI -DDEBUG -DMAKE_TRACE)
+add_definitions(-DBUILD_GRAPH -DUSE_MPI -DDEBUG -DMAKE_TRACE -DSOLVERS -DILLUM)
 
 add_compile_options(    
     -fopenmp    

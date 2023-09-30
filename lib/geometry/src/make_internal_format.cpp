@@ -18,7 +18,7 @@ static int SetTypeOfBound(const std::vector<Vector3> &centers,
 
       if (neighbors[id] < 0) // граница
       {
-#ifdef Cone_JET
+#if GEOMETRY_TYPE == Cone_JET
         if ((normals[num_cell].n[num_face] - Vector3(-1, 0, 0)).norm() < 1e-7) {
           if (Vector2(P[1], P[2]).norm() < 0.01)
             neighbors[id] = e_bound_out_source; // ИСТОЧНИК джет
@@ -32,7 +32,7 @@ static int SetTypeOfBound(const std::vector<Vector3> &centers,
         }
 #endif
 
-#ifdef Cone
+#if GEOMETRY_TYPE == Cone
         if ((normals[num_cell].n[num_face] - Vector3(-1, 0, 0)).norm() < 1e-7) {
           neighbors[id] = e_bound_out_source; // излучающее дно
         } else if ((normals[num_cell].n[num_face] - Vector3(1, 0, 0)).norm() < 1e-7) {
@@ -42,18 +42,18 @@ static int SetTypeOfBound(const std::vector<Vector3> &centers,
         }
 #endif
 
-#ifdef Sphere
+#if GEOMETRY_TYPE == Sphere
         if ((P - kCenterPoint).norm() > kInternalRadius)
           neighbors[id] = e_bound_free; // внешняя сфера
         else
           neighbors[id] = e_bound_inner_source; // внутренняя сфера
 #endif
 
-#ifdef Cube
+#if GEOMETRY_TYPE == Cube
         neighbors[id] = e_bound_free;
 #endif
 
-#ifdef Step
+#if GEOMETRY_TYPE == Step
         if ((normals[num_cell].n[num_face] - Vector3(-1, 0, 0)).norm() < 1e-5) {
           neighbors[id] = e_bound_free; // левая стенка
         } else if ((normals[num_cell].n[num_face] - Vector3(1, 0, 0)).norm() < 1e-5 && P[0] > 0.7) {
@@ -63,7 +63,7 @@ static int SetTypeOfBound(const std::vector<Vector3> &centers,
         }
 
 #endif
-#ifdef Cylinder
+#if GEOMETRY_TYPE == Cylinder
         if ((normals[num_cell].n[num_face] - Vector3(-1, 0, 0)).norm() < 1e-5 &&
             Vector2(P[1], P[2]).norm() < 0.2) {
           neighbors[id] = e_bound_out_source; // основание

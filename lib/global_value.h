@@ -22,9 +22,9 @@ constexpr double kGamma1 = 5. / 3; ///< показатель адиабаты
 constexpr double kGamma_g = kGamma1 / (kGamma1 - 1);
 
 //! (в случае сплошной области задаётся так, чтобы сфера не пересекала расчётную область)
-#ifdef Sphere
+#if GEOMETRY_TYPE == Sphere
 const Vector3 kCenterPoint(0, 0, 0);     ///< центр внутренней сферы на сетке
-constexpr double kInternalRadius = 0.51; ///< радиус внутренней сферы (с запасом)
+constexpr double kInternalRadius = 0.31; ///< радиус внутренней сферы (с запасом)
 #else
 const Vector3 kCenterPoint(10, 0, 0);    ///< центр внутренней сферы на сетке
 constexpr double kInternalRadius = 0.12; ///< радиус внутренней сферы (с запасом)

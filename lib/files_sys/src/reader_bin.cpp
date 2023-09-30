@@ -155,20 +155,17 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
   face_states.resize(send[myid]);
 
   for (int i = 0; i < send[myid]; i++) {
-    if (ReadSimple(gbl_files.name_file_x0_loc + std::to_string(disp[myid] + i) +
-                       ".bin",
-                   vec_x0[i]))
+
+    if (ReadSimple(gbl_files.name_file_x0_loc + std::to_string(disp[myid] + i) + ".bin", vec_x0[i]))
       return e_completion_fail;
-    if (ReadSimple(
-            gbl_files.graph_address + std::to_string(disp[myid] + i) + ".bin",
-            sorted_id_cell[i]))
+
+    if (ReadSimple(gbl_files.graph_address + F_GRAPH + std::to_string(disp[myid] + i) + ".bin", sorted_id_cell[i]))
       return e_completion_fail;
-    if (ReadSimple(gbl_files.name_file_state_face +
-                       std::to_string(disp[myid] + i) + ".bin",
-                   face_states[i]))
+
+    if (ReadSimple(gbl_files.name_file_state_face + std::to_string(disp[myid] + i) + ".bin", face_states[i]))
       return e_completion_fail;
   }
 
-  return 0;
+  return e_completion_success;
 }
 #endif //! ILLUM

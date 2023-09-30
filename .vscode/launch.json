@@ -4,12 +4,13 @@
     {
       "name": "C/C++ Runner: Debug Session",
       "type": "cppdbg",
-      "request": "launch",
+      "request": "attach",
+      "processId": "${command:pickProcess}",
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
       "cwd": "/home/artem/projects/solver",
-      "program": "/home/artem/projects/solver/build/Debug/outDebug",
+      "program": "/home/artem/projects/solver/build/solver",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

@@ -22,7 +22,7 @@ typedef Eigen::MatrixXd MatrixX;
 typedef double Type;
 typedef int IntId;
 typedef uint8_t State;
-typedef uint32_t bits_flag_t; ///< битовые флаги
+typedef uint8_t bits_flag_t; ///< битовые флаги
 
 typedef uint8_t ShortId;
 typedef const std::string &file_name_t;

@@ -66,8 +66,8 @@ struct geo_cell_t {
   bool sign_n[CELL_SIZE];
   Vector3 center;
 
-  geo_cell_t() : id_faces({0, 0, 0, 0}), V(0),
-                 sign_n({true, true, true, true}),
+  geo_cell_t() : id_faces{0, 0, 0, 0}, V(0),
+                 sign_n{true, true, true, true},
                  center(Vector3(0, 0, 0)) {}
 };
 

@@ -157,18 +157,18 @@ static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid
 #ifdef ILLUM
   std::vector<Type> illum;
   GetDirectionIllumFromFace(grid.size, 0, grid.Illum, illum);
-  files_sys::bin::WriteSimple(main_dir + "Illum.bin", illum);
+  files_sys::bin::WriteSimple(main_dir + F_ILLUM, illum);
 
 #if !defined USE_CUDA
-  WRITE_FILE_ELEM((main_dir + "energy.bin").c_str(), grid.cells, illum_val.energy);
+  WRITE_FILE_ELEM((main_dir + F_ENERGY).c_str(), grid.cells, illum_val.energy);
 
-  WRITE_FILE_ELEM((main_dir + "stream.bin").c_str(), grid.cells, illum_val.stream);
+  WRITE_FILE_ELEM((main_dir + F_STREAM).c_str(), grid.cells, illum_val.stream);
 
-  WRITE_FILE_ELEM((main_dir + "impuls.bin").c_str(), grid.cells, illum_val.impuls);
+  WRITE_FILE_ELEM((main_dir + F_IMPULS).c_str(), grid.cells, illum_val.impuls);
 
-  WRITE_FILE_ELEM((main_dir + "divstream.bin").c_str(), grid.cells, illum_val.div_stream);
+  WRITE_FILE_ELEM((main_dir + F_DIVSTREAM).c_str(), grid.cells, illum_val.div_stream);
 
-  WRITE_FILE_ELEM((main_dir + "divimpuls.bin").c_str(), grid.cells, illum_val.div_impuls);
+  WRITE_FILE_ELEM((main_dir + F_DIVIMPULS).c_str(), grid.cells, illum_val.div_impuls);
 #else
   WriteSimple((main_dir + "energy.bin").c_str(), grid.size, grid.energy);
 

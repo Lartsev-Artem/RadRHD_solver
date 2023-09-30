@@ -22,7 +22,7 @@ if(INSTALL)
     # set(CMAKE_CXX_COMPILER g++) #компилятор
     message(WARNING "installing utils")                   
     add_compile_options(-Ofast -fopenmp -std=c++17)
-    add_definitions(-DGENERATE_UTILS)
+    add_definitions(-DGENERATE_UTILS -DLOG_OUT_TO_SCREEN)
 endif() #INSTALL
 
 #отдельно от общих файлов для генерации набора исполняемых файлов
@@ -73,7 +73,7 @@ if(INSTALL) # формеруем набор подпрограмм
         # target_link_libraries(${name} PRIVATE lib)
         if(VTK_FOUND)
             target_link_libraries(${name} PRIVATE  ${VTK_LIBRARIES})
-        endif()
+        endif()        
     endforeach()
 else() # создаем библиотеку
     add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}_SRC_CXX} ${SRC_CXX} ${SRC_H})

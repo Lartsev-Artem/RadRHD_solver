@@ -1,4 +1,4 @@
-#if defined USE_VTK && defined MAKE_TRACE
+#if defined USE_VTK
 #include "trace_prebuild.h"
 #include "global_value.h"
 
@@ -31,9 +31,9 @@ int trace::PreBuild(const global_files_t &glb_files) {
     GetVertexMatrix(i, unstructured_grid, vertexs[i]);
   }
 
-  files_sys::bin::WriteSimple(name_file_cells, vertexs);
+  files_sys::bin::WriteSimple(name_file_vertex, vertexs);
 
   return e_completion_success;
 }
 
-#endif //! MAKE_TRACE
+#endif //! USE_VTK

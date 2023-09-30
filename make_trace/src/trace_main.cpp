@@ -19,19 +19,15 @@ int trace::RunTracesModule() {
   int np = get_mpi_np();
   int myid = get_mpi_id();
 
-#ifdef ONLY_GEO_DATA
-  return PreBuild(glb_files);
-#endif
-
   //-----------файлы с данными сетки. Построены здесь на метки USE_VTK-----------------------
   const std::string name_file_normals = glb_files.base_address + F_NORMALS;
   const std::string name_file_cells = glb_files.base_address + F_TRACE_GRID;
   const std::string name_file_vertex = glb_files.base_address + F_TRACE_VERTEX;
   const std::string name_file_neigh = glb_files.base_address + F_NEIGHBOR;
   //-------------------читающиеся файлы, построенные в build_graph---------------------------
-  const std::string name_file_id_defining_faces = glb_files.base_address + "pairs.bin";
-  const std::string name_file_x_defining_faces = glb_files.base_address + "x_defining_faces.bin";
-  const std::string name_file_size = glb_files.base_address + "Size.txt"; // на ДОЗАПИСЬ
+  // const std::string name_file_id_defining_faces = glb_files.base_address + "pairs.bin";
+  // const std::string name_file_x_defining_faces = glb_files.base_address + "x_defining_faces.bin";
+  // const std::string name_file_size = glb_files.base_address + "Size.txt"; // на ДОЗАПИСЬ
   //--------------------------------создающиеся файлы----------------------------------------
   const std::string name_file_state_face = glb_files.illum_geo_address + F_STATE_FACE;
   const std::string name_file_x = glb_files.illum_geo_address + F_X;
@@ -58,7 +54,7 @@ int trace::RunTracesModule() {
 
   sorted_graph.resize(grid_direction.size);
   for (int i = myid; i < grid_direction.size; i += np) {
-    err |= files_sys::bin::ReadSimple(glb_files.graph_address + std::to_string(i) + ".bin", sorted_graph[i]);
+    err |= files_sys::bin::ReadSimple(glb_files.graph_address + F_GRAPH + std::to_string(i) + ".bin", sorted_graph[i]);
   }
   if (err != 0) {
     RETURN_ERR("error during reading\n");
@@ -97,7 +93,7 @@ int trace::RunTracesModule() {
     RETURN_ERR("Error writing %s\n", name_file_x.c_str());
   }
 
-  register int num_cell;
+  int num_cell;
   Vector3 direction;
 
   // массивы записи в файл:
@@ -137,7 +133,7 @@ int trace::RunTracesModule() {
     if (files_sys::bin::WriteSimple(name_file_x0_loc + std::to_string(num_direction) + ".bin", vec_x0))
       RETURN_ERR("Error vec_x0");
 
-    WRITE_LOG("End trace direction number # $d\n", num_direction);
+    WRITE_LOG("End trace direction number # %d\n", num_direction);
   }
   /*---------------------------------- конец FOR по направлениям----------------------------------*/
 

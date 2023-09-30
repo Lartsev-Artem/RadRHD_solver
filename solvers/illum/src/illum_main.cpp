@@ -8,13 +8,6 @@
 #include "reader_txt.h"
 #include "writer_bin.h"
 
-/**
- * @brief Последовательный модуль обработки излучения
- *
- * @todo утилиты конверт дата->geo, rebuild_solve
- *
- * @return int
- */
 int illum::RunIllumModule() {
 
   grid_t grid;
@@ -37,18 +30,18 @@ int illum::RunIllumModule() {
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, grid.faces);
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
 
-  grid.InitMemory(grid.cells.size(), grid_direction.size);
-
   if (err) {
     RETURN_ERR("Error reading \n");
   }
+
+  grid.InitMemory(grid.cells.size(), grid_direction.size);
 
   CalculateIllum(grid_direction, face_states, neighbours,
                  vec_x0, vec_x, sorted_id_cell, grid);
 
   CalculateIllumParam(grid_direction, grid);
 
-  return files_sys::bin::WriteSolution(glb_files.solve_address, grid);
+  return files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
 }
 
 #endif //! SOLVERS
