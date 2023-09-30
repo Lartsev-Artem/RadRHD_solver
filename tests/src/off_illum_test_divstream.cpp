@@ -1,5 +1,11 @@
 #if 0
-int TestDivStream(const std::vector<Vector3> &centers_face, grid_t &grid) {
+/**
+ * @brief Тест для определения порядка сходимости дивергенции потока
+ * 
+ * @param centers_face центры граней
+ * @param grid сетка
+ */
+void TestDivStream(const std::vector<Vector3> &centers_face, grid_t &grid) {
 #pragma omp parallel default(none) shared(centers_face, grid)
   {
 #pragma omp for
@@ -9,7 +15,7 @@ int TestDivStream(const std::vector<Vector3> &centers_face, grid_t &grid) {
       Vector3 Stream[CELL_SIZE];
       for (int j = 0; j < CELL_SIZE; j++) {
         Vector3 x = centers_face[i * CELL_SIZE + j];
-        Stream[j] = Vector3(3 * x[0], 0, 0);
+        Stream[j] = Vector3(3 * x[0], 0, 0);  //аналитическая функция
       }
 
       GET_FACE_TO_CELL(el.illum_val.stream, Stream, Vector3::Zero());
@@ -26,7 +32,6 @@ int TestDivStream(const std::vector<Vector3> &centers_face, grid_t &grid) {
 
       el.illum_val.div_stream /= el.geo.V;
     }
-  }
-  return 0;
+  }  
 }
 #endif

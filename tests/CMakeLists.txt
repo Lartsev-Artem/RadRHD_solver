@@ -16,10 +16,10 @@ find_package(OpenMP)
 
 add_compile_options(-fopenmp)
 
-add_definitions(-DBUILD_GRAPH  -DDEBUG)
+add_definitions(-DBUILD_GRAPH  -DDEBUG -DMAKE_TRACE -DSOLVERS -DILLUM)
 
 set(MAIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
-set(MAIN_SUB_DIRS "graph" "include" "lib" "utils")
+set(MAIN_SUB_DIRS "graph" "include" "lib" "utils" "solvers" "make_trace")
 
 #отдельно от общих файлов для генерации набора исполняемых файлов
 get_all_files("${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" ${PROJECT_NAME}_SRC_CXX)

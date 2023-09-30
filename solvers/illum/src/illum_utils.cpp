@@ -184,7 +184,10 @@ Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coe
       const Type curI = (Il[0] + Il[1] + Il[2]) / 3; //  среднее на грани (в идеале переход к ax+by+c)
       const int id = CELL_SIZE * (shift_dir + num_cell) + i;
 
-      norm = std::max(norm, fabs(grid.Illum[id] - curI) / curI);
+      if (curI < 1e-15) // защита от деления на ноль
+        norm = 1;
+      norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
+
       grid.Illum[id] = curI;
 
       grid.cells[num_cell].illum_val.illum[num_dir * CELL_SIZE + i] = curI; //на каждой грани по направлениям

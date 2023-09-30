@@ -1,5 +1,6 @@
 #if defined ILLUM && defined SOLVERS // && !defined USE_MPI
 #include "illum_part.h"
+#include "illum_params.h"
 #include "illum_utils.h"
 #include "scattering.h"
 
@@ -60,10 +61,10 @@ int illum::CalculateIllum(const grid_directions_t &grid_direction, const std::ve
 
     norm = -1;
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
+    const int count_directions = grid_direction.size;
 
-#pragma omp parallel default(none) shared(sorted_id_cell, neighbours, face_states, vec_x0, vec_x, grid, norm, inter_coef_all)
+#pragma omp parallel default(none) firstprivate(count_directions) shared(sorted_id_cell, neighbours, face_states, vec_x0, vec_x, grid, norm, inter_coef_all, glb_files)
     {
-      const int count_directions = grid_direction.size;
       const int count_cells = grid.size;
 
       Type loc_norm = -1;
@@ -153,4 +154,9 @@ int illum::CalculateIllum(const grid_directions_t &grid_direction, const std::ve
   return e_completion_success;
 }
 
+void illum::CalculateIllumParam(const grid_directions_t &grid_direction, grid_t &grid) {
+  GetEnergy(grid_direction, grid);
+  GetStream(grid_direction, grid);
+  GetImpuls(grid_direction, grid);
+}
 #endif //! defined ILLUM && defined SOLVERS  && !defined USE_MPI

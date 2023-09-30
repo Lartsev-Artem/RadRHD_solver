@@ -120,6 +120,8 @@ void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions)
 #if defined ILLUM
   Illum = new Type[num_directions * size * CELL_SIZE];
   scattering = new Type[num_directions * size];
+  memset(Illum, 0.0, sizeof(Type) * num_directions * size * CELL_SIZE);
+  memset(scattering, 0.0, sizeof(Type) * num_directions * size);
 
   if (get_mpi_id() == 0) {
     for (int i = 0; i < size; i++) {

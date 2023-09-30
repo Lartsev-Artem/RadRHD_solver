@@ -11,6 +11,8 @@
 #include "reader_txt.h"
 #include "writer_bin.h"
 
+#include "mpi_ext.h"
+
 #include <chrono>
 namespace tick = std::chrono;
 
