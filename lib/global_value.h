@@ -53,11 +53,11 @@ constexpr double kDensity = (3.34 * 10e-14);                                  //
 constexpr double kPressure = (kDensity * kVelocity * kVelocity);              ///< характерное давление
 constexpr double kRadiation = (kDensity * kVelocity * kVelocity * kVelocity); ///< характерное излучение
 
-constexpr double R_gas = 8.314;                  ///< газовая постоянная [ Дж/(моль*К)]
-constexpr double h_plank = 6.62 * 1e-34;         ///< постоянная Планка[кг * м^2 /с]
-constexpr double k_boltzmann = 1.38 * 1e-23;     ///< постоянная Больцмана[Дж/K] = [ кг*м^2/(с^2*T)]
-constexpr double sigma_thomson = 6.652 * 1e-29;  ///< сечение томсоновского рассеяния [m^2]
-constexpr double m_hydrogen = 1.6735575 * 1e-27; ///< масса водорода[кг]
+constexpr double kR_gas = 8.314;                  ///< газовая постоянная [ Дж/(моль*К)]
+constexpr double kH_plank = 6.62 * 1e-34;         ///< постоянная Планка[кг * м^2 /с]
+constexpr double k_boltzmann = 1.38 * 1e-23;      ///< постоянная Больцмана[Дж/K] = [ кг*м^2/(с^2*T)]
+constexpr double kSigma_thomson = 6.652 * 1e-29;  ///< сечение томсоновского рассеяния [m^2]
+constexpr double kM_hydrogen = 1.6735575 * 1e-27; ///< масса водорода[кг]
 
 //--------------------------Файлы управления---------------//
 #define F_SET "settings_file.txt"

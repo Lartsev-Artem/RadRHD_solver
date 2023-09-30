@@ -142,6 +142,16 @@
   { CONVERT_TO_STRING(__VA_ARGS__); }
 #endif // WRITE_GLOBAL_LOG
 
+#ifdef DEBUG
+#include <unistd.h>
+#define GDB_ATTACH \
+  {                \
+    int i = 0;     \
+    while (i == 0) \
+      sleep(1);    \
+  }
+#endif
+
 //#undef Files_log
 // #undef WRITE_POS
 #endif // DBG_DEF

@@ -33,6 +33,8 @@
 #define Cone_JET 4
 #define Sphere 5
 #define Cylinder 6
+#define TEST_ELLIPSE 7
+#define MAIN_ELLIPSE 8
 /*=======================================================*/
 
 #define GEOMETRY_TYPE Sphere

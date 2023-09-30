@@ -110,7 +110,7 @@ struct elem_t {
 
 #ifndef USE_CUDA
 struct grid_t {
-  uint32_t size;
+  int size;
   std::vector<elem_t> cells;
   std::vector<face_t> faces;
 

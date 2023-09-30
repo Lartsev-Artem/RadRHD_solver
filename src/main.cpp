@@ -17,10 +17,7 @@ int main(int argc, char *argv[]) {
   graph::RunGraphModule();
   trace::RunTracesModule();
 
-  // int i = 0;
-  // while (i == 0) {
-  //   sleep(1);
-  // }
+  GDB_ATTACH;
 
   illum::RunIllumModule();
 
