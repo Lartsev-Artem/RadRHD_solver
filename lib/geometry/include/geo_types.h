@@ -1,6 +1,7 @@
 #ifndef GEO_TYPES
 #define GEO_TYPES
 
+#define EIGEN_NO_CUDA
 #include <Eigen/Dense>
 
 #include "global_def.h"

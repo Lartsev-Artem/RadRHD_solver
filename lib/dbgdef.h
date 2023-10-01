@@ -12,10 +12,11 @@
 #include <string>
 
 #include "global_types.h"
-#include "global_value.h"
 #include "prj_config.h"
 
-#define Files_log std::string(glb_files.base_address + F_LOG).c_str()
+#include "json/json_struct.h"
+extern global_files_t glb_files;
+#define Files_log std::string(glb_files.base_address + "File_Logs.txt").c_str()
 
 /**
  * @brief Вывод сообщения с указанием позиции в коде

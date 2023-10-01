@@ -7,6 +7,7 @@
                 "${workspaceFolder}/include",
                 "/usr/lib/x86_64-linux-gnu/openmpi/include",
                 "/home/artem/projects/VTK9.3/VTK/Common/Core",
+                "/usr/local/cuda-12.2/include",
                 "/home/artem/projects/VTK9.3/VTK/Common/DataModel",
                 "/home/artem/projects/VTK9.3/VTK/Utilities/KWIML",
                 "/home/artem/projects/VTK9.3/VTK/IO/Legacy",
@@ -27,7 +28,9 @@
                 "${workspaceFolder}/solvers/illum",
                 "${workspaceFolder}/solvers/illum/include",
                 "${workspaceFolder}/lib",
-                "${workspaceFolder}/lib/mpi_extension"
+                "${workspaceFolder}/lib/mpi_extension",
+                "${workspaceFolder}/cuda/include",
+                "${workspaceFolder}/cuda/src"
             ],
             "defines": [
                 "BUILD_GRAPH",
@@ -37,7 +40,8 @@
                 "USE_MPI",
                 "USE_VTK",
                 "MAKE_TRACE",
-                "ILLUM"
+                "ILLUM",
+                "USE_CUDA"
             ],
             "compilerPath": "/usr/bin/mpic++",
             "cStandard": "c17",

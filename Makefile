@@ -36,7 +36,7 @@ CPPFLAGS        = $(DEF_SET) -fopenmp  -Ofast #-fPIE
 CXXFLAGS        = #-g #-Wall -Wextra -std=c++11
 
 NVCC 				= nvcc
-NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp"
+NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp" --expt-relaxed-constexpr #совместимость с Eigen3
 NVCC_FLAGS 			= $(DEF_SET) -O2 -gencode arch=compute_70,code=sm_70 -dc $(NVCC_OTHER_FLAGS)
 
 PROGRAM         = run

@@ -1,4 +1,38 @@
 {
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "support.function.cuda-cpp",
+        "settings": {
+          "foreground": "#56b6c2"
+        }
+      },
+      {
+        "scope": "keyword.function.qualifier.cuda-cpp",
+        "settings": {
+          "foreground": "#56b6c2"
+        }
+      },
+      {
+        "scope": "support.type.cuda-cpp",
+        "settings": {
+          "foreground": "#56b6c2"
+        }
+      },
+      {
+        "scope": "storage.modifier.cuda-cpp",
+        "settings": {
+          "foreground": "#56b6c2"
+        }
+      },
+      {
+        "scope": "variable.language.cuda-cpp",
+        "settings": {
+          "foreground": "#56b6c2"
+        }
+      }
+    ]
+  },
   "clang-format.style": "{ColumnLimit: 0 }",
   "clang-format.fallbackStyle": "Google",
   "editor.formatOnSave": true,
@@ -154,7 +188,9 @@
     "typeindex": "cpp",
     "variant": "cpp",
     "ios": "cpp",
-    "regex": "cpp"
+    "regex": "cpp",
+    "__config": "cpp",
+    "*.cu": "cpp",
   },
   "cSpell.words": [
     "ifile",

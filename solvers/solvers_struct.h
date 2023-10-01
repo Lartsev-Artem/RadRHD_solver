@@ -123,11 +123,46 @@ struct grid_t {
   ~grid_t();
 
 #else
-  grid_t() { size = 0; }
+  grid_t() : size(0) {}
 #endif
   void InitMemory(const uint32_t num_cells, const uint32_t num_directions);
 };
+#else
+struct grid_t {
+  int size;
+  std::vector<elem_t> cells;
+  std::vector<face_t> faces;
+  std::vector<std::vector<Vector3>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
 
-extern std::vector<bound_size_t> hllc_loc_size;
+  Type *Illum;
+  Type *scattering;
+
+  int loc_size;
+  int loc_shift;
+
+  Type *divstream;
+  Vector3 *divimpuls;
+
+#ifdef ON_FULL_ILLUM_ARRAYS
+  Type *energy;
+  Vector3 *stream;
+  Matrix3 *impuls;
+#endif
+
+  void InitMemory(const uint32_t num_cells, const uint32_t num_directions);
+
+  grid_t() : size(0), loc_size(0), loc_shift(0), Illum(nullptr), scattering(nullptr),
+             divstream(nullptr), divimpuls(nullptr)
+#ifdef ON_FULL_ILLUM_ARRAYS
+             ,
+             energy(nullptr), stream(nullptr), impuls(nullptr)
+#endif
+  {
+  }
+  ~grid_t();
+};
+
 #endif // USE_CUDA
+extern std::vector<bound_size_t> hllc_loc_size;
+
 #endif //! SOLVERS_STRUCT_H

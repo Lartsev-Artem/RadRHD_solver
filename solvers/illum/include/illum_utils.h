@@ -6,6 +6,7 @@
 #if !defined ILLUM_UTILS_H && defined ILLUM && defined SOLVERS
 #define ILLUM_UTILS_H
 
+#include "geo_types.h"
 #include "global_types.h"
 #include "solvers_struct.h"
 

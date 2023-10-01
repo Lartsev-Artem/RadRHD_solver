@@ -2,6 +2,7 @@
 
 #include "dbgdef.h"
 #include "mpi_ext.h"
+#include <omp.h>
 
 solve_mode_t _solve_mode;
 
@@ -111,8 +112,6 @@ illum_value_t::illum_value_t(const int num_dir) {
 }
 
 #ifndef USE_CUDA
-#include <omp.h>
-
 void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions) {
 
   DIE_IF(cells.size() != num_cells);
@@ -141,6 +140,46 @@ void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions)
 grid_t::~grid_t() {
   delete[] Illum;
   delete[] scattering;
+  inter_coef_all.clear();
 }
 #endif
+#else // CUDA
+void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions) {
+
+  DIE_IF(cells.size() != num_cells);
+
+  size = num_cells;
+
+  Illum = new Type[num_directions * size * CELL_SIZE];
+  scattering = new Type[num_directions * size];
+  memset(Illum, 0.0, sizeof(Type) * num_directions * size * CELL_SIZE);
+  memset(scattering, 0.0, sizeof(Type) * num_directions * size);
+
+  inter_coef_all.resize(omp_get_max_threads());
+  for (size_t i = 0; i < inter_coef_all.size(); i++) {
+    inter_coef_all[i].resize(size * CELL_SIZE);
+  }
+  // loc_size = hllc_loc_size[myid].right - hllc_loc_size[id].left;
+
+  divstream = new Type[size];
+  divimpuls = new Vector3[size];
+#ifdef ON_FULL_ILLUM_ARRAYS
+  energy = new Type[size];
+  stream = new Vector3[size];
+  impuls = new Matrix3[size];
+#endif
+}
+grid_t::~grid_t() {
+  delete[] Illum;
+  delete[] scattering;
+  delete[] divstream;
+  delete[] divimpuls;
+
+  inter_coef_all.clear();
+#ifdef ON_FULL_ILLUM_ARRAYS
+  delete[] energy;
+  delete[] stream;
+  delete[] impuls;
+#endif
+}
 #endif // NOT USE_CUDA

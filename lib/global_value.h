@@ -10,9 +10,11 @@
 #include <iostream>
 #include <string>
 
+#include "geo_types.h"
 #include "global_def.h"
 #include "prj_config.h"
 #include "json/json_struct.h"
+
 
 extern global_files_t glb_files;
 
