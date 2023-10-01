@@ -117,6 +117,7 @@ struct grid_t {
 #if defined ILLUM
   Type *Illum;
   Type *scattering;
+  std::vector<std::vector<Vector3>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
 
   grid_t() : size(0), Illum(nullptr), scattering(nullptr) {}
   ~grid_t();

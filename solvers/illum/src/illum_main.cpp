@@ -2,7 +2,7 @@
 #include "illum_main.h"
 
 #include "global_types.h"
-#include "illum_part.h"
+#include "illum_calc_cpu.h"
 
 #include "reader_bin.h"
 #include "reader_txt.h"
@@ -36,10 +36,10 @@ int illum::RunIllumModule() {
 
   grid.InitMemory(grid.cells.size(), grid_direction.size);
 
-  CalculateIllum(grid_direction, face_states, neighbours,
-                 vec_x0, vec_x, sorted_id_cell, grid);
+  cpu::CalculateIllum(grid_direction, face_states, neighbours,
+                      vec_x0, vec_x, sorted_id_cell, grid);
 
-  CalculateIllumParam(grid_direction, grid);
+  cpu::CalculateIllumParam(grid_direction, grid);
 
   return files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
 }

@@ -1,9 +1,19 @@
+/**
+ * @file illum_integrate.h
+ * @brief Функций интегрирования по сфере направлений
+ *
+ */
 #if !defined ILLUM_INTEGRATE_H && defined SOLVERS && defined ILLUM
 #define ILLUM_INTEGRATE_H
 
 #include "geo_types.h"
 
 namespace illum {
+
+/**
+ * @brief Пространство имён для функций интегрирования по сфере направлений
+ *
+ */
 namespace direction_integrator {
 
 /**

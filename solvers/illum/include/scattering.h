@@ -1,3 +1,8 @@
+/**
+ * @file scattering.h
+ * @brief Функции для расчёта интеграла рассеяния
+ *
+ */
 #if !defined SCATTERING_H && defined SOLVERS && defined ILLUM
 #define SCATTERING_H
 
@@ -5,6 +10,11 @@
 #include "solvers_struct.h"
 
 namespace illum {
+
+/**
+ * @brief Пространство имён для интеграла рассеяния
+ *
+ */
 namespace scattering {
 
 /**

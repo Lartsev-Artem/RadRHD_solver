@@ -198,4 +198,28 @@ Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coe
   return norm;
 }
 
+Type illum::GetIllumeFromInFace(const int num_in_face, const int neigh_id, elem_t *cell, Vector3 &inter_coef) {
+
+  if (neigh_id < 0) {
+    Type I_x0 = illum::BoundaryConditions(neigh_id);
+    inter_coef = Vector3(I_x0, I_x0, I_x0);
+    return I_x0;
+  }
+  // Vector3 coef = grid[num_cell].nodes_value[num_in_face];
+  Vector3 &coef = inter_coef; // cell->illum_val.coef_inter[num_in_face];
+
+  /// \note сейчас храним значения а не коэффициента интерполяции
+
+  // Vector2	x0_local = X0[ShiftX0 + posX0++]; // grid[num_cell].x0_loc[num_in_face_dir];
+  // I_x0 = x0_local[0] * coef[0] + x0_local[1] * coef[1] + coef[2];
+
+  Type I_x0 = (coef[0] + coef[1] + coef[2]) / 3.;
+
+  if (I_x0 < 0) {
+    D_L;
+    return 0;
+  }
+  return I_x0;
+}
+
 #endif //! defined ILLUM && defined SOLVERS

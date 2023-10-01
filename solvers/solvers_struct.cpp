@@ -111,6 +111,8 @@ illum_value_t::illum_value_t(const int num_dir) {
 }
 
 #ifndef USE_CUDA
+#include <omp.h>
+
 void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions) {
 
   DIE_IF(cells.size() != num_cells);
@@ -122,6 +124,11 @@ void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions)
   scattering = new Type[num_directions * size];
   memset(Illum, 0.0, sizeof(Type) * num_directions * size * CELL_SIZE);
   memset(scattering, 0.0, sizeof(Type) * num_directions * size);
+
+  inter_coef_all.resize(omp_get_max_threads());
+  for (size_t i = 0; i < inter_coef_all.size(); i++) {
+    inter_coef_all[i].resize(size * CELL_SIZE);
+  }
 
   if (get_mpi_id() == 0) {
     for (int i = 0; i < size; i++) {

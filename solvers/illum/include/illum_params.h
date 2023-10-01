@@ -1,3 +1,7 @@
+/**
+ * @file illum_params.h
+ * @brief Функции расчета параметров зависящих от излучения
+ */
 #if !defined ILLUM_PARAMS_H && defined SOLVERS && defined ILLUM
 #define ILLUM_PARAMS_H
 
