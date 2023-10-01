@@ -1,10 +1,15 @@
 #ifndef GEO_TYPES
 #define GEO_TYPES
 
+#if !__NVCC__
 #define EIGEN_NO_CUDA
+#endif
 #include <Eigen/Dense>
 
 #include "global_def.h"
+#include "global_types.h"
+
+#include <array>
 
 typedef Eigen::Vector3d Vector3;
 typedef Eigen::Vector2d Vector2;
@@ -13,15 +18,10 @@ typedef Eigen::Matrix3d Matrix3;
 typedef Eigen::Vector4d Vector4;
 typedef Eigen::Matrix4d Matrix4;
 typedef Eigen::MatrixXd MatrixX;
-typedef double Type;
-typedef uint8_t ShortId;
-typedef int IntId;
 
-///\todo: d в новый файл  с классами
+///\todo: d в новый файл  с классами.
 struct Normals {
-  std::vector<Vector3> n;
-  Normals(const int size = CELL_SIZE) { n.resize(size); }
-  ~Normals() { n.clear(); }
+  std::array<Vector3, CELL_SIZE> n;
 };
 
 struct Face {

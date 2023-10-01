@@ -1,8 +1,8 @@
 #if defined ILLUM && defined SOLVERS
 
 #include "illum_utils.h"
-
 #include "dbgdef.h"
+#include "global_value.h"
 
 /**
  * @brief Точное решение уравнения переноса (вдоль луча) в ячейке

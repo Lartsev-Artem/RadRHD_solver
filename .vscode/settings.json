@@ -191,6 +191,7 @@
     "regex": "cpp",
     "__config": "cpp",
     "*.cu": "cpp",
+    "__bit_reference": "cpp"
   },
   "cSpell.words": [
     "ifile",

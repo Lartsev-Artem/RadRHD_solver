@@ -1,4 +1,5 @@
 #include "global_def.h"
+#include "global_value.h"
 
 #include "writer_bin.h"
 

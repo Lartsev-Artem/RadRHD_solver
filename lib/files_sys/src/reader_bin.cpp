@@ -15,7 +15,7 @@ int files_sys::bin::ReadNormals(const std::string &name_file_normals, std::vecto
   }
   normals.resize(n);
 
-  Normals norm(CELL_SIZE);
+  Normals norm;
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < CELL_SIZE; j++)
       if (fread(&norm.n[j], sizeof(Vector3), 1, f) != 1) {

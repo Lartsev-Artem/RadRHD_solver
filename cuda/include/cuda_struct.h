@@ -18,6 +18,8 @@ typedef double Type;
 #include "dbgdef.h"
 #include "solvers_config.h"
 
+#include "geo_types.h" /// \todo: Eigen подключается там!!!
+
 namespace cuda {
 namespace geo {
 
@@ -41,9 +43,8 @@ struct grid_directions_device_t {
   Type full_area;                 ///< площадь сферы направлений
 
   __host__ __device__ grid_directions_device_t() : size(0), directions(nullptr), full_area(0) {}
-  __host__ __device__ ~grid_directions_device_t() {
-    /// \todo очистка памяти в деструкторе класса
-  }
+  __host__ __device__ grid_directions_device_t(const grid_directions_t &grid_host);
+  __host__ __device__ ~grid_directions_device_t() {}
 };
 
 /**

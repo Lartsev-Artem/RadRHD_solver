@@ -1,6 +1,7 @@
 #if !defined SOLVERS_STRUCT_H
 #define SOLVERS_STRUCT_H
 
+#include "geo_types.h"
 #include "global_def.h"
 #include "global_types.h"
 

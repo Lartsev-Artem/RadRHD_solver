@@ -2,11 +2,13 @@
 #include "graph_main.h"
 
 #include "dbgdef.h"
+#include "global_value.h"
 #include "graph_config.h"
 #include "mpi_ext.h"
 #include "reader_bin.h"
 #include "reader_txt.h"
 #include "writer_bin.h"
+
 
 #include "graph_calc.h"
 #include "graph_init_state.h"

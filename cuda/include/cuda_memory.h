@@ -9,56 +9,70 @@
 namespace cuda {
 namespace mem_protected {
 
-template <typename distType, typename srcType, typename sizeT>
-void inline CpyToDevice(distType *&dist, const srcType *src, sizeT size) {
+template <typename dataType, typename sizeT>
+void inline Malloc(sizeT size, dataType **data) {
+  if (CheckError(cudaMalloc((void **)data, size))) {
+    EXIT_ERR("Error cudaMalloc\n");
+  }
+}
+
+template <typename dataType>
+void inline MallocHost(size_t size, dataType **data) {
+  if (CheckError(cudaMallocHost((void **)data, size))) {
+    EXIT_ERR("Error MallocHost\n");
+  }
+}
+
+template <typename distType, typename srcType>
+void inline CpyToDevice(distType *dist, const srcType *src, size_t size) {
 
   if (CheckError(cudaMemcpy(dist, src, size, cudaMemcpyHostToDevice))) {
     EXIT_ERR("Error CpyToDevice\n");
   }
 }
 
-template <typename distType, typename srcType, typename sizeT>
-void inline CpyToHost(distType *&dist, const srcType *src, sizeT size) {
+template <typename distType, typename srcType>
+void inline CpyToHost(distType **dist, const srcType *src, size_t size) {
 
   if (CheckError(cudaMemcpy(dist, src, size, cudaMemcpyDeviceToHost))) {
-    EXIT_ERR("Error CpyToHost\n")
+    EXIT_ERR("Error CpyToHost\n");
   }
 }
 
-template <typename distType, typename srcType, typename sizeT>
-void inline CpyToDeviceAsync(distType *&dist, const srcType *src, sizeT size) {
+template <typename distType, typename srcType>
+void inline CpyToDeviceAsync(distType *dist, const srcType *src, size_t size) {
 
   if (CheckError(cudaMemcpyAsync(dist, src, size, cudaMemcpyHostToDevice))) {
-    EXIT_ERR("Error CpyToDeviceAsync\n")
+    EXIT_ERR("Error CpyToDeviceAsync\n");
   }
 }
 
-template <typename distType, typename srcType, typename sizeT>
-void inline CpyToHostAsync(distType *&dist, const srcType *src, sizeT size) {
+template <typename distType, typename srcType>
+void inline CpyToHostAsync(distType **dist, const srcType *src, size_t size) {
 
   if (CheckError(cudaMemcpyAsync(dist, src, size, cudaMemcpyDeviceToHost))) {
-    EXIT_ERR("Error CpyToHostAsync\n")
+    EXIT_ERR("Error CpyToHostAsync\n");
   }
 }
 
-template <typename distType, typename srcType, typename sizeT>
-void inline CpyToHostAsyncStream(distType *&dist, const srcType *src, sizeT size, cudaStream_t &st) {
+template <typename distType, typename srcType>
+void inline CpyToHostAsyncStream(distType **dist, const srcType *src, size_t size, cudaStream_t &st) {
 
   if (CheckError(cudaMemcpyAsync(dist, src, size, cudaMemcpyDeviceToHost, st))) {
-    EXIT_ERR("Error CpyToHostAsyncStream\n")
-  }
-}
-template <typename srcType, typename sizeT>
-void inline MallocHost(sizeT size, const srcType *&src) {
-  if (CheckError(cudaMallocHost(dist, (void **)src, size))) {
-    EXIT_ERR("Error MallocHost\n")
+    EXIT_ERR("Error CpyToHostAsyncStream\n");
   }
 }
 
-template <typename srcType>
-void inline FreeMem(srcType *&src) {
-  if (CheckError(cudaFree(src))) {
-    EXIT_ERR("Error FreeMem\n")
+template <typename dataType>
+void inline FreeMem(dataType *&data) {
+  if (CheckError(cudaFree(data))) {
+    EXIT_ERR("Error FreeMem\n");
+  }
+}
+template <typename dataType>
+void inline FreeMemHost(dataType *&data) {
+  if (CheckError(cudaFreeHost(data))) {
+    EXIT_ERR("Error cudaFreeHost\n");
   }
 }
 

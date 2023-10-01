@@ -6,6 +6,9 @@
 #ifndef GLB_TYPES
 #define GLB_TYPES
 
+#include <cstdint>
+#include <string>
+
 typedef double Type;
 typedef int IntId;
 typedef uint8_t State;
