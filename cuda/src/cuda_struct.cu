@@ -3,10 +3,9 @@
 #include "cuda_memory.h"
 #include "cuda_struct.h"
 
-
-device_host_ptr_t device_host_ptr;
-grid_directions_device_t *grid_dir_device_ptr;
-grid_device_t *grid_cell_device_ptr;
+cuda::geo::device_host_ptr_t device_host_ptr;
+cuda::geo::grid_directions_device_t *grid_dir_device_ptr;
+cuda::geo::grid_device_t *grid_cell_device_ptr;
 
 #define CUDA_INIT_GRID_PTR_DEVICE(dist, src, N) \
   CUDA_MALLOC(&src, N)                          \
