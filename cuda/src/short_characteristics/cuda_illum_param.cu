@@ -13,7 +13,7 @@
     val[k] /= CELL_SIZE;                          \
   }
 
-__device__ void cuda::kernel::MakeEnergy(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
+__device__ void cuda::device::MakeEnergy(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
   const int N = grid->loc_size;
   const int shift = grid->shift;
   const int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -25,7 +25,7 @@ __device__ void cuda::kernel::MakeEnergy(const geo::grid_directions_device_t *di
 }
 #endif // ON_FULL_ILLUM_ARRAYS
 
-__device__ void cuda::kernel::MakeDivStream(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
+__device__ void cuda::device::MakeDivStream(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
   const int M = dir->size;
   const int N = grid->loc_size;
   const int shift = grid->shift;
@@ -57,7 +57,7 @@ __device__ void cuda::kernel::MakeDivStream(const geo::grid_directions_device_t 
   return;
 }
 
-__device__ void cuda::kernel::MakeDivImpuls(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
+__device__ void cuda::device::MakeDivImpuls(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
   const int M = dir->size;
   const int N = grid->loc_size;
   const int shift = grid->shift;
@@ -93,11 +93,11 @@ __device__ void cuda::kernel::MakeDivImpuls(const geo::grid_directions_device_t 
 
 #undef CUDA_CONVERT_FACE_TO_CELL
 
-__global__ void cuda::MakeIllumParam(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
+__global__ void cuda::kernel::MakeIllumParam(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
   // эти функции можно объденить в одну. Тогда будет одно общее обращение в память к illum
-  kernel::MakeEnergy(dir, grid);
-  kernel::MakeDivStream(dir, grid);
-  kernel::MakeDivImpuls(dir, grid);
+  device::MakeEnergy(dir, grid);
+  device::MakeDivStream(dir, grid);
+  device::MakeDivImpuls(dir, grid);
 }
 
 #endif //! USE_CUDA

@@ -1,4 +1,4 @@
-#if !defined CUDA_RAY_STRUCT_H && defined USE_CUDA
+#if 0 && !defined CUDA_RAY_STRUCT_H && defined USE_CUDA
 #define CUDA_RAY_STRUCT_H
 
 // workaround issue between gcc >= 4.7 and cuda 5.5 (совместимость с компиляторами (см. док. Eigen3: https://eigen.tuxfamily.org/dox/TopicCUDA.html))

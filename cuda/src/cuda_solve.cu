@@ -1,4 +1,4 @@
-﻿#ifdef USE_CUDA
+﻿#if 0 // def USE_CUDA
 #include "geo_types.h"
 #include "global_types.h"
 #include "solvers_struct.h"

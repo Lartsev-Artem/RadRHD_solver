@@ -2,7 +2,7 @@
 #define CUDA_INTEGRATOR_H
 
 #include "cuda_struct.h"
-namespace cuda::kernel {
+namespace cuda::device {
 namespace direction_integrator {
 
 __device__ Type Gamma(const Vector3 &direction, const Vector3 &direction2);
@@ -14,5 +14,5 @@ __device__ void IntegrateByFaces3(const int num_cell, const geo::grid_directions
 __device__ void IntegrateByFaces9(const int num_cell, const geo::grid_directions_device_t *dir_grid, geo::grid_device_t *grid, Matrix3 *Impuls);
 
 } // namespace direction_integrator
-} // namespace cuda::kernel
+} // namespace cuda::device
 #endif // CUDA_INTEGRATOR_H

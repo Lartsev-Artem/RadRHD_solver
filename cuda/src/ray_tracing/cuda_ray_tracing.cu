@@ -1,4 +1,4 @@
-#ifdef USE_CUDA
+#if 0 && defined USE_CUDA
 
 #include "cuda_ray_struct.h"
 

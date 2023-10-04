@@ -149,6 +149,8 @@ void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions)
   DIE_IF(cells.size() != num_cells);
 
   size = num_cells;
+  loc_size = size;
+  loc_shift = 0;
 
   Illum = new Type[num_directions * size * CELL_SIZE];
   scattering = new Type[num_directions * size];

@@ -1,4 +1,4 @@
-#if !defined CUDA_SOLVE_H && defined USE_CUDA
+#if 0 // !defined CUDA_SOLVE_H && defined USE_CUDA
 #define CUDA_SOLVE_H
 
 #include "cuda_interface.h"

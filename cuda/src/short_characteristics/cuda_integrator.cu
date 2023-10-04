@@ -5,7 +5,7 @@
 #include "cuda_integrator.h"
 #include "global_def.h"
 
-namespace c_dir = cuda::kernel::direction_integrator;
+namespace c_dir = cuda::device::direction_integrator;
 
 __device__ Type c_dir::Gamma(const Vector3 &direction, const Vector3 &direction2) {
   Type sum = direction.dot(direction2);

@@ -8,6 +8,10 @@
 #if !defined CUDA_INTERFACE_H && defined USE_CUDA
 #define CUDA_INTERFACE_H
 
+#include "geo_types.h"
+#include "solvers_struct.h"
+
+#include "cuda_struct.h"
 /**
  * @brief Пространство имён модуля расчета на видеокарте
  *
@@ -26,12 +30,19 @@ enum e_cuda_stream_id_t {
   e_сuda_count ///< общее число потоков
 };
 
-namespace inteface {
+extern geo::grid_directions_device_t *grid_dir_device;
+extern geo::grid_device_t *grid_device;
 
-void InitDevice(const grid_directions_t &grid_dir_host, grid_t &grid_host, const int start, const int end);
+namespace interface {
+
+int InitDevice(const std::string &address, const grid_directions_t &grid_dir_host, grid_t &grid_host, const int start, const int end);
 void ClearDevice();
 void ClearHost(grid_t &grid_host);
-} // namespace inteface
+
+int CalculateAllParam(const grid_directions_t &grid_dir, grid_t &grid);
+int CalculateIntScattering(const grid_directions_t &grid_dir, grid_t &grid);
+
+} // namespace interface
 
 } // namespace cuda
 

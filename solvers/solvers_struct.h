@@ -5,6 +5,8 @@
 #include "global_def.h"
 #include "global_types.h"
 
+#include "solvers_config.h"
+
 extern solve_mode_t _solve_mode;
 
 /**

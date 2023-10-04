@@ -16,6 +16,8 @@
 
 namespace cuda {
 
+#define CONVERT_TO_STRING(s, ...) #s #__VA_ARGS__
+
 /**
  * @brief Функция проверки работы функций cuda с расшифровкой кода ошибки
  *
@@ -33,6 +35,7 @@ int inline CheckError(Err_t cudaStatus, const std::string my_text = "") {
   return e_completion_success;
 }
 
+#ifdef DEBUG
 /**
  * @brief Безопасный вызов cuda функции c проверкой возвращаемого значения
  *
@@ -40,18 +43,17 @@ int inline CheckError(Err_t cudaStatus, const std::string my_text = "") {
 #define CUDA_CALL_FUNC(_func, ...)                              \
   if (CheckError(_func(__VA_ARGS__), CONVERT_TO_STRING(_func))) \
   EXIT_ERR("Error with args: %s\n", CONVERT_TO_STRING(__VA_ARGS__))
+#else
+#define CUDA_CALL_FUNC(_func, ...) _func(__VA_ARGS__);
+#endif
 
-/**
- * @brief Вызов функции ядра
- *
- */
-#define CUDA_CALL_KERNEL(_func, _blocks, _threads, ...) _func<<<_blocks, _threads>>>(__VA_ARGS__)
+#define BS 32 ///< размер блока
 
-/**
- * @brief Вызов функции ядра с указанием потока выполнения
- *
- */
-#define CUDA_CALL_KERNEL_STREAM(_func, _blocks, _threads, _st, ...) _func<<<_blocks, _threads, 0, _st>>>(__VA_ARGS__)
+#define CUDA_BLOCKS_2D(val, cells, dirs) dim3 val((cells + BS - 1) / BS, (dirs + BS - 1) / BS);
+#define CUDA_TREADS_2D(val) dim3 val(BS, BS);
+
+#define CUDA_BLOCKS_1D(val, cells) dim3 val((cells + BS - 1) / BS);
+#define CUDA_TREADS_1D(val) dim3 val(BS);
 
 } // namespace cuda
 #endif // CUDA_DEF_H
