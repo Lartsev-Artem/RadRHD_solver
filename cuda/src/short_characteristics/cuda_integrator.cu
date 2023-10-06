@@ -68,7 +68,7 @@ __device__ void c_dir::IntegrateByFaces9(const int num_cell, const geo::grid_dir
       for (int i = 0; i < 3; i++)
         for (int k = 0; k < 3; k++) {
           Type I = grid->illum[pos + f];
-          Impuls[f][i * 3 + k] += dir_grid->directions[dir].dir[i] * dir_grid->directions[dir].dir[k] * (I * dir_grid->directions[dir].area);
+          Impuls[f](i, k) += dir_grid->directions[dir].dir[i] * dir_grid->directions[dir].dir[k] * (I * dir_grid->directions[dir].area);
         }
     }
   }

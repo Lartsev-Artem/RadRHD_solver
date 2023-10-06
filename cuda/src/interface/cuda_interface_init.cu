@@ -13,6 +13,8 @@ cuda::geo::grid_device_t *grid_device;
 
 int cuda::interface::InitDevice(const std::string &address, const grid_directions_t &grid_dir_host, grid_t &grid_host, const int start, const int end) {
 
+  CUDA_CALL_FUNC(cudaSetDevice, 0);
+
   InitDirectionsOnDevice(grid_dir_host, grid_dir_device);
   InitGridOnDevice(grid_host, grid_dir_host.size, start, end, grid_device); /// \todo сдвиги в сетку и сюда сразу передавать геометрию
 
@@ -50,9 +52,9 @@ int cuda::interface::InitDevice(const std::string &address, const grid_direction
       }
     }
 
-    mem_protected::CpyToDevice(cuda::device_host_ptr.normals, dev_norm.data(), dev_norm.size() * sizeof(dev_norm[0]));
-    mem_protected::CpyToDevice(cuda::device_host_ptr.volume, volume.data(), N * sizeof(volume[0]));
-    mem_protected::CpyToDevice(cuda::device_host_ptr.areas, areas_faces.data(), CELL_SIZE * N * sizeof(areas_faces[0]));
+    mem_protected::CpyToDevice(device_host_ptr.normals, dev_norm.data(), dev_norm.size() * sizeof(dev_norm[0]));
+    mem_protected::CpyToDevice(device_host_ptr.volume, volume.data(), N * sizeof(volume[0]));
+    mem_protected::CpyToDevice(device_host_ptr.areas, areas_faces.data(), CELL_SIZE * N * sizeof(areas_faces[0]));
   }
 
   return e_completion_success;
@@ -62,6 +64,8 @@ void cuda::interface::ClearDevice() {
 
   ClearDirectionsOnDevice(grid_dir_device);
   ClearGridOnDevice(grid_device);
+
+  CUDA_CALL_FUNC(cudaDeviceReset);
 
   WRITE_LOG("Free device arrays\n");
 }

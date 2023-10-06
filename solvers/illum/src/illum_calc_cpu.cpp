@@ -7,6 +7,10 @@
 
 #include "geo_types.h"
 
+#ifdef USE_CUDA
+#include "cuda_interface.h"
+#endif
+
 #include <omp.h>
 
 #include <chrono>
@@ -112,7 +116,11 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
 
     if (iter > 0) // пропуск первой итерации
     {
+#ifndef USE_CUDA
       scattering::CalculateIntCPU(grid_direction, grid);
+#else
+      cuda::interface::CalculateIntScattering(grid_direction, grid);
+#endif
     }
 
     WRITE_LOG("End iter number#: %d, norm=%lf, time= %lf\n", iter, norm,
@@ -124,8 +132,13 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
 }
 
 void illum::cpu::CalculateIllumParam(const grid_directions_t &grid_direction, grid_t &grid) {
+
+#ifndef USE_CUDA
   GetEnergy(grid_direction, grid);
   GetStream(grid_direction, grid);
   GetImpuls(grid_direction, grid);
+#else
+  cuda::interface::CalculateAllParam(grid_direction, grid);
+#endif
 }
 #endif //! defined ILLUM && defined SOLVERS  && !defined USE_MPI

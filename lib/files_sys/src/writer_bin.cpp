@@ -171,15 +171,15 @@ static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid
 
   WRITE_FILE_ELEM((main_dir + F_DIVIMPULS).c_str(), grid.cells, illum_val.div_impuls);
 #else
-  WriteSimple((main_dir + "energy.bin").c_str(), grid.size, grid.energy);
+  files_sys::bin::WriteSimple((main_dir + F_ENERGY).c_str(), grid.size, grid.energy);
 
-  WriteSimple((main_dir + "stream.bin").c_str(), grid.size, grid.stream);
+  files_sys::bin::WriteSimple((main_dir + F_STREAM).c_str(), grid.size, grid.stream);
 
-  WriteSimple((main_dir + "impuls.bin").c_str(), grid.size, grid.impuls);
+  files_sys::bin::WriteSimple((main_dir + F_IMPULS).c_str(), grid.size, grid.impuls);
 
-  WriteSimple((main_dir + "divstream.bin").c_str(), grid.size, grid.divstream);
+  files_sys::bin::WriteSimple((main_dir + F_DIVSTREAM).c_str(), grid.size, grid.divstream);
 
-  WriteSimple((main_dir + "divimpuls.bin").c_str(), grid.size, grid.divimpuls);
+  files_sys::bin::WriteSimple((main_dir + F_DIVIMPULS).c_str(), grid.size, grid.divimpuls);
 #endif
 #endif
 

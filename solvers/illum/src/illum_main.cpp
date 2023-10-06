@@ -8,6 +8,8 @@
 #include "reader_txt.h"
 #include "writer_bin.h"
 
+#include "cuda_interface.h"
+
 int illum::RunIllumModule() {
 
   grid_t grid;
@@ -35,13 +37,24 @@ int illum::RunIllumModule() {
   }
 
   grid.InitMemory(grid.cells.size(), grid_direction.size);
+#ifdef USE_CUDA
+  cuda::interface::InitDevice(glb_files.base_address, grid_direction, grid, 0, grid_direction.size);
+#endif
 
   cpu::CalculateIllum(grid_direction, face_states, neighbours,
                       vec_x0, vec_x, sorted_id_cell, grid);
 
   cpu::CalculateIllumParam(grid_direction, grid);
 
+#ifdef USE_CUDA
+  cuda::interface::CudaWait();
+  cuda::interface::ClearDevice();
+  return 0;
+#endif
+
   return files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
+
+  cuda::interface::ClearHost(grid);
 }
 
 #endif //! SOLVERS

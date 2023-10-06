@@ -14,10 +14,15 @@ int main(int argc, char *argv[]) {
 
   files_sys::json::ReadStartSettings("/home/artem/projects/solver/config/directories_cfg.json",
                                      glb_files, &_solve_mode);
-  //  graph::RunGraphModule();
-  //  trace::RunTracesModule();
+  // graph::RunGraphModule();
+  // trace::RunTracesModule();
 
   // GDB_ATTACH;
+  // {
+  //   int i = 0;
+  //   while (i == 0)
+  //     sleep(1);
+  // }
 
   illum::RunIllumModule();
 

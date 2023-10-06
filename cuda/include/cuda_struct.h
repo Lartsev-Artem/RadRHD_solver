@@ -113,11 +113,11 @@ struct device_host_ptr_t {
 #endif
 };
 
-extern device_host_ptr_t device_host_ptr;
-extern grid_directions_device_t *grid_dir_device_ptr;
-extern grid_device_t *grid_cell_device_ptr;
-
 } // namespace geo
 } // namespace cuda
+
+extern cuda::geo::grid_directions_device_t *grid_dir_device;
+extern cuda::geo::grid_device_t *grid_device;
+extern cuda::geo::device_host_ptr_t device_host_ptr; ///< связь хоста с массивами внутри видеокарты (через эту структуры идёт обращение к массивам на карте)
 
 #endif // CUDA_STRUCT_H

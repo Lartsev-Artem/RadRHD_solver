@@ -1,8 +1,13 @@
 #ifndef GEO_TYPES
 #define GEO_TYPES
 
-#if !__NVCC__
-#define EIGEN_NO_CUDA
+// #if !__NVCC__
+// #define EIGEN_NO_CUDA
+// #endif
+// workaround issue between gcc >= 4.7 and cuda 5.5 (совместимость с компиляторами (см. док. Eigen3: https://eigen.tuxfamily.org/dox/TopicCUDA.html))
+#if (defined __GNUC__) && (__GNUC__ > 4 || __GNUC_MINOR__ >= 7)
+#undef _GLIBCXX_ATOMIC_BUILTINS
+#undef _GLIBCXX_USE_INT128
 #endif
 #include <Eigen/Dense>
 

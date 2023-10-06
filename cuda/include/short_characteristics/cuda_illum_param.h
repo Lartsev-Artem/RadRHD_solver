@@ -17,7 +17,7 @@ __device__ void MakeDivImpuls(const geo::grid_directions_device_t *dir, geo::gri
 
 namespace kernel {
 
-__global__ void MakeIllumParam(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid);
+__global__ void MakeIllumParam(const cuda::geo::grid_directions_device_t *dir, cuda::geo::grid_device_t *grid);
 
 } // namespace kernel
 } // namespace cuda

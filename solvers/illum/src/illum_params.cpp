@@ -1,4 +1,4 @@
-#if defined SOLVERS && defined ILLUM
+#if defined SOLVERS && defined ILLUM && !defined USE_CUDA
 #include "illum_params.h"
 
 #include "illum_integrate.h"

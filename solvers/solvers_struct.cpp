@@ -144,6 +144,7 @@ grid_t::~grid_t() {
 }
 #endif
 #else // CUDA
+#include "cuda_interface.h"
 void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions) {
 
   DIE_IF(cells.size() != num_cells);
@@ -152,10 +153,10 @@ void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions)
   loc_size = size;
   loc_shift = 0;
 
-  Illum = new Type[num_directions * size * CELL_SIZE];
-  scattering = new Type[num_directions * size];
-  memset(Illum, 0.0, sizeof(Type) * num_directions * size * CELL_SIZE);
-  memset(scattering, 0.0, sizeof(Type) * num_directions * size);
+  // Illum = new Type[num_directions * size * CELL_SIZE];
+  // scattering = new Type[num_directions * size];
+  // memset(Illum, 0.0, sizeof(Type) * num_directions * size * CELL_SIZE);
+  // memset(scattering, 0.0, sizeof(Type) * num_directions * size);
 
   inter_coef_all.resize(omp_get_max_threads());
   for (size_t i = 0; i < inter_coef_all.size(); i++) {
@@ -163,25 +164,15 @@ void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions)
   }
   // loc_size = hllc_loc_size[myid].right - hllc_loc_size[id].left;
 
-  divstream = new Type[size];
-  divimpuls = new Vector3[size];
-#ifdef ON_FULL_ILLUM_ARRAYS
-  energy = new Type[size];
-  stream = new Vector3[size];
-  impuls = new Matrix3[size];
-#endif
+  //   divstream = new Type[size];
+  //   divimpuls = new Vector3[size];
+  // #ifdef ON_FULL_ILLUM_ARRAYS
+  //   energy = new Type[size];
+  //   stream = new Vector3[size];
+  //   impuls = new Matrix3[size];
+  // #endif
 }
 grid_t::~grid_t() {
-  delete[] Illum;
-  delete[] scattering;
-  delete[] divstream;
-  delete[] divimpuls;
-
   inter_coef_all.clear();
-#ifdef ON_FULL_ILLUM_ARRAYS
-  delete[] energy;
-  delete[] stream;
-  delete[] impuls;
-#endif
 }
 #endif // NOT USE_CUDA

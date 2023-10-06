@@ -166,12 +166,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     D_LD;
   }
 }
-
 Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid) {
-
-#ifdef USE_CUDA
-  D_LD;
-#endif
 
   Type norm = -1;
   const int shift_dir = num_dir * grid.size;
@@ -190,9 +185,10 @@ Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coe
 
       grid.Illum[id] = curI;
 
+#ifndef USE_CUDA
       grid.cells[num_cell].illum_val.illum[num_dir * CELL_SIZE + i] = curI; //на каждой грани по направлениям
+#endif
     }
-    // cells[num_cell].illum_val.illum[num_dir] /= CELL_SIZE; //пересчёт по направлению для расчёта энергий и т.д.
   }
 
   return norm;

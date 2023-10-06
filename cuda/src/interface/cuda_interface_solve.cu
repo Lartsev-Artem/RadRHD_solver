@@ -9,6 +9,10 @@
 #include "cuda_illum_param.h"
 #include "cuda_scattering.h"
 
+#include "cuda_struct.h"
+
+using namespace cuda::geo;
+
 int cuda::interface::CalculateAllParam(const grid_directions_t &grid_dir, grid_t &grid) {
 
   const int N = grid.size;
@@ -17,13 +21,13 @@ int cuda::interface::CalculateAllParam(const grid_directions_t &grid_dir, grid_t
   CUDA_TREADS_1D(threads);
   CUDA_BLOCKS_1D(blocks, N);
 
-  kernel::MakeIllumParam<<<blocks, threads>>>(grid_dir_device_ptr, grid_cell_device_ptr);
+  kernel::MakeIllumParam<<<blocks, threads>>>(grid_dir_device, grid_device);
 
   CUDA_CALL_FUNC(cudaGetLastError);
 
   // не асинхронно т.к. сразу затем идет расчет газовый
-  mem_protected::CpyToHost(&grid.divstream, geo::device_host_ptr.divstream, N_loc * sizeof(grid.divstream[0]));
-  mem_protected::CpyToHost(&grid.divimpuls, geo::device_host_ptr.divimpuls, N_loc * sizeof(grid.divimpuls[0]));
+  mem_protected::CpyToHost(&grid.divstream, device_host_ptr.divstream, N_loc * sizeof(grid.divstream[0]));
+  mem_protected::CpyToHost(&grid.divimpuls, device_host_ptr.divimpuls, N_loc * sizeof(grid.divimpuls[0]));
 
 #ifdef ON_FULL_ILLUM_ARRAYS
   mem_protected::CpyToHostAsync(&grid.energy, device_host_ptr.energy, N_loc * sizeof(grid.energy[0]));
@@ -43,7 +47,7 @@ int cuda::interface::CalculateIntScattering(const grid_directions_t &grid_dir, g
   CUDA_TREADS_2D(threads);
   CUDA_BLOCKS_2D(blocks, N, M);
 
-  kernel::GetS<<<blocks, threads>>>(grid_dir_device_ptr, grid_cell_device_ptr);
+  kernel::GetS<<<blocks, threads>>>(grid_dir_device, grid_device);
 
   CUDA_CALL_FUNC(cudaGetLastError);
 

@@ -22,7 +22,7 @@ __global__ void cuda::kernel::GetS(const geo::grid_directions_device_t *dir, geo
   for (int num_direction = 0; num_direction < M; num_direction++) {
     int pos = CELL_SIZE * (num_direction * N + i);
     Type I = (Illum[pos] + Illum[pos + 1] + Illum[pos + 2] + Illum[pos + 3]) / 4.;
-    scatter += direction_integrator::Gamma(all_dir[num_direction].dir, cur_dir) * I * all_dir[num_direction].area;
+    scatter += device::direction_integrator::Gamma(all_dir[num_direction].dir, cur_dir) * I * all_dir[num_direction].area;
   }
 
   grid->int_scattering[k * N + i] = scatter / dir->full_area;
@@ -47,7 +47,7 @@ __global__ void cuda::kernel::GetS_MPI(const geo::grid_directions_device_t *dir,
   for (int num_direction = 0; num_direction < M; num_direction++) {
     int pos = CELL_SIZE * (num_direction * N + i);
     Type I = (Illum[pos] + Illum[pos + 1] + Illum[pos + 2] + Illum[pos + 3]) / 4.;
-    scatter += direction_integrator::Gamma(all_dir[num_direction].dir, cur_dir) * I * all_dir[num_direction].area;
+    scatter += device::direction_integrator::Gamma(all_dir[num_direction].dir, cur_dir) * I * all_dir[num_direction].area;
   }
 
   grid->int_scattering[k * N + i] = scatter / dir->full_area;
@@ -72,7 +72,7 @@ __global__ void cuda::kernel::GetS_MPI_Stream(const geo::grid_directions_device_
   for (int num_direction = 0; num_direction < M; num_direction++) {
     int pos = CELL_SIZE * (num_direction * N + i);
     Type I = (Illum[pos] + Illum[pos + 1] + Illum[pos + 2] + Illum[pos + 3]) / 4.;
-    scatter += direction_integrator::Gamma(all_dir[num_direction].dir, cur_dir) * I * all_dir[num_direction].area;
+    scatter += device::direction_integrator::Gamma(all_dir[num_direction].dir, cur_dir) * I * all_dir[num_direction].area;
   }
 
   grid->int_scattering[k * N + i] = scatter / dir->full_area;

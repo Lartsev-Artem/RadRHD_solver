@@ -1,7 +1,9 @@
 #if !defined CUDA_MEMORY_H && defined USE_CUDA
 #define CUDA_MEMORY_H
 
+#include "cuda_def.h"
 #include "dbgdef.h"
+
 
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>

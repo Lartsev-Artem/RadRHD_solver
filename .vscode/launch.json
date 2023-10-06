@@ -10,7 +10,7 @@
       "stopAtEntry": false,
       "externalConsole": false,
       "cwd": "/home/artem/projects/solver",
-      "program": "/home/artem/projects/solver/build/solver",
+      "program": "/home/artem/projects/solver/build/run",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

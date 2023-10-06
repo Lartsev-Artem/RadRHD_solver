@@ -7,10 +7,10 @@
 #ifdef ON_FULL_ILLUM_ARRAYS
 #define CUDA_CONVERT_FACE_TO_CELL(val, size, src) \
   for (int k = 0; k < size; k++) {                \
-    val[k] = 0;                                   \
+    val(k) = 0;                                   \
     for (int f = 0; f < CELL_SIZE; f++)           \
-      val[k] += src[f][k];                        \
-    val[k] /= CELL_SIZE;                          \
+      val(k) += src[f][k];                        \
+    val(k) /= CELL_SIZE;                          \
   }
 
 __device__ void cuda::device::MakeEnergy(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
@@ -26,7 +26,7 @@ __device__ void cuda::device::MakeEnergy(const geo::grid_directions_device_t *di
 #endif // ON_FULL_ILLUM_ARRAYS
 
 __device__ void cuda::device::MakeDivStream(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
-  const int M = dir->size;
+  //  const int M = dir->size;
   const int N = grid->loc_size;
   const int shift = grid->shift;
 
@@ -58,7 +58,7 @@ __device__ void cuda::device::MakeDivStream(const geo::grid_directions_device_t 
 }
 
 __device__ void cuda::device::MakeDivImpuls(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
-  const int M = dir->size;
+  // const int M = dir->size;
   const int N = grid->loc_size;
   const int shift = grid->shift;
 
@@ -70,7 +70,11 @@ __device__ void cuda::device::MakeDivImpuls(const geo::grid_directions_device_t 
   direction_integrator::IntegrateByFaces9(i + shift, dir, grid, impuls);
 
 #ifdef ON_FULL_ILLUM_ARRAYS
-  CUDA_CONVERT_FACE_TO_CELL(grid->impuls[i], 9, impuls);
+  // CUDA_CONVERT_FACE_TO_CELL(grid->impuls[i], 9, impuls);
+  grid->impuls[i] = Matrix3::Zero();
+  for (int f = 0; f < CELL_SIZE; f++)
+    grid->impuls[i] += impuls[f];
+  grid->impuls[i] /= CELL_SIZE;
 #endif
 
   Vector3 div = Vector3::Zero();
@@ -80,7 +84,7 @@ __device__ void cuda::device::MakeDivImpuls(const geo::grid_directions_device_t 
     for (int h = 0; h < 3; h++) {
       Type sum = 0;
       for (int k = 0; k < 3; k++) {
-        sum += impuls[j][h * 3 + k] * grid->normals[pos][k];
+        sum += impuls[j](h, k) * grid->normals[pos][k];
       }
 
       div[h] += sum * grid->areas[pos];
@@ -93,11 +97,11 @@ __device__ void cuda::device::MakeDivImpuls(const geo::grid_directions_device_t 
 
 #undef CUDA_CONVERT_FACE_TO_CELL
 
-__global__ void cuda::kernel::MakeIllumParam(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
+__global__ void cuda::kernel::MakeIllumParam(const cuda::geo::grid_directions_device_t *dir, cuda::geo::grid_device_t *grid) {
   // эти функции можно объденить в одну. Тогда будет одно общее обращение в память к illum
-  device::MakeEnergy(dir, grid);
-  device::MakeDivStream(dir, grid);
-  device::MakeDivImpuls(dir, grid);
+  // device::MakeEnergy(dir, grid);
+  // device::MakeDivStream(dir, grid);
+  // device::MakeDivImpuls(dir, grid);
 }
 
 #endif //! USE_CUDA
