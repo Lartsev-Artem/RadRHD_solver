@@ -10,6 +10,10 @@
 #include "geo_types.h"
 #include "solvers_struct.h"
 
+/*! \addtogroup cuda Модуль расчёта излучения на видеокарте
+    @{
+*/
+
 namespace cuda {
 
 /**

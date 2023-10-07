@@ -14,6 +14,10 @@
 #include "dbgdef.h"
 #include <string>
 
+/*! \addtogroup cuda Модуль расчёта излучения на видеокарте
+    @{
+*/
+
 namespace cuda {
 
 #define CONVERT_TO_STRING(s, ...) #s #__VA_ARGS__

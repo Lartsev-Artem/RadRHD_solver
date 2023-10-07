@@ -18,11 +18,6 @@ int main(int argc, char *argv[]) {
   // trace::RunTracesModule();
 
   // GDB_ATTACH;
-  // {
-  //   int i = 0;
-  //   while (i == 0)
-  //     sleep(1);
-  // }
 
   illum::RunIllumModule();
 

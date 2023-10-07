@@ -18,9 +18,18 @@ typedef double Type;
 #include "dbgdef.h"
 #include "solvers_config.h"
 
-#include "geo_types.h" /// \todo: Eigen подключается там!!!
+#include "geo_types.h"
+
+/*! \addtogroup cuda Модуль расчёта излучения на видеокарте
+    @{
+*/
 
 namespace cuda {
+
+/**
+ * @brief Пространство имён с описанием геометрии
+ *
+ */
 namespace geo {
 
 /**
@@ -85,23 +94,27 @@ struct grid_device_t {
 #endif
 };
 
+/**
+ * @brief набор массивов, связывающих память на карте и хосте
+ *
+ */
 struct device_host_ptr_t {
-  direction_device_t *directions;
+  direction_device_t *directions; ///< массив направлений
 
-  Type *illum;
-  Type *int_scattering;
+  Type *illum;          ///< излучение
+  Type *int_scattering; ///< интеграл рессеяния
 
-  Type *divstream;
-  Vector3 *divimpuls;
+  Type *divstream;    ///< дивергенция потока
+  Vector3 *divimpuls; ///< дивергенция импульса
 
-  Vector3 *normals;
-  Type *areas;
-  Type *volume;
+  Vector3 *normals; ///< нормали к ячейкам
+  Type *areas;      ///< площадь граней
+  Type *volume;     ///< объемы ячеек
 
 #ifdef ON_FULL_ILLUM_ARRAYS
-  Type *energy;
-  Vector3 *stream;
-  Matrix3 *impuls;
+  Type *energy;    ///< энергия излучения
+  Vector3 *stream; ///< поток энергии излучения
+  Matrix3 *impuls; ///< импулься энергии излучения
 #endif
 
   device_host_ptr_t() : illum(nullptr), int_scattering(nullptr), divstream(nullptr), divimpuls(nullptr),
@@ -116,8 +129,8 @@ struct device_host_ptr_t {
 } // namespace geo
 } // namespace cuda
 
-extern cuda::geo::grid_directions_device_t *grid_dir_device;
-extern cuda::geo::grid_device_t *grid_device;
-extern cuda::geo::device_host_ptr_t device_host_ptr; ///< связь хоста с массивами внутри видеокарты (через эту структуры идёт обращение к массивам на карте)
+extern cuda::geo::grid_directions_device_t *grid_dir_device; ///< сфера направлений
+extern cuda::geo::grid_device_t *grid_device;                ///< сетка
+extern cuda::geo::device_host_ptr_t device_host_ptr;         ///< связь хоста с массивами внутри видеокарты (через эту структуры идёт обращение к массивам на карте)
 
 #endif // CUDA_STRUCT_H

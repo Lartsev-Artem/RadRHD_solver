@@ -12,7 +12,7 @@ __device__ Type c_dir::Gamma(const Vector3 &direction, const Vector3 &direction2
   return (3. * (1 + sum * sum)) / 4.;
 }
 
-__device__ Type c_dir::IntegrateByCell(const int num_cell, const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
+__device__ Type c_dir::IntegrateByCell(const int num_cell, const geo::grid_directions_device_t *dir, const geo::grid_device_t *grid) {
   const int M = dir->size;
   const int N = grid->size;
 
