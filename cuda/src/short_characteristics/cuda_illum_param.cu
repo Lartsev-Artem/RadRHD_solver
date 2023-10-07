@@ -99,9 +99,9 @@ __device__ void cuda::device::MakeDivImpuls(const geo::grid_directions_device_t 
 
 __global__ void cuda::kernel::MakeIllumParam(const cuda::geo::grid_directions_device_t *dir, cuda::geo::grid_device_t *grid) {
   // эти функции можно объденить в одну. Тогда будет одно общее обращение в память к illum
-  // device::MakeEnergy(dir, grid);
-  // device::MakeDivStream(dir, grid);
-  // device::MakeDivImpuls(dir, grid);
+  device::MakeEnergy(dir, grid);
+  device::MakeDivStream(dir, grid);
+  device::MakeDivImpuls(dir, grid);
 }
 
 #endif //! USE_CUDA

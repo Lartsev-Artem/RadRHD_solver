@@ -26,13 +26,13 @@ int cuda::interface::CalculateAllParam(const grid_directions_t &grid_dir, grid_t
   CUDA_CALL_FUNC(cudaGetLastError);
 
   // не асинхронно т.к. сразу затем идет расчет газовый
-  mem_protected::CpyToHost(&grid.divstream, device_host_ptr.divstream, N_loc * sizeof(grid.divstream[0]));
-  mem_protected::CpyToHost(&grid.divimpuls, device_host_ptr.divimpuls, N_loc * sizeof(grid.divimpuls[0]));
+  mem_protected::CpyToHost(grid.divstream, device_host_ptr.divstream, N_loc * sizeof(grid.divstream[0]));
+  mem_protected::CpyToHost(grid.divimpuls, device_host_ptr.divimpuls, N_loc * sizeof(grid.divimpuls[0]));
 
 #ifdef ON_FULL_ILLUM_ARRAYS
-  mem_protected::CpyToHostAsync(&grid.energy, device_host_ptr.energy, N_loc * sizeof(grid.energy[0]));
-  mem_protected::CpyToHostAsync(&grid.stream, device_host_ptr.stream, N_loc * sizeof(grid.stream[0]));
-  mem_protected::CpyToHostAsync(&grid.impuls, device_host_ptr.impuls, N_loc * sizeof(grid.impuls[0]));
+  mem_protected::CpyToHostAsync(grid.energy, device_host_ptr.energy, N_loc * sizeof(grid.energy[0]));
+  mem_protected::CpyToHostAsync(grid.stream, device_host_ptr.stream, N_loc * sizeof(grid.stream[0]));
+  mem_protected::CpyToHostAsync(grid.impuls, device_host_ptr.impuls, N_loc * sizeof(grid.impuls[0]));
 #endif
 
   return e_completion_success;
@@ -51,7 +51,7 @@ int cuda::interface::CalculateIntScattering(const grid_directions_t &grid_dir, g
 
   CUDA_CALL_FUNC(cudaGetLastError);
 
-  mem_protected::CpyToHost(&grid.scattering, device_host_ptr.int_scattering, N * M * sizeof(grid.scattering[0]));
+  mem_protected::CpyToHost(grid.scattering, device_host_ptr.int_scattering, N * M * sizeof(grid.scattering[0]));
 
   return e_completion_success;
 }

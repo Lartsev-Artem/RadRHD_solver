@@ -47,7 +47,7 @@ CXXFLAGS        = #-g #-Wall -Wextra -std=c++11
 
 NVCC 				= nvcc
 NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp" --expt-relaxed-constexpr #совместимость с Eigen3
-NVCC_FLAGS 			= $(DEF_SET) -O2 -gencode arch=compute_52,code=sm_52 -dc $(NVCC_OTHER_FLAGS)
+NVCC_FLAGS 			= $(DEF_SET) -O2  -dc $(NVCC_OTHER_FLAGS)  #-gencode arch=compute_52,code=sm_52
 
 PROGRAM         = run
 #TARGET_ARCH	=
@@ -95,7 +95,9 @@ clean:
 	$(RM) $(PROGRAM)
 	$(RM) "File_Logs.txt"
 
-
+.PHONY: clean_o
+clean_o:
+	$(RM) $(OBJDIR) -r
 ## попытка собирать только утилиты. с линковкой к библиотеке
 # SRCDIR_UTILS         = src lib/files_sys/src lib/geometry lib/mpi_extension lib/json lib/geometry/src utils/netgen_to_vtk
 # SRCS_UTILS 			= $(foreach dir,$(SRCDIR_UTILS),$(wildcard $(dir)/*.cpp))

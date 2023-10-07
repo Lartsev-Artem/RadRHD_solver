@@ -4,7 +4,6 @@
 #include "cuda_def.h"
 #include "dbgdef.h"
 
-
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
@@ -34,7 +33,7 @@ void inline CpyToDevice(distType *dist, const srcType *src, size_t size) {
 }
 
 template <typename distType, typename srcType>
-void inline CpyToHost(distType **dist, const srcType *src, size_t size) {
+void inline CpyToHost(distType *dist, const srcType *src, size_t size) {
 
   if (CheckError(cudaMemcpy(dist, src, size, cudaMemcpyDeviceToHost))) {
     EXIT_ERR("Error CpyToHost\n");
@@ -50,7 +49,7 @@ void inline CpyToDeviceAsync(distType *dist, const srcType *src, size_t size) {
 }
 
 template <typename distType, typename srcType>
-void inline CpyToHostAsync(distType **dist, const srcType *src, size_t size) {
+void inline CpyToHostAsync(distType *dist, const srcType *src, size_t size) {
 
   if (CheckError(cudaMemcpyAsync(dist, src, size, cudaMemcpyDeviceToHost))) {
     EXIT_ERR("Error CpyToHostAsync\n");
@@ -58,7 +57,7 @@ void inline CpyToHostAsync(distType **dist, const srcType *src, size_t size) {
 }
 
 template <typename distType, typename srcType>
-void inline CpyToHostAsyncStream(distType **dist, const srcType *src, size_t size, cudaStream_t &st) {
+void inline CpyToHostAsyncStream(distType *dist, const srcType *src, size_t size, cudaStream_t &st) {
 
   if (CheckError(cudaMemcpyAsync(dist, src, size, cudaMemcpyDeviceToHost, st))) {
     EXIT_ERR("Error CpyToHostAsyncStream\n");

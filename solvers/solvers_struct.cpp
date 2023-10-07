@@ -174,5 +174,6 @@ void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions)
 }
 grid_t::~grid_t() {
   inter_coef_all.clear();
+  cuda::interface::ClearHost(*this);
 }
 #endif // NOT USE_CUDA

@@ -65,7 +65,7 @@ void cuda::interface::ClearDevice() {
   ClearDirectionsOnDevice(grid_dir_device);
   ClearGridOnDevice(grid_device);
 
-  CUDA_CALL_FUNC(cudaDeviceReset);
+  // CUDA_CALL_FUNC(cudaDeviceReset);
 
   WRITE_LOG("Free device arrays\n");
 }

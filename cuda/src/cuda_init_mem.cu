@@ -27,7 +27,7 @@ void cuda::ClearDirectionsOnDevice(geo::grid_directions_device_t *&grid_device) 
   mem::FreeMem(grid_device);                // удаляем саму структуру
 }
 
-void cuda::InitGridOnDevice(const grid_t grid_host,
+void cuda::InitGridOnDevice(const grid_t &grid_host,
                             const int size_dir, const int start_dir, const int end_dir,
                             geo::grid_device_t *&grid_device) {
 

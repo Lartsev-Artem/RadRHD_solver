@@ -37,6 +37,7 @@ int illum::RunIllumModule() {
   }
 
   grid.InitMemory(grid.cells.size(), grid_direction.size);
+
 #ifdef USE_CUDA
   cuda::interface::InitDevice(glb_files.base_address, grid_direction, grid, 0, grid_direction.size);
 #endif
@@ -46,15 +47,14 @@ int illum::RunIllumModule() {
 
   cpu::CalculateIllumParam(grid_direction, grid);
 
+  files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
+
 #ifdef USE_CUDA
   cuda::interface::CudaWait();
   cuda::interface::ClearDevice();
-  return 0;
 #endif
 
-  return files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
-
-  cuda::interface::ClearHost(grid);
+  return e_completion_success;
 }
 
 #endif //! SOLVERS

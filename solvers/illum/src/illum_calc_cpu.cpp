@@ -58,7 +58,7 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
 
             const int neigh_id = neighbours[num_cell * CELL_SIZE + num_out_face]; ///< сосед к текущей грани
 
-            // если эта грань входящая и не граничная, то пропускаем её
+            // если эта грань входящая и граничная, то пропускаем её
             if (CHECK_BIT(face_states[num_direction][num_cell], num_out_face) == e_face_type_in) {
               if (neigh_id < 0) {
                 Type I0 = illum::BoundaryConditions(neigh_id);
@@ -74,7 +74,7 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
               Vector3 &x = vec_x[num_cell].x[num_out_face][num_node];
               ShortId num_in_face = X0_ptr->in_face_id;
 
-              Type I_x0 = GetIllumeFromInFace(num_in_face, neigh_id, cell, (*inter_coef)[num_cell * CELL_SIZE + num_in_face]);
+              Type I_x0 = GetIllumeFromInFace(num_in_face, neighbours[num_cell * CELL_SIZE + num_in_face], cell, (*inter_coef)[num_cell * CELL_SIZE + num_in_face]);
               I[num_node] = GetIllum(x, X0_ptr->s, I_x0, grid.scattering[num_direction * count_cells + num_cell], *cell);
 
               X0_ptr++;
@@ -114,7 +114,7 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
       }
     } // parallel
 
-    if (iter > 0) // пропуск первой итерации
+    if (_solve_mode.max_number_of_iter > 1) // пропуск первой итерации
     {
 #ifndef USE_CUDA
       scattering::CalculateIntCPU(grid_direction, grid);
@@ -123,7 +123,7 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
 #endif
     }
 
-    WRITE_LOG("End iter number#: %d, norm=%lf, time= %lf\n", iter, norm,
+    WRITE_LOG("End iter number#: %d, norm=%.16lf, time= %lf\n", iter, norm,
               (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
     iter++;
   } while (norm > _solve_mode.accuracy && iter < _solve_mode.max_number_of_iter);
