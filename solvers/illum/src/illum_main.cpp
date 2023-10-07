@@ -1,4 +1,4 @@
-#ifdef SOLVERS
+#if defined SOLVERS && defined ILLUM
 #include "illum_main.h"
 
 #include "global_types.h"

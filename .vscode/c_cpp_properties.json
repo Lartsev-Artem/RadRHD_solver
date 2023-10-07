@@ -40,8 +40,6 @@
                 "USE_MPI",
                 "USE_VTK",
                 "MAKE_TRACE",
-                "ILLUM",
-                "USE_CUDA"
             ],
             "compilerPath": "/usr/bin/mpic++",
             "cStandard": "c17",

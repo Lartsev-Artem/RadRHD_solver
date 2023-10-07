@@ -8,18 +8,23 @@
 
 #include "solvers_struct.h"
 
+#include "rhllc_main.h"
+
 int main(int argc, char *argv[]) {
 
   MPI_START(argc, argv);
 
   files_sys::json::ReadStartSettings("/home/artem/projects/solver/config/directories_cfg.json",
                                      glb_files, &_solve_mode);
+
+#ifdef ILLUM
   // graph::RunGraphModule();
   // trace::RunTracesModule();
-
-  // GDB_ATTACH;
-
   illum::RunIllumModule();
+// GDB_ATTACH;
+#endif
+
+  rhllc::RunRhllcModule();
 
   MPI_END;
   return 0;
