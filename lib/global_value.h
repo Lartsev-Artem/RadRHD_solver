@@ -1,7 +1,7 @@
 /**
  * @file global_value.h
  * @brief Файл содержит глобальные константы
- *
+ * \todo физические константы
  */
 
 #ifndef GLOBAL_VALUE

@@ -82,6 +82,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
 
   case e_grid_cfg_default:
   case e_grid_cfg_static_illum: {
+
 #if GEOMETRY_TYPE == Sphere
     Type Q = 1;
     Type alpha = 2;
@@ -94,6 +95,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
       alpha = 0.5;
       betta = 0.5;
     }
+    return std::max(0.0, GetI(s, Q, S, I_0, alpha + betta, betta));
 #endif
 #if GEOMETRY_TYPE == Cone
     Type Q = 0;
@@ -107,9 +109,10 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
       alpha = 1;
       betta = 2;
     }
+    return std::max(0.0, GetI(s, Q, S, I_0, alpha + betta, betta));
 #endif
 
-    return std::max(0.0, GetI(s, Q, S, I_0, alpha + betta, betta));
+    D_LD;
   }
 
   case e_grid_cfg_radiation: // test task
@@ -135,6 +138,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
 #endif
   }
 
+    ///\todo Здесь пересчёт в размерные единицы, потом вычисление излучения и возврат к безразмерным
   case e_grid_cfg_full_init: // HLLC + Illum для конуса
   {
     // переход к размерным параметрам
