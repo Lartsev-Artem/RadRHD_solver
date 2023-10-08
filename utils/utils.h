@@ -116,10 +116,37 @@ int RebuildSolve(int argc, char **argv);
  * @brief Функция строит для всех модулей геометрические настроечные файлы из vtk сетки
  *
  * @param argc кол-во аргументов (требуется 3)
- * @param argv
+ * @param argv массив char** содержит {адрес для сборки, файл vtk сетки}
  * @return int ::e_type_completion
  */
 int MakeAllGeoData(int argc, char **argv);
+
+/**
+ * @brief Возвращает средний и минимальный размер ячеек (радиус вписанной окружности)
+ *
+ * @param argc кол-во аргументов (требуется 1)
+ * @param argv массив char** содержит {файл vtk сетки}
+ * @return int  ::e_type_completion
+ */
+int GetAverageSize3D(int argc, char **argv);
+
+/**
+ * @brief Создает файл с полной проекцией решения на заданную координатную ось
+ *
+ * @param argc кол-во аргументов (требуется 3)
+ * @param argv массив char** содержит {файл vtk сетки, адрес вывода файлов, ось X,Y,Z}
+ * @return int ::e_type_completion
+ */
+int Make1dProjection(int argc, char **argv);
+
+/**
+ * @brief Переписывает поля сетки в бинарные файлы
+ *
+ * @param argc кол-во аргументов (требуется 2)
+ * @param argv массив char** содержит {файл vtk сетки, адрес вывода файлов}
+ * @return int ::e_type_completion
+ */
+int WriteBinFromVtk(int argc, char *argv[]);
 #endif
 
 } // namespace utils

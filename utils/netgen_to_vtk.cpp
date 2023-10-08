@@ -1,6 +1,8 @@
 #include "global_def.h"
 #include "utils.h"
 
+#include "geo_types.h"
+
 #include <vector>
 
 static int ReadNetgenGrid(const std::string &name_file_in, std::vector<Eigen::Vector3d> &point, std::vector<Eigen::Vector4i> &cell, const size_t size = 3) {

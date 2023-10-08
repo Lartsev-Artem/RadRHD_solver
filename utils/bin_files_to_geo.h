@@ -2,6 +2,7 @@
 #define BIN_FILES_TO_GEO
 
 #include "convert_bin_to_geo.h"
+#include "global_value.h"
 #include "reader_bin.h"
 #include "writer_bin.h"
 

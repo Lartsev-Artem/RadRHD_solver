@@ -1,5 +1,7 @@
 #include "convert_vtk_geo.h"
 #ifdef USE_VTK
+#include "global_value.h"
+
 #include <vtkCell.h>
 #include <vtkIdList.h>
 #include <vtkPoints.h>
@@ -206,7 +208,7 @@ static void NormalAndSquareFace3D(const int cell_number, const int face_number, 
 int GetNormalAndAreas3D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<Normals> &normals, std::vector<Type> &areas) {
 
   const int n = unstructured_grid->GetNumberOfCells();
-  normals.resize(n, Normals(CELL_SIZE));
+  normals.resize(n);
   areas.resize(n * (CELL_SIZE));
 
   for (size_t i = 0; i < n; i++) {
