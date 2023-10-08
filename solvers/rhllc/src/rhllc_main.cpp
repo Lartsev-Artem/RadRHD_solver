@@ -2,10 +2,15 @@
 #if defined SOLVERS
 #include "rhllc_main.h"
 
+#include "rhllc_calc.h"
+#include "rhllc_init.h"
+#include "rhllc_utils.h"
+
 #include "reader_bin.h"
 #include "writer_bin.h"
 
-#include "solvers_struct.h"
+#include <chrono>
+namespace tick = std::chrono;
 
 int rhllc::RunRhllcModule() {
   grid_t grid;
@@ -19,12 +24,35 @@ int rhllc::RunRhllcModule() {
   }
   grid.InitMemory(grid.cells.size(), 0);
 
-  /*
-  run rhllc
-  */
+  DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
 
-  files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
+  Type t = 0.0;
+  Type cur_timer = 0;
+  int res_count = 0;
 
+  _hllc_cfg.tau = GetTimeStep(_hllc_cfg, grid.cells);
+
+  WRITE_LOG("tau = %lf\n", _hllc_cfg.tau);
+
+  files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid); // начальное сохранение
+
+  auto start_clock = tick::steady_clock::now();
+
+  while (t < _hllc_cfg.T) {
+    Hllc3d(_hllc_cfg.tau, grid);
+
+    if (cur_timer >= _hllc_cfg.save_timer) {
+      DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
+
+      WRITE_LOG("t= %lf, step= %d, time_step=%lf\n", t, res_count, (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
+      cur_timer = 0;
+    }
+
+    t += _hllc_cfg.tau;
+    cur_timer += _hllc_cfg.tau;
+  }
+
+  files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid);
   return e_completion_success;
 }
 

@@ -148,6 +148,40 @@ int ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
                        std::vector<Type> &vec_res_bound);
 #endif //! ILLUM
 
+#if defined RHLLC || defined HLLC
+#define READ_FILE(name_file, data, value)       \
+  {                                             \
+    FILE *f;                                    \
+    OPEN_FILE(f, name_file., "rb");             \
+    int n;                                      \
+    fread(&n, sizeof(int), 1, f);               \
+    data.resize(n);                             \
+    for (auto &el : data) {                     \
+      fread(&el.value, sizeof(el.value), 1, f); \
+    }                                           \
+    fclose(f);                                  \
+  }
+
+template <typename elem_with_phys_val>
+int ReadHllcInit(const std::string &file_init_value, std::vector<elem_with_phys_val> &data) {
+
+  FILE *f;
+  OPEN_FILE(f, file_init_value.c_str(), "rb");
+  int n;
+  if (fread(&n, sizeof(int), 1, f) != 1)
+    return e_completion_fail;
+
+  data.resize(n);
+  for (auto &el : data) {
+    if (fread(&el.phys_val, sizeof(el.phys_val), 1, f) != 1)
+      return e_completion_fail;
+  }
+  fclose(f);
+
+  return e_completion_success;
+}
+#endif //!  RHLLC || HLLC
+
 } // namespace bin
 } // namespace files_sys
 

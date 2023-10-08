@@ -1,5 +1,5 @@
 # defining project config 
-DEFCONF 		= SOLVERS BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI DEBUG LINUX USE_CUDA
+DEFCONF 		= SOLVERS LINUX RHLLC DEBUG #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI  LINUX USE_CUDA
 
 # defining working directories
 LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension
@@ -8,8 +8,11 @@ LIB_SRC = lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometr
 CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteristics 
 CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics 
 
-SRCDIR          = src graph/src make_trace/src  ${LIB_SRC} solvers/illum/src solvers 
-INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR} solvers/illum/include solvers ${CUDA_INCDIR}
+SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include
+SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src
+
+SRCDIR          = src graph/src make_trace/src ${LIB_SRC} ${SOLVERS_SRC}
+INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR}  ${CUDA_INCDIR} ${SOLVERS_DIR}
 BUILDDIR        = build
 OBJDIR          = $(BUILDDIR)/objs
 DEPDIR          = $(BUILDDIR)/dep

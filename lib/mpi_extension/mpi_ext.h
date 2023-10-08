@@ -37,5 +37,9 @@ extern MPI_Datatype MPI_flux_elem_t;       ///< mpi-тип для перессы
 #define MPI_START(argc, argv) MPI_Init(&argc, &argv);
 #define MPI_END MPI_Finalize();
 
+#else
+#define CONVERT_TO_STRING(s, ...) #s #__VA_ARGS__
+#define MPI_START(argc, argv) CONVERT_TO_STRING(argc, argv);
+#define MPI_END
 #endif
 #endif // MPI_EXTENSION

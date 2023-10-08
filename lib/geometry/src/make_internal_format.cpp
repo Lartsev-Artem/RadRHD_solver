@@ -1,5 +1,6 @@
 #include "make_internal_format.h"
 #ifdef USE_VTK
+#include "global_value.h"
 
 #include "reader_bin.h"
 #include "reader_vtk.h"

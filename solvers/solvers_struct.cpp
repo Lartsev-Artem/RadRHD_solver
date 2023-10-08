@@ -5,6 +5,7 @@
 #include <omp.h>
 
 solve_mode_t _solve_mode;
+hllc_value_t _hllc_cfg;
 
 flux_t flux_t::operator+(const flux_t &x) {
   d += x.d;

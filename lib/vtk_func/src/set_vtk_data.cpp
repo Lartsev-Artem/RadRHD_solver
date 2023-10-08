@@ -1,7 +1,10 @@
 #ifdef USE_VTK
 #include "set_vtk_data.h"
+#include "global_value.h"
 #include "reader_bin.h"
+
 #include <filesystem>
+
 namespace fs = std::filesystem;
 
 int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointer<vtkUnstructuredGrid> &u_grid) {

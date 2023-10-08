@@ -35,7 +35,7 @@ Type IntegrateByCell(const std::vector<Type> &Illum, const grid_directions_t &gr
 void IntegrateByFace3(const std::vector<Type> &Illum, const grid_directions_t &grid_direction, Vector3 *stream_face);
 
 /**
- * @brief @brief Функция интегрирования по направлениям с тензором направления на каждой грани (импульс излучения)
+ * @brief Функция интегрирования по направлениям с тензором направления на каждой грани (импульс излучения)
  *
  * @param[in] Illum излучение в области, заданная на гранях
  * @param[in] grid_direction сфера направлений

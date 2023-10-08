@@ -15,7 +15,7 @@
 
 #include "prj_config.h"
 
-#define HLLC
+//#define HLLC
 //#define RHLLC
 // #define ILLUM
 

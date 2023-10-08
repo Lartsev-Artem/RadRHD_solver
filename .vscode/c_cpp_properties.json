@@ -40,6 +40,7 @@
                 "USE_MPI",
                 "USE_VTK",
                 "MAKE_TRACE",
+                "RHLLC"
             ],
             "compilerPath": "/usr/bin/mpic++",
             "cStandard": "c17",

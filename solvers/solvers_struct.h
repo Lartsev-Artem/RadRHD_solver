@@ -8,6 +8,7 @@
 #include "solvers_config.h"
 
 extern solve_mode_t _solve_mode;
+extern hllc_value_t _hllc_cfg;
 
 /**
  * @brief Структура потоков

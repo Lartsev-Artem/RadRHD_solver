@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   MPI_START(argc, argv);
 
   files_sys::json::ReadStartSettings("/home/artem/projects/solver/config/directories_cfg.json",
-                                     glb_files, &_solve_mode);
+                                     glb_files, &_solve_mode, &_hllc_cfg);
 
 #ifdef ILLUM
   // graph::RunGraphModule();
