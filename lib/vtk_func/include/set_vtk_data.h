@@ -1,3 +1,7 @@
+/**
+ * @file set_vtk_data.h
+ * @brief Функции вставки данных в vtk сетку из бинарного файла
+ */
 #if !defined SET_DATA_H && defined USE_VTK
 #define SET_DATA_H
 

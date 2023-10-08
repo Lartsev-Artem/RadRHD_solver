@@ -1,3 +1,8 @@
+/**
+ * @file cuda_memory.h
+ * @brief Функции безопасного обращения с памятью
+ *
+ */
 #if !defined CUDA_MEMORY_H && defined USE_CUDA
 #define CUDA_MEMORY_H
 

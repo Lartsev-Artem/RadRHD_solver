@@ -19,8 +19,6 @@
  *
  */
 
-/// \todo if UTILS -> LOG_file -> log_screen
-
 #ifndef PRJ_CONFIG
 #define PRJ_CONFIG
 

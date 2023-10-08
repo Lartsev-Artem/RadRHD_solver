@@ -15,12 +15,11 @@
 #include "prj_config.h"
 #include "json/json_struct.h"
 
-
 extern global_files_t glb_files;
 
 constexpr double PI = 3.1415926535897932384626433832795; ///<число пи
 
-constexpr double kGamma1 = 5. / 3; ///< показатель адиабаты
+constexpr double kGamma1 = 4. / 3; ///< показатель адиабаты
 constexpr double kGamma_g = kGamma1 / (kGamma1 - 1);
 
 //! (в случае сплошной области задаётся так, чтобы сфера не пересекала расчётную область)

@@ -1,3 +1,8 @@
+/**
+ * @file rhllc_calc.h
+ * @brief Функции расчета газодинамического состояние на текущий момент времени
+ *
+ */
 #if !defined RHLLC_CALC_H && defined SOLVERS
 #define RHLLC_CALC_H
 

@@ -1,3 +1,7 @@
+/**
+ * @file make_internal_format.h
+ * @brief Функция разбиения vtk сетки на бинарные файлы
+ */
 #ifndef MAKE_INTERNAL_FORMAT_H
 #define MAKE_INTERNAL_FORMAT_H
 

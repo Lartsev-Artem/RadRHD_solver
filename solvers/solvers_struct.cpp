@@ -7,94 +7,37 @@
 solve_mode_t _solve_mode;
 hllc_value_t _hllc_cfg;
 
-flux_t flux_t::operator+(const flux_t &x) {
+flux_t flux_t::operator+(const flux_t &x) const {
+  return flux_t(d + x.d, v + x.v, p + x.p);
+}
+
+void flux_t::operator+=(const flux_t &x) {
   d += x.d;
   v += x.v;
   p += x.p;
-  return *this;
 }
-flux_t flux_t::operator+=(const flux_t &x) {
-  d += x.d;
-  v += x.v;
-  p += x.p;
-  return *this;
-}
-flux_t flux_t::operator-=(const flux_t &x) {
+void flux_t::operator-=(const flux_t &x) {
   d -= x.d;
   v -= x.v;
   p -= x.p;
-  return *this;
 }
-flux_t flux_t::operator*(const Type x) {
+void flux_t::operator*=(const Type x) {
   d *= x;
   v *= x;
   p *= x;
-  return *this;
 }
-flux_t flux_t::operator-(const flux_t &x) {
-  d -= x.d;
-  v -= x.v;
-  p -= x.p;
-  return *this;
-}
-flux_t flux_t::operator/(const Type x) {
+
+void flux_t::operator/=(const Type x) {
   d /= x;
   v /= x;
   p /= x;
-  return *this;
 }
 
-// это временно для свзяи со старым кодом
 Type flux_t::operator[](const int i) const {
-  switch (i) {
-  case 0:
-    return d;
-  case 1:
-    return v[0];
-  case 2:
-    return v[1];
-  case 3:
-    return v[2];
-  case 4:
-    return p;
-
-  default:
-    D_LD;
-  }
+  return *((Type *)((uint8_t *)&(*this) + sizeof(Type) * i));
 }
 Type &flux_t::operator[](const int i) {
-  switch (i) {
-  case 0:
-    return d;
-  case 1:
-    return v[0];
-  case 2:
-    return v[1];
-  case 3:
-    return v[2];
-  case 4:
-    return p;
-
-  default:
-    D_LD;
-  }
-}
-Type flux_t::operator()(const int i) {
-  switch (i) {
-  case 0:
-    return d;
-  case 1:
-    return v[0];
-  case 2:
-    return v[1];
-  case 3:
-    return v[2];
-  case 4:
-    return p;
-
-  default:
-    D_LD;
-  }
+  return *((Type *)((uint8_t *)&(*this) + sizeof(Type) * i));
 }
 
 illum_value_t::illum_value_t(const int num_dir) {

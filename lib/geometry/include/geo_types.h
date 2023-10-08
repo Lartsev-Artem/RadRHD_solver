@@ -1,3 +1,8 @@
+/**
+ * @file geo_types.h
+ * @brief Объявления геометрических структур и типов
+ *
+ */
 #ifndef GEO_TYPES
 #define GEO_TYPES
 
@@ -23,6 +28,14 @@ typedef Eigen::Matrix3d Matrix3;
 typedef Eigen::Vector4d Vector4;
 typedef Eigen::Matrix4d Matrix4;
 typedef Eigen::MatrixXd MatrixX;
+
+struct Ray_t {
+  Vector3 orig;
+  Vector3 direction;
+
+  Ray_t() {}
+  Ray_t(const Vector3 o, const Vector3 dir) : direction(dir), orig(o) {}
+};
 
 ///\todo: d в новый файл  с классами.
 struct Normals {

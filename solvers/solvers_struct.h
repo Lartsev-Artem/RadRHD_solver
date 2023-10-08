@@ -1,3 +1,8 @@
+/**
+ * @file solvers_struct.h
+ * @brief Структуры связанные непосредственно с решателями излучения и газа
+ *
+ */
 #if !defined SOLVERS_STRUCT_H
 #define SOLVERS_STRUCT_H
 
@@ -13,7 +18,6 @@ extern hllc_value_t _hllc_cfg;
 /**
  * @brief Структура потоков
  * @warning операторы написаны строго под hllc в той реализации, в которой есть
- * @todo переписать нормально. Решить вопрос с копированием
  */
 struct flux_t {
   Type d;    ///< плотность
@@ -21,22 +25,18 @@ struct flux_t {
   Type p;    ///< давление
 
   flux_t() : d(0), v(Vector3(0, 0, 0)), p(0) {}
-  flux_t(const Type a, const Type b, const Type c, const Type d, const Type e) : d(a), v(Vector3(b, c, d)), p(e) {}
+  flux_t(const Type a, const Vector3 b, const Type c) : d(a), v(b), p(c) {}
+  flux_t(const flux_t &f) : d(f.d), v(f.v), p(f.p) {}
 
-  flux_t operator+(const flux_t &x);
-  flux_t operator+=(const flux_t &x);
-  flux_t operator-=(const flux_t &x);
-  flux_t operator*(const Type x);
-  flux_t operator-(const flux_t &x);
-  flux_t operator/(const Type x);
+  flux_t operator+(const flux_t &x) const;
 
-  // это временно для свзяи со старым кодом
+  void operator+=(const flux_t &x);
+  void operator-=(const flux_t &x);
+  void operator*=(const Type x);
+  void operator/=(const Type x);
+
   Type operator[](const int i) const;
   Type &operator[](const int i);
-  Type operator()(const int i);
-
-  // private:
-  flux_t(const flux_t &f) : d(f.d), v(f.v), p(f.p) {}
 };
 
 struct flux_all_t {

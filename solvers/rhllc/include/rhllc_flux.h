@@ -1,3 +1,8 @@
+/**
+ * @file rhllc_flux.h
+ * @brief Функции расчёта потоков
+ *
+ */
 #if !defined RHLLC_FLUX_H && defined SOLVERS
 #define RHLLC_FLUX_H
 

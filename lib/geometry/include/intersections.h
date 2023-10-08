@@ -7,6 +7,11 @@
 #include "geo_types.h"
 #include "global_types.h"
 
+#ifdef USE_VTK
+#include <vtkSmartPointer.h>
+#include <vtkUnstructuredGrid.h>
+#endif
+
 /**
  * @brief Пространство имён геометрических пересечений
  *
@@ -65,5 +70,17 @@ int IntersectionWithPlaneDisk(const Vector3 &X0, const Vector3 &n, Vector3 &res)
  * @return Type расстояние до пересечения или -1
  */
 Type RayIntersectsTriangle(const Vector3 &ray_orig, const Vector3 &ray_dir, const Face &triangle, Vector3 &intersection);
+
+#ifdef USE_VTK
+/**
+ * @brief Функция возвращает неупорядоченные номера ячеек, пересекающихся лучом
+ *
+ * @param[in] ray  луч
+ * @param[in] grid сетка
+ * @param[out] id_cells id ячеек
+ */
+void GetIntersectionCellId(const Ray_t &ray, const vtkSmartPointer<vtkUnstructuredGrid> &grid, std::vector<IntId> &id_cells);
+#endif
+
 } // namespace intersection
 #endif //! INTERSECTIONS_H

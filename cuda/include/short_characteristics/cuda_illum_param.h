@@ -1,3 +1,8 @@
+/**
+ * @file cuda_illum_param.h
+ * @brief Функции расчёта параметров зависящих от излучения
+
+ */
 #if !defined CUDA_ILLUM_PARAM_H && defined USE_CUDA
 #define CUDA_ILLUM_PARAM_H
 

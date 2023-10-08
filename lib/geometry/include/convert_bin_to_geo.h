@@ -1,3 +1,8 @@
+/**
+ * @file convert_bin_to_geo.h
+ * @brief Функция перевода бинарных файлов геометрии в структуру сетки
+ *
+ */
 #ifndef CONVERT_BIN_TO_GEO_H
 #define CONVERT_BIN_TO_GEO_H
 

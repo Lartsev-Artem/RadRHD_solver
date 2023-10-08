@@ -1,3 +1,7 @@
+/**
+ * @file cuda_scattering.h
+ * @brief Функция расчета интеграла рассеяния
+ */
 #if !defined CUDA_SCATTERING_H && defined USE_CUDA
 #define CUDA_SCATTERING_H
 

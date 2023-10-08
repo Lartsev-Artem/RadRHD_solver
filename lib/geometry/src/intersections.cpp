@@ -200,3 +200,34 @@ Type intersection::RayIntersectsTriangle(const Vector3 &ray_orig, const Vector3 
 
   return -1; //Это означает, что линия пересекла треугольник против хода луча
 }
+
+#ifdef USE_VTK
+void intersection::GetIntersectionCellId(const Ray_t &ray, const vtkSmartPointer<vtkUnstructuredGrid> &grid, std::vector<IntId> &id_cells) {
+
+  vtkIdType size = grid->GetNumberOfCells();
+
+  id_cells.clear();
+  id_cells.reserve(size);
+
+  Face f;
+  for (vtkIdType i = 0; i < size; i++) {
+
+    for (vtkIdType j = 0; j < CELL_SIZE; j++) {
+
+      vtkSmartPointer<vtkIdList> idp = grid->GetCell(i)->GetFace(j)->GetPointIds();
+      f.A = Vector3(grid->GetPoint(idp->GetId(0)));
+      f.B = Vector3(grid->GetPoint(idp->GetId(1)));
+      f.C = Vector3(grid->GetPoint(idp->GetId(2)));
+      Vector3 p;
+
+      if (intersection::RayIntersectsTriangle(ray.orig, ray.direction, f, p) > 0) {
+        id_cells.push_back(i);
+        break;
+      }
+    }
+  }
+
+  id_cells.shrink_to_fit();
+}
+
+#endif

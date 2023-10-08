@@ -1,3 +1,10 @@
+/**
+ * @file illum_test_cpu.cpp
+ * @brief Тест расчета излучения без рассеяния в постановке излучающего шара
+ * @version 0.1
+ *
+ */
+#ifdef ILLUM
 #include "global_value.h"
 #include "solvers_struct.h"
 
@@ -55,3 +62,4 @@ int main(int argc, char **argv) {
 
   return 0;
 }
+#endif

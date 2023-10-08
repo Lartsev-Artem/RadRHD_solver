@@ -1,3 +1,9 @@
+/**
+ * @file file_module.h
+ * @brief Функции оперирующие с файлами
+ * @warning Могут быть не безопасны!!!
+
+ */
 #ifndef FILE_MODULE_H
 #define FILE_MODULE_H
 

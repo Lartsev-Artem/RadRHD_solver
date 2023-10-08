@@ -1,3 +1,8 @@
+/**
+ * @file linear_alg.h
+ * @brief Функции линейной алгебры
+ *
+ */
 #ifndef LINEAR_ALG_H
 #define LINEAR_ALG_H
 

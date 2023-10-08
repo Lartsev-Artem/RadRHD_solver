@@ -53,7 +53,8 @@ void rhllc::Hllc3d(const Type tau, grid_t &grid) {
           sumF -= grid.faces[el.geo.id_faces[j]].f;
         }
       }
-      el.conv_val -= sumF * (tau / el.geo.V);
+      sumF *= (tau / el.geo.V);
+      el.conv_val -= sumF;
 
       GetPhysValue(el.conv_val, el.phys_val); // востановление физических переменных
     }

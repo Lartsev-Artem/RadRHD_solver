@@ -133,12 +133,22 @@ int GetAverageSize3D(int argc, char **argv);
 /**
  * @brief Создает файл с полной проекцией решения на заданную координатную ось
  *
+ * @note у векторных компонент берётся норма
  * @param argc кол-во аргументов (требуется 3)
  * @param argv массив char** содержит {файл vtk сетки, адрес вывода файлов, ось X,Y,Z}
  * @return int ::e_type_completion
  */
 int Make1dProjection(int argc, char **argv);
 
+/**
+ * @brief Создает серию файлов с полной проекцией решения на заданную координатную ось
+ *
+ * @note у векторных компонент берётся норма
+ * @param argc кол-во аргументов (требуется 4)
+ * @param argv массив char** содержит {шаблон названия vtk сетки, адрес вывода файлов, ось X,Y,Z, число проекций(решений)}
+ * @return int ::e_type_completion
+ */
+int MakeSeries1dProjection(int argc, char **argv);
 /**
  * @brief Переписывает поля сетки в бинарные файлы
  *
@@ -147,6 +157,25 @@ int Make1dProjection(int argc, char **argv);
  * @return int ::e_type_completion
  */
 int WriteBinFromVtk(int argc, char *argv[]);
+
+/**
+ * @brief Формирует файл с номерами ячеек, пересекавших луч
+ *
+ * @param argc кол-во аргументов (требуется 8)
+ * @param argv массив char** содержит {файл vtk сетки, файл результат, направление{x,y,z}, основание {x,y,z}}
+ * @return int ::e_type_completion
+ */
+int MakeTrace(int argc, char *argv[]);
+
+/**
+ * @brief Создает серию файлов с проекцией (по лучу) решения на заданную координатную ось
+ *
+ * @param argc кол-во аргументов (требуется 10)
+ * @param argv массив char** содержит {шаблон названия vtk сетки, адрес вывода файлов,
+ * направление{x,y,z}, основание {x,y,z} число проекций(решений), ось X,Y,Z}
+ * @return int ::e_type_completion
+ */
+int MakeSeries1dRayProjection(int argc, char *argv[]);
 #endif
 
 } // namespace utils

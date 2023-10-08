@@ -1,3 +1,7 @@
+/**
+ * @file cuda_integrator.h
+ * @brief Функции интегрирования по направлениям
+ */
 #if !defined CUDA_INTEGRATOR_H && defined USE_CUDA
 #define CUDA_INTEGRATOR_H
 

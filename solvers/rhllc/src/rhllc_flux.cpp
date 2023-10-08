@@ -162,15 +162,15 @@ void rhllc::GetFlux(const flux_t &conv_val_l, const flux_t &conv_val_r,
   W_R.v = T * phys_val_r.v;
 
   //==================== Кэшируем физические переменные слева и справа============================//
-  // нормальная сокорость
-  const Vector3 Vel_L(W_L[1], W_L[2], W_L[3]); // T * velocity[num_cell];
-  const Vector3 Vel_R(W_R[1], W_R[2], W_R[3]); // T * velocity[neig / 4];
+  // нормальная скорость
+  const Vector3 Vel_L(W_L.v); // T * velocity[num_cell];
+  const Vector3 Vel_R(W_R.v); // T * velocity[neig / 4];
 
-  const Type d_L = W_L(0);
-  const Type d_R = W_R(0);
+  const Type d_L = W_L.d;
+  const Type d_R = W_R.d;
 
-  const Type p_L = W_L(4);
-  const Type p_R = W_R(4);
+  const Type p_L = W_L.p;
+  const Type p_R = W_R.p;
 
   const Type VV_L = Vel_L.dot(Vel_L);
   const Type VV_R = Vel_R.dot(Vel_R);
@@ -202,19 +202,19 @@ void rhllc::GetFlux(const flux_t &conv_val_l, const flux_t &conv_val_r,
   flux_t F;
   if (lambda_R <= 0) // если верно выполнить всегда
   {
-    F.d = U_R[0] * Vel_R[0];          // D*v_x
-    F.v(0) = U_R[1] * Vel_R[0] + p_R; // mx*vx+p
-    F.v(1) = U_R[2] * Vel_R[0];
-    F.v(2) = U_R[3] * Vel_R[0];
-    F.p = U_R[1];
+    F.d = U_R.d * Vel_R[0];             // D*v_x
+    F.v(0) = U_R.v[0] * Vel_R[0] + p_R; // mx*vx+p
+    F.v(1) = U_R.v[1] * Vel_R[0];
+    F.v(2) = U_R.v[2] * Vel_R[0];
+    F.p = U_R.v[0];
     // continue;
   } else if (lambda_L >= 0) // выполнить либо по условию либо для всех границ
   {
-    F.d = U_L[0] * Vel_L[0];          // D*v_x
-    F.v(0) = U_L[1] * Vel_L[0] + p_L; // mx*vx+p
-    F.v(1) = U_L[2] * Vel_L[0];
-    F.v(2) = U_L[3] * Vel_L[0];
-    F.p = U_L[1];
+    F.d = U_L.d * Vel_L[0];             // D*v_x
+    F.v(0) = U_L.v[0] * Vel_L[0] + p_L; // mx*vx+p
+    F.v(1) = U_L.v[1] * Vel_L[0];
+    F.v(2) = U_L.v[2] * Vel_L[0];
+    F.p = U_L.v[0];
     // continue;
   } else {
     //====================Расчёт потоков и приближений hll=========================================//
@@ -223,17 +223,17 @@ void rhllc::GetFlux(const flux_t &conv_val_l, const flux_t &conv_val_r,
     flux_t U_hll;
     flux_t F_hll;
 
-    F_R.d = U_R[0] * Vel_R[0];          // D*v_x
-    F_R.v(0) = U_R[1] * Vel_R[0] + p_R; // mx*vx+p
-    F_R.v(1) = U_R[2] * Vel_R[0];
-    F_R.v(2) = U_R[3] * Vel_R[0];
-    F_R.p = U_R[1];
+    F_R.d = U_R.d * Vel_R[0];             // D*v_x
+    F_R.v(0) = U_R.v[0] * Vel_R[0] + p_R; // mx*vx+p
+    F_R.v(1) = U_R.v[1] * Vel_R[0];
+    F_R.v(2) = U_R.v[2] * Vel_R[0];
+    F_R.p = U_R.v[0];
 
-    F_L.d = U_L[0] * Vel_L[0];          // D*v_x
-    F_L.v(0) = U_L[1] * Vel_L[0] + p_L; // mx*vx+p
-    F_L.v(1) = U_L[2] * Vel_L[0];
-    F_L.v(2) = U_L[3] * Vel_L[0];
-    F_L.p = U_L[1];
+    F_L.d = U_L.d * Vel_L[0];             // D*v_x
+    F_L.v(0) = U_L.v[0] * Vel_L[0] + p_L; // mx*vx+p
+    F_L.v(1) = U_L.v[1] * Vel_L[0];
+    F_L.v(2) = U_L.v[2] * Vel_L[0];
+    F_L.p = U_L.v[0];
 
     for (int i = 0; i < CELL_SIZE + 1; i++) {
       F_hll[i] = (F_L[i] * lambda_R - F_R[i] * lambda_L + ((U_R[i] - U_L[i]) * lambda_R * lambda_L)) / (lambda_R - lambda_L);
@@ -249,9 +249,9 @@ void rhllc::GetFlux(const flux_t &conv_val_l, const flux_t &conv_val_r,
     //============================================================================================//
 #ifndef ONLY_RHLL
     //=========================Поиск скорости промежуточной волны===============================//
-    const Type a = F_hll[4];             // F_E^hll
-    const Type b = -U_hll[4] - F_hll[1]; // (E_hll + F_mx^hll)
-    const Type c = U_hll[1];             // mx_hll
+    const Type a = F_hll.p;               // F_E^hll
+    const Type b = -U_hll.p - F_hll.v[0]; // (E_hll + F_mx^hll)
+    const Type c = U_hll.v[0];            // mx_hll
 
 #if 1 // как описано в Mignone...
     Type quad = -0.5 * (b + SIGN(b) * sqrt(b * b - 4 * a * c));
@@ -261,37 +261,41 @@ void rhllc::GetFlux(const flux_t &conv_val_l, const flux_t &conv_val_r,
     {
       if (_lambda >= 0.0) {
         //============================Поиск промежуточного давления ===================================//
-        const Type _p = -F_hll[4] * _lambda + F_hll[1];
+        const Type _p = -F_hll.p * _lambda + F_hll.v[0];
         //============================================================================================//
 
         //==========================Финальный поток HLLC=============================================//
         flux_t _U_L;
         const Type dif_L = 1.0 / (lambda_L - _lambda);
 
-        _U_L.d = (U_L[0] * (lambda_L - Vel_L[0])) * dif_L;
-        _U_L.v[0] = (U_L[1] * (lambda_L - Vel_L[0]) + _p - p_L) * dif_L;
-        _U_L.v[1] = (U_L[2] * (lambda_L - Vel_L[0])) * dif_L;
-        _U_L.v[2] = (U_L[3] * (lambda_L - Vel_L[0])) * dif_L;
-        _U_L.p = (U_L[4] * (lambda_L - Vel_L[0]) + _p * _lambda - p_L * Vel_L[0]) * dif_L;
+        _U_L.d = (U_L.d * (lambda_L - Vel_L[0])) * dif_L;
+        _U_L.v[0] = (U_L.v[0] * (lambda_L - Vel_L[0]) + _p - p_L) * dif_L;
+        _U_L.v[1] = (U_L.v[1] * (lambda_L - Vel_L[0])) * dif_L;
+        _U_L.v[2] = (U_L.v[2] * (lambda_L - Vel_L[0])) * dif_L;
+        _U_L.p = (U_L.p * (lambda_L - Vel_L[0]) + _p * _lambda - p_L * Vel_L[0]) * dif_L;
 
-        F = F_L + (_U_L - U_L) * lambda_L;
+        _U_L -= U_L;
+        _U_L *= lambda_L;
+        F = F_L + _U_L;
 
         //============================================================================================//
       } else //(_S <= 0)
       {
         //============================Поиск промежуточного давления ===================================//
-        const Type _p = -F_hll[4] * _lambda + F_hll[1];
+        const Type _p = -F_hll.p * _lambda + F_hll.v[0];
         //============================================================================================//
         flux_t _U_R;
         const Type dif_R = 1.0 / (lambda_R - _lambda);
 
-        _U_R.d = (U_R[0] * (lambda_R - Vel_R[0])) * dif_R;
-        _U_R.v[0] = (U_R[1] * (lambda_R - Vel_R[0]) + _p - p_R) * dif_R;
-        _U_R.v[1] = (U_R[2] * (lambda_R - Vel_R[0])) * dif_R;
-        _U_R.v[2] = (U_R[3] * (lambda_R - Vel_R[0])) * dif_R;
-        _U_R.p = (U_R[4] * (lambda_R - Vel_R[0]) + _p * _lambda - p_R * Vel_R[0]) * dif_R;
+        _U_R.d = (U_R.d * (lambda_R - Vel_R[0])) * dif_R;
+        _U_R.v[0] = (U_R.v[0] * (lambda_R - Vel_R[0]) + _p - p_R) * dif_R;
+        _U_R.v[1] = (U_R.v[1] * (lambda_R - Vel_R[0])) * dif_R;
+        _U_R.v[2] = (U_R.v[2] * (lambda_R - Vel_R[0])) * dif_R;
+        _U_R.p = (U_R.p * (lambda_R - Vel_R[0]) + _p * _lambda - p_R * Vel_R[0]) * dif_R;
 
-        F = F_R + (_U_R - U_R) * lambda_R;
+        _U_R -= U_R;
+        _U_R *= lambda_R;
+        F = F_R + _U_R;
       }
     }
 #endif
@@ -300,7 +304,7 @@ void rhllc::GetFlux(const flux_t &conv_val_l, const flux_t &conv_val_r,
   f.f = F;
   f.f.v = (T.transpose()) * F.v;
   // WRITE_LOG(" F1= " << f.f[0] << ' ' << f.f[1] << ' ' << f.f[2] << ' ' << f.f[3] << ' ' << f.f[4] << '\n');
-  f.f = f.f * f.geo.S;
+  f.f *= f.geo.S;
 }
 
 #endif //! SOLVERS

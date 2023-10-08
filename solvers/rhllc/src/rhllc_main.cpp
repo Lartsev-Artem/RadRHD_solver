@@ -28,7 +28,7 @@ int rhllc::RunRhllcModule() {
 
   Type t = 0.0;
   Type cur_timer = 0;
-  int res_count = 0;
+  int res_count = _solve_mode.start_point;
 
   _hllc_cfg.tau = GetTimeStep(_hllc_cfg, grid.cells);
 

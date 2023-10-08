@@ -1,3 +1,8 @@
+/**
+ * @file cuda_struct.h
+ * @brief ОбЪявления геометрических структур
+ *
+ */
 #if !defined CUDA_STRUCT_H && defined USE_CUDA
 #define CUDA_STRUCT_H
 

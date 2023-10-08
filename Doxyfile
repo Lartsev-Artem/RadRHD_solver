@@ -2261,7 +2261,11 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = USE_VTK \
                          USE_MPI \
-                         BUILD_GRAPH
+                         BUILD_GRAPH \
+                         SOLVERS \
+                         USE_CUDA \
+                         ILLUM \
+                         RHLLC
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
