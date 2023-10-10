@@ -1,17 +1,6 @@
 #include "intersections.h"
 
-/**
- * @brief Построение локального базиса плоскости
- *
- * @details по начальной точке и нормали строит локальный базис картинной плоскости (vec1, vec2).
-    нормаль дана.
-    задаем второй вектор ортогонально, по св-ву скалярного умножения
-    третий вектор из векторного произведения
- *
- * @param[in] normal нормаль к плоскости
- * @param[out] basis новый базис (тройка векторов)
- */
-static void SetBasis(const Vector3 &normal, Matrix3 &basis) {
+void intersection::SetBasis(const Vector3 &normal, Matrix3 &basis) {
   Vector3 vec_1;
   Vector3 vec_2;
 

@@ -41,7 +41,8 @@
                 "USE_VTK",
                 "MAKE_TRACE",
                 "RHLLC",
-                "ILLUM"
+                "ILLUM",
+                "USE_CUDA"
             ],
             "compilerPath": "/usr/bin/mpic++",
             "cStandard": "c17",

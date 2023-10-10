@@ -1,6 +1,7 @@
 {
     "base_address": "/home/artem/projects/solver/build/",
     "graph_address": "/home/artem/projects/solver/build/graph/",
+    "trace_address": "/home/artem/projects/solver/build/trace/",
     "hllc_init_value": "/home/artem/projects/solver/config/no.bin",
     "illum_geo_address": "/home/artem/projects/solver/build/illum_geo/",
     "name_file_hllc_set": "/home/artem/projects/solver/config/hllc_cfg.json",

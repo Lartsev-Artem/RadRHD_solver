@@ -37,6 +37,13 @@ struct Ray_t {
   Ray_t(const Vector3 o, const Vector3 dir) : direction(dir), orig(o) {}
 };
 
+struct Intersection_t {
+  int id;
+  Type dist;
+  Vector3 point;
+  Intersection_t(const int i = -1, const Type d = -1, const Vector3 &p = Vector3::Zero()) : id(i), dist(d), point(p) {}
+};
+
 ///\todo: d в новый файл  с классами.
 struct Normals {
   std::array<Vector3, CELL_SIZE> n;

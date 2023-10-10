@@ -21,6 +21,7 @@ int FUNC_NAME(MakeAllGeoData)(int argc, char **argv) {
   files.name_file_vtk = argv[2];
   files.Build();
 
+  fs::create_directory(files.base_address + "trace");
   fs::create_directory(files.base_address + "graph");
   fs::create_directory(files.base_address + "illum_geo");
   fs::create_directory(files.base_address + "Solve");

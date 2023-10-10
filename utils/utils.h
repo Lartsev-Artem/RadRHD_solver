@@ -176,6 +176,15 @@ int MakeTrace(int argc, char *argv[]);
  * @return int ::e_type_completion
  */
 int MakeSeries1dRayProjection(int argc, char *argv[]);
+
+/**
+ * @brief Формирует файл с гранями всей границы(включая внутреннюю) в формате ::FaceCell
+ *
+ * @param argc кол-во аргументов (требуется 2)
+ * @param argv массив char** содержит {шаблон названия vtk сетки, файл результата}
+ * @return int ::e_type_completion
+ */
+int GetSurface(int argc, char *argv[]);
 #endif
 
 } // namespace utils

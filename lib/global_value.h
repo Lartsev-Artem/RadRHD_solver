@@ -75,6 +75,8 @@ constexpr double kM_hydrogen = 1.6735575 * 1e-27; ///< масса водород
 #define F_TRACE_VERTEX "vertex.bin"
 #define F_TRACE_GRID "trace_grid.bin"
 
+#define F_RAY_TRACE "ray_trace"
+
 //---------------Файлы трассировки сквозь внутреннюю границу------------//
 #define F_DIST_TRY "dist_defining_faces"
 #define F_ID_TRY "id_defining_faces"
@@ -96,6 +98,7 @@ constexpr double kM_hydrogen = 1.6735575 * 1e-27; ///< масса водород
 #define F_VOLUME "volume.bin"
 #define F_NEIGHBOR "neighbors.bin"
 #define F_CENTER_FACE "center_face.bin"
+#define F_SURFACE "surface.bin"
 
 //--------------------------Файлы решение-------------------------------//
 #define F_SOLVE "Solve" // задается в настройках

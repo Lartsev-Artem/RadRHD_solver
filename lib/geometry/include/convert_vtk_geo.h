@@ -78,6 +78,15 @@ int GetBoundaryCells(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_gr
  */
 int GetInterBoundaryFacesOfSphere(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::set<IntId> &inter_boundary_faces);
 
+/**
+ * @brief Возвращает  номеров граничных граней (с включением внутренней границы)
+ * в глобальной нумерации (cell*cell_size + face)
+ *
+ * @param[in] unstructured_grid сетка в формате vtk
+ * @param[out] boundary_faces номера граничных граней
+ * @return int ::e_type_completion
+ */
+int GetBoundaryFacesId(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<IntId> &boundary_faces);
 #if NUMBER_OF_MEASUREMENTS == 3
 
 /**

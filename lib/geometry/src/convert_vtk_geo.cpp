@@ -72,6 +72,32 @@ int GetInterBoundaryFacesOfSphere(const vtkSmartPointer<vtkUnstructuredGrid> &un
   return e_completion_success;
 }
 
+int GetBoundaryFacesId(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<IntId> &boundary_faces) {
+
+  int N = unstructured_grid->GetNumberOfCells();
+
+  boundary_faces.clear();
+  boundary_faces.reserve(N);
+
+  vtkSmartPointer<vtkIdList> idc = vtkSmartPointer<vtkIdList>::New();
+
+  for (int i = 0; i < N; ++i) {
+
+    for (int j = 0; j < CELL_SIZE; ++j) {
+      unstructured_grid->GetCellNeighbors(i, unstructured_grid->GetCell(i)->GetFace(j)->GetPointIds(), idc);
+
+      if (idc->GetNumberOfIds() == 0) {
+        boundary_faces.push_back(i * CELL_SIZE + j);
+        break;
+      } else if (idc->GetNumberOfIds() > 1)
+        RETURN_ERR("More than 1 neighbor????\n");
+    }
+  }
+
+  boundary_faces.shrink_to_fit();
+  return e_completion_success;
+}
+
 #if NUMBER_OF_MEASUREMENTS == 3
 
 int GetNeighborFace3D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<int> &neighbors) {
