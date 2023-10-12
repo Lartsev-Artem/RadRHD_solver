@@ -1,3 +1,8 @@
+/**
+ * @file ray_tracing_build_plane.h
+ * @brief Построение лучей, формирующих картинную плоскость
+ *
+ */
 #ifndef RAY_TRACING_BUILD_PLANE_H
 #define RAY_TRACING_BUILD_PLANE_H
 

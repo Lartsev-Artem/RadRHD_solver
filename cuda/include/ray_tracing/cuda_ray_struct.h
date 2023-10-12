@@ -1,3 +1,9 @@
+/**
+ * @file cuda_ray_struct.h
+ * @brief Структуры модуля трассировки лучей
+ *
+ */
+
 #if !defined CUDA_RAY_STRUCT_H && defined USE_CUDA
 #define CUDA_RAY_STRUCT_H
 
@@ -17,22 +23,34 @@ typedef double Type;
 
 namespace cuda::ray_tracing {
 
+/**
+ * @brief луч
+ *
+ */
 struct Ray {
-  Vector3 orig;
-  Vector3 dir;
+  Vector3 orig; ///< начало луча
+  Vector3 dir;  ///< направление
 };
 
+/**
+ * @brief Грань. Соответствует структуре ::FaceCell
+ *
+ */
 struct Face {
-  int id;
-  Vector3 A;
-  Vector3 B;
-  Vector3 C;
+  int id;    ///<  номер грани в глобальной нумерации
+  Vector3 A; ///< вершина треугольника
+  Vector3 B; ///<вершина треугольника
+  Vector3 C; ///<вершина треугольника
 };
 
+/**
+ * @brief Структура пересечения
+ *
+ */
 struct Intersection {
-  int id;
-  Type dist;
-  Vector3 point;
+  int id;        ///<  номер ячейки пересечения
+  Type dist;     ///< расстояние до пересечения
+  Vector3 point; ///< точка пересечения
   __device__ Intersection(const int i = -1, const Type d = -1, const Vector3 p = Vector3::Zero()) : id(i), dist(d), point(p) {}
 };
 

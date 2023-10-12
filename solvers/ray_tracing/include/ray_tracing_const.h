@@ -1,3 +1,8 @@
+/**
+ * @file ray_tracing_const.h
+ * @brief Константы с описанием геометрии
+ *
+ */
 #ifndef RAY_TRACING_CONST_H
 #define RAY_TRACING_CONST_H
 

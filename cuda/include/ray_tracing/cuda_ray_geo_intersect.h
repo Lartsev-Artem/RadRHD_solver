@@ -1,3 +1,8 @@
+/**
+ * @file cuda_ray_geo_intersect.h
+ * @brief Функции поиска пересечений с геометрическими объектами
+ *
+ */
 #if !defined CUDA_RAY_GEO_INTERSECT_H && defined USE_CUDA
 #define CUDA_RAY_GEO_INTERSECT_H
 
