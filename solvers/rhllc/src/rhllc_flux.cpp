@@ -1,4 +1,4 @@
-#if defined SOLVERS
+#if defined SOLVERS && defined RHLLC
 #include "rhllc_flux.h"
 
 #include "global_value.h"

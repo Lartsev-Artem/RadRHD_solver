@@ -145,10 +145,10 @@ void rhllc::SetCfgDefault(hllc_value_t &hllc_set) {
   hllc_set.h_min = 0.004; // default
 
 #ifdef ILLUM
-  hllc_set.h = 0.0007166575761593; // jet
+  hllc_set.h_min = 0.0007166575761593; // jet
   hllc_set.tau = 1e-7;
   hllc_set.CFL = 0.001;
-  hllc_set.print_timer = 0.02;
+  hllc_set.save_timer = 0.02;
   hllc_set.T = 1;
 #else // ILLUM
 

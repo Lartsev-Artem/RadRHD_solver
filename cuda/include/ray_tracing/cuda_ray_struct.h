@@ -17,6 +17,10 @@
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 
+/*! \addtogroup ray_tracing Модуль трассировки лучей, построения картинной плоскости и кривых блеска
+    @{
+*/
+
 typedef Eigen::Vector3d Vector3;
 typedef Eigen::Matrix3d Matrix3;
 typedef double Type;

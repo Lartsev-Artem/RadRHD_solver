@@ -3,6 +3,7 @@
 #include "cuda_ray_calc.h"
 #include "cuda_ray_geo_intersect.h"
 #include "cuda_ray_interface.h"
+#include "ray_tracing_const.h"
 
 namespace ray = cuda::ray_tracing;
 

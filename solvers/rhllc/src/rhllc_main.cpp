@@ -1,5 +1,5 @@
 
-#if defined SOLVERS
+#if defined SOLVERS && defined RHLLC
 #include "rhllc_main.h"
 
 #include "rhllc_calc.h"

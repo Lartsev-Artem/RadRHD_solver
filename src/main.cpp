@@ -8,6 +8,7 @@
 
 #include "solvers_struct.h"
 
+#include "ray_tracing_main.h"
 #include "rhllc_main.h"
 
 int main(int argc, char *argv[]) {
@@ -18,13 +19,15 @@ int main(int argc, char *argv[]) {
                                      glb_files, &_solve_mode, &_hllc_cfg);
 
 #ifdef ILLUM
-  // graph::RunGraphModule();
-  // trace::RunTracesModule();
+  graph::RunGraphModule();
+  trace::RunTracesModule();
   illum::RunIllumModule();
 // GDB_ATTACH;
 #endif
 
-  rhllc::RunRhllcModule();
+  ray_tracing::RunRayTracing(glb_files.solve_address + "0" + F_ENERGY);
+
+  //  rhllc::RunRhllcModule();
 
   MPI_END;
   return 0;

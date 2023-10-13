@@ -1,15 +1,16 @@
 # defining project config 
-DEFCONF 		= SOLVERS LINUX RHLLC DEBUG #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI  LINUX USE_CUDA
+#DEFCONF 		= SOLVERS LINUX RHLLC DEBUG #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI  LINUX USE_CUDA
+DEFCONF 		= SOLVERS LINUX  DEBUG BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI LINUX USE_CUDA
 
 # defining working directories
 LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension
 LIB_SRC = lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometry/src
 
-CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteristics 
-CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics 
+CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteristics cuda/include/ray_tracing
+CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/src/ray_tracing
 
-SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include
-SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src
+SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include solvers/ray_tracing/include
+SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src solvers/ray_tracing/src
 
 SRCDIR          = src graph/src make_trace/src ${LIB_SRC} ${SOLVERS_SRC}
 INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR}  ${CUDA_INCDIR} ${SOLVERS_DIR}

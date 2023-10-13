@@ -9,6 +9,10 @@
 
 #include "geo_types.h"
 
+/*! \addtogroup ray_tracing Модуль трассировки лучей, построения картинной плоскости и кривых блеска
+    @{
+*/
+
 namespace cuda {
 
 /**
@@ -16,18 +20,6 @@ namespace cuda {
  *
  */
 namespace ray_tracing {
-
-/**
- * @brief Код объекта пересечения
- * \note неотрицательные значения будут соответствовать ячейкам (или граням)
- *
- */
-enum e_ray_intersect_code {
-  e_ray_intersect_none = -1,   ///< нет пересечения
-  e_ray_intersect_disk = -2,   ///< пересечение с диском
-  e_ray_intersect_sphere = -3, ///< пересечение со сферой
-  e_ray_intersect_rosh = -4    ///< пересечение с потенциалом роша
-};
 
 /**
  * @brief Пространство имён интерфейсных функция модуля cuda::ray_tracing

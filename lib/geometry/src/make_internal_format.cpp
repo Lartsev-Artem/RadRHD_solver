@@ -43,7 +43,7 @@ static int SetTypeOfBound(const std::vector<Vector3> &centers,
         }
 #endif
 
-#if GEOMETRY_TYPE == Sphere
+#if (GEOMETRY_TYPE == Sphere) || (GEOMETRY_TYPE == MAIN_ELLIPSE) || (GEOMETRY_TYPE == TEST_ELLIPSE)
         if ((P - kCenterPoint).norm() > kInternalRadius)
           neighbors[id] = e_bound_free; // внешняя сфера
         else

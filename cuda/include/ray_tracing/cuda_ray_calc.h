@@ -8,6 +8,10 @@
 
 #include "cuda_ray_struct.h"
 
+/*! \addtogroup ray_tracing Модуль трассировки лучей, построения картинной плоскости и кривых блеска
+    @{
+*/
+
 namespace cuda::ray_tracing {
 
 /**

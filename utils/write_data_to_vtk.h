@@ -31,10 +31,10 @@ int WriteDataToGrid(file name_file_grid, file name_file_data, file name_file_out
   std::string formats = name_file_data.substr(name_file_data.find(".") + 1, 3);
   if (formats == "txt") {
     if (files_sys::txt::ReadSimple(name_file_data, vector_data))
-      RETURN_ERR("");
+      return e_completion_fail;
   } else if (formats == "bin") {
     if (files_sys::bin::ReadSimple(name_file_data, vector_data))
-      RETURN_ERR("");
+      return e_completion_fail;
   } else {
     RETURN_ERR("Error formats data file. use .bin or .txt\n");
   }

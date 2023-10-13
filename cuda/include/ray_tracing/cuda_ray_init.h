@@ -9,6 +9,10 @@
 #include "cuda_ray_struct.h"
 #include "geo_types.h"
 
+/*! \addtogroup ray_tracing Модуль трассировки лучей, построения картинной плоскости и кривых блеска
+    @{
+*/
+
 namespace cuda::ray_tracing {
 
 /**

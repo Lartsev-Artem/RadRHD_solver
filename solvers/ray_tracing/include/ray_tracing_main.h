@@ -8,6 +8,7 @@
 #ifndef RAY_TRACING_MAIN_H
 #define RAY_TRACING_MAIN_H
 
+#include <string>
 /**
  * @brief Пространство имён трассировки лучей на картинную плоскость
  *
@@ -18,8 +19,9 @@ namespace ray_tracing {
  * @brief Функция запускает геометрическую сортировку
  * и формирует файлы матриц изображения
  *
+ * @param[in] file_energy файл с рассчитанной на сетке энергией
  * @return int ::e_type_completion
  */
-int RunRayTracing();
+int RunRayTracing(const std::string &file_energy);
 } // namespace ray_tracing
 #endif //! RAY_TRACING_MAIN_H

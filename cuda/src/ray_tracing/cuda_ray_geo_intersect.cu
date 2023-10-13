@@ -95,10 +95,12 @@ __device__ void ray::IntersectionWithPlane(const Face &face, const Ray &ray, Vec
   result = ray.dir * t + ray.orig; // точка пересечения луча   с плоскостью!!!
 }
 
-static const Vector3 &center = ray_tracing::k_center_sphere;
-static const Type radius_sphere = ray_tracing::k_radius_sphere;
-static const Type R_in_2 = ray_tracing::k_internal_radius_disk * ray_tracing::k_internal_radius_disk;
-static const Type R_ex_2 = ray_tracing::k_external_radius_disk * ray_tracing::k_external_radius_disk;
+__device__ static const Type c_x = ray_tracing::k_center_x;
+__device__ static const Type c_y = ray_tracing::k_center_y;
+__device__ static const Type c_z = ray_tracing::k_center_z;
+__device__ static const Type radius_sphere = ray_tracing::k_radius_sphere;
+__device__ static const Type R_in_2 = ray_tracing::k_internal_radius_disk * ray_tracing::k_internal_radius_disk;
+__device__ static const Type R_ex_2 = ray_tracing::k_external_radius_disk * ray_tracing::k_external_radius_disk;
 
 __device__ int ray::GetIntersectionWithSphereODisk(const Ray &ray) {
 
@@ -106,6 +108,8 @@ __device__ int ray::GetIntersectionWithSphereODisk(const Ray &ray) {
   plane_disk.A = Vector3(1, 0, 0);
   plane_disk.B = Vector3(0, 0.9928768384869221, 0.11914522061843064);
   plane_disk.C = Vector3(2, 0, 0);
+
+  Vector3 center(c_x, c_y, c_z);
 
   // базисные вектора, задающие наклон аккреционного диска вне расчетной плоскости (Wolfram)
   Vector3 vec_1(1, 0, 0);

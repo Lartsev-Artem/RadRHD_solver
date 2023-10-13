@@ -26,6 +26,9 @@ constexpr double kGamma_g = kGamma1 / (kGamma1 - 1);
 #if GEOMETRY_TYPE == Sphere
 const Vector3 kCenterPoint(0, 0, 0);     ///< центр внутренней сферы на сетке
 constexpr double kInternalRadius = 0.31; ///< радиус внутренней сферы (с запасом)
+#elif (GEOMETRY_TYPE == TEST_ELLIPSE) || (GEOMETRY_TYPE == MAIN_ELLIPSE)
+const Vector3 kCenterPoint(1, 0, 0);     ///< центр внутренней сферы на сетке
+constexpr double kInternalRadius = 0.15; ///< радиус внутренней сферы (с запасом)
 #else
 const Vector3 kCenterPoint(10, 0, 0);    ///< центр внутренней сферы на сетке
 constexpr double kInternalRadius = 0.12; ///< радиус внутренней сферы (с запасом)
@@ -76,6 +79,8 @@ constexpr double kM_hydrogen = 1.6735575 * 1e-27; ///< масса водород
 #define F_TRACE_GRID "trace_grid.bin"
 
 #define F_RAY_TRACE "ray_trace"
+#define F_IMAGE_PLANE "image_plane"
+#define F_GLOSS_CURVE "gloss_curve.txt"
 
 //---------------Файлы трассировки сквозь внутреннюю границу------------//
 #define F_DIST_TRY "dist_defining_faces"
