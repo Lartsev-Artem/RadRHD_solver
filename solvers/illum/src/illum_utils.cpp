@@ -35,7 +35,7 @@ Type illum::BoundaryConditions(const int type_bound) {
     return 0;
 
   case e_bound_inner_source: {
-    return 2;
+    return 0.1;
 #if 0
 		id_try_pos++;
 		grid[num_cell].nodes_value[num_in_face] = Vector3(res_on_inner_bound, res_on_inner_bound, res_on_inner_bound);
@@ -206,14 +206,19 @@ Type illum::GetIllumeFromInFace(const int num_in_face, const int neigh_id, elem_
     return I_x0;
   }
   // Vector3 coef = grid[num_cell].nodes_value[num_in_face];
-  Vector3 &coef = inter_coef; // cell->illum_val.coef_inter[num_in_face];
+  Vector3 &coef = inter_coef;
 
+#ifdef INTERPOLATION_ON_FACES
+
+#pragma error("Unsupported config")
+
+  Vector2 x0_local = X0[ShiftX0 + posX0++];
+  Type I_x0 = x0_local[0] * coef[0] + x0_local[1] * coef[1] + coef[2];
+
+#else
   /// \note сейчас храним значения а не коэффициента интерполяции
-
-  // Vector2	x0_local = X0[ShiftX0 + posX0++]; // grid[num_cell].x0_loc[num_in_face_dir];
-  // I_x0 = x0_local[0] * coef[0] + x0_local[1] * coef[1] + coef[2];
-
   Type I_x0 = (coef[0] + coef[1] + coef[2]) / 3.;
+#endif
 
   if (I_x0 < 0) {
     D_L;

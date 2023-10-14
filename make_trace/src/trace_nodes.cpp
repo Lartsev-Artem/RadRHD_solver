@@ -219,27 +219,32 @@ static int CalculateNodeValue(const int num_cell, const Normals &normal, const s
     if (!CHECK_BIT(face_state, num_in_face))
       continue; // обрабатываем только входные грани
 
+#if 0
     intersection::IntersectionWithPlane(grid[face_id], x, direction, x0);
-
-    // intersection::RayIntersectsTriangle(x, -direction, grid[face_id], x0);
-
     if (intersection::InTriangle(grid[face_id], normal.n[num_in_face], x0)) {
-      cell_local x0_local;
-      x0_local.s = (x - x0).norm();
-      x0_local.in_face_id = num_in_face;
-      x0_local.x0 = GetIllumeOnInnerFace(num_in_face, all_pairs_face[face_id], vertex_tetra, x, x0, vec_res_bound);
+#else
+    if (intersection::RayIntersectsTriangle(x, -direction, grid[face_id], x0) > 0) {
+#endif
 
-      vec_x0.push_back(x0_local);
-      break;
-    }
+    cell_local x0_local;
+    x0_local.in_face_id = num_in_face;
+    x0_local.s = (x - x0).norm();
 
-    if (num_in_face == CELL_SIZE - 1) {
-      EXIT_ERR("Not found inner face\n");
-    }
+#ifdef INTERPOLATION_ON_FACES
+    x0_local.x0 = GetIllumeOnInnerFace(num_in_face, all_pairs_face[face_id], vertex_tetra, x, x0, vec_res_bound);
+#endif
 
-  } // for num_in_face
+    vec_x0.push_back(x0_local);
+    break;
+  }
 
-  return e_completion_success;
+  if (num_in_face == CELL_SIZE - 1) {
+    EXIT_ERR("Not found inner face\n");
+  }
+
+} // for num_in_face
+
+return e_completion_success;
 }
 
 int trace::GetLocNodes(const int num_cell, const ShortId num_out_face, const std::vector<Face> &grid,

@@ -28,7 +28,6 @@ void ray_tracing::MakeVtkPlane(vtkSmartPointer<vtkUnstructuredGrid> &image_plane
   for (int i = 0; i < k_pixels_width; ++i) {
     for (int j = 0; j < k_pixels_height; ++j) {
 
-      D_L;
       Vector3 orig_2d(angle_of_plane(0) + i * step_x, angle_of_plane(1) + j * step_y, 0); ///< центр нового пикселя на плоскости
 
       points_quad->InsertNextPoint(orig_2d[0] - step_x / 2., orig_2d[1] - step_y / 2., 0);

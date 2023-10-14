@@ -12,6 +12,7 @@
 
 #include "dbgdef.h"
 #include "geo_types.h"
+#include "solvers_struct.h"
 
 /*! \addtogroup file_sys Файловый модуль
     @{
@@ -51,6 +52,8 @@ size_t ReadSimple(const std::string &name_file, std::vector<T> &data) {
   }
 
   fclose(f);
+
+  WRITE_LOG("Read %s success\n", name_file.c_str());
   return e_completion_success;
 }
 
@@ -79,6 +82,7 @@ size_t ReadGridGeo(const std::string &name_file, std::vector<geo_elem> &data) {
   }
   fclose(f);
 
+  WRITE_LOG("Read %s success\n", name_file.c_str());
   return e_completion_success;
 }
 
@@ -114,7 +118,7 @@ int ReadData(const size_t class_file_vtk, const std::string &main_dir,
              const bool is_print = false);
 
 #ifdef ILLUM
-#include "solvers_struct.h"
+
 /**
  * @brief Чтение данных, распределённых по ячейкам сетки
  * @warning НЕ ИСПОЛЬЗОВАТЬ!!!!

@@ -12,6 +12,9 @@
 
 int ray_tracing::RunRayTracing(const std::string &file_energy) {
 
+  if (get_mpi_id() != 0) {
+    return e_completion_success;
+  }
 #ifdef USE_VTK
   {
     vtkSmartPointer<vtkUnstructuredGrid> grid;
@@ -37,7 +40,11 @@ int ray_tracing::RunRayTracing(const std::string &file_energy) {
 
   cuda::ray_tracing::interface::ClearDevice();
 
+  WRITE_LOG("Ray Tracing ready\n");
+
   MakeEnergyAndCurve(file_energy);
+
+  WRITE_LOG("Image plane ready\n");
 
   return e_completion_success;
 }

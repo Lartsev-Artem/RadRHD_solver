@@ -5,7 +5,7 @@
 #include "illum_utils.h"
 #include "scattering.h"
 
-#include "geo_types.h"
+#include "solvers_struct.h"
 
 #ifdef USE_CUDA
 #include "cuda_interface.h"

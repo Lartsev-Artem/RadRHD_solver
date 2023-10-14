@@ -3,12 +3,12 @@
 
 #include "trace_nodes.h"
 
-#include "geo_types.h"
 #include "global_types.h"
 #include "global_value.h"
 #include "intersections.h"
 #include "reader_bin.h"
 #include "reader_txt.h"
+#include "solvers_struct.h"
 #include "writer_bin.h"
 
 #include "mpi_ext.h"
@@ -132,6 +132,7 @@ int trace::RunTracesModule() {
 
     if (files_sys::bin::WriteSimple(name_file_state_face + std::to_string(num_direction) + ".bin", face_states))
       RETURN_ERR("Error face_states");
+
     if (files_sys::bin::WriteSimple(name_file_x0_loc + std::to_string(num_direction) + ".bin", vec_x0))
       RETURN_ERR("Error vec_x0");
 

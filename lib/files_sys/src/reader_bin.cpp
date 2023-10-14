@@ -151,6 +151,7 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
 #endif
 
   vec_x0.resize(send[myid]);
+
   sorted_id_cell.resize(send[myid]);
   face_states.resize(send[myid]);
 

@@ -75,6 +75,15 @@ struct geo_cell_t {
                  center(Vector3(0, 0, 0)) {}
 };
 
+struct cell_local // для каждой ячейки и каждого направления
+{
+#ifdef INTERPOLATION_ON_FACES
+  Vector2 x0; ///< локальная координата входного узла для интерполяции
+#endif
+  Type s;             ///< расстояние x0-x
+  ShortId in_face_id; ///< id выходной грани
+};
+
 struct illum_value_t {
   Type absorp_coef;
   Type rad_en_loose_rate;

@@ -21,6 +21,7 @@ int files_sys::txt::ReadSphereDirectionСartesian(const std::string &file_sphere
   ifile >> grid_direction.full_area;
   ifile.close();
 
+  WRITE_LOG("Read %s success\n", file_sphere_direction.c_str());
   return e_completion_success;
 }
 

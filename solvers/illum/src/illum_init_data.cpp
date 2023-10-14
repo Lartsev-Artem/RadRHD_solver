@@ -12,7 +12,7 @@ int illum::InitRadiationState(const std::string &address_data, grid_t &grid) {
     return e_completion_fail;
 
   if (data.size() != grid.cells.size())
-    RETURN_ERR("bad size %s: %u %u", F_ABSORPCOEF, data.size(), grid.cells.size());
+    RETURN_ERR("bad size %s: %lu %lu", F_ABSORPCOEF, data.size(), grid.cells.size());
 
   for (size_t i = 0; i < data.size(); i++) {
     grid.cells[i].illum_val.absorp_coef = data[i];
@@ -22,7 +22,7 @@ int illum::InitRadiationState(const std::string &address_data, grid_t &grid) {
     return e_completion_fail;
 
   if (data.size() != grid.cells.size())
-    RETURN_ERR("bad size %s: %u %u", F_RADLOOSERATE, data.size(), grid.cells.size());
+    RETURN_ERR("bad size %s: %lu %lu", F_RADLOOSERATE, data.size(), grid.cells.size());
 
   for (size_t i = 0; i < data.size(); i++) {
     grid.cells[i].illum_val.rad_en_loose_rate = data[i];

@@ -12,6 +12,7 @@
 #define TRACE_LOGIC_FUNC_H
 
 #include "geo_types.h"
+#include "solvers_struct.h"
 #include "trace_struct.h"
 
 namespace trace {
