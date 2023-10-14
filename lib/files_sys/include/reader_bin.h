@@ -53,7 +53,7 @@ size_t ReadSimple(const std::string &name_file, std::vector<T> &data) {
 
   fclose(f);
 
-  WRITE_LOG("Read %s success\n", name_file.c_str());
+  // WRITE_LOG("Read %s success\n", name_file.c_str());
   return e_completion_success;
 }
 
@@ -82,7 +82,7 @@ size_t ReadGridGeo(const std::string &name_file, std::vector<geo_elem> &data) {
   }
   fclose(f);
 
-  WRITE_LOG("Read %s success\n", name_file.c_str());
+  // WRITE_LOG("Read %s success\n", name_file.c_str());
   return e_completion_success;
 }
 

@@ -21,7 +21,10 @@ int main(int argc, char *argv[]) {
 #ifdef ILLUM
   // graph::RunGraphModule();
   // trace::RunTracesModule();
-  // illum::RunIllumModule();
+
+  // if (get_mpi_id() == 0) {
+  //   illum::RunIllumModule();
+  // }
 // GDB_ATTACH;
 #endif
 

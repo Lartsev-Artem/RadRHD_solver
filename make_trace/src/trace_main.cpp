@@ -54,9 +54,11 @@ int trace::RunTracesModule() {
   err |= files_sys::bin::ReadNormals(name_file_normals, normals);
   err |= files_sys::txt::ReadSphereDirectionСartesian(glb_files.name_file_sphere_direction, grid_direction);
 
-  sorted_graph.resize(grid_direction.size);
-  for (int i = myid; i < grid_direction.size; i += np) {
-    err |= files_sys::bin::ReadSimple(glb_files.graph_address + F_GRAPH + std::to_string(i) + ".bin", sorted_graph[i]);
+  sorted_graph.resize(grid_direction.size / np + 1);
+
+  int loc_dir = 0;
+  for (int i = myid; i < grid_direction.size; i += np, loc_dir++) {
+    err |= files_sys::bin::ReadSimple(glb_files.graph_address + F_GRAPH + std::to_string(i) + ".bin", sorted_graph[loc_dir]);
   }
   if (err != 0) {
     RETURN_ERR("error during reading\n");
@@ -91,8 +93,10 @@ int trace::RunTracesModule() {
     D_LD;
   }
 
-  if (files_sys::bin::WriteSimple(name_file_x, vec_x)) {
-    RETURN_ERR("Error writing %s\n", name_file_x.c_str());
+  if (myid == 0) {
+    if (files_sys::bin::WriteSimple(name_file_x, vec_x)) {
+      RETURN_ERR("Error writing %s\n", name_file_x.c_str());
+    }
   }
 
   int num_cell;
@@ -140,8 +144,10 @@ int trace::RunTracesModule() {
   }
   /*---------------------------------- конец FOR по направлениям----------------------------------*/
 
-  if (files_sys::bin::WriteSimple(name_file_res_bound, vec_res_bound))
-    RETURN_ERR("Error vec_res_bound");
+  if (myid == 0) {
+    if (files_sys::bin::WriteSimple(name_file_res_bound, vec_res_bound))
+      RETURN_ERR("Error vec_res_bound");
+  }
 
   WRITE_LOG("Full trace time: %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
   return e_completion_success;

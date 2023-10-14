@@ -2,14 +2,21 @@
 
 #ifdef USE_MPI
 
+#include "dbgdef.h"
 #include "mpi.h"
 
 static int8_t id = -1;
 static int8_t np = -1;
 
 static void init_value(const MPI_Comm &comm) {
-  MPI_Comm_rank(comm, (int *)&id);
-  MPI_Comm_size(comm, (int *)&np);
+  int rank, size;
+  MPI_Comm_rank(comm, &rank);
+  MPI_Comm_size(comm, &size);
+
+  id = (int8_t)rank;
+  np = (int8_t)size;
+
+  WRITE_LOG("MPI Claster config: %d %d\n", id, np);
 }
 
 int8_t get_mpi_id() {
