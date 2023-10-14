@@ -30,7 +30,7 @@ int illum::RunIllumModule() {
 
   uint32_t err = 0;
   err |= files_sys::bin::ReadSimple(glb_files.name_file_neigh, neighbours);
-  err |= files_sys::txt::ReadSphereDirectionСartesian(glb_files.name_file_sphere_direction, grid_direction);
+  err |= files_sys::txt::ReadSphereDirectionCartesian(glb_files.name_file_sphere_direction, grid_direction);
   err |= files_sys::bin::ReadRadiationTrace(grid_direction.size, glb_files, vec_x, face_states, vec_x0, sorted_id_cell, vec_res_bound);
 
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, grid.faces);
@@ -57,7 +57,7 @@ int illum::RunIllumModule() {
 
 #ifdef USE_CUDA
   cuda::interface::CudaWait();
-  cuda::interface::CudaSyncStream(cuda::e_сuda_params);
+  cuda::interface::CudaSyncStream(cuda::e_cuda_params);
 #endif
 
   if (get_mpi_id() == 0) {

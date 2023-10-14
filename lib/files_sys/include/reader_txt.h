@@ -92,7 +92,7 @@ int ReadSimple(const Str_Type name_file, std::set<T> &data) {
  * направлений, дискретную площадь сферы
  * @return int ::e_type_completion
  */
-int ReadSphereDirectionСartesian(const std::string &file_sphere_direction,
+int ReadSphereDirectionCartesian(const std::string &file_sphere_direction,
                                  grid_directions_t &grid_direction);
 
 /**

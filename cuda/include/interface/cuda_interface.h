@@ -28,11 +28,11 @@ namespace cuda {
  *
  */
 enum e_cuda_stream_id_t {
-  e_сuda_scattering_1 = 0, ///< первая часть интеграла рассеяния
-  e_сuda_scattering_2 = 1, ///< вторая часть интеграла рассеяния
-  e_сuda_params = 2,       ///<  расчёт физических величин (потоки, импульсы)
-  // e_сuda_sender,
-  e_сuda_streams_count ///< общее число потоков
+  e_cuda_scattering_1 = 0, ///< первая часть интеграла рассеяния
+  e_cuda_scattering_2 = 1, ///< вторая часть интеграла рассеяния
+  e_cuda_params = 2,       ///<  расчёт физических величин (потоки, импульсы)
+  // e_cuda_sender,
+  e_cuda_streams_count ///< общее число потоков
 };
 
 /**

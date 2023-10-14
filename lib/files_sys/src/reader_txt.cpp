@@ -2,7 +2,7 @@
 #include "mpi_shifts.h"
 #include <map>
 
-int files_sys::txt::ReadSphereDirectionСartesian(const std::string &file_sphere_direction,
+int files_sys::txt::ReadSphereDirectionCartesian(const std::string &file_sphere_direction,
                                                  grid_directions_t &grid_direction) {
   std::ifstream ifile;
   OPEN_FSTREAM(ifile, file_sphere_direction.c_str());

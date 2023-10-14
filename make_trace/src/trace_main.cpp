@@ -52,7 +52,7 @@ int trace::RunTracesModule() {
   err |= files_sys::bin::ReadSimple(name_file_cells, grid);
   err |= files_sys::bin::ReadSimple(name_file_vertex, vertexs);
   err |= files_sys::bin::ReadNormals(name_file_normals, normals);
-  err |= files_sys::txt::ReadSphereDirectionСartesian(glb_files.name_file_sphere_direction, grid_direction);
+  err |= files_sys::txt::ReadSphereDirectionCartesian(glb_files.name_file_sphere_direction, grid_direction);
 
   sorted_graph.resize(grid_direction.size / np + 1);
 

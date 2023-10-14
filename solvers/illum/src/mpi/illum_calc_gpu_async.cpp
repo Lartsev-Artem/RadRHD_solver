@@ -144,11 +144,11 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
     if (section_2.requests_send[0] != MPI_REQUEST_NULL) {
       MPI_Waitall(section_2.requests_send.size(), section_2.requests_send.data(), MPI_STATUSES_IGNORE);
     }
-    cuda::interface::CudaSyncStream(cuda::e_сuda_scattering_1);
+    cuda::interface::CudaSyncStream(cuda::e_cuda_scattering_1);
 
     if (myid == 0) {
       //самый высоких приоритет, т.к. надо расчитать, до конфликта с асинхронной отправкой
-      cuda::interface::CalculateAllParamAsync(grid_direction, grid, cuda::e_сuda_params); //запустим расчёт параметров здесь
+      cuda::interface::CalculateAllParamAsync(grid_direction, grid, cuda::e_cuda_params); //запустим расчёт параметров здесь
                                                                                           // на выходе получим ответ за 1 шаг до сходимости, но зато без ожидания на выходе
     }
 
@@ -238,7 +238,7 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
 
         section_2.flags_send_to_gpu.assign(section_2.flags_send_to_gpu.size(), 0); // nowait
         MPI_Startall(section_2.requests_rcv.size(), section_2.requests_rcv.data());
-        cuda::interface::CudaSyncStream(cuda::e_сuda_scattering_2);
+        cuda::interface::CudaSyncStream(cuda::e_cuda_scattering_2);
       }
 
 #pragma omp for
@@ -377,8 +377,8 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
 
     if (_solve_mode.max_number_of_iter > 1) // пропуск первой итерации
     {
-      cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, 0, section_1.size, cuda::e_сuda_scattering_1);
-      cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, section_1.size, local_size, cuda::e_сuda_scattering_2);
+      cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, 0, section_1.size, cuda::e_cuda_scattering_1);
+      cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, section_1.size, local_size, cuda::e_cuda_scattering_2);
     }
 
     MPI_Wait(&rq_norm, MPI_STATUS_IGNORE);

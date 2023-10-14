@@ -318,7 +318,7 @@ int RunGraphModule() {
   err |= files_sys::txt::ReadSimple(glb_files.base_address + F_INTERNAL_BOUND, inter_boundary_face_id);
   err |= files_sys::bin::ReadNormals(glb_files.base_address + F_NORMALS, normals);
   err |= files_sys::txt::ReadInitBoundarySetInFaces(glb_files.base_address + F_FACE_ID, inter_faces);
-  err |= files_sys::txt::ReadSphereDirectionСartesian(glb_files.name_file_sphere_direction, grid_dir);
+  err |= files_sys::txt::ReadSphereDirectionCartesian(glb_files.name_file_sphere_direction, grid_dir);
 
   if (err != 0) {
     RETURN_ERR("error during reading\n");
