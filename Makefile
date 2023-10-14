@@ -47,7 +47,7 @@ DEF_SET 		= $(addprefix -D , $(DEFCONF))
 
 CXX             = mpic++
 CPPFLAGS        = $(DEF_SET) -fopenmp  -Ofast -fPIE
-CXXFLAGS        = #-g #-Wall -Wextra -std=c++11
+CXXFLAGS        = -std=c++17 #-g #-Wall -Wextra -std=c++11
 
 NVCC 				= nvcc
 NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp" --expt-relaxed-constexpr #совместимость с Eigen3
@@ -67,10 +67,15 @@ all: $(PROGRAM)
 $(PROGRAM): %: $(OBJS)
 	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./, $^) $(LOADLIBES) $(LDLIBS) -o $@ 
 	mv $(PROGRAM) $(BUILDDIR)
+	mkdir -p $(BUILDDIR)/graph
+	mkdir -p $(BUILDDIR)/illum_geo
+	mkdir -p $(BUILDDIR)/Solve
+	mkdir -p $(BUILDDIR)/trace
 
 # Building rule for .o files and its .c/.cpp in combination with all .h
 %.o: %.cpp
-	$(COMPILE.cpp) -c -o $(OBJDIR)/$@ $<
+	$(COMPILE.cpp) -c $<
+	mv $@ $(OBJDIR)/$@
 
 # Creates the dependecy rules
 %.d: %.cpp
@@ -79,7 +84,8 @@ $(PROGRAM): %: $(OBJS)
 	$(COMPILE.cpp) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@
 
 %.o: %.cu
-	$(COMPILE.cu) -c -o $(OBJDIR)/$@ $<
+	$(COMPILE.cu) -c $<
+	mv $@ $(OBJDIR)/$@
 
 %.d: %.cu
 	mkdir -p $(OBJDIR)

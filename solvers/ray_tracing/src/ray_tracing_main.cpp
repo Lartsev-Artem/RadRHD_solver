@@ -10,6 +10,9 @@
 #include "writer_bin.h"
 #include "writer_vtk.h"
 
+#include <chrono>
+namespace tick = std::chrono;
+
 int ray_tracing::RunRayTracing(const std::string &file_energy) {
 
   if (get_mpi_id() != 0) {
@@ -32,6 +35,8 @@ int ray_tracing::RunRayTracing(const std::string &file_energy) {
 
   cuda::ray_tracing::interface::InitDevice(faces, rays);
 
+  auto start_clock = tick::steady_clock::now();
+
   for (int i = 0; i < k_number_of_frame; i++) {
     MakeRays(i, rays);
     cuda::ray_tracing::interface::StartTracing(rays, intersections);
@@ -40,11 +45,11 @@ int ray_tracing::RunRayTracing(const std::string &file_energy) {
 
   cuda::ray_tracing::interface::ClearDevice();
 
-  WRITE_LOG("Ray Tracing ready\n");
+  WRITE_LOG("Tracing end%lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 
   MakeEnergyAndCurve(file_energy);
 
-  WRITE_LOG("Image plane ready\n");
+  WRITE_LOG("Make energy end%lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 
   return e_completion_success;
 }
