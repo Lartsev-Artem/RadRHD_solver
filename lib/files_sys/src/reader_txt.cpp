@@ -1,4 +1,5 @@
 #include "reader_txt.h"
+#include "mpi_shifts.h"
 #include <map>
 
 int files_sys::txt::ReadSphereDirectionСartesian(const std::string &file_sphere_direction,
@@ -20,6 +21,15 @@ int files_sys::txt::ReadSphereDirectionСartesian(const std::string &file_sphere
   }
   ifile >> grid_direction.full_area;
   ifile.close();
+
+  std::vector<int> send;
+  std::vector<int> disp;
+
+  GetDisp(get_mpi_np(), N, disp);
+  GetSend(get_mpi_np(), N, send);
+
+  grid_direction.loc_size = send[get_mpi_id()];
+  grid_direction.loc_shift = disp[get_mpi_id()];
 
   // WRITE_LOG("Read %s success\n", file_sphere_direction.c_str());
   return e_completion_success;

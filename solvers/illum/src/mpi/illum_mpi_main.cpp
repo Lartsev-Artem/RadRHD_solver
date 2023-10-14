@@ -1,8 +1,8 @@
-#if defined SOLVERS && defined ILLUM && !defined USE_MPI
+#if defined SOLVERS && defined ILLUM && defined USE_MPI
 #include "illum_main.h"
 
 #include "global_types.h"
-#include "illum_calc_cpu.h"
+#include "illum_calc_gpu_async.h"
 #include "illum_init_data.h"
 
 #include "reader_bin.h"
@@ -12,6 +12,10 @@
 #include "cuda_interface.h"
 
 int illum::RunIllumModule() {
+
+#ifndef USE_CUDA
+  D_LD;
+#endif
 
   grid_t grid;
   grid_directions_t grid_direction;
@@ -42,19 +46,25 @@ int illum::RunIllumModule() {
     DIE_IF(_solve_mode.class_vtk == e_grid_cfg_radiation); //в иных случаях допускает пропуск инициализации
   }
 
+  gpu_async::InitSender(grid_direction, grid);
 #ifdef USE_CUDA
   cuda::interface::InitDevice(glb_files.base_address, grid_direction, grid);
+  cuda::interface::SetStreams();
 #endif
 
-  cpu::CalculateIllum(grid_direction, face_states, neighbours,
-                      vec_x0, vec_x, sorted_id_cell, grid);
-
-  cpu::CalculateIllumParam(grid_direction, grid);
-
-  files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
+  gpu_async::CalculateIllum(grid_direction, face_states, neighbours,
+                            vec_x0, vec_x, sorted_id_cell, grid);
 
 #ifdef USE_CUDA
   cuda::interface::CudaWait();
+  cuda::interface::CudaSyncStream(cuda::e_сuda_params);
+#endif
+
+  if (get_mpi_id() == 0) {
+    files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
+  }
+
+#ifdef USE_CUDA
   cuda::interface::ClearDevice();
 #endif
 

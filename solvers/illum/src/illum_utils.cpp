@@ -170,7 +170,8 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     D_LD;
   }
 }
-Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid) {
+
+Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, int mpi_dir_shift) {
 
   Type norm = -1;
   const int shift_dir = num_dir * grid.size;
@@ -181,7 +182,7 @@ Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coe
 
       Vector3 Il = inter_coef[num_cell * CELL_SIZE + i];
       const Type curI = (Il[0] + Il[1] + Il[2]) / 3; //  среднее на грани (в идеале переход к ax+by+c)
-      const int id = CELL_SIZE * (shift_dir + num_cell) + i;
+      const int id = mpi_dir_shift + CELL_SIZE * (shift_dir + num_cell) + i;
 
       // if (curI < 1e-15) // защита от деления на ноль
       //        norm = 1;
@@ -198,14 +199,14 @@ Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coe
   return norm;
 }
 
-Type illum::GetIllumeFromInFace(const int num_in_face, const int neigh_id, elem_t *cell, Vector3 &inter_coef) {
+Type illum::GetIllumeFromInFace(const int neigh_id, Vector3 &inter_coef) {
 
   if (neigh_id < 0) {
     Type I_x0 = illum::BoundaryConditions(neigh_id);
     inter_coef = Vector3(I_x0, I_x0, I_x0);
     return I_x0;
   }
-  // Vector3 coef = grid[num_cell].nodes_value[num_in_face];
+
   Vector3 &coef = inter_coef;
 
 #ifdef INTERPOLATION_ON_FACES

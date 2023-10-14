@@ -74,7 +74,7 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
               Vector3 &x = vec_x[num_cell].x[num_out_face][num_node];
               ShortId num_in_face = X0_ptr->in_face_id;
 
-              Type I_x0 = GetIllumeFromInFace(num_in_face, neighbours[num_cell * CELL_SIZE + num_in_face], cell, (*inter_coef)[num_cell * CELL_SIZE + num_in_face]);
+              Type I_x0 = GetIllumeFromInFace(neighbours[num_cell * CELL_SIZE + num_in_face], (*inter_coef)[num_cell * CELL_SIZE + num_in_face]);
               I[num_node] = GetIllum(x, X0_ptr->s, I_x0, grid.scattering[num_direction * count_cells + num_cell], *cell);
 
               X0_ptr++;

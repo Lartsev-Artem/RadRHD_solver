@@ -85,6 +85,8 @@ struct direction_s {
 
 struct grid_directions_t {
   int size;
+  int loc_size;
+  int loc_shift;
   std::vector<direction_s> directions;
   Type full_area;
 };

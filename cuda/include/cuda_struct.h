@@ -23,7 +23,9 @@ typedef double Type;
 #include "dbgdef.h"
 #include "solvers_config.h"
 
+#include "cuda_interface.h"
 #include "geo_types.h"
+
 
 /*! \addtogroup cuda Модуль расчёта излучения на видеокарте
     @{
@@ -138,4 +140,5 @@ extern cuda::geo::grid_directions_device_t *grid_dir_device; ///< сфера н�
 extern cuda::geo::grid_device_t *grid_device;                ///< сетка
 extern cuda::geo::device_host_ptr_t device_host_ptr;         ///< связь хоста с массивами внутри видеокарты (через эту структуры идёт обращение к массивам на карте)
 
+extern cudaStream_t cuda_streams[cuda::e_сuda_streams_count];
 #endif // CUDA_STRUCT_H

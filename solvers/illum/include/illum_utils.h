@@ -88,24 +88,24 @@ Type GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scat
  * @brief Функция переводит данные расчёта излучения в структуру решателя
  *
  * @note используется только при расчёте на cpu, для расчёта на видеокарте не нужна
- * @param num_dir номер направления
- * @param inter_coef коэффициенты интерполяции по данному направлению
- * @param grid сетка с излучением
+ * @param[in] num_dir номер направления
+ * @param[in] inter_coef коэффициенты интерполяции по данному направлению
+ * @param[inout] grid сетка с излучением
+ * @param[in] mpi_dir_shift - сдвиг в массиве излучения
+ * @note при расчёте mpi не вся сетка расчитывается на узле, но вся собирается
  * @return возвращает норму ошибки на текущей итерации
  * @warning сейчас коэффициенты интерполяции == значения в узлах на гранях
  */
-Type ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid);
+Type ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, int mpi_dir_shift = 0);
 
 /**
  * @brief Функция возвращает значение на определяющей грани
  *
- * @param[in] num_in_face номер входящей грани(локальный)
  * @param[in] faces все грани
- * @param[in] cell текущая ячейка
  * @param[in] inter_coef коэффицинты интерполяции текущей грани
  * @return определяющее значение на входящей грани для текущего выходящего узла
  */
-Type GetIllumeFromInFace(const int num_in_face, const int neigh_id, elem_t *cell, Vector3 &inter_coef);
+Type GetIllumeFromInFace(const int neigh_id, Vector3 &inter_coef);
 } // namespace illum
 
 #endif //! ILLUM_UTILS_H

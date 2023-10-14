@@ -48,7 +48,7 @@ constexpr int k_pixels_height = 100;        ///< число пикселей в 
 constexpr Type k_height_above_center = 0.0; ///<(0.3) высота над центром масс
 
 const Vector3 k_center_of_mass(0.879518, 0, 0); ///< центр масс системы
-constexpr int k_number_of_frame = 360;          ///< число позиций в окружности
+constexpr int k_number_of_frame = 60;           ///< число позиций в окружности
 
 constexpr Type k_accretion_energy = 10; ///< энергия на поверхности аккретора
 constexpr Type k_disk_energy = 5;       ///< энергия аккреционного диска около аккретора

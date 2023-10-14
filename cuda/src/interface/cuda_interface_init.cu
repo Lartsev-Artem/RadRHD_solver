@@ -11,18 +11,18 @@
 cuda::geo::grid_directions_device_t *grid_dir_device;
 cuda::geo::grid_device_t *grid_device;
 
-int cuda::interface::InitDevice(const std::string &address, const grid_directions_t &grid_dir_host, grid_t &grid_host, const int start, const int end) {
+int cuda::interface::InitDevice(const std::string &address, const grid_directions_t &grid_dir_host, grid_t &grid_host) {
 
   CUDA_CALL_FUNC(cudaSetDevice, 0);
 
   InitDirectionsOnDevice(grid_dir_host, grid_dir_device);
-  InitGridOnDevice(grid_host, grid_dir_host.size, start, end, grid_device); /// \todo сдвиги в сетку и сюда сразу передавать геометрию
+  InitGridOnDevice(grid_host, grid_dir_host.size, grid_dir_host.loc_shift, grid_dir_host.loc_shift + grid_dir_host.loc_size, grid_device); /// \todo сдвиги в сетку и сюда сразу передавать геометрию
 
   /// \todo это отдельно, т.к. относится к инициализации хоста
   mem_protected::MallocHost((CELL_SIZE * grid_dir_host.size * grid_host.size * sizeof(Type)), &grid_host.Illum);
-  mem_protected::MallocHost(((end - start) * grid_host.size * sizeof(Type)), &grid_host.scattering);
+  mem_protected::MallocHost(((grid_dir_host.loc_size) * grid_host.size * sizeof(Type)), &grid_host.scattering);
 
-  if (start == 0 || (grid_host.size != grid_host.loc_size)) // или нулевой узел, или данные разделены
+  if (grid_dir_host.loc_shift == 0 || (grid_host.size != grid_host.loc_size)) // или нулевой узел, или данные разделены
   {
     mem_protected::MallocHost((grid_host.loc_size * sizeof(Type)), &grid_host.divstream);
     mem_protected::MallocHost((grid_host.loc_size * sizeof(Vector3)), &grid_host.divimpuls);

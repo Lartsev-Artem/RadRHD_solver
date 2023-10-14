@@ -5,6 +5,8 @@
 #include "global_def.h"
 #include "global_value.h"
 
+#include "mpi_shifts.h"
+
 int files_sys::bin::ReadNormals(const std::string &name_file_normals, std::vector<Normals> &normals) {
   FILE *f;
   OPEN_FILE(f, name_file_normals.c_str(), "rb");
@@ -138,17 +140,11 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
   std::vector<int> disp;
   std::vector<int> send;
 
-#if 0 /// def USE_MPI
   int np = get_mpi_np();
   int myid = get_mpi_id();
 
   GetDisp(np, count_dir, disp);
   GetSend(np, count_dir, send);
-#else
-  disp.resize(1, 0);
-  send.resize(1, count_dir);
-  int myid = 0;
-#endif
 
   vec_x0.resize(send[myid]);
 

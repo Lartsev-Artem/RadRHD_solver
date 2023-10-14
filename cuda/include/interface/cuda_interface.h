@@ -32,7 +32,7 @@ enum e_cuda_stream_id_t {
   e_сuda_scattering_2 = 1, ///< вторая часть интеграла рассеяния
   e_сuda_params = 2,       ///<  расчёт физических величин (потоки, импульсы)
   // e_сuda_sender,
-  e_сuda_count ///< общее число потоков
+  e_сuda_streams_count ///< общее число потоков
 };
 
 /**
@@ -48,11 +48,9 @@ namespace interface {
  * @param[in] address путь до файлов геометрии
  * @param[in] grid_dir_host сфера направлений
  * @param[inout] grid_host сетка
- * @param[in] start локальное направление
- * @param[in] end конец локальных направлений
  * @return ::e_type_completion
  */
-int InitDevice(const std::string &address, const grid_directions_t &grid_dir_host, grid_t &grid_host, const int start, const int end);
+int InitDevice(const std::string &address, const grid_directions_t &grid_dir_host, grid_t &grid_host);
 
 /**
  * @brief удаление структур на видеокарте
@@ -79,6 +77,16 @@ void ClearHost(grid_t &grid_host);
 int CalculateAllParam(const grid_directions_t &grid_dir, grid_t &grid);
 
 /**
+ * @brief Расчёт энергии, импульса, потока излучения
+ *
+ * @param[in] grid_dir сфера направлений
+ * @param[inout] grid сетка
+ * @param[in] st id потока
+ * @return int ::e_type_completion
+ * @warning Перед чтением данных на хосте необходимо синхронизироваться с потоком
+ */
+int CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st);
+/**
  * @brief Расчёт интеграла рассеяния (с копированием излучения на карту)
  *
  * @param[in] grid_dir  сфера направлений
@@ -88,10 +96,44 @@ int CalculateAllParam(const grid_directions_t &grid_dir, grid_t &grid);
 int CalculateIntScattering(const grid_directions_t &grid_dir, grid_t &grid);
 
 /**
+ * @brief Расчёт интеграла рассеяния без блокировки и с асинхронной отправкой данных
+ *
+ * @param[in] grid_dir сфера направлений
+ * @param[in] grid сетка
+ * @param[in] start_dir начало направлений для данного потока
+ * @param[in] end_dir конец направлений для данного потока
+ * @param[in] stream id потока
+ * @return int ::e_type_completion
+ */
+int CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid, const int start_dir, const int end_dir, const e_cuda_stream_id_t stream);
+
+/**
  * @brief Барьерная синхронизация с cuda
  *
  */
 void CudaWait();
+
+/**
+ * @brief Синхронизация с отдельным потоком
+ *
+ * @param[in] stream_id id потока
+ */
+void CudaSyncStream(const e_cuda_stream_id_t stream_id);
+
+/**
+ * @brief Инициализация потоков cuda с приоритетами
+ *
+ */
+void SetStreams();
+
+/**
+ * @brief Не блокирующая отправка данных на видеокарту
+ *
+ * @param[in] size размер данных (в элементах)
+ * @param[in] shift сдвиг в массиве
+ * @param[in] Illum_host массив излучения
+ */
+void CudaSendIllumAsync(const int size, const int shift, const Type *Illum_host);
 
 } // namespace interface
 
