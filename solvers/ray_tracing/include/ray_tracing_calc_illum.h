@@ -14,7 +14,6 @@
 
 namespace ray_tracing {
 
-#ifdef USE_VTK
 /**
  * @brief Функция заполняет шаблон картиной плоскости и считает кривую блеска
  * @note требуется поддержка VTK
@@ -24,7 +23,7 @@ namespace ray_tracing {
  * @warning предварительно должна быть вызвана трассировка лучей и заполнены файловые структуры
  */
 int MakeEnergyAndCurve(const std::string &file_energy);
-#endif
+
 } // namespace ray_tracing
 
 #endif //! RAY_TRACING_CALC_ILLUM_H

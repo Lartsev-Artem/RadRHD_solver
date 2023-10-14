@@ -1,3 +1,4 @@
+#ifdef USE_CUDA
 #include "ray_tracing_main.h"
 #include "cuda_ray_interface.h"
 #include "global_value.h"
@@ -9,12 +10,7 @@
 #include "writer_bin.h"
 #include "writer_vtk.h"
 
-/// \todo Отрисовка самой плоскости и её перевод в vtk формат
 int ray_tracing::RunRayTracing(const std::string &file_energy) {
-
-#ifndef USE_CUDA
-  EXIT_ERR("Need cuda support\n");
-#else
 
 #ifdef USE_VTK
   {
@@ -41,10 +37,8 @@ int ray_tracing::RunRayTracing(const std::string &file_energy) {
 
   cuda::ray_tracing::interface::ClearDevice();
 
-#ifdef USE_VTK
   MakeEnergyAndCurve(file_energy);
-#endif
 
-#endif // USE_CUDA
   return e_completion_success;
 }
+#endif ///! USE_CUDA

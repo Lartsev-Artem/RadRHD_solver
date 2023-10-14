@@ -193,7 +193,10 @@
     "*.cu": "cpp",
     "__bit_reference": "cpp",
     "__node_handle": "cpp",
-    "__memory": "cpp"
+    "__memory": "cpp",
+    "*.txx": "cpp",
+    "__functional_03": "cpp",
+    "__string": "cpp"
   },
   "cSpell.words": [
     "ifile",

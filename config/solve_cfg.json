@@ -1,5 +1,5 @@
 {
-    "class_vtk": 0,
+    "class_vtk": 1,
     "max_number_of_iter": 10,
     "accuracy": 1e-5,
     "start_point": 0

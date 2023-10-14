@@ -123,8 +123,6 @@ int FUNC_NAME(Archive)(int argc, char **argv) {
   std::string cmd_call = (command + zip_key + name_archive + files_path);
 
   printf("zip cmd: %s\n", cmd_call.c_str());
-  system(cmd_call.c_str());
-
-  return e_completion_success;
+  return system(cmd_call.c_str());
 }
 #endif //! USE_VTK

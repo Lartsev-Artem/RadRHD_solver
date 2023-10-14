@@ -32,7 +32,16 @@ void MakeRays(int num_frame, std::vector<Ray_t> &rays);
  *
  * @param[out] image_plane сетка
  */
-void ray_tracing::MakeVtkPlane(vtkSmartPointer<vtkUnstructuredGrid> &image_plane);
+void MakeVtkPlane(vtkSmartPointer<vtkUnstructuredGrid> &image_plane);
+
+/**
+ * @brief Функция перестраивает бинарные файлы в формат визуализации vtk (получает серию картинных плоскостей)
+ *
+ * @param[in] number_of_planes число плоскостей
+ * @param[in] files_plane основное название серии бинарных файлов с картинной плоскостью (в формате path/file[i.bin])
+ * @return int ::e_type_completion
+ */
+int BuildVtkFromBin(const int number_of_planes, const std::string &files_plane);
 #endif
 } // namespace ray_tracing
 #endif //! RAY_TRACING_BUILD_PLANE_H

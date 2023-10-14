@@ -20,8 +20,8 @@ static __device__ void sort(const int size, Type *array) {
 
 __device__ Type ray::Rosh(const Ray &ray, Type t) {
 
-  const Vector3 S = ray.dir;
-  const Vector3 a = ray.orig;
+  const Vector3 a = ray.dir;
+  const Vector3 S = ray.orig;
 
   // wolfram
   constexpr Type max_potential = -1.82547; // потенциал роша

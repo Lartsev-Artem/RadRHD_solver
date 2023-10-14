@@ -1,3 +1,4 @@
+#if 0
 /**
  * @file foo.cpp
  * @brief Файл ни куда не подключается. Присутствует временно
@@ -36,3 +37,5 @@ int SolveIllumAndHLLC(const Type tau, grid_t &grid) {
   }
   return ret_flag;
 }
+
+#endif

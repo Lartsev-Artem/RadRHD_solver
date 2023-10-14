@@ -185,6 +185,16 @@ int MakeSeries1dRayProjection(int argc, char *argv[]);
  * @return int ::e_type_completion
  */
 int GetSurface(int argc, char *argv[]);
+
+/**
+ * @brief Функция из бинарных формирует серию файлов картинной плоскости
+ *
+ * @param argc кол-во аргументов (требуется 2)
+ * @param argv массив char** содержит {шаблон названия бинарных данных, число файлов}
+ * @return int  ::e_type_completion
+ */
+int RebuildImageBinToVtk(int argc, char *argv[]);
+
 #endif
 
 } // namespace utils

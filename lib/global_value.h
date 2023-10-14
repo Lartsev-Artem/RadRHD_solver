@@ -119,7 +119,11 @@ constexpr double kM_hydrogen = 1.6735575 * 1e-27; ///< масса водород
 #define F_DIVSTREAM "divstream.bin"
 #define F_DIVIMPULS "divimpuls.bin"
 
+#if GEOMETRY_TYPE == TEST_ELLIPSE
+#define F_ABSORPCOEF "alpha.bin"
+#define F_RADLOOSERATE "Q.bin"
+#else
 #define F_ABSORPCOEF "AbsorpCoef.bin"
 #define F_RADLOOSERATE "radEnLooseRate.bin"
-
+#endif
 #endif //! GLOBAL_VALUE

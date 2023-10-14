@@ -19,9 +19,9 @@ int main(int argc, char *argv[]) {
                                      glb_files, &_solve_mode, &_hllc_cfg);
 
 #ifdef ILLUM
-  graph::RunGraphModule();
-  trace::RunTracesModule();
-  illum::RunIllumModule();
+  // graph::RunGraphModule();
+  // trace::RunTracesModule();
+  // illum::RunIllumModule();
 // GDB_ATTACH;
 #endif
 
@@ -32,19 +32,3 @@ int main(int argc, char *argv[]) {
   MPI_END;
   return 0;
 }
-
-#ifdef OST_BIN_READER
-
-//#if defined HLLC || defined RHLLC
-template <typename T>
-int ReadValueGrid(const T main_dir, grid_t &grid) {
-  READ_FILE(std::string(main_dir + "phys_val.bin").c_str(), grid.cells,
-            phys_val);
-  return 0;
-}
-template <typename T>
-int ReadHllcInit(const T file_init_value, std::vector<elem_t> &cells) {
-  READ_FILE(std::string(file_init_value).c_str(), cells, phys_val);
-  return 0;
-}
-#endif

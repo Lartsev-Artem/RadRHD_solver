@@ -9,7 +9,6 @@
 #include "reader_txt.h"
 #include "writer_bin.h"
 
-
 #include "graph_calc.h"
 #include "graph_init_state.h"
 #include "graph_struct.h"
@@ -99,14 +98,14 @@ int graph::RunGraphModule() {
       int cur_ret = FindCurFront(next_step_el, count_in_face, count_def_face, cur_el);
 #endif // GRID_WITH_INNER_BOUNDARY
 
-      if (cur_ret != e_completion_success) {
-        WRITE_LOG("Warning proc: %d, dir= %d, processed %d cells", myid, cur_direction, count_graph);
+      // if (cur_ret != e_completion_success) {
+      //   WRITE_LOG("Warning proc: %d, dir= %d, processed %d cells", myid, cur_direction, count_graph);
 
-        if (TryRestart(count_in_face, count_def_face, outer_part, cur_el, next_step_el) == e_completion_success) {
-          WRITE_LOG("\n\n Warning!!! try_restart %d \n\n", cur_direction);
-          continue;
-        }
-      }
+      //   if (TryRestart(count_in_face, count_def_face, outer_part, cur_el, next_step_el) == e_completion_success) {
+      //     WRITE_LOG("\n\n Warning!!! try_restart %d \n\n", cur_direction);
+      //     continue;
+      //   }
+      // }
 
       NewStep(neighbours, count_in_face, cur_el, count_def_face, next_step_el);
 
@@ -114,6 +113,16 @@ int graph::RunGraphModule() {
         graph[count_graph] = el;
         count_graph++;
       }
+
+      if ((graph.size() != count_graph && next_step_el.size() == 0) || cur_ret != e_completion_success) {
+        WRITE_LOG("Warning proc: %d, dir= %d, processed %d cells\n", myid, cur_direction, count_graph);
+
+        if (TryRestart(count_in_face, count_def_face, outer_part, cur_el, next_step_el) == e_completion_success) {
+          // WRITE_LOG("\n\n Warning!!! try_restart %d \n\n", cur_direction);
+          continue;
+        }
+      }
+
     } // while
 
     DIE_IF_ACTION(count_graph < graph.size(), WRITE_LOG_ERR("Error size graph[%d] %d\n", cur_direction, count_graph));

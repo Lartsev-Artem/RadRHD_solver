@@ -35,7 +35,7 @@ Type illum::BoundaryConditions(const int type_bound) {
     return 0;
 
   case e_bound_inner_source: {
-    return 10;
+    return 2;
 #if 0
 		id_try_pos++;
 		grid[num_cell].nodes_value[num_in_face] = Vector3(res_on_inner_bound, res_on_inner_bound, res_on_inner_bound);

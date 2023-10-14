@@ -8,6 +8,10 @@
 #ifndef RAY_TRACING_MAIN_H
 #define RAY_TRACING_MAIN_H
 
+/*! \addtogroup ray_tracing Модуль трассировки лучей, построения картинной плоскости и кривых блеска
+    @{
+*/
+
 #include <string>
 /**
  * @brief Пространство имён трассировки лучей на картинную плоскость

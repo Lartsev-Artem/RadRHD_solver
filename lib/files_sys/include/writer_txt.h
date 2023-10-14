@@ -39,7 +39,7 @@ int WriteSimple(const Str_Type name_file, const stdT &data) {
 
   if (typeid(*data.begin()) == typeid(double)) { //если размер данных double, то выводить
     for (auto el : data)
-      ofile << setprecision(16) << el << '\n';
+      ofile << std::setprecision(16) << el << '\n';
   } else {
     for (auto el : data)
       ofile << el << '\n';

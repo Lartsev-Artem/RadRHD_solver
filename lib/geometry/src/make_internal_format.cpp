@@ -157,6 +157,22 @@ static int WriteCentersOfCells(const std::string name_file_centers, const vtkSma
 
 #if NUMBER_OF_MEASUREMENTS == 3
 
+static int WriteBoundarySurface(const std::string &name_file_surface, const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid) {
+  std::vector<IntId> surface_id;
+  GetBoundaryFacesId(unstructured_grid, surface_id);
+
+  std::vector<FaceCell> faces(surface_id.size());
+  for (size_t i = 0; i < surface_id.size(); i++) {
+    int id = surface_id[i];
+
+    faces[i].face_id = id;
+    for (vtkIdType k = 0; k < CELL_SIZE - 1; k++)
+      faces[i].face[k] = Vector3(unstructured_grid->GetCell(id / CELL_SIZE)->GetFace(id % CELL_SIZE)->GetPoints()->GetPoint(k));
+  }
+
+  return files_sys::bin::WriteSimple(name_file_surface, faces);
+}
+
 static int WriteCentersOfFaces(const std::string &name_file_centers_faces, const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid) {
 
   std::vector<Vector3> centers_faces;
@@ -235,6 +251,10 @@ int BuildDataFromVTK(const global_files_t &glb_files) {
 
   if (WriteCentersOfFaces(glb_files.base_address + F_CENTER_FACE, unstructured_grid)) {
     RETURN_ERR("Error writing file %s\n", F_CENTER_FACE);
+  }
+
+  if (WriteBoundarySurface(glb_files.base_address + F_SURFACE, unstructured_grid)) {
+    RETURN_ERR("Error writing file %s\n", F_SURFACE);
   }
 
 #endif // 3d
