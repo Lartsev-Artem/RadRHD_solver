@@ -25,6 +25,16 @@ namespace graph {
 
 constexpr int GRAPH_MAX_RESTART = 5; ///< максимальное число рестартов на направление
 
+/**
+ * @brief Функция запускает процесс рестарта поиска текущей границы в случае преждевременной остановки
+ *
+ * @param[in] count_in_face массив количества входящих граней ячейки
+ * @param[in] count_def_face массив количества определённых граней ячейки
+ * @param[in] outer_part номера ЯЧЕЕК выходящей части
+ * @param[out] cur_front новая определённая граница
+ * @param[out] next_candidate начальный набор ячеек-кандидатов для упорядоченного графа
+ * @return int
+ */
 int TryRestart(const std::vector<State> &count_in_face,
                const std::vector<State> &count_def_face,
                const std::set<IntId> &outer_part,

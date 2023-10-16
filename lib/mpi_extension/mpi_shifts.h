@@ -1,4 +1,8 @@
-
+/**
+ * @file mpi_shifts.h
+ * @brief Расчет локальных смещений в линейных массивах на разных узлах
+ *
+ */
 #ifndef MPI_SHIFTS
 #define MPI_SHIFTS
 

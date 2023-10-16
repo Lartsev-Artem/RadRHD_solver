@@ -41,6 +41,7 @@
                 "USE_VTK",
                 "MAKE_TRACE",
                 "RHLLC",
+                "HLLC",
                 "ILLUM",
                 "USE_CUDA"
             ],
