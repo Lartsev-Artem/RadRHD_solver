@@ -75,8 +75,9 @@ static int SetRHllcValueDefault(std::vector<elem_t> &cells) {
   if (files_sys::bin::ReadSimple(glb_files.base_address + F_CENTERS, centers))
     RETURN_ERR("Default rhllc value not set\n");
 
-  int i = 0;
-  for (auto &el : cells) {
+#pragma omp parallel for
+  for (int i = 0; i < cells.size(); i++) {
+    elem_t &el = cells[i];
 #if GEOMETRY_TYPE == Cylinder
     Vector3 x = centers[i];
     if (Vector2(x[1], x[2]).norm() < 0.03 && x[0] < 0.1) {
@@ -133,7 +134,6 @@ static int SetRHllcValueDefault(std::vector<elem_t> &cells) {
     el.phys_val.v = Vector3(1e-4, 0, 0);
 #endif // Cube
 
-    i++;
   } // for
 
   return e_completion_success;

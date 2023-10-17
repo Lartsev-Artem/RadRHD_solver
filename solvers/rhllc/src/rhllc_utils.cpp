@@ -19,7 +19,7 @@ void rhllc::HllcPhysToConv(std::vector<elem_t> &cells) {
 
 #pragma omp parallel for
   for (int i = 0; i < cells.size(); i++) {
-    rhllc::GetConvValue(cells[i].phys_val, cells[i].conv_val);
+    GetConvValue(cells[i].phys_val, cells[i].conv_val);
   }
 }
 
