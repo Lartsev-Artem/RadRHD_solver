@@ -46,15 +46,23 @@ int illum::RunIllumModule() {
     DIE_IF(_solve_mode.class_vtk == e_grid_cfg_radiation); //в иных случаях допускает пропуск инициализации
   }
 
-  gpu_async::InitSender(grid_direction, grid);
+  WRITE_LOG("Init memory\n");
+
 #ifdef USE_CUDA
   cuda::interface::InitDevice(glb_files.base_address, grid_direction, grid);
   cuda::interface::SetStreams();
+  WRITE_LOG("Init mpi device\n");
 #endif
+
+  gpu_async::InitSender(grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
+  WRITE_LOG("Init mpi sender\n");
+
+  MPI_Barrier(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
   gpu_async::CalculateIllum(grid_direction, face_states, neighbours,
                             vec_x0, vec_x, sorted_id_cell, grid);
 
+  WRITE_LOG("end calculate illum\n");
 #ifdef USE_CUDA
   cuda::interface::CudaWait();
   cuda::interface::CudaSyncStream(cuda::e_cuda_params);
@@ -68,6 +76,8 @@ int illum::RunIllumModule() {
   cuda::interface::ClearDevice();
 #endif
 
+  WRITE_LOG("end proc illum\n");
+  MPI_BARRIER(MPI_COMM_WORLD);
   return e_completion_success;
 }
 

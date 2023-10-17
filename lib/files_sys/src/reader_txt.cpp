@@ -1,6 +1,8 @@
 #include "reader_txt.h"
+#include "mpi_ext.h"
 #include "mpi_shifts.h"
 #include <map>
+
 
 int files_sys::txt::ReadSphereDirectionCartesian(const std::string &file_sphere_direction,
                                                  grid_directions_t &grid_direction) {

@@ -9,8 +9,8 @@ LIB_SRC = lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometr
 CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteristics cuda/include/ray_tracing
 CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/src/ray_tracing
 
-SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include solvers/ray_tracing/include
-SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src solvers/ray_tracing/src
+SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include solvers/ray_tracing/include solvers/illum/include/mpi
+SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src solvers/ray_tracing/src solvers/illum/src/mpi
 
 SRCDIR          = src graph/src make_trace/src ${LIB_SRC} ${SOLVERS_SRC}
 INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR}  ${CUDA_INCDIR} ${SOLVERS_DIR}
@@ -50,7 +50,7 @@ CPPFLAGS        = $(DEF_SET) -fopenmp  -Ofast -fPIE
 CXXFLAGS        = -std=c++17 #-g #-Wall -Wextra -std=c++11
 
 NVCC 				= nvcc
-NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp" --expt-relaxed-constexpr #совместимость с Eigen3
+NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp" --expt-relaxed-constexpr -gencode arch=compute_70,code=sm_70 #совместимость с Eigen3
 NVCC_FLAGS 			= $(DEF_SET) -O2  -dc $(NVCC_OTHER_FLAGS)  #-gencode arch=compute_52,code=sm_52
 
 PROGRAM         = run

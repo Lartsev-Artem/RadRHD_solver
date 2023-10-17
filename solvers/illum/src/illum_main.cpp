@@ -13,6 +13,9 @@
 
 int illum::RunIllumModule() {
 
+  if (get_mpi_id() != 0) {
+    return e_completion_success;
+  }
   grid_t grid;
   grid_directions_t grid_direction;
 

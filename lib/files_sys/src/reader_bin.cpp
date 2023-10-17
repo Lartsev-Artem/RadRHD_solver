@@ -134,8 +134,8 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
                                        std::vector<Type> &vec_res_bound) {
   if (ReadSimple(gbl_files.name_file_x, vec_x))
     return e_completion_fail;
-  if (ReadSimple(gbl_files.name_file_res, vec_res_bound))
-    return e_completion_fail;
+  // if (ReadSimple(gbl_files.name_file_res, vec_res_bound))
+  //   return e_completion_fail;
 
   std::vector<int> disp;
   std::vector<int> send;

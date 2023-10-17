@@ -127,12 +127,9 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
   const int local_size = grid_direction.loc_size;
   const int local_disp = grid_direction.loc_shift;
 
-  int count = 0;
-  Type norm = -1;
-  std::vector<Type> norms(np, -10);
-
   int iter = 0;    ///< номер итерации
   double norm = 0; ///< норма ошибки
+  std::vector<Type> norms(np, -10);
 
   do {
     auto start_clock = tick::steady_clock::now();
@@ -155,8 +152,8 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
     const int count_directions = grid_direction.size;
 
-#pragma omp parallel default(none) firstprivate(count_directions) shared(sorted_id_cell, neighbours, face_states, vec_x0, vec_x, grid, norm, \
-                                                                         disp_illum, section_1, section_2)
+#pragma omp parallel default(none) firstprivate(count_directions, n_illum, myid, np, local_disp, local_size) \
+    shared(sorted_id_cell, neighbours, face_states, vec_x0, vec_x, grid, norm, disp_illum, section_1, section_2)
     {
 #pragma omp single
       {
@@ -242,7 +239,7 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
       }
 
 #pragma omp for
-      for (register int num_direction = section_1.size; num_direction < local_size; num_direction++) {
+      for (int num_direction = section_1.size; num_direction < local_size; num_direction++) {
 
         const cell_local *X0_ptr = vec_x0[num_direction].data(); ///< индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
         /*---------------------------------- далее FOR по ячейкам----------------------------------*/

@@ -150,6 +150,8 @@ int trace::RunTracesModule() {
   }
 
   WRITE_LOG("Full trace time: %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
+
+  MPI_BARRIER(MPI_COMM_WORLD);
   return e_completion_success;
 }
 

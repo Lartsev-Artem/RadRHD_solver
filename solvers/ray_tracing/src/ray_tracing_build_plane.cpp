@@ -61,11 +61,10 @@ int ray_tracing::BuildVtkFromBin(const int number_of_planes, const std::string &
     if (files_sys::bin::ReadSimple(files_plane + std::to_string(i) + ".bin", energy_plane))
       return e_completion_fail;
 
-    D_L;
     Illum_array->SetArray(energy_plane.data(), energy_plane.size(), 1);
-    D_L;
+
     grid_plane->GetCellData()->SetScalars(Illum_array);
-    D_L;
+
     if (files_sys::vtk::WriteVtkGrid(files_plane + std::to_string(i) + ".vtk", grid_plane))
       return e_completion_fail;
   }

@@ -23,16 +23,14 @@ int main(int argc, char *argv[]) {
     return e_completion_fail;
 
 #ifdef ILLUM
-    // graph::RunGraphModule();
-    // trace::RunTracesModule();
+  // graph::RunGraphModule();
+  // trace::RunTracesModule();
+  illum::RunIllumModule();
 
-    // if (get_mpi_id() == 0) {
-    //   illum::RunIllumModule();
-    // }
 // GDB_ATTACH;
 #endif
 
-  ray_tracing::RunRayTracing(glb_files.solve_address + "0" + F_ENERGY);
+  // ray_tracing::RunRayTracing(glb_files.solve_address + "0" + F_ENERGY);
 
   //  rhllc::RunRhllcModule();
 

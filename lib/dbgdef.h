@@ -15,6 +15,8 @@
 #include "prj_config.h"
 
 #include "json/json_struct.h"
+
+#include "mpi_ext.h"
 extern global_files_t glb_files;
 #define Files_log std::string(glb_files.base_address + "File_Logs.txt").c_str()
 
@@ -70,13 +72,13 @@ extern global_files_t glb_files;
  * @brief Лог ошибок. вывод в файл
  * \note Лог ошибок включен всегда
  */
-#define WRITE_LOG_ERR(...)                       \
-  {                                              \
-    char buf[1024];                              \
-    sprintf(buf, __VA_ARGS__);                   \
-    std::ofstream out(Files_log, std::ios::app); \
-    out << buf << "\n";                          \
-    out.close();                                 \
+#define WRITE_LOG_ERR(...)                                                \
+  {                                                                       \
+    char buf[1024];                                                       \
+    sprintf(buf, __VA_ARGS__);                                            \
+    std::ofstream out(Files_log, std::ios::app);                          \
+    out << "from " << std::to_string(get_mpi_id()) + ": " << buf << "\n"; \
+    out.close();                                                          \
   }
 #endif
 
@@ -114,7 +116,7 @@ extern global_files_t glb_files;
 #ifdef WRITE_GLOBAL_LOG
 
 #ifdef WRITE_MPI_LOG
-#include "mpi_ext.h"
+// #include "mpi_ext.h"
 
 /**
  * @brief Вывод лога в отдельный для каждого узла файл
