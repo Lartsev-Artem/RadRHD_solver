@@ -141,15 +141,16 @@ int ReadData(const solve_mode_t &mode, const std::string &main_dir, grid_t &grid
  * @param[out] face_states битовые флаги входящий/входящий граней
  * @param[out] vec_x0 точка начало луча в локальных координатах грани
  * @param[out] sorted_id_cell перенумерация ячеек вдоль луча
- * @param[out] vec_res_bound массив с предрасчитамм граничными значениями
+ * @param[out] inner_bound_code массив с кодами внутренних граничными значениями
  * @return int ::e_type_completion
+ * @warning массив inner_bound_code может быть не считан, т.к. не все сетки заданы с внутренней границей
  */
 int ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
                        std::vector<BasePointTetra> &vec_x,
                        std::vector<std::vector<State>> &face_states,
                        std::vector<std::vector<cell_local>> &vec_x0,
                        std::vector<std::vector<IntId>> &sorted_id_cell,
-                       std::vector<Type> &vec_res_bound);
+                       std::vector<std::vector<IntId>> &inner_bound_code);
 #endif //! ILLUM
 
 #if defined RHLLC || defined HLLC

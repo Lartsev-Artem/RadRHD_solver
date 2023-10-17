@@ -79,4 +79,41 @@ __global__ void cuda::ray_tracing::RayTracing(const int M, const Ray *rays, cons
   intersections[dir] = loc_id;
 }
 
+__global__ void cuda::ray_tracing::InnerRayTracing(const int M, const Ray *rays, const int N, const Face *triangles, int *intersections) {
+
+  const int dir = blockIdx.x * blockDim.x + threadIdx.x; //ячейка
+
+  if (dir >= M) {
+    return;
+  }
+
+  int loc_id = e_ray_intersect_none;
+  Type loc_dist = 1e10;
+
+  loc_id = GetIntersectionWithSphereOfDisk(rays[dir]);
+
+  if (loc_id != e_ray_intersect_none) {
+    intersections[dir] = loc_id;
+    return;
+  }
+
+  //по всей границе
+  Vector3 p;
+  for (int i = 0; i < N; i++) {
+
+    Type d = RayIntersectsTriangle(rays[dir], triangles[i], p);
+
+    //новое пересечение есть и оно ближе имеющегося
+    if (d > 0 && d < loc_dist) {
+      loc_id = triangles[i].id;
+      loc_dist = d;
+    }
+  }
+
+  /*
+    сюда пересечения с внешней геометрией
+  */
+  intersections[dir] = loc_id;
+}
+
 #endif //! USE_CUDA

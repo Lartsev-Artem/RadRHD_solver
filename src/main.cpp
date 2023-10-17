@@ -23,8 +23,8 @@ int main(int argc, char *argv[]) {
     return e_completion_fail;
 
 #ifdef ILLUM
-  // graph::RunGraphModule();
-  // trace::RunTracesModule();
+  graph::RunGraphModule();
+  trace::RunTracesModule();
   illum::RunIllumModule();
 
 // GDB_ATTACH;

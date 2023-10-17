@@ -8,6 +8,7 @@
 
 #include "geo_types.h"
 #include "global_types.h"
+#include "ray_tracing_const.h"
 #include "solvers_struct.h"
 
 /*! \addtogroup illum Модуль расчёта излучения
@@ -66,10 +67,12 @@ inline Matrix3 GetAverageByCell(const Matrix3 *array) {
 /**
  * @brief Функция возвращает значение на границе
  *
- * @param[in] type_bound тип граничных условий  ::e_boundary_types_t
+ * @param[in] type_bound тип граничных условий  ::e_boundary_types_t (связан с геометрией сетки)
+ * @param[in] type_obj   тип объекта, определяющего условие на границе ::e_ray_intersect_code
+ * @param[in] inter_coef  коэффициенты интерполяции на потонциально определяющий границу грани
  * @return значение излучения
  */
-Type BoundaryConditions(const int type_bound);
+Type BoundaryConditions(const int type_bound, const int type_obj = e_ray_intersect_none, const Vector3 &inter_coef = Vector3 ::Zero());
 
 /**
  * @brief Функция возвращает текущее накопленное значение вдоль луча

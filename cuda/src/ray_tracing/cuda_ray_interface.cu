@@ -32,6 +32,24 @@ int ray::interface::StartTracing(const std::vector<Ray_t> &rays_host, std::vecto
   return e_completion_success;
 }
 
+int ray::interface::FindInnerIntersection(const std::vector<Ray_t> &rays_host, std::vector<int> &intersections) {
+
+  int M = rays_host.size();
+
+  CUDA_TREADS_1D(threads);
+  CUDA_BLOCKS_1D(blocks, M);
+
+  mem::CpyToDevice(rays_device, rays_host.data(), M * sizeof(Ray_t));
+
+  cuda::ray_tracing::InnerRayTracing<<<blocks, threads>>>(M, rays_device, size_surface, faces_device, intersection_device);
+
+  CUDA_CALL_FUNC(cudaGetLastError);
+
+  mem::CpyToHost(intersections.data(), intersection_device, M * sizeof(int));
+
+  return e_completion_success;
+}
+
 void ray::interface::InitDevice(const std::vector<FaceCell> &faces_host, const std::vector<Ray_t> &rays_host) {
 
   CUDA_CALL_FUNC(cudaSetDevice, 0);

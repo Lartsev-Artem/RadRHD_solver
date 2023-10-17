@@ -51,7 +51,7 @@ __device__ int GetIntersectionWithRosh(const Ray &ray, Type *dist);
  * @param[in] ray луч
  * @return ::e_ray_intersect_code
  */
-__device__ int GetIntersectionWithSphereODisk(const Ray &ray);
+__device__ int GetIntersectionWithSphereOfDisk(const Ray &ray);
 
 /**
  * @brief Пересечение луча с плоскость заданной 3 точками

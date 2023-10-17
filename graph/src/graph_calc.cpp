@@ -49,7 +49,7 @@ static int FindCellOnInnerPartBoundary(const int out_cell,
   for (int i = 0; i < 3; i++) {
     for (auto &in_cell : inner_part) {
 
-      FaceCell start_face = inner_faces.find(in_cell)->second; //грань на противолежащей стороне
+      const FaceCell &start_face = inner_faces.find(in_cell)->second; //грань на противолежащей стороне
 
       // in::IntersectionWithPlane(start_face.face, vertex[i], -direction, trace.x[i]);
       // if (in::InTriangle(start_face.face, normals[in_cell].n[start_face.face_id % CELL_SIZE], trace.x[i])) {

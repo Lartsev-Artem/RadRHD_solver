@@ -131,11 +131,9 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
                                        std::vector<std::vector<State>> &face_states,
                                        std::vector<std::vector<cell_local>> &vec_x0,
                                        std::vector<std::vector<IntId>> &sorted_id_cell,
-                                       std::vector<Type> &vec_res_bound) {
+                                       std::vector<std::vector<IntId>> &inner_bound_code) {
   if (ReadSimple(gbl_files.name_file_x, vec_x))
     return e_completion_fail;
-  // if (ReadSimple(gbl_files.name_file_res, vec_res_bound))
-  //   return e_completion_fail;
 
   std::vector<int> disp;
   std::vector<int> send;
@@ -150,6 +148,7 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
 
   sorted_id_cell.resize(send[myid]);
   face_states.resize(send[myid]);
+  inner_bound_code.resize(send[myid]);
 
   for (int i = 0; i < send[myid]; i++) {
 
@@ -161,6 +160,9 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
 
     if (ReadSimple(gbl_files.name_file_state_face + std::to_string(disp[myid] + i) + ".bin", face_states[i]))
       return e_completion_fail;
+
+    if (ReadSimple(gbl_files.name_file_res + std::to_string(disp[myid] + i) + ".bin", inner_bound_code[i]))
+      WRITE_LOG("WARNING!!! inner bound[%d] didn't read\n", i);
   }
 
   return e_completion_success;

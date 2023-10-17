@@ -106,7 +106,7 @@ __device__ static const Type radius_sphere = ray_tracing::k_radius_sphere;
 __device__ static const Type R_in_2 = ray_tracing::k_internal_radius_disk * ray_tracing::k_internal_radius_disk;
 __device__ static const Type R_ex_2 = ray_tracing::k_external_radius_disk * ray_tracing::k_external_radius_disk;
 
-__device__ int ray::GetIntersectionWithSphereODisk(const Ray &ray) {
+__device__ int ray::GetIntersectionWithSphereOfDisk(const Ray &ray) {
 
   Face plane_disk; // точки задающие плоскость диска (Wolfram)
   plane_disk.A = Vector3(1, 0, 0);

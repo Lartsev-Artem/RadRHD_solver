@@ -11,12 +11,11 @@
 
 #include "graph_calc.h"
 #include "graph_init_state.h"
+#include "graph_inner_bound.h"
 #include "graph_struct.h"
 
 #include <chrono>
-#include <filesystem>
 namespace tick = std::chrono;
-namespace fs = std::filesystem;
 
 namespace graph {
 std::vector<boundary_trace_t> bound_trace; ///< данные перетрассировки луча сквозь внутреннюю область
@@ -47,10 +46,14 @@ int graph::RunGraphModule() {
   WRITE_LOG("Reading time graph prebuild %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
   WRITE_LOG("Inner boundary has %d faces\n", (int)inter_boundary_face_id.size());
 
-  if (!fs::exists(glb_files.graph_address)) {
-    WRITE_LOG("Create directory to graph");
-    fs::create_directory(glb_files.base_address + "graph/");
-  }
+#ifdef GRID_WITH_INNER_BOUNDARY
+#ifdef USE_CUDA
+  trace_through_boundary::IntersectBound_t intersections; //коды пересечений на внутренней границе
+  trace_through_boundary::InitDevice();
+#else
+  WRITE_LOG_ERR("CUDA UNDEF!!!. The inner border is not traced!"\n);
+#endif
+#endif
 
   const size_t num_cells = normals.size();
 
@@ -79,6 +82,11 @@ int graph::RunGraphModule() {
     Vector3 direction = grid_dir.directions[cur_direction].dir;
 
     DivideInnerBoundary(direction, normals, inter_boundary_face_id, inner_part, outer_part);
+
+#if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA
+    trace_through_boundary::FindBoundCondOnInnerBoundary(cur_direction, direction, inter_faces, outer_part, intersections.code);
+    intersections.out_id_cell.assign(outer_part.begin(), outer_part.end());
+#endif
 
     bound_trace.clear();
     bound_trace.reserve(outer_part.size() * 3); // потенциально в массив могут войдут все ячейки внутренней границы
@@ -131,6 +139,13 @@ int graph::RunGraphModule() {
       RETURN_ERR("file_graph is not opened for writing\n");
     }
 
+#if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA
+    trace_through_boundary::SortInnerBoundary(graph, intersections);
+    if (files_sys::bin::WriteSimple(glb_files.trace_address + F_RES + std::to_string(cur_direction) + ".bin", intersections.code)) {
+      RETURN_ERR("file_res is not opened for writing\n");
+    }
+#endif
+
     WRITE_LOG("Id_proc: %d. Graph construction in the direction %d is completed, t= %lf c. \n", myid, cur_direction,
               (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
   }
@@ -138,6 +153,9 @@ int graph::RunGraphModule() {
   bound_trace.clear();
   WRITE_LOG("Full graph time: %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 
+#if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA
+  trace_through_boundary::ClearDevice();
+#endif
   MPI_BARRIER(MPI_COMM_WORLD);
   return e_completion_success;
 }

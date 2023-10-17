@@ -144,10 +144,10 @@ int trace::RunTracesModule() {
   }
   /*---------------------------------- конец FOR по направлениям----------------------------------*/
 
-  if (myid == 0) {
-    if (files_sys::bin::WriteSimple(name_file_res_bound, vec_res_bound))
-      RETURN_ERR("Error vec_res_bound");
-  }
+  // if (myid == 0) {
+  //   if (files_sys::bin::WriteSimple(name_file_res_bound, vec_res_bound))
+  //     RETURN_ERR("Error vec_res_bound");
+  // }
 
   WRITE_LOG("Full trace time: %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 

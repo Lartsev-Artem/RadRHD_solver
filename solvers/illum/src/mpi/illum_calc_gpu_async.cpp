@@ -1,4 +1,4 @@
-#if defined ILLUM && defined SOLVERS && defined USE_MPI && defined USE_CUDA
+#if defined ILLUM && defined SOLVERS && !defined USE_MPI && defined USE_CUDA
 #include "illum_calc_gpu_async.h"
 
 #include "illum_params.h"
@@ -113,7 +113,7 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
 }
 
 int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, const std::vector<std::vector<bits_flag_t>> &face_states,
-                                     const std::vector<IntId> &neighbours,
+                                     const std::vector<IntId> &neighbours, const std::vector<std::vector<IntId>> &inner_bound_code,
                                      const std::vector<std::vector<cell_local>> &vec_x0, std::vector<BasePointTetra> &vec_x,
                                      const std::vector<std::vector<IntId>> &sorted_id_cell, grid_t &grid) {
 

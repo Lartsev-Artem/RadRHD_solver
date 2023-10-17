@@ -39,6 +39,16 @@ namespace interface {
 int StartTracing(const std::vector<Ray_t> &rays_host, std::vector<IntId> &intersections);
 
 /**
+ * @brief Поиск пересечений внутренней границы с заданными лучами
+ * @details Функция копирует rays_host на карту и intersections с карты.
+ * Определяется ближайшее пересечение от источника
+ * @param[in] rays_host лучи из центра граничной ячейке против направления излучения
+ * @param[out] intersections код пересечения ::e_ray_intersect_code (с номером грани)
+ * @return int ::e_type_completion
+ */
+int FindInnerIntersection(const std::vector<Ray_t> &rays_host, std::vector<IntId> &intersections);
+
+/**
  * @brief Инициализация видеокарты
  *
  * @param[in] faces_host грани сетки с которыми проверяем пересечения(с копированием на карту)

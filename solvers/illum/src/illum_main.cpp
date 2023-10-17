@@ -1,4 +1,4 @@
-#if defined SOLVERS && defined ILLUM && !defined USE_MPI
+#if defined SOLVERS && defined ILLUM && defined USE_MPI
 #include "illum_main.h"
 
 #include "global_types.h"
@@ -25,12 +25,12 @@ int illum::RunIllumModule() {
   std::vector<std::vector<State>> face_states;
   std::vector<std::vector<cell_local>> vec_x0;
   std::vector<std::vector<IntId>> sorted_id_cell;
-  std::vector<Type> vec_res_bound;
+  std::vector<std::vector<IntId>> inner_bound_code;
 
   uint32_t err = 0;
   err |= files_sys::bin::ReadSimple(glb_files.name_file_neigh, neighbours);
   err |= files_sys::txt::ReadSphereDirectionCartesian(glb_files.name_file_sphere_direction, grid_direction);
-  err |= files_sys::bin::ReadRadiationTrace(grid_direction.size, glb_files, vec_x, face_states, vec_x0, sorted_id_cell, vec_res_bound);
+  err |= files_sys::bin::ReadRadiationTrace(grid_direction.size, glb_files, vec_x, face_states, vec_x0, sorted_id_cell, inner_bound_code);
 
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, grid.faces);
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
@@ -49,7 +49,7 @@ int illum::RunIllumModule() {
   cuda::interface::InitDevice(glb_files.base_address, grid_direction, grid);
 #endif
 
-  cpu::CalculateIllum(grid_direction, face_states, neighbours,
+  cpu::CalculateIllum(grid_direction, face_states, neighbours, inner_bound_code,
                       vec_x0, vec_x, sorted_id_cell, grid);
 
   cpu::CalculateIllumParam(grid_direction, grid);

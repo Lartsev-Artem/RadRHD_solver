@@ -37,5 +37,17 @@ __device__ Type RayIntersectsTriangle(const Ray &ray, const Face &triangle, Vect
  */
 __global__ void RayTracing(const int M, const Ray *rays, const int N, const Face *triangles, int *intersections);
 
+/**
+ * @brief Поиск всех пересечений с матрицей лучей, образованной внутренней поверхностью
+ *
+ * @param[in] M число лучей
+ * @param[in] rays лучи
+ * @param[in] N число треугольников
+ * @param[in] triangles треугольники
+ * @param[out] intersections коды пересечений для каждого луча
+ * @return __global__ use cudaGetLastError
+ */
+__global__ void InnerRayTracing(const int M, const Ray *rays, const int N, const Face *triangles, int *intersections);
+
 } // namespace cuda::ray_tracing
 #endif //! CUDA_RAY_CALC_H

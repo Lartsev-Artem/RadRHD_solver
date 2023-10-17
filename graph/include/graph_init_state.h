@@ -33,7 +33,7 @@ constexpr int GRAPH_MAX_RESTART = 5; ///< максимальное число р
  * @param[in] outer_part номера ЯЧЕЕК выходящей части
  * @param[out] cur_front новая определённая граница
  * @param[out] next_candidate начальный набор ячеек-кандидатов для упорядоченного графа
- * @return int
+ * @return int ::e_type_completion
  */
 int TryRestart(const std::vector<State> &count_in_face,
                const std::vector<State> &count_def_face,

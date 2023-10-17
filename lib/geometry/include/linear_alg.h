@@ -18,4 +18,25 @@
  */
 void GetRotationMatrix(const Vector3 &n, Matrix3 &T);
 
+/**
+ * @brief Возвращает центр треугольника
+ *
+ * @param[in] a вершина треугольника
+ * @param[in] b вершина треугольника
+ * @param[in] c вершина треугольника
+ * @return точка - центр
+ */
+inline Vector3 GetCenterTriangle(const Vector3 &a, const Vector3 &b, const Vector3 &c) {
+  return (a + b + c) / .3;
+}
+/**
+ * @brief  Возвращает центр треугольника
+ *
+ * @param f - треугольник, заданный вершинами
+ * @return точка - центр
+ */
+inline Vector3 GetCenterTriangle(const Face f) {
+  return (f.A + f.B + f.C) / .3;
+}
+
 #endif //! LINEAR_ALG_H
