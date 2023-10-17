@@ -1,4 +1,8 @@
-
+/**
+ * @file hllc_init.h
+ * @brief Инициализация hllc решателя
+ *
+ */
 #if !defined HLLC_INIT_H && defined SOLVERS && defined HLLC
 #define HLLC_INIT_H
 

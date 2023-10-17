@@ -1,5 +1,8 @@
-
-
+/**
+ * @file hllc_utils.h
+ * @brief Вспомогательные функции
+ *
+ */
 #if !defined HLLC_UTILS_H && defined SOLVERS && defined HLLC
 #define HLLC_UTILS_H
 

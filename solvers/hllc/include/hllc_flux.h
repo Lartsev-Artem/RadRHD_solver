@@ -1,4 +1,7 @@
-
+/**
+ * @file hllc_flux.h
+ * @brief Функции расчёта потоков
+ */
 #if !defined HLLC_FLUX_H && defined SOLVERS && defined HLLC
 #define HLLC_FLUX_H
 
