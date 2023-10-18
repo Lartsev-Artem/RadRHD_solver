@@ -130,4 +130,31 @@ __global__ void cuda::ray_tracing::InnerRayTracing(const int M, const Ray *rays,
   }
 }
 
+__global__ void cuda::ray_tracing::RayTracingGrid(const int M, const Ray *rays, const int N, const Face *triangles, int *intersections) {
+
+  const int dir = blockIdx.x * blockDim.x + threadIdx.x; //ячейка
+
+  if (dir >= M) {
+    return;
+  }
+
+  int loc_id = e_ray_intersect_none;
+  Type loc_dist = 1e10;
+
+  //по всей сетке
+  Vector3 p;
+  for (int i = 0; i < N; i++) {
+
+    Type d = RayIntersectsTriangle(rays[dir], triangles[i], p);
+
+    //новое пересечение есть и оно ближе имеющегося
+    if (d > 0 && d < loc_dist) {
+      loc_id = triangles[i].id;
+      loc_dist = d;
+    }
+  }
+
+  intersections[dir] = loc_id;
+}
+
 #endif //! USE_CUDA

@@ -21,7 +21,7 @@ int ray_tracing::RunRayTracing(const std::string &file_energy) {
 #ifdef USE_VTK
   {
     vtkSmartPointer<vtkUnstructuredGrid> grid;
-    MakeVtkPlane(grid);
+    MakeVtkPlane(k_pixels_width, k_pixels_height, grid);
     files_sys::vtk::WriteVtkGrid(glb_files.trace_address + F_IMAGE_PLANE + ".vtk", grid);
   }
 #endif

@@ -23,6 +23,12 @@ int CalculateIllum(const grid_directions_t &grid_direction, const std::vector<st
 
 void CalculateIllumParam(const grid_directions_t &grid_direction, grid_t &grid);
 
+int CalculateAdditionalIllum(const grid_directions_t &grid_direction, const std::vector<IntId> &scat_interpolation_id,
+                             const std::vector<std::vector<bits_flag_t>> &face_states,
+                             const std::vector<IntId> &neighbours, const std::vector<std::vector<IntId>> &inner_bound_code,
+                             const std::vector<std::vector<cell_local>> &vec_x0, std::vector<BasePointTetra> &vec_x,
+                             const std::vector<std::vector<IntId>> &sorted_id_cell, grid_t &grid);
+
 } // namespace cpu
 
 } // namespace illum
