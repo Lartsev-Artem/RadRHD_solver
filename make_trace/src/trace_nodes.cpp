@@ -67,7 +67,7 @@ int trace::GetInterpolationNodes(const std::vector<Eigen::Matrix4d> &vertexs, st
 }
 
 static Vector2 GetIllumeOnInnerFace(const int num_in_face, const int neib_id, const Matrix4 &vertex_tetra,
-                                    const Vector3 &x, const Vector3 &x0, std::vector<Type> &vec_res_bound) {
+                                    const Vector3 &x, const Vector3 &x0) {
   Vector2 x0_local(0, 0);
 
   Type I_x0 = 0;
@@ -211,74 +211,68 @@ static Vector2 GetIllumeOnInnerFace(const int num_in_face, const int neib_id, co
 
 static int CalculateNodeValue(const int num_cell, const Normals &normal, const std::vector<Face> &grid,
                               const int face_state, const Vector3 &direction, const Matrix4 &vertex_tetra, const Vector3 &x,
-                              const std::vector<IntId> &all_pairs_face, std::vector<Type> &vec_res_bound, std::vector<cell_local> &vec_x0) {
+                              const std::vector<IntId> &all_pairs_face, std::vector<cell_local> &vec_x0) {
   Vector3 x0;
 
   for (ShortId num_in_face = 0; num_in_face < CELL_SIZE; ++num_in_face) {
     const int face_id = num_cell * CELL_SIZE + num_in_face;
-    if (!CHECK_BIT(face_state, num_in_face))
+    if (CHECK_BIT(face_state, num_in_face) == e_face_type_out)
       continue; // обрабатываем только входные грани
 
-#if 0
-    intersection::IntersectionWithPlane(grid[face_id], x, direction, x0);
-    if (intersection::InTriangle(grid[face_id], normal.n[num_in_face], x0)) {
-#else
     if (intersection::RayIntersectsTriangle(x, -direction, grid[face_id], x0) > 0) {
-#endif
 
-    cell_local x0_local;
-    x0_local.in_face_id = num_in_face;
-    x0_local.s = (x - x0).norm();
-
+      cell_local x0_local;
+      x0_local.in_face_id = num_in_face;
+      x0_local.s = (x - x0).norm();
 #ifdef INTERPOLATION_ON_FACES
-    x0_local.x0 = GetIllumeOnInnerFace(num_in_face, all_pairs_face[face_id], vertex_tetra, x, x0, vec_res_bound);
+      x0_local.x0 = GetIllumeOnInnerFace(num_in_face, all_pairs_face[face_id], vertex_tetra, x, x0);
 #endif
 
-    vec_x0.push_back(x0_local);
-    break;
-  }
+      vec_x0.push_back(x0_local);
+      break;
+    }
 
-  if (num_in_face == CELL_SIZE - 1) {
-    EXIT_ERR("Not found inner face\n");
-  }
+    if (num_in_face == CELL_SIZE - 1) {
+      EXIT_ERR("Not found inner face\n");
+    }
 
-} // for num_in_face
+  } // for num_in_face
 
-return e_completion_success;
+  return e_completion_success;
 }
 
 int trace::GetLocNodes(const int num_cell, const ShortId num_out_face, const std::vector<Face> &grid,
                        const Eigen::Matrix4d &vertex_tetra, const bits_flag_t face_state,
                        const Vector3 &direction, const Normals &normals,
                        const std::vector<IntId> &neighbours, const BasePointTetra &x,
-                       std::vector<Type> &vec_res_bound, std::vector<cell_local> &vec_x0) {
+                       std::vector<cell_local> &vec_x0) {
 
   switch (num_out_face) {
 
   case 1: // 1->2
     for (size_t num_node = 0; num_node < 3; ++num_node) {
       CalculateNodeValue(num_cell, normals, grid, face_state, direction, vertex_tetra, x(num_out_face, num_node),
-                         neighbours, vec_res_bound, vec_x0);
+                         neighbours, vec_x0);
     }
     break;
   case 2: // 2->0
     for (size_t num_node = 0; num_node < 3; ++num_node) {
       CalculateNodeValue(num_cell, normals, grid, face_state, direction, vertex_tetra, x(num_out_face, num_node),
-                         neighbours, vec_res_bound, vec_x0);
+                         neighbours, vec_x0);
     }
     break;
   case 0: // 0->3
     for (size_t num_node = 0; num_node < 3; ++num_node) {
 
       CalculateNodeValue(num_cell, normals, grid, face_state, direction, vertex_tetra, x(num_out_face, num_node),
-                         neighbours, vec_res_bound, vec_x0);
+                         neighbours, vec_x0);
     } // x->координата узла на выходящей грани		}
     break;
   case 3: // 3->1
     for (size_t num_node = 0; num_node < 3; ++num_node) {
 
       CalculateNodeValue(num_cell, normals, grid, face_state, direction, vertex_tetra, x(num_out_face, num_node),
-                         neighbours, vec_res_bound, vec_x0);
+                         neighbours, vec_x0);
     }
     break;
   default:

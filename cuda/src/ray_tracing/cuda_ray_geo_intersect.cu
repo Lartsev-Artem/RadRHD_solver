@@ -140,6 +140,7 @@ __device__ int ray::GetIntersectionWithSphereOfDisk(const Ray &ray) {
 
   if (radical >= 0) // есть пересечения со сферой
   {
+
     Type t = (n[0] - n.dot(ray.orig) - 0.5 * sqrt(radical)) / A;
     Vector3 in_sphere = n * t + ray.orig; // точка на сфере
 

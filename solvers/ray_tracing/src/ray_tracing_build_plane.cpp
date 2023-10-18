@@ -13,7 +13,7 @@
 #include <vtkPoints.h>
 #include <vtkQuad.h>
 
-void ray_tracing::MakeVtkPlane(vtkSmartPointer<vtkUnstructuredGrid> &image_plane) {
+void ray_tracing::MakeVtkPlane(const int x_cnt, const int y_cnt, vtkSmartPointer<vtkUnstructuredGrid> &image_plane) {
 
   // компоненты картинной плоскости
   vtkSmartPointer<vtkPoints> points_quad = vtkSmartPointer<vtkPoints>::New();
@@ -21,12 +21,12 @@ void ray_tracing::MakeVtkPlane(vtkSmartPointer<vtkUnstructuredGrid> &image_plane
   vtkSmartPointer<vtkQuad> quad = vtkSmartPointer<vtkQuad>::New();
 
   const Vector3 angle_of_plane(-(k_width_plane / 2), -(k_height_plane / 2), 0); // угол плоскости. От него начинается заполнение всей плоскости
-  constexpr Type step_x = k_width_plane / k_pixels_width;                       // ширина пикселя
-  constexpr Type step_y = k_height_plane / k_pixels_height;                     // высота пикселя
+  const Type step_x = k_width_plane / x_cnt;                                    // ширина пикселя
+  const Type step_y = k_height_plane / y_cnt;                                   // высота пикселя
 
   size_t quad_number = 0;
-  for (int i = 0; i < k_pixels_width; ++i) {
-    for (int j = 0; j < k_pixels_height; ++j) {
+  for (int i = 0; i < x_cnt; ++i) {
+    for (int j = 0; j < y_cnt; ++j) {
 
       Vector3 orig_2d(angle_of_plane(0) + i * step_x, angle_of_plane(1) + j * step_y, 0); ///< центр нового пикселя на плоскости
 
@@ -49,10 +49,10 @@ void ray_tracing::MakeVtkPlane(vtkSmartPointer<vtkUnstructuredGrid> &image_plane
   return;
 }
 
-int ray_tracing::BuildVtkFromBin(const int number_of_planes, const std::string &files_plane) {
+int ray_tracing::BuildVtkFromBin(const int x_cnt, const int y_cnt, const int number_of_planes, const std::string &files_plane) {
 
   vtkSmartPointer<vtkUnstructuredGrid> grid_plane = vtkSmartPointer<vtkUnstructuredGrid>::New();
-  MakeVtkPlane(grid_plane);
+  MakeVtkPlane(x_cnt, y_cnt, grid_plane);
 
   vtkSmartPointer<vtkDoubleArray> Illum_array = vtkSmartPointer<vtkDoubleArray>::New();
   std::vector<Type> energy_plane;

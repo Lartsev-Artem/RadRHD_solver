@@ -30,7 +30,7 @@ void global_files_t::Build() {
   //--------Файлы трассировки сквозь внутреннюю границу------//
   name_file_dist_try = base_address + F_DIST_TRY;
   name_file_id_try = base_address + F_ID_TRY;
-  name_file_res = illum_geo_address + F_RES;
+  name_file_res = graph_address + F_RES;
   name_file_neigh = base_address + F_NEIGHBOR;
 
 #if 0

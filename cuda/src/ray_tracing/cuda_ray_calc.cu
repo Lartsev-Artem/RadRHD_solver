@@ -60,6 +60,15 @@ __global__ void cuda::ray_tracing::RayTracing(const int M, const Ray *rays, cons
     loc_id = e_ray_intersect_rosh;
   }
 
+  // if (loc_id == e_ray_intersect_none) {
+
+  //   loc_id = GetIntersectionWithSphereOfDisk(rays[dir]);
+  //   if (loc_id != e_ray_intersect_none) {
+  //     intersections[dir] = loc_id;
+  //     return;
+  //   }
+  // }
+
   //по всей границе
   Vector3 p;
   for (int i = 0; i < N; i++) {
@@ -114,6 +123,11 @@ __global__ void cuda::ray_tracing::InnerRayTracing(const int M, const Ray *rays,
     сюда пересечения с внешней геометрией
   */
   intersections[dir] = loc_id;
+
+  if (loc_id == e_ray_intersect_none) {
+    printf("undef inner trace in cuda\n");
+    /// \todo generate error
+  }
 }
 
 #endif //! USE_CUDA

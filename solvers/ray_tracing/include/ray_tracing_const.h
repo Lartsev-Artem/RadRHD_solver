@@ -36,9 +36,9 @@ HOST_DEVICE constexpr double PI = 3.1415926535897932384626433832795; ///<чис�
 
 HOST_DEVICE constexpr Type k_center_x = 1, k_center_y = 0, k_center_z = 0; ///< координаты центр аккретора
 const Vector3 k_center_sphere(k_center_x, k_center_y, k_center_z);         ///< центр аккретора
-HOST_DEVICE constexpr Type k_radius_sphere = 0.01;                         ///< радиус аккретора
-HOST_DEVICE constexpr Type k_internal_radius_disk = 0.01;                  ///< внутренний радиус около аккриционного диска
-HOST_DEVICE constexpr Type k_external_radius_disk = 0.06;                  ///< внешний радиус около аккриционного диска
+HOST_DEVICE constexpr Type k_radius_sphere = 0.01;                         // 0.01;                         ///< радиус аккретора
+HOST_DEVICE constexpr Type k_internal_radius_disk = 0.01;                  ///< внутренний радиус около аккреционного диска
+HOST_DEVICE constexpr Type k_external_radius_disk = 0.06;                  ///< внешний радиус около аккреционного диска
 
 // параметры картинной плоскости
 constexpr Type k_width_plane = 2.4;         ///< безразмерная ширина картинной плоскости

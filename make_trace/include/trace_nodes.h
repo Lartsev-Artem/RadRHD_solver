@@ -30,7 +30,6 @@ namespace trace {
  * @param[in] normals структура нормалей к ячейке
  * @param[in] neighbours список соседей
  * @param[in] x узлы интерполяции тетраэдра в глобальных координатах
- * @param[out] vec_res_bound ЧТО-ТО С ПЕРЕТРАССИРОВКОЙ
  * @param[out] vec_x0 список точек определяющих узлов в лок. системе координат
  * @return int ::e_type_completion
  * @note массив хранит упорядоченные данные (добавление через push_back())
@@ -39,7 +38,7 @@ int GetLocNodes(const int num_cell, const ShortId num_out_face, const std::vecto
                 const Eigen::Matrix4d &vertex_tetra, const bits_flag_t face_state,
                 const Vector3 &direction, const Normals &normals,
                 const std::vector<IntId> &neighbours, const BasePointTetra &x,
-                std::vector<Type> &vec_res_bound, std::vector<cell_local> &vec_x0);
+                std::vector<cell_local> &vec_x0);
 /**
  * @brief Функция возвращает точки интерполяции на всех гранях в глобальной системе координат
  *

@@ -31,6 +31,7 @@ Type illum::BoundaryConditions(const int type_bound, const int type_obj, const V
   case e_bound_out_source:
     return 0;
 
+#ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
   case e_bound_inner_source: {
     switch (type_obj) {
     case e_ray_intersect_none: // внутренняя граница не может быть не определённой
@@ -38,18 +39,20 @@ Type illum::BoundaryConditions(const int type_bound, const int type_obj, const V
       D_LD;
 
     case e_ray_intersect_disk:
-      return 0.5;
-      break;
+      return 3;
 
     case e_ray_intersect_sphere:
-      return 1;
-      break;
+      return 10;
 
     default:
       Vector3 copy(inter_coef);
       return GetIllumeFromInFace(0, copy); //значение на ячейке (код не не границы)
     }
   }
+#else
+  case e_bound_inner_source:
+    return 1;
+#endif
   default:
     D_LD;
   }
@@ -179,10 +182,15 @@ Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coe
 
 Type illum::GetIllumeFromInFace(const int neigh_id, Vector3 &inter_coef) {
 
-  if (neigh_id < 0) {
-    Type I_x0 = illum::BoundaryConditions(neigh_id);
-    inter_coef = Vector3(I_x0, I_x0, I_x0);
-    return I_x0;
+#ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
+  if (neigh_id != e_bound_inner_source) //при использовании трассировки сквозь границу, внутренняя грань определена до этого
+#endif
+  {
+    if (neigh_id < 0) {
+      Type I_x0 = illum::BoundaryConditions(neigh_id);
+      inter_coef = Vector3(I_x0, I_x0, I_x0);
+      return I_x0;
+    }
   }
 
   Vector3 &coef = inter_coef;

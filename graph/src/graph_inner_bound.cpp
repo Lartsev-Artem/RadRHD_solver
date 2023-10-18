@@ -30,13 +30,14 @@ int graph::trace_through_boundary::FindBoundCondOnInnerBoundary(int num_dir, con
                                                                 std::vector<IntId> &intersections) {
 
   std::vector<Ray_t> rays(outer_part.size());
-  intersections.assign(outer_part.size(), -1);
+  intersections.resize(outer_part.size());
 
   int k = 0;
   for (auto out : outer_part) {
-    const FaceCell &f = faces.find(out)->second;
-    rays[k].orig = GetCenterTriangle(f.face) - direction * (1e-4); //сдвиг чтобы не было самопересечения
-    rays[k].direction = -direction;                                //ищем обратное пересечение
+    const FaceCell f = faces.find(out)->second;
+    Vector3 center = (f.face.A + f.face.B + f.face.C) / 3.;
+    rays[k].orig = center - direction * (1e-4); //сдвиг чтобы не было самопересечения
+    rays[k].direction = -direction;             //ищем обратное пересечение
     k++;
   }
 
@@ -46,19 +47,31 @@ int graph::trace_through_boundary::FindBoundCondOnInnerBoundary(int num_dir, con
 void graph::trace_through_boundary::SortInnerBoundary(const std::vector<IntId> &graph, IntersectBound_t &intersections) {
 
   size_t N = intersections.out_id_cell.size();
+
   std::vector<std::pair<int, int>> pairs(N);
   for (size_t i = 0; i < N; i++) {
-    pairs[i] = std::make_pair(graph[intersections.out_id_cell[i]], intersections.code[i]);
+    pairs[i] = std::make_pair(intersections.out_id_cell[i], intersections.code[i]);
   }
 
-  std::sort(pairs.begin(), pairs.end(),
-            [](std::pair<int, int> &a, std::pair<int, int> &b) {
-              return a.first < b.first;
-            });
-
-  for (size_t i = 0; i < N; i++) {
-    intersections.code[i] = pairs[i].second;
+  // переупорядочивание определяющих граней на внутренней границе в соответствии с их порядком в решении
+  std::vector<int> buf(N, 0);
+  int pos = 0;
+  for (auto num_cell : graph) {
+    for (size_t j = 0; j < N; j++) {
+      if (num_cell == pairs[j].first) {
+        intersections.code[pos++] = pairs[j].second;
+        break;
+      }
+    }
   }
+
+#if 0 // def DEBUG
+  for (int i = 0; i < N; i++)
+    for (int j = 0; j < N; j++) {
+      DIE_IF(intersections.out_id_cell[i] == intersections.code[j] / 4); //ячейка не должна определяться сама на себя
+    }
+
+#endif
 }
 
 #endif //! MAKE_TRACE

@@ -8,6 +8,7 @@
 #include "reader_bin.h"
 #include "reader_txt.h"
 #include "writer_bin.h"
+#include "writer_txt.h"
 
 #include "graph_calc.h"
 #include "graph_init_state.h"
@@ -106,15 +107,6 @@ int graph::RunGraphModule() {
       int cur_ret = FindCurFront(next_step_el, count_in_face, count_def_face, cur_el);
 #endif // GRID_WITH_INNER_BOUNDARY
 
-      // if (cur_ret != e_completion_success) {
-      //   WRITE_LOG("Warning proc: %d, dir= %d, processed %d cells", myid, cur_direction, count_graph);
-
-      //   if (TryRestart(count_in_face, count_def_face, outer_part, cur_el, next_step_el) == e_completion_success) {
-      //     WRITE_LOG("\n\n Warning!!! try_restart %d \n\n", cur_direction);
-      //     continue;
-      //   }
-      // }
-
       NewStep(neighbours, count_in_face, cur_el, count_def_face, next_step_el);
 
       for (auto el : cur_el) {
@@ -141,7 +133,7 @@ int graph::RunGraphModule() {
 
 #if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA
     trace_through_boundary::SortInnerBoundary(graph, intersections);
-    if (files_sys::bin::WriteSimple(glb_files.trace_address + F_RES + std::to_string(cur_direction) + ".bin", intersections.code)) {
+    if (files_sys::bin::WriteSimple(glb_files.graph_address + F_RES + std::to_string(cur_direction) + ".bin", intersections.code)) {
       RETURN_ERR("file_res is not opened for writing\n");
     }
 #endif

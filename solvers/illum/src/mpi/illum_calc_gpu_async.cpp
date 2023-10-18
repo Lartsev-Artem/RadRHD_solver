@@ -1,4 +1,4 @@
-#if defined ILLUM && defined SOLVERS && !defined USE_MPI && defined USE_CUDA
+#if defined ILLUM && defined SOLVERS && defined USE_MPI && defined USE_CUDA
 #include "illum_calc_gpu_async.h"
 
 #include "illum_params.h"
@@ -152,8 +152,9 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
     const int count_directions = grid_direction.size;
 
-#pragma omp parallel default(none) firstprivate(count_directions, n_illum, myid, np, local_disp, local_size) \
-    shared(sorted_id_cell, neighbours, face_states, vec_x0, vec_x, grid, norm, disp_illum, section_1, section_2)
+#pragma omp parallel default(none) firstprivate(count_directions, n_illum, myid, np, local_disp, local_size)     \
+    shared(sorted_id_cell, neighbours, face_states, vec_x0, vec_x, grid, norm, disp_illum, section_1, section_2, \
+           inner_bound_code)
     {
 #pragma omp single
       {
@@ -175,7 +176,7 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
       for (int num_direction = 0; num_direction < section_1.size; ++num_direction) {
 
         const cell_local *X0_ptr = vec_x0[num_direction].data(); ///< индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
-
+        const IntId *code_bound = inner_bound_code[num_direction].data();
         /*---------------------------------- далее FOR по ячейкам----------------------------------*/
         for (int h = 0; h < count_cells; ++h) {
 
@@ -192,7 +193,18 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
             // если эта грань входящая и граничная, то пропускаем её
             if (CHECK_BIT(face_states[num_direction][num_cell], num_out_face) == e_face_type_in) {
               if (neigh_id < 0) {
+#ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
+                Type I0;
+                if (neigh_id == e_bound_inner_source) {
+                  Vector3 I_def = *code_bound >= 0 ? (*inter_coef)[*code_bound] : Vector3::Zero(); //т.е. определять будет ячейка, а не геометрия
+                  I0 = illum::BoundaryConditions(neigh_id, *code_bound, I_def);
+                  code_bound++;
+                } else {
+                  I0 = illum::BoundaryConditions(neigh_id);
+                }
+#else
                 Type I0 = illum::BoundaryConditions(neigh_id);
+#endif
                 (*inter_coef)[face_block_id + num_out_face] = Vector3(I0, I0, I0); //значение на грани ( или коэффициенты интерполяции)
               }
               continue;
@@ -242,6 +254,8 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
       for (int num_direction = section_1.size; num_direction < local_size; num_direction++) {
 
         const cell_local *X0_ptr = vec_x0[num_direction].data(); ///< индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
+        const IntId *code_bound = inner_bound_code[num_direction].data();
+
         /*---------------------------------- далее FOR по ячейкам----------------------------------*/
         for (int h = 0; h < count_cells; ++h) {
 
@@ -258,7 +272,18 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
             // если эта грань входящая и граничная, то пропускаем её
             if (CHECK_BIT(face_states[num_direction][num_cell], num_out_face) == e_face_type_in) {
               if (neigh_id < 0) {
+#ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
+                Type I0;
+                if (neigh_id == e_bound_inner_source) {
+                  Vector3 I_def = *code_bound >= 0 ? (*inter_coef)[*code_bound] : Vector3::Zero(); //т.е. определять будет ячейка, а не геометрия
+                  I0 = illum::BoundaryConditions(neigh_id, *code_bound, I_def);
+                  code_bound++;
+                } else {
+                  I0 = illum::BoundaryConditions(neigh_id);
+                }
+#else
                 Type I0 = illum::BoundaryConditions(neigh_id);
+#endif
                 (*inter_coef)[face_block_id + num_out_face] = Vector3(I0, I0, I0); //значение на грани ( или коэффициенты интерполяции)
               }
               continue;

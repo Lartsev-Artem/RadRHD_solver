@@ -1,4 +1,4 @@
-#if defined SOLVERS && defined ILLUM && defined USE_MPI
+#if defined SOLVERS && defined ILLUM && !defined USE_MPI
 #include "illum_main.h"
 
 #include "global_types.h"
@@ -54,10 +54,13 @@ int illum::RunIllumModule() {
 
   cpu::CalculateIllumParam(grid_direction, grid);
 
+#ifdef USE_CUDA
+  cuda::interface::CudaWait();
+#endif
+
   files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
 
 #ifdef USE_CUDA
-  cuda::interface::CudaWait();
   cuda::interface::ClearDevice();
 #endif
 

@@ -1,4 +1,4 @@
-#if defined ILLUM && defined SOLVERS // && !defined USE_MPI
+#if defined ILLUM && defined SOLVERS && defined USE_MPI
 #include "illum_calc_cpu.h"
 
 #include "illum_params.h"
@@ -61,11 +61,19 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
             // если эта грань входящая и граничная, то пропускаем её
             if (CHECK_BIT(face_states[num_direction][num_cell], num_out_face) == e_face_type_in) {
               if (neigh_id < 0) {
-
-                Vector3 I_def = *code_bound >= 0 ? (*inter_coef)[*code_bound] : Vector3::Zero(); //т.е. определять будет ячейка, а не геометрия
-                Type I0 = illum::BoundaryConditions(neigh_id, *code_bound, I_def);
+#ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
+                Type I0;
+                if (neigh_id == e_bound_inner_source) {
+                  Vector3 I_def = *code_bound >= 0 ? (*inter_coef)[*code_bound] : Vector3::Zero(); //т.е. определять будет ячейка, а не геометрия
+                  I0 = illum::BoundaryConditions(neigh_id, *code_bound, I_def);
+                  code_bound++;
+                } else {
+                  I0 = illum::BoundaryConditions(neigh_id);
+                }
+#else
+                Type I0 = illum::BoundaryConditions(neigh_id);
+#endif
                 (*inter_coef)[num_cell * CELL_SIZE + num_out_face] = Vector3(I0, I0, I0); //значение на грани ( или коэффициенты интерполяции)
-                code_bound++;
               }
               continue;
             }

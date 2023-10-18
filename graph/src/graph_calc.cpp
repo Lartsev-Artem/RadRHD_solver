@@ -103,6 +103,7 @@ int graph::FindCurFrontWithHole(const Vector3 &direction,
           cur_front.push_back(cell_id);
           outer_part.erase(cell_id);
           count_def_face[cell_id]++;
+          // WRITE_LOG("bound id %d %d %d\n", trace.id[0], trace.id[1], trace.id[2]);
           continue;
         }
       }

@@ -1,4 +1,4 @@
-#if defined SOLVERS && defined ILLUM && !defined USE_MPI
+#if defined SOLVERS && defined ILLUM && defined USE_MPI
 #include "illum_main.h"
 
 #include "global_types.h"
