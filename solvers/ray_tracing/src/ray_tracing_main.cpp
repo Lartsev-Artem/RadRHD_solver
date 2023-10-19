@@ -15,9 +15,11 @@ namespace tick = std::chrono;
 
 int ray_tracing::RunRayTracing(const std::string &file_energy) {
 
-  if (get_mpi_id() != 0) {
-    return e_completion_success;
-  }
+  // if (get_mpi_id() != 0) {
+  //   return e_completion_success;
+  // }
+  int myid = get_mpi_id();
+  int np = get_mpi_np();
 #ifdef USE_VTK
   {
     vtkSmartPointer<vtkUnstructuredGrid> grid;
@@ -37,7 +39,7 @@ int ray_tracing::RunRayTracing(const std::string &file_energy) {
 
   auto start_clock = tick::steady_clock::now();
 
-  for (int i = 0; i < k_number_of_frame; i++) {
+  for (int i = myid; i < k_number_of_frame; i += np) {
     MakeRays(i, rays);
     cuda::ray_tracing::interface::StartTracing(rays, intersections);
     files_sys::bin::WriteSimple(glb_files.trace_address + F_RAY_TRACE + std::to_string(i) + ".bin", intersections);
@@ -47,11 +49,17 @@ int ray_tracing::RunRayTracing(const std::string &file_energy) {
 
   WRITE_LOG("Tracing end %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 
-  // MakeEnergyAndCurve(file_energy);
-  MakeIllumAndCurve(file_energy);
+  MPI_BARRIER(MPI_COMM_WORLD);
+
+  /// \todo там надо gather для кривой и все
+  if (myid == 0) {
+    // MakeEnergyAndCurve(file_energy);
+    MakeIllumAndCurve(file_energy);
+  }
 
   WRITE_LOG("Make energy end %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 
+  MPI_BARRIER(MPI_COMM_WORLD);
   return e_completion_success;
 }
 #endif ///! USE_CUDA

@@ -28,7 +28,6 @@ int main(int argc, char *argv[]) {
 #ifdef ILLUM
   graph::RunGraphModule();
   trace::RunTracesModule();
-
   illum::additional_direction::PreBuildAddDirections(ray_tracing::k_number_of_frame);
 
   if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))

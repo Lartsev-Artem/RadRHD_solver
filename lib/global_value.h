@@ -34,14 +34,33 @@ const Vector3 kCenterPoint(10, 0, 0);    ///< центр внутренней с
 constexpr double kInternalRadius = 0.12; ///< радиус внутренней сферы (с запасом)
 #endif
 
+#if 1 //СГС
+
+constexpr double kC_Light = 3 * 1e10;                     ///<скорость света в м/c
+constexpr double kC_LightInv = (1.0 / (kC_Light));        ///< обратная величина к скорости света
+constexpr double kR_gas = 83144626.1815324;               ///< газовая постоянная [ Дж/(моль*К)]
+constexpr double kH_plank = 6.62 * 1e-27;                 ///< постоянная Планка[кг * м^2 /с]
+constexpr double k_boltzmann = 1.3807 * 1e-16;            ///< постоянная Больцмана[Дж/K] = [ кг*м^2/(с^2*T)]
+constexpr double kSigma_thomson = 6.65210 * 1e-25;        ///< сечение томсоновского рассеяния [m^2]
+constexpr double kM_hydrogen = 1.6735575 * 1e-24;         ///< масса водорода[кг]
+constexpr double kDistAccretor = 3.88190065213158 * 1e10; ///< характерное расстояние
+
+#else //СИ
+
+constexpr double kC_Light = 299792458.0;           ///<скорость света в м/c
+constexpr double kC_LightInv = (1.0 / (kC_Light)); ///< обратная величина к скорости света
+constexpr double kR_gas = 8.314;                   ///< газовая постоянная [ Дж/(моль*К)]
+constexpr double kH_plank = 6.62 * 1e-34;          ///< постоянная Планка[кг * м^2 /с]
+constexpr double k_boltzmann = 1.38 * 1e-23;       ///< постоянная Больцмана[Дж/K] = [ кг*м^2/(с^2*T)]
+constexpr double kSigma_thomson = 6.65210 * 1e-29; ///< сечение томсоновского рассеяния [m^2]
+constexpr double kM_hydrogen = 1.6735575 * 1e-27;  ///< масса водорода[кг]
+#endif
+
 constexpr double kEarthMass = (5.9722 * 1e25); ///< масса Земли в кг
 constexpr double kSunMass = (1.9891 * 1e31);   ///< масса Солнца в кг
 
 constexpr double kDistSun = (149.6 * 10e9); ///< расстояние до Солнца в м
 constexpr double kDistMoon = 400000000.;    ///<расстояние до Луны в м
-
-constexpr double kC_Light = 299792458.0;           ///<скорость света в м/c
-constexpr double kC_LightInv = (1.0 / (kC_Light)); ///< обратная величина к скорости света
 
 constexpr double kDist = 1e6;          ///< характерное расстояние
 constexpr double kMass = (1 * 1e21);   ///< характерная масса
@@ -56,12 +75,6 @@ constexpr double kTime = (kDist / kVelocity); ///< характерное вре
 constexpr double kDensity = (3.34 * 10e-14);                                  ///< характерная плотность
 constexpr double kPressure = (kDensity * kVelocity * kVelocity);              ///< характерное давление
 constexpr double kRadiation = (kDensity * kVelocity * kVelocity * kVelocity); ///< характерное излучение
-
-constexpr double kR_gas = 8.314;                  ///< газовая постоянная [ Дж/(моль*К)]
-constexpr double kH_plank = 6.62 * 1e-34;         ///< постоянная Планка[кг * м^2 /с]
-constexpr double k_boltzmann = 1.38 * 1e-23;      ///< постоянная Больцмана[Дж/K] = [ кг*м^2/(с^2*T)]
-constexpr double kSigma_thomson = 6.652 * 1e-29;  ///< сечение томсоновского рассеяния [m^2]
-constexpr double kM_hydrogen = 1.6735575 * 1e-27; ///< масса водорода[кг]
 
 //--------------------------Файлы управления---------------//
 #define F_SET "settings_file.txt"

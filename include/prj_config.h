@@ -35,7 +35,7 @@
 #define MAIN_ELLIPSE 8
 /*=======================================================*/
 
-#define GEOMETRY_TYPE TEST_ELLIPSE // Sphere
+#define GEOMETRY_TYPE MAIN_ELLIPSE // Sphere
 
 #if !defined CLASTER
 #if !__NVCC__

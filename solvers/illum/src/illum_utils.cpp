@@ -39,12 +39,13 @@ Type illum::BoundaryConditions(const int type_bound, const int type_obj, const V
       D_LD;
 
     case e_ray_intersect_disk:
-      return 3;
+      return 0;
 
     case e_ray_intersect_sphere:
-      return 10;
+      return 1e12;
 
     default:
+      return 0;
       Vector3 copy(inter_coef);
       return GetIllumeFromInFace(0, copy); //значение на ячейке (код не не границы)
     }
@@ -98,8 +99,8 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
 
   case e_grid_cfg_radiation: // test task
   {
-#if GEOMETRY_TYPE == TEST_ELLIPSE
     Type S = int_scattering;
+#if GEOMETRY_TYPE == TEST_ELLIPSE
     Type Q = cell.illum_val.rad_en_loose_rate; // Q=alpha*Ie
     Type alpha = cell.illum_val.absorp_coef;
     Type betta = alpha / 2; // просто из головы
@@ -107,11 +108,11 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     return std::max(0.0, GetI(s, Q, S, I_0, alpha + betta, betta));
 #elif GEOMETRY_TYPE == MAIN_ELLIPSE
 
-    const Type ss = s * 388189 * 1e5;          // числа --- переход к размерным параметрам
+    const Type ss = s * kDistAccretor;         // числа --- переход к размерным параметрам
     Type Q = cell.illum_val.rad_en_loose_rate; // Q=alpha*Ie
     Type alpha = cell.phys_val.d * cell.illum_val.absorp_coef;
-
-    return std::max(0.0, GetI(ss, Q, 0, I_0, alpha, 0));
+    Type betta = cell.phys_val.d * (kSigma_thomson / kM_hydrogen);
+    return std::max(0.0, GetI(s, Q, S, I_0, alpha + betta, betta));
     // I = I_0 * exp(-alpha * ss) + Q * (1 - exp(-alpha * ss)) / alpha;
     // I = I_0 * (1 - alpha * ss) + Q * ss;
 #else
