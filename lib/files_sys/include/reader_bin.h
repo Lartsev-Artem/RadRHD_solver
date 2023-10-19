@@ -58,6 +58,38 @@ size_t ReadSimple(const std::string &name_file, std::vector<T> &data) {
 }
 
 /**
+ * @brief Чтение бинарного файла
+ *
+ * @tparam T - тип данных
+ * @param[in] name_file полное имя файла с расширением
+ * @param[out] data массив T*
+ * @note Файл должен содержать в первой строке число элементов. Далее
+ * последовательные данные.
+ * @warning размер типа данных должен соответствовать данным в файле
+ * @return size_t - ::e_type_completion
+ * @warning Память для массива data должна быть выделена заранее
+ */
+template <typename T>
+size_t ReadSimple(const std::string &name_file, T *data) {
+  FILE *f;
+  OPEN_FILE(f, name_file.c_str(), "rb");
+
+  int n;
+  if (fread(&n, sizeof(int), 1, f) != 1) {
+    return e_completion_fail;
+  }
+  // data.resize(n);
+  if (fread(data, sizeof(T), n, f) != n) {
+    return e_completion_fail;
+  }
+
+  fclose(f);
+
+  // WRITE_LOG("Read %s success\n", name_file.c_str());
+  return e_completion_success;
+}
+
+/**
  * @brief Чтение геометрии элементов сетки
  *
  * @tparam geo_elem - структура, содержащая поле "geo"

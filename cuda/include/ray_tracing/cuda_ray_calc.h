@@ -59,7 +59,7 @@ __global__ void InnerRayTracing(const int M, const Ray *rays, const int N, const
  * @param[out] intersections коды пересечений для каждого луча
  * @return __global__ use cudaGetLastError
  */
-__global__ void cuda::ray_tracing::RayTracingGrid(const int M, const Ray *rays, const int N, const Face *triangles, int *intersections);
+__global__ void RayTracingGrid(const int M, const Ray *rays, const int N, const Face *triangles, int *intersections);
 
 } // namespace cuda::ray_tracing
 #endif //! CUDA_RAY_CALC_H

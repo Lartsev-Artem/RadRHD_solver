@@ -47,7 +47,8 @@ int ray_tracing::RunRayTracing(const std::string &file_energy) {
 
   WRITE_LOG("Tracing end%lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 
-  MakeEnergyAndCurve(file_energy);
+  // MakeEnergyAndCurve(file_energy);
+  MakeIllumAndCurve(file_energy);
 
   WRITE_LOG("Make energy end%lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 

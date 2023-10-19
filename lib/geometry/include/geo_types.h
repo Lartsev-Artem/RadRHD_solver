@@ -89,6 +89,7 @@ struct grid_directions_t {
   int loc_shift;
   std::vector<direction_s> directions;
   Type full_area;
+  grid_directions_t(const int N = 0) : size(N), directions(N) {}
 };
 
 //это узлы интерполяции на гранях

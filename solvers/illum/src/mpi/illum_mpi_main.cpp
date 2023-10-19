@@ -2,6 +2,7 @@
 #include "illum_main.h"
 
 #include "global_types.h"
+#include "illum_add_dir.h"
 #include "illum_calc_gpu_async.h"
 #include "illum_init_data.h"
 
@@ -69,6 +70,10 @@ int illum::RunIllumModule() {
 
   if (get_mpi_id() == 0) {
     files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
+    if (_solve_mode.max_number_of_iter > 1) //иначе интеграл рассеяния не расчитывался
+    {
+      additional_direction::SaveInterpolationScattering(glb_files.add_dir_address, grid);
+    }
   }
 
 #ifdef USE_CUDA

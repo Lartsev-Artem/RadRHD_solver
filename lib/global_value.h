@@ -105,6 +105,12 @@ constexpr double kM_hydrogen = 1.6735575 * 1e-27; ///< масса водород
 #define F_CENTER_FACE "center_face.bin"
 #define F_SURFACE "surface.bin"
 
+//--------------------------Файлы сферы направлений-----------------------------//
+#define F_DIRECTION_GRID "grid_direction.txt"
+#define F_ADDITIONAL_DIRECTION_GRID "add_direction.txt"
+#define F_DIRECTION_INTERPOLATION "direction_interpolation.bin" ///< номера ячеек на сфере направлений для переинтерполяции на картинную плоскость
+#define F_SURFACE_SPHERE_DIRECTION "surface_grid_direction.bin" ///< ячейки на поверхности сфер направлений
+
 //--------------------------Файлы решение-------------------------------//
 #define F_SOLVE "Solve" // задается в настройках
 
@@ -118,6 +124,8 @@ constexpr double kM_hydrogen = 1.6735575 * 1e-27; ///< масса водород
 #define F_IMPULS "impuls.bin"
 #define F_DIVSTREAM "divstream.bin"
 #define F_DIVIMPULS "divimpuls.bin"
+
+#define F_SCATTERING "int_scatter"
 
 #if GEOMETRY_TYPE == TEST_ELLIPSE
 #define F_ABSORPCOEF "alpha.bin"

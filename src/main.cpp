@@ -8,6 +8,9 @@
 
 #include "solvers_struct.h"
 
+#include "illum_add_main.h"
+#include "illum_add_prebuild.h"
+#include "ray_tracing_const.h"
 #include "ray_tracing_main.h"
 #include "rhllc_main.h"
 
@@ -25,12 +28,19 @@ int main(int argc, char *argv[]) {
 #ifdef ILLUM
   graph::RunGraphModule();
   trace::RunTracesModule();
+
+  illum::additional_direction::PreBuildAddDirections(ray_tracing::k_number_of_frame);
+  if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
+    return e_completion_fail;
+
   illum::RunIllumModule();
 
 // GDB_ATTACH;
 #endif
 
+  illum::additional_direction::RunModule();
   // ray_tracing::RunRayTracing(glb_files.solve_address + "0" + F_ENERGY);
+  ray_tracing::RunRayTracing(glb_files.add_dir_address + F_ILLUM);
 
   //  rhllc::RunRhllcModule();
 

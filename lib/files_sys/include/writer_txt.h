@@ -12,6 +12,8 @@
 #include <typeinfo>
 #include <vector>
 
+#include "geo_types.h"
+
 /*! \addtogroup file_sys Файловый модуль
     @{
 */
@@ -28,7 +30,7 @@ namespace txt {
  * @param[in] data массив std::vector
  * @note  Файл содержит в первой строке число элементов. Далее последовательные
  * данные
- * @return size_t ::e_type_completion
+ * @return int ::e_type_completion
  */
 template <typename Str_Type, typename stdT>
 int WriteSimple(const Str_Type name_file, const stdT &data) {
@@ -48,6 +50,15 @@ int WriteSimple(const Str_Type name_file, const stdT &data) {
   ofile.close();
   return e_completion_success;
 }
+
+/**
+ * @brief
+ *
+ * @param[in] file_sphere_direction полное имя файла с расширением
+ * @param[in] grid_direction сетка сферы направлений
+ * @return int ::e_type_completion
+ */
+int WriteSphereDirectionCartesian(const std::string &file_sphere_direction, const grid_directions_t &grid_direction);
 
 } // namespace txt
 } // namespace files_sys

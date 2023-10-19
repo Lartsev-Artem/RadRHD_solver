@@ -267,4 +267,34 @@ int BuildDataFromVTK(const global_files_t &glb_files) {
   return e_completion_success;
 }
 
+int BuildSphereDirection(const std::string &sphere_vtk_grid, const std::string &out_address) {
+
+  vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
+
+  if (files_sys::vtk::Read(sphere_vtk_grid, grid))
+    RETURN_ERR("Error reading file vtk %s\n", sphere_vtk_grid.c_str());
+
+  std::vector<Type> areas;
+  std::vector<Vector3> centers;
+  std::vector<Face> faces;
+
+  GetVolume2D(grid, areas);
+  GetCentersOfCells2D(grid, centers);
+  GetCellsPointsSurface(grid, faces);
+
+  grid_directions_t grid_dir(grid->GetNumberOfCells());
+
+  grid_dir.full_area = 0;
+  for (int i = 0; i < grid_dir.size; i++) {
+    grid_dir.directions[i].area = areas[i];
+    grid_dir.directions[i].dir = centers[i].normalized(); //у единичной сферы начало направления- точка (0,0,0)
+    grid_dir.full_area += areas[i];
+  }
+
+  if (files_sys::txt::WriteSphereDirectionCartesian(out_address + F_DIRECTION_GRID, grid_dir))
+    return e_completion_fail;
+
+  return files_sys::bin::WriteSimple(out_address + F_SURFACE_SPHERE_DIRECTION, faces);
+}
+
 #endif //! USE_VTK

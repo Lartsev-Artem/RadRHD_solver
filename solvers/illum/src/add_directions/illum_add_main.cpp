@@ -1,10 +1,13 @@
-#if defined SOLVERS && defined ILLUM && !defined USE_MPI
-#include "illum_main.h"
+#if defined SOLVERS && defined ILLUM
+#include "illum_add_main.h"
+#include "global_value.h"
 
 #include "global_types.h"
 #include "illum_add_dir.h"
 #include "illum_calc_cpu.h"
 #include "illum_init_data.h"
+
+#include "convert_face_to_cell.h"
 
 #include "reader_bin.h"
 #include "reader_txt.h"
@@ -12,11 +15,14 @@
 
 #include "cuda_interface.h"
 
-int illum::RunIllumModule() {
+int illum::additional_direction::RunModule() {
 
-  if (get_mpi_id() != 0) {
-    return e_completion_success;
-  }
+  //переключаемся на новую сферу направлений
+  glb_files.name_file_sphere_direction = glb_files.add_dir_address + F_ADDITIONAL_DIRECTION_GRID;
+  glb_files.illum_geo_address = glb_files.add_dir_address;
+  glb_files.graph_address = glb_files.add_dir_address;
+  glb_files.Build();
+
   grid_t grid;
   grid_directions_t grid_direction;
 
@@ -47,27 +53,27 @@ int illum::RunIllumModule() {
   }
 
 #ifdef USE_CUDA
-  cuda::interface::InitDevice(glb_files.base_address, grid_direction, grid);
+  grid.Illum = new Type[grid_direction.loc_size * grid.size * CELL_SIZE];
+  grid.scattering = new Type[grid_direction.loc_size * grid.size];
 #endif
 
-  cpu::CalculateIllum(grid_direction, face_states, neighbours, inner_bound_code,
-                      vec_x0, vec_x, sorted_id_cell, grid);
+  int loc_dir = 0;
+  for (size_t i = grid_direction.loc_shift; i < grid_direction.loc_shift + grid_direction.loc_size; i++, loc_dir++) {
+    files_sys::bin::ReadSimple(glb_files.add_dir_address + F_SCATTERING + std::to_string(i) + ".bin", &grid.scattering[loc_dir * grid.size]);
+  }
 
-  cpu::CalculateIllumParam(grid_direction, grid);
+  cpu::CalculateAdditionalIllum(grid_direction, face_states, neighbours, inner_bound_code,
+                                vec_x0, vec_x, sorted_id_cell, grid);
 
-#ifdef USE_CUDA
-  cuda::interface::CudaWait();
-#endif
-
-  files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
-
-  if (_solve_mode.max_number_of_iter > 1) //иначе интеграл рассеяния не расчитывался
-  {
-    additional_direction::SaveInterpolationScattering(glb_files.add_dir_address, grid);
+  std::vector<Type> illum(grid.size);
+  for (int i = 0; i < grid_direction.loc_size; i++) {
+    GetDirectionDataFromFace(grid.size, i, grid.Illum, 0.0, illum);
+    files_sys::bin::WriteSimple(glb_files.add_dir_address + F_ILLUM + std::to_string(grid_direction.loc_shift + i) + ".bin", illum);
   }
 
 #ifdef USE_CUDA
-  cuda::interface::ClearDevice();
+  delete[] grid.Illum;
+  delete[] grid.scattering;
 #endif
 
   return e_completion_success;

@@ -24,6 +24,15 @@ namespace ray_tracing {
  */
 int MakeEnergyAndCurve(const std::string &file_energy);
 
+/**
+ * @brief Функция заполняет шаблон картиной плоскости и считает кривую блеска
+ *
+ * @param[in] base_file_illum шаблон файла в формате path\file{i}.bin с распределением излучения на исходной сетки
+ * @return int ::e_type_completion
+ * @warning предварительно должна быть вызвана трассировка лучей и заполнены файловые структуры
+ */
+int MakeIllumAndCurve(const std::string &base_file_illum);
+
 } // namespace ray_tracing
 
 #endif //! RAY_TRACING_CALC_ILLUM_H

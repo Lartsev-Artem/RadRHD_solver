@@ -8,5 +8,6 @@
     "name_file_sphere_direction": "/home/artem/projects/solver/tests/data/surface_126_dir.txt",
     "name_file_vtk": "/home/artem/projects/solver/tests/data/sphereR05.vtk",
     "solve_address": "/home/artem/projects/solver/build/Solve/Solve",
-    "solve_configuration": "/home/artem/projects/solver/config/solve_cfg.json"
+    "solve_configuration": "/home/artem/projects/solver/config/solve_cfg.json",
+    "add_dir_address": "/home/artem/projects/solver/build/add_dir/"
 }

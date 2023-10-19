@@ -87,7 +87,7 @@ int GetInterBoundaryFacesOfSphere(const vtkSmartPointer<vtkUnstructuredGrid> &un
  * @return int ::e_type_completion
  */
 int GetBoundaryFacesId(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<IntId> &boundary_faces);
-#if NUMBER_OF_MEASUREMENTS == 3
+// #if NUMBER_OF_MEASUREMENTS == 3
 
 /**
  * @brief Функция находит всех соседей 3d сетки (без привязки к геометрии)
@@ -148,7 +148,7 @@ int GetCentersOfFaces3D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured
  * @return int ::e_type_completion
  */
 int GetVertexMatrix(const size_t number_cell, const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, Eigen::Matrix4d &vertex_tetra);
-#elif
+// #else
 
 /**
  * @brief Функция находит всех соседей 2d сетки (без привязки к геометрии)
@@ -187,7 +187,16 @@ int GetVolume2D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, s
  * @return int ::e_type_completion
  */
 int GetCentersOfCells2D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<Vector3> &centers);
-#endif // NUMBER_OF_MEASUREMENTS
+
+/**
+ * @brief Функция возвращает ячейки сетки - поверхности
+ *
+ * @param[in] unstructured_grid сетка поверхности в формате vtk
+ * @param[out] faces ячейки на поверхности
+ * @return int ::e_type_completion
+ */
+int GetCellsPointsSurface(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<Face> &faces);
+// #endif // NUMBER_OF_MEASUREMENTS
 
 #endif // USE_VTK
 #endif //! CONVERT_VTK_GEO_H

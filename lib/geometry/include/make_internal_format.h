@@ -12,6 +12,8 @@
 
 int BuildDataFromVTK(const global_files_t &glb_files);
 
+int BuildSphereDirection(const std::string &sphere_vtk_grid, const std::string &out_address);
+
 #endif
 
 #endif //! MAKE_INTERNAL_FORMAT_H

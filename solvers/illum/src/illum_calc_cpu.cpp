@@ -153,7 +153,7 @@ void illum::cpu::CalculateIllumParam(const grid_directions_t &grid_direction, gr
 #endif
 }
 
-int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction, const std::vector<IntId> &scat_interpolation_id,
+int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction,
                                          const std::vector<std::vector<bits_flag_t>> &face_states,
                                          const std::vector<IntId> &neighbours, const std::vector<std::vector<IntId>> &inner_bound_code,
                                          const std::vector<std::vector<cell_local>> &vec_x0, std::vector<BasePointTetra> &vec_x,
@@ -162,10 +162,10 @@ int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction
   auto start_clock = tick::steady_clock::now();
 
   /*---------------------------------- далее FOR по направлениям----------------------------------*/
-  const int shift_directions = grid_direction.loc_shift;
-  const int end_directions = grid_direction.loc_shift + grid_direction.loc_size;
 
-#pragma omp parallel default(none) firstprivate(shift_directions, end_directions) shared(sorted_id_cell, neighbours, face_states, inner_bound_code, vec_x0, vec_x, grid, norm)
+  const int size_directions = grid_direction.loc_size;
+
+#pragma omp parallel default(none) firstprivate(size_directions) shared(sorted_id_cell, neighbours, face_states, inner_bound_code, vec_x0, vec_x, grid)
   {
     const int count_cells = grid.size;
 
@@ -173,7 +173,7 @@ int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction
     std::vector<Vector3> *inter_coef = &grid.inter_coef_all[omp_get_thread_num()]; ///< указатель на коэффициенты интерполяции по локальному для потока направлению
 
 #pragma omp for
-    for (int num_direction = shift_directions; num_direction < end_directions; ++num_direction) {
+    for (int num_direction = 0; num_direction < size_directions; ++num_direction) {
 
       const cell_local *X0_ptr = vec_x0[num_direction].data(); ///< индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
       const IntId *code_bound = inner_bound_code[num_direction].data();
@@ -217,8 +217,7 @@ int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction
 
             Type I_x0 = GetIllumeFromInFace(neighbours[num_cell * CELL_SIZE + num_in_face], (*inter_coef)[num_cell * CELL_SIZE + num_in_face]);
 
-            int scat_dir = scat_interpolation_id[num_direction]; // переинтерполяция интеграла рассеяния
-            I[num_node] = GetIllum(x, X0_ptr->s, I_x0, grid.scattering[scat_dir * count_cells + num_cell], *cell);
+            I[num_node] = GetIllum(x, X0_ptr->s, I_x0, grid.scattering[num_direction * count_cells + num_cell], *cell);
 
             X0_ptr++;
           } // num_node
