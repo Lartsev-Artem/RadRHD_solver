@@ -18,9 +18,6 @@ int main(int argc, char *argv[]) {
 
   MPI_START(argc, argv);
 
-  remove((Files_log + std::to_string(get_mpi_id()) + ".txt").c_str());
-  remove(Files_log);
-
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";
   if (argc > 1)
     file_config = argv[1];
@@ -33,6 +30,7 @@ int main(int argc, char *argv[]) {
   trace::RunTracesModule();
 
   illum::additional_direction::PreBuildAddDirections(ray_tracing::k_number_of_frame);
+
   if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
     return e_completion_fail;
 

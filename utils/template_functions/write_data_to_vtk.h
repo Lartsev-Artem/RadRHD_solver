@@ -12,10 +12,10 @@
 #include <vtkDoubleArray.h>
 
 namespace utils {
-typedef int data_type;
+// typedef double data_type;
 
-template <typename file>
-int WriteDataToGrid(file name_file_grid, file name_file_data, file name_file_output, file name_data) {
+template <typename file, typename data_type>
+int WriteDataToGrid(file name_file_grid, file name_file_data, file name_file_output, file name_data, data_type type_example) {
 
   vtkSmartPointer<vtkUnstructuredGrid> unstructured_grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
 

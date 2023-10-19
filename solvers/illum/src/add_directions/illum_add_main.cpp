@@ -55,6 +55,8 @@ int illum::additional_direction::RunModule() {
 #ifdef USE_CUDA
   grid.Illum = new Type[grid_direction.loc_size * grid.size * CELL_SIZE];
   grid.scattering = new Type[grid_direction.loc_size * grid.size];
+  memset(grid.Illum, 0.0, sizeof(Type) * grid_direction.loc_size * grid.size * CELL_SIZE);
+  memset(grid.scattering, 0.0, sizeof(Type) * grid_direction.loc_size * grid.size);
 #endif
 
   int loc_dir = 0;
