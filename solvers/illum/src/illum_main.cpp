@@ -1,4 +1,4 @@
-#if defined SOLVERS && defined ILLUM && !defined USE_MPI
+#if defined SOLVERS && defined ILLUM
 #include "illum_main.h"
 
 #include "global_types.h"
@@ -63,10 +63,11 @@ int illum::RunIllumModule() {
 
   if (_solve_mode.max_number_of_iter > 1) //иначе интеграл рассеяния не расчитывался
   {
-    additional_direction::SaveInterpolationScattering(glb_files.add_dir_address, grid);
+    additional_direction::SaveInterpolationScattering(glb_files.add_dir_address, grid_direction, grid);
   }
 
 #ifdef USE_CUDA
+  cuda::interface::ClearHost(grid);
   cuda::interface::ClearDevice();
 #endif
 

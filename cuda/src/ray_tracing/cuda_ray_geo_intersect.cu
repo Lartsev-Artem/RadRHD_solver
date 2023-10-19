@@ -24,12 +24,12 @@ __device__ Type ray::Rosh(const Ray &ray, Type t) {
   const Vector3 S = ray.orig;
 
   // wolfram
-  // constexpr Type max_potential = -1.82547; // потенциал роша
-  // constexpr Type m = 0.8795180722891566;
+  constexpr Type max_potential = -1.82547; // потенциал роша
+  constexpr Type m = 0.8795180722891566;
 
-  /// увеличена масса донора с 0.1М до 0.22 для полного затмения полярных областей расчётной области
-  constexpr Type max_potential = -1.9242410534319847; // потенциал роша
-  constexpr Type m = 0.7684210526315789;
+  // /// увеличена масса донора с 0.1М до 0.22 для полного затмения полярных областей расчётной области
+  // constexpr Type max_potential = -1.9242410534319847; // потенциал роша
+  // constexpr Type m = 0.7684210526315789;
 
   // математические расчёты
   Type x1 = S[0] + a[0] * t;

@@ -14,8 +14,12 @@ int illum::additional_direction::PreBuildAddDirections(const int add_directions_
   if (files_sys::txt::ReadSphereDirectionCartesian(glb_files.name_file_sphere_direction, grid))
     return e_completion_fail;
 
-  if (MakeDirectionReInterpolation(glb_files.base_address, glb_files.add_dir_address, add_directions_cnt, grid))
-    return e_completion_fail;
+  if (get_mpi_id() == 0) {
+    if (MakeDirectionReInterpolation(glb_files.base_address, glb_files.add_dir_address, add_directions_cnt, grid))
+      return e_completion_fail;
+  }
+
+  MPI_BARRIER(MPI_COMM_WORLD);
 
   // перенаправляем вывод в новый каталог
   glb_files.name_file_sphere_direction = glb_files.add_dir_address + F_ADDITIONAL_DIRECTION_GRID;

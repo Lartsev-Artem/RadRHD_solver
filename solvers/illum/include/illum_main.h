@@ -10,6 +10,6 @@
 namespace illum {
 
 int RunIllumModule();
-
+int RunIllumMpiModule();
 } // namespace illum
 #endif //! ILLUM_MAIN_H

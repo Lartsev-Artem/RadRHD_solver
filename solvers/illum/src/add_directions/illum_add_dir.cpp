@@ -85,12 +85,16 @@ int illum::additional_direction::MakeDirectionReInterpolation(const std::string 
   return files_sys::bin::WriteSimple(out_address + F_DIRECTION_INTERPOLATION, dir_intersection_id); //номера ячеек переинтерполяции для сетки направлений
 }
 
-void illum::additional_direction::SaveInterpolationScattering(const std::string &address_add_dir, const grid_t &grid) {
+void illum::additional_direction::SaveInterpolationScattering(const std::string &address_add_dir, const grid_directions_t &grid_dir, const grid_t &grid) {
   std::vector<int> interpolation_direction;
   if (files_sys::bin::ReadSimple(address_add_dir + F_DIRECTION_INTERPOLATION, interpolation_direction) == e_completion_success) {
+
     for (size_t i = 0; i < interpolation_direction.size(); i++) {
-      int dir = interpolation_direction[i];
-      files_sys::bin::WriteSimple(address_add_dir + F_SCATTERING + std::to_string(i) + ".bin", grid.size, &grid.scattering[dir * grid.size]);
+      int dir = interpolation_direction[i] - grid_dir.loc_shift;
+
+      if (dir >= 0 && dir < grid_dir.loc_size) {
+        files_sys::bin::WriteSimple(address_add_dir + F_SCATTERING + std::to_string(i) + ".bin", grid.size, &grid.scattering[dir * grid.size]);
+      }
     }
   }
 }

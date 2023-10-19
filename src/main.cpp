@@ -18,6 +18,9 @@ int main(int argc, char *argv[]) {
 
   MPI_START(argc, argv);
 
+  remove((Files_log + std::to_string(get_mpi_id()) + ".txt").c_str());
+  remove(Files_log);
+
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";
   if (argc > 1)
     file_config = argv[1];
@@ -33,12 +36,16 @@ int main(int argc, char *argv[]) {
   if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
     return e_completion_fail;
 
-  illum::RunIllumModule();
+  if (get_mpi_np() == 1) {
+    illum::RunIllumModule();
+  } else {
+    illum::RunIllumMpiModule();
+  }
 
-// GDB_ATTACH;
 #endif
 
   illum::additional_direction::RunModule();
+
   // ray_tracing::RunRayTracing(glb_files.solve_address + "0" + F_ENERGY);
   ray_tracing::RunRayTracing(glb_files.add_dir_address + F_ILLUM);
 

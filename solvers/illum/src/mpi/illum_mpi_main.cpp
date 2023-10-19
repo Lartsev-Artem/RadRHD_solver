@@ -12,7 +12,7 @@
 
 #include "cuda_interface.h"
 
-int illum::RunIllumModule() {
+int illum::RunIllumMpiModule() {
 
 #ifndef USE_CUDA
   D_LD;
@@ -70,14 +70,16 @@ int illum::RunIllumModule() {
 
   if (get_mpi_id() == 0) {
     files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
-    if (_solve_mode.max_number_of_iter > 1) //иначе интеграл рассеяния не расчитывался
-    {
-      additional_direction::SaveInterpolationScattering(glb_files.add_dir_address, grid);
-    }
+  }
+
+  if (_solve_mode.max_number_of_iter > 1) //иначе интеграл рассеяния не расчитывался
+  {
+    additional_direction::SaveInterpolationScattering(glb_files.add_dir_address, grid_direction, grid);
   }
 
 #ifdef USE_CUDA
   cuda::interface::ClearDevice();
+  cuda::interface::ClearHost(grid);
 #endif
 
   WRITE_LOG("end proc illum\n");

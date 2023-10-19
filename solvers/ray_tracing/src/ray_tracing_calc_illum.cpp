@@ -168,7 +168,7 @@ int ray_tracing::MakeIllumAndCurve(const std::string &base_file_illum) {
         break;
       }
 
-      curve_light[frame] += Illum_array[i];
+      curve_light[frame] += (Illum_array[i] * (k_width_plane / k_pixels_width) * (k_height_plane / k_pixels_height));
     }
 
     if (files_sys::bin::WriteSimple(glb_files.trace_address + F_IMAGE_PLANE + std::to_string(frame) + ".bin", Illum_array))
