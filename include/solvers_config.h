@@ -32,7 +32,8 @@
 #ifdef USE_MPI
 
 #ifdef ILLUM
-#define ILLUM_MPI ///< расчёт излучения с технологией MPI
+#define ILLUM_MPI            ///< расчёт излучения с технологией MPI
+#define ONLY_CUDA_SCATTERING ///< отключает весь расчет на видеокарте, кроме рассеяния
 #endif
 
 #ifdef HLLC

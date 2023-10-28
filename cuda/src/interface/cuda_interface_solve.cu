@@ -82,6 +82,7 @@ int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_d
 
 int cuda::interface::CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
 
+#ifndef ONLY_CUDA_SCATTERING
   const int N_loc = grid.loc_size;
 
   CUDA_TREADS_1D(threads);
@@ -98,6 +99,7 @@ int cuda::interface::CalculateAllParamAsync(const grid_directions_t &grid_dir, g
   CUDA_CALL_FUNC(cudaMemcpyAsync, grid.energy, device_host_ptr.energy, N_loc * sizeof(grid.energy[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
   CUDA_CALL_FUNC(cudaMemcpyAsync, grid.stream, device_host_ptr.stream, N_loc * sizeof(grid.stream[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
   CUDA_CALL_FUNC(cudaMemcpyAsync, grid.impuls, device_host_ptr.impuls, N_loc * sizeof(grid.impuls[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
+#endif
 #endif
 
   return e_completion_success;

@@ -47,7 +47,7 @@ int graph::RunGraphModule() {
   WRITE_LOG("Reading time graph prebuild %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
   WRITE_LOG("Inner boundary has %d faces\n", (int)inter_boundary_face_id.size());
 
-#ifdef GRID_WITH_INNER_BOUNDARY
+#if defined GRID_WITH_INNER_BOUNDARY && defined GRAPH_TRACING_INNER_BOUNDARY
 #ifdef USE_CUDA
   trace_through_boundary::IntersectBound_t intersections; //коды пересечений на внутренней границе
   trace_through_boundary::InitDevice();
@@ -84,7 +84,7 @@ int graph::RunGraphModule() {
 
     DivideInnerBoundary(direction, normals, inter_boundary_face_id, inner_part, outer_part);
 
-#if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA
+#if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA && defined GRAPH_TRACING_INNER_BOUNDARY
     trace_through_boundary::FindBoundCondOnInnerBoundary(cur_direction, direction, inter_faces, outer_part, intersections.code);
     intersections.out_id_cell.assign(outer_part.begin(), outer_part.end());
 #endif
@@ -131,7 +131,7 @@ int graph::RunGraphModule() {
       RETURN_ERR("file_graph is not opened for writing\n");
     }
 
-#if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA
+#if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA && defined GRAPH_TRACING_INNER_BOUNDARY
     trace_through_boundary::SortInnerBoundary(graph, intersections);
     if (files_sys::bin::WriteSimple(glb_files.graph_address + F_RES + std::to_string(cur_direction) + ".bin", intersections.code)) {
       RETURN_ERR("file_res is not opened for writing\n");
@@ -145,7 +145,7 @@ int graph::RunGraphModule() {
   bound_trace.clear();
   WRITE_LOG("Full graph time: %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 
-#if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA
+#if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA && defined GRAPH_TRACING_INNER_BOUNDARY
   trace_through_boundary::ClearDevice();
 #endif
   MPI_BARRIER(MPI_COMM_WORLD);

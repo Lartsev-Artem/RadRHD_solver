@@ -42,7 +42,7 @@ Type illum::BoundaryConditions(const int type_bound, const int type_obj, const V
       return 0;
 
     case e_ray_intersect_sphere:
-      return 1e12;
+      return 20;
 
     default:
       return 0;
@@ -66,16 +66,16 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
   case e_grid_cfg_static_illum: {
 
 #if GEOMETRY_TYPE == Sphere
-    Type Q = 1;
-    Type alpha = 2;
-    Type betta = 1;
+    Type Q = 10;
+    Type alpha = 10;
+    Type betta = 0;
     Type S = int_scattering;
 
-    if ((x - Vector3(0, 0, 0)).norm() > 0.09) // излучающий шар
+    if ((x - Vector3(0, 0, 0)).norm() > 0.3) // излучающий шар
     {
       Q = 0;
-      alpha = 0.5;
-      betta = 0.5;
+      alpha = 1;
+      betta = 0;
     }
     return std::max(0.0, GetI(s, Q, S, I_0, alpha + betta, betta));
 #endif

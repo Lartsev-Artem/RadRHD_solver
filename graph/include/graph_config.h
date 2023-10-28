@@ -13,6 +13,7 @@
 
 #include "prj_config.h"
 
+// #define GRAPH_TRACING_INNER_BOUNDARY ///< включать трассировку сквозь внутреннюю границу
 #define GRID_WITH_INNER_BOUNDARY ///< граф для сетки с внутренней границей (для оптимизации следует отключить, при использование сплошной сетки)
 
 #ifdef DEBUG

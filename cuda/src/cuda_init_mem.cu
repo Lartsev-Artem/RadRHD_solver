@@ -53,6 +53,7 @@ void cuda::InitGridOnDevice(const grid_t &grid_host,
   mem::Malloc(loc_size_dir * size_grid * sizeof(Type), &device_host_ptr.int_scattering);                                   //память на массив рассеяния внутри структуры сетки
   mem::CpyToDevice(&grid_device->int_scattering, &device_host_ptr.int_scattering, sizeof(device_host_ptr.int_scattering)); //указатель со стороны хоста в указатель на стороне карты
 
+#ifndef ONLY_CUDA_SCATTERING
   //дивергенция потока
   mem::Malloc(num_cell_loc * sizeof(Type), &device_host_ptr.divstream);                                     //память на массив дивергенций внутри структуры сетки
   mem::CpyToDevice(&grid_device->divstream, &device_host_ptr.divstream, sizeof(device_host_ptr.divstream)); //указатель со стороны хоста в указатель на стороне карты
@@ -86,6 +87,7 @@ void cuda::InitGridOnDevice(const grid_t &grid_host,
   mem::Malloc(num_cell_loc * sizeof(Matrix3), &device_host_ptr.impuls);                            //память на массив импульса внутри структуры сетки
   mem::CpyToDevice(&grid_device->impuls, &device_host_ptr.impuls, sizeof(device_host_ptr.impuls)); //указатель со стороны хоста в указатель на стороне карты
 
+#endif
 #endif
 }
 

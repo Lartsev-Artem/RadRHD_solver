@@ -32,7 +32,6 @@ int illum::RunIllumMpiModule() {
   uint32_t err = 0;
   err |= files_sys::bin::ReadSimple(glb_files.name_file_neigh, neighbours);
   err |= files_sys::txt::ReadSphereDirectionCartesian(glb_files.name_file_sphere_direction, grid_direction);
-  err |= files_sys::bin::ReadRadiationTrace(grid_direction.size, glb_files, vec_x, face_states, vec_x0, sorted_id_cell, inner_bound_code);
 
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, grid.faces);
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
@@ -57,6 +56,10 @@ int illum::RunIllumMpiModule() {
 
   gpu_async::InitSender(grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
   WRITE_LOG("Init mpi sender\n");
+
+  //перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
+  if (files_sys::bin::ReadRadiationTrace(grid_direction.size, glb_files, vec_x, face_states, vec_x0, sorted_id_cell, inner_bound_code))
+    RETURN_ERR("Error reading trace part\n");
 
   MPI_Barrier(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 

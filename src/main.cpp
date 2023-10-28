@@ -25,13 +25,16 @@ int main(int argc, char *argv[]) {
   if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
     return e_completion_fail;
 
+  RunRhllcPluto();
+  // rhllc::RunRhllcModule();
+#if 0
 #ifdef ILLUM
-  graph::RunGraphModule();
-  trace::RunTracesModule();
-  illum::additional_direction::PreBuildAddDirections(ray_tracing::k_number_of_frame);
+  // graph::RunGraphModule();
+  // trace::RunTracesModule();
+  // illum::additional_direction::PreBuildAddDirections(ray_tracing::k_number_of_frame);
 
-  if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
-    return e_completion_fail;
+  // if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
+  //   return e_completion_fail;
 
   if (get_mpi_np() == 1) {
     illum::RunIllumModule();
@@ -47,7 +50,7 @@ int main(int argc, char *argv[]) {
   ray_tracing::RunRayTracing(glb_files.add_dir_address + F_ILLUM);
 
   //  rhllc::RunRhllcModule();
-
+#endif
   MPI_END;
   return 0;
 }

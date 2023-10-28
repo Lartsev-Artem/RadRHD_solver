@@ -19,8 +19,11 @@ extern global_files_t glb_files;
 
 constexpr double PI = 3.1415926535897932384626433832795; ///<число пи
 
+constexpr double kMinPressure = 1e-12;
+constexpr double kMinDensity = 1e-12;
+
 constexpr double kGamma1 = 4. / 3; ///< показатель адиабаты
-constexpr double kGamma_g = kGamma1 / (kGamma1 - 1);
+constexpr double kGamma_g = kGamma1 / (kGamma1 - 1.0);
 
 //! (в случае сплошной области задаётся так, чтобы сфера не пересекала расчётную область)
 #if GEOMETRY_TYPE == Sphere

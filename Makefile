@@ -1,6 +1,6 @@
 # defining project config 
 #DEFCONF 		= SOLVERS LINUX RHLLC DEBUG #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI  LINUX USE_CUDA
-DEFCONF 		= SOLVERS DEBUG BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI LINUX USE_CUDA
+DEFCONF 		= SOLVERS DEBUG RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI LINUX USE_CUDA
 
 # defining working directories
 LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension

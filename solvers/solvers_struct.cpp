@@ -10,6 +10,11 @@ hllc_value_t _hllc_cfg;
 flux_t flux_t::operator+(const flux_t &x) const {
   return flux_t(d + x.d, v + x.v, p + x.p);
 }
+void flux_t::operator=(const flux_t &x) {
+  d = x.d;
+  v = x.v;
+  p = x.p;
+}
 
 void flux_t::operator+=(const flux_t &x) {
   d += x.d;

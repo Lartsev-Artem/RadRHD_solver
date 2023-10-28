@@ -32,7 +32,7 @@ int cuda::interface::InitDevice(const std::string &address, const grid_direction
     mem_protected::MallocHost((grid_host.loc_size * sizeof(Vector3)), &grid_host.stream);
     mem_protected::MallocHost((grid_host.loc_size * sizeof(Matrix3)), &grid_host.impuls);
 #endif
-
+#ifndef ONLY_CUDA_SCATTERING
     const int N = grid_host.size;
     std::vector<Normals> normals;
     std::vector<Type> areas_faces;
@@ -56,7 +56,7 @@ int cuda::interface::InitDevice(const std::string &address, const grid_direction
     mem_protected::CpyToDevice(device_host_ptr.volume, volume.data(), N * sizeof(volume[0]));
     mem_protected::CpyToDevice(device_host_ptr.areas, areas_faces.data(), CELL_SIZE * N * sizeof(areas_faces[0]));
   }
-
+#endif
   return e_completion_success;
 }
 

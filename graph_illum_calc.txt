@@ -1,0 +1,34 @@
+digraph BookingWorkflow {
+  start[label="Начало"]
+  end[label="Конец"]
+  calc_param[shape=rectangle label="Вычисление дивергенций"]
+  wait_1[shape=rectangle label="Ожидание первой части \n интеграла рассеяния"]
+  calc1[shape=rectangle label="Вычисление \nпервой части излучения"]
+  send_recv_1[shape=rectangle label="Пересылки излучения \n между узлами"]
+  resend_cuda1[shape=rectangle label="Отправка излучения \n на видеокарту"]
+  wait_2[shape=rectangle label="Ожидание второй части \n интеграла рассеяния"]
+  
+  calc2[shape=rectangle label="Вычисление \n второй части излучения"]
+  send_recv_2[shape=rectangle label="Пересылки излучения \n между узлами"]
+  resend_cuda2[shape=rectangle label="Отправка излучения \n на видеокарту"]
+  
+  scat_1[shape=rectangle label=" Вычисление первой части \n интеграла рассеяния"]
+  scat_2[shape=rectangle label=" Вычисление второй части \n интеграла рассеяния"]
+  
+  accuracy [shape=diamond label="Точность достигнута?"]
+  
+  start->calc_param->wait_1
+  
+  wait_1->calc1->wait_2
+  wait_1->send_recv_1->wait_2
+  wait_1->resend_cuda1->wait_2
+  
+  wait_2->calc2->scat_1
+  wait_2->send_recv_2->scat_1
+  wait_2->resend_cuda2->scat_1
+  
+  scat_1->scat_2->accuracy
+  accuracy->calc_param[label=" Нет"]
+  accuracy->end[label=" Да"]
+  
+}

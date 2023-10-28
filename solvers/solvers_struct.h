@@ -29,7 +29,7 @@ struct flux_t {
   flux_t(const flux_t &f) : d(f.d), v(f.v), p(f.p) {}
 
   flux_t operator+(const flux_t &x) const;
-
+  void operator=(const flux_t &x);
   void operator+=(const flux_t &x);
   void operator-=(const flux_t &x);
   void operator*=(const Type x);
