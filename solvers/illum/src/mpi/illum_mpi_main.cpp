@@ -61,12 +61,15 @@ int illum::RunIllumMpiModule() {
   if (files_sys::bin::ReadRadiationTrace(grid_direction.size, glb_files, vec_x, face_states, vec_x0, sorted_id_cell, inner_bound_code))
     RETURN_ERR("Error reading trace part\n");
 
-  MPI_Barrier(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
+  MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
   gpu_async::CalculateIllum(grid_direction, face_states, neighbours, inner_bound_code, vec_x0, vec_x, sorted_id_cell, grid);
 
   WRITE_LOG("end calculate illum\n");
 #ifdef USE_CUDA
+  if (get_mpi_id() == 0) {
+    cuda::interface::CalculateAllParam(grid_direction, grid);
+  }
   cuda::interface::CudaWait();
   cuda::interface::CudaSyncStream(cuda::e_cuda_params);
 #endif

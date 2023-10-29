@@ -19,8 +19,6 @@
 namespace rhllc {
 
 int RunRhllcModule();
-
 } // namespace rhllc
-int RunRhllcPluto();
 
 #endif //! RHLLC_MAIN_H

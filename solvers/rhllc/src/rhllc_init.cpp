@@ -172,7 +172,7 @@ int rhllc::Init(std::string &file_init_value, std::vector<elem_t> &cells) {
   }
 
   HllcPhysToConv(cells);
-
+  rhllc::max_signal_speed = 1;
   _hllc_cfg.tau = GetTimeStep(_hllc_cfg, cells);
   return e_completion_success;
 }

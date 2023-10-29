@@ -18,6 +18,8 @@ namespace tick = std::chrono;
 
 int trace::RunTracesModule() {
 
+  WRITE_LOG("Start RunTracesModule\n");
+
   int np = get_mpi_np();
   int myid = get_mpi_id();
 
@@ -126,6 +128,8 @@ int trace::RunTracesModule() {
   WRITE_LOG("Full trace time: %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 
   MPI_BARRIER(MPI_COMM_WORLD);
+
+  WRITE_LOG("End RunTracesModule\n");
   return e_completion_success;
 }
 

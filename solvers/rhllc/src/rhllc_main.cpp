@@ -13,6 +13,7 @@
 namespace tick = std::chrono;
 
 int rhllc::RunRhllcModule() {
+  WRITE_LOG("Start RunRhllcModule()\n");
   grid_t grid;
 
   uint32_t err = 0;
@@ -39,7 +40,7 @@ int rhllc::RunRhllcModule() {
   auto start_clock = tick::steady_clock::now();
 
   while (t < _hllc_cfg.T) {
-    Hllc3d(_hllc_cfg.tau, grid);
+    Hllc3dStab(_hllc_cfg.tau, grid);
 
     if (cur_timer >= _hllc_cfg.save_timer) {
       DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
@@ -50,9 +51,12 @@ int rhllc::RunRhllcModule() {
 
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
+    _hllc_cfg.tau = GetTimeStep(_hllc_cfg, grid.cells);
   }
 
   files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid);
+
+  WRITE_LOG("End RunRhllcModule()\n");
   return e_completion_success;
 }
 

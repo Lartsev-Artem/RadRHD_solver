@@ -160,12 +160,17 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
 
     if (ReadSimple(gbl_files.name_file_state_face + std::to_string(disp[myid] + i) + ".bin", face_states[i]))
       return e_completion_fail;
+  }
 
 #ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
-    if (ReadSimple(gbl_files.name_file_res + std::to_string(disp[myid] + i) + ".bin", inner_bound_code[i]))
+  for (int i = 0; i < send[myid]; i++) {
+    if (ReadSimple(gbl_files.name_file_res + std::to_string(disp[myid] + i) + ".bin", inner_bound_code[i])) {
       WRITE_LOG("WARNING!!! inner bound[%d] didn't read\n", i);
-#endif
+      inner_bound_code.clear();
+      break;
+    }
   }
+#endif
 
   return e_completion_success;
 }

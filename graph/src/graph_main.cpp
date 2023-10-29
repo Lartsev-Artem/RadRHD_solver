@@ -23,6 +23,8 @@ std::vector<boundary_trace_t> bound_trace; ///< данные перетрасс�
 }
 int graph::RunGraphModule() {
 
+  WRITE_LOG("Start RunGraphModule\n");
+
   int np = get_mpi_np();
   int myid = get_mpi_id();
 
@@ -149,6 +151,8 @@ int graph::RunGraphModule() {
   trace_through_boundary::ClearDevice();
 #endif
   MPI_BARRIER(MPI_COMM_WORLD);
+
+  WRITE_LOG("End RunGraphModule\n");
   return e_completion_success;
 }
 

@@ -22,5 +22,14 @@ namespace rhllc {
  */
 void Hllc3d(const Type tau, grid_t &grid);
 
+/**
+ * @brief Газодинамический расчёт на текущий момент времени с шагом tau
+ *
+ * @details PLUTO архитектура
+ * @param[in] tau шаг интегрирования
+ * @param[inout] grid сетка
+ */
+void Hllc3dStab(const Type tau, grid_t &grid);
+
 } // namespace rhllc
 #endif //! RHLLC_CALC_H

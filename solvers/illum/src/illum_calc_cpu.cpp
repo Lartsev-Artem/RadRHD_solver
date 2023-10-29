@@ -125,7 +125,7 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
       }
     } // parallel
 
-    if (_solve_mode.max_number_of_iter > 1) // пропуск первой итерации
+    if (_solve_mode.max_number_of_iter >= 1) // пропуск первой итерации
     {
 #ifndef USE_CUDA
       scattering::CalculateIntCPU(grid_direction, grid);

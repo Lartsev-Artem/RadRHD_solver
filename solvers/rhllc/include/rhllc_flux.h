@@ -43,12 +43,6 @@ void GetPhysValue(const flux_t &U, flux_t &W);
  */
 bool GetPhysValueSave(const flux_t &U, flux_t &W);
 
-void GetConvValueStab(flux_t &W, flux_t &U);
-int PhysPressureFix(flux_t &U, flux_t &W);
-int GetPhysValueStab(const flux_t &U, flux_t &W);
-void GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
-                 const flux_t &phys_val_l, const flux_t &phys_val_r, face_t &f);
-
 /**
  * @brief Расчёт потоков методом HLLC
  *

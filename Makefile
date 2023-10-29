@@ -1,6 +1,6 @@
 # defining project config 
-#DEFCONF 		= SOLVERS LINUX RHLLC DEBUG #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI  LINUX USE_CUDA
-DEFCONF 		= SOLVERS DEBUG RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI LINUX USE_CUDA
+DEFCONF 		= SOLVERS LINUX DEBUG BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI USE_CUDA
+#DEFCONF 		= SOLVERS DEBUG RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI USE_CUDA
 
 # defining working directories
 LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension
@@ -17,6 +17,9 @@ INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR}  ${CUDA_I
 BUILDDIR        = build
 OBJDIR          = $(BUILDDIR)/objs
 DEPDIR          = $(BUILDDIR)/dep
+EXEDIR          = $(BUILDDIR)/bin
+
+SRCEXE 			= src
 
 # specify the list of directories in which the search should be performed.
 vpath %.cpp 		$(SRCDIR) 
@@ -41,6 +44,11 @@ OBJS            += $(patsubst %.cu, %.o, $(notdir $(CUDA_SRCS))) # add cuda objs
 
 INCLUDE_DIRS    = $(addprefix -I ,$(INCLUDESDIR))
 DEF_SET 		= $(addprefix -D , $(DEFCONF))
+
+EXE_SRCS 		= $(foreach dir,$(SRCEXE),$(wildcard $(dir)/*.cpp))
+EXE_OBJ	 		= $(patsubst %.cpp, %.o, $(notdir $(EXE_SRCS)))
+EXE		 		= $(patsubst %.cpp, %.exe, $(notdir $(EXE_SRCS)))
+LINK_SRC		= $(filter-out $(EXE_OBJ),$(OBJS))
 #######################################################################
 ################ CONFIGURING THE COMPILER #############################
 #######################################################################
@@ -64,14 +72,20 @@ all: $(PROGRAM)
 
 
 #Make executable file. Early was $(addprefix $(OBJDIR)/, $^)
-$(PROGRAM): %: $(OBJS)
-	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./, $^) $(LOADLIBES) $(LDLIBS) -o $@ 
-	mv $(PROGRAM) $(BUILDDIR)
+$(PROGRAM): %: $(OBJS) $(EXE)
+#	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./, $^) $(LOADLIBES) $(LDLIBS) -o $@ 
+#	mv $(PROGRAM) $(BUILDDIR)
 	mkdir -p $(BUILDDIR)/graph
 	mkdir -p $(BUILDDIR)/illum_geo
 	mkdir -p $(BUILDDIR)/Solve
 	mkdir -p $(BUILDDIR)/trace
 	mkdir -p $(BUILDDIR)/add_dir
+
+# Linking executable files files from all .o in combination with all .h
+%.exe: %.cpp
+	mkdir -p $(EXEDIR)
+	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./$(OBJDIR)/, $(LINK_SRC)) $(patsubst %.exe, ./$(OBJDIR)/%.o,$@) $(LOADLIBES) $(LDLIBS) -o $(patsubst %.exe, %,$@)
+	mv $(patsubst %.exe, %,$@) $(EXEDIR)
 
 # Building rule for .o files and its .c/.cpp in combination with all .h
 %.o: %.cpp
@@ -109,17 +123,3 @@ clean:
 .PHONY: clean_o
 clean_o:
 	$(RM) $(OBJDIR) -r
-## попытка собирать только утилиты. с линковкой к библиотеке
-# SRCDIR_UTILS         = src lib/files_sys/src lib/geometry lib/mpi_extension lib/json lib/geometry/src utils/netgen_to_vtk
-# SRCS_UTILS 			= $(foreach dir,$(SRCDIR_UTILS),$(wildcard $(dir)/*.cpp))
-# OBJS_UTILS            = $(patsubst %.cpp, %.o, $(notdir $(SRCS_UTILS)))
-
-# UTIL = util
-
-# utils: $(UTIL)
-
-# $(UTIL): %: $(OBJS_UTILS)
-# 	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./, $^) $(LOADLIBES) $(LDLIBS) -o $@ 
-
-# test:
-# 	make clean

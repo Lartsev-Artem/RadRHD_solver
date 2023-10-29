@@ -1,15 +1,19 @@
 #if defined RHLLC && defined SOLVERS
 #include "rhllc_utils.h"
 #include "rhllc_flux.h"
+#include "rhllc_flux_stab.h"
 
 #include "global_value.h"
 #include "linear_alg.h"
 
 #include <omp.h>
 
+Type rhllc::max_signal_speed = 1;
+
 Type rhllc::GetTimeStep(const hllc_value_t &hllc_set, const std::vector<elem_t> &cells) {
 
-  const Type t = hllc_set.CFL * hllc_set.h_min;
+  const Type t = hllc_set.CFL * hllc_set.h_min / max_signal_speed;
+
   DIE_IF(t < 0);
 
   return t;
@@ -19,7 +23,7 @@ void rhllc::HllcPhysToConv(std::vector<elem_t> &cells) {
 
 #pragma omp parallel for
   for (int i = 0; i < cells.size(); i++) {
-    GetConvValue(cells[i].phys_val, cells[i].conv_val);
+    GetConvValueStab(cells[i].phys_val, cells[i].conv_val);
   }
 }
 

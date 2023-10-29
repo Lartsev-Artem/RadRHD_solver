@@ -14,6 +14,8 @@
 
 int illum::RunIllumModule() {
 
+  WRITE_LOG("Start RunIllumModule()\n");
+
   if (get_mpi_id() != 0) {
     return e_completion_success;
   }
@@ -61,7 +63,7 @@ int illum::RunIllumModule() {
 
   files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
 
-  if (_solve_mode.max_number_of_iter > 1) //иначе интеграл рассеяния не расчитывался
+  if (_solve_mode.max_number_of_iter > 1) //иначе интеграл рассеяния не расчитывался (1-означает считать без рассеяния, но переслать данные на карту)
   {
     additional_direction::SaveInterpolationScattering(glb_files.add_dir_address, grid_direction, grid);
   }
@@ -71,6 +73,7 @@ int illum::RunIllumModule() {
   cuda::interface::ClearDevice();
 #endif
 
+  WRITE_LOG("End RunIllumModule()\n");
   return e_completion_success;
 }
 

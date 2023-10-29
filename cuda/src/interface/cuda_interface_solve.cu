@@ -15,11 +15,12 @@ using namespace cuda::geo;
 
 int cuda::interface::CalculateAllParam(const grid_directions_t &grid_dir, grid_t &grid) {
 
-  const int N = grid.size;
+#ifndef ONLY_CUDA_SCATTERING
+
   const int N_loc = grid.loc_size;
 
   CUDA_TREADS_1D(threads);
-  CUDA_BLOCKS_1D(blocks, N);
+  CUDA_BLOCKS_1D(blocks, N_loc);
 
   kernel::MakeIllumParam<<<blocks, threads>>>(grid_dir_device, grid_device);
 
@@ -34,7 +35,7 @@ int cuda::interface::CalculateAllParam(const grid_directions_t &grid_dir, grid_t
   mem_protected::CpyToHostAsync(grid.stream, device_host_ptr.stream, N_loc * sizeof(grid.stream[0]));
   mem_protected::CpyToHostAsync(grid.impuls, device_host_ptr.impuls, N_loc * sizeof(grid.impuls[0]));
 #endif
-
+#endif
   return e_completion_success;
 }
 

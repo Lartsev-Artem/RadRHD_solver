@@ -10,7 +10,7 @@
 
 #include "illum_add_main.h"
 #include "illum_add_prebuild.h"
-#include "ray_tracing_const.h"
+// #include "ray_tracing_const.h"
 #include "ray_tracing_main.h"
 #include "rhllc_main.h"
 
@@ -25,8 +25,8 @@ int main(int argc, char *argv[]) {
   if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
     return e_completion_fail;
 
-  RunRhllcPluto();
-  // rhllc::RunRhllcModule();
+    // RunRhllcPluto();
+    // rhllc::RunRhllcModule();
 #if 0
 #ifdef ILLUM
   // graph::RunGraphModule();

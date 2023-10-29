@@ -397,7 +397,7 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
 
     } while (!ready);
 
-    if (_solve_mode.max_number_of_iter > 1) // пропуск первой итерации
+    if (_solve_mode.max_number_of_iter >= 1) // пропуск первой итерации
     {
       cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, 0, section_1.size, cuda::e_cuda_scattering_1);
       cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, section_1.size, local_size, cuda::e_cuda_scattering_2);
