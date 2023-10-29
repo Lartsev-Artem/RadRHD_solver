@@ -27,13 +27,14 @@
 // #define INTERPOLATION_ON_FACES ///< расчитывать линейную 2d интерполяцию на гранях, вместо усреднения
 
 #define USE_TRACE_THROUGH_INNER_BOUNDARY ///< использование трассировки сквозь внутреннюю границу (доп. память и эффект луча!)
+
+// #define ONLY_CUDA_SCATTERING ///< отключает весь расчет на видеокарте, кроме рассеяния
 #endif
 
 #ifdef USE_MPI
 
 #ifdef ILLUM
 #define ILLUM_MPI ///< расчёт излучения с технологией MPI
-// #define ONLY_CUDA_SCATTERING ///< отключает весь расчет на видеокарте, кроме рассеяния
 #endif
 
 #ifdef HLLC

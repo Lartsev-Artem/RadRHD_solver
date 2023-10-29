@@ -34,7 +34,7 @@ namespace mem_protected {
  */
 template <typename dataType, typename sizeT>
 void inline Malloc(sizeT size, dataType **data) {
-  WRITE_LOG("Malloc %d bytes\n", size);
+  WRITE_LOG("Malloc %lf Mb\n", ((double)size / 1024 / 1024));
   if (CheckError(cudaMalloc((void **)data, size))) {
     EXIT_ERR("Error cudaMalloc\n");
   }
@@ -50,7 +50,7 @@ void inline Malloc(sizeT size, dataType **data) {
  */
 template <typename dataType, typename sizeT>
 void inline MallocHost(sizeT size, dataType **data) {
-  WRITE_LOG("MallocHost %d bytes\n", size);
+  WRITE_LOG("MallocHost %lf Mb\n", ((double)size / 1024 / 1024));
   if (CheckError(cudaMallocHost((void **)data, size))) {
     EXIT_ERR("Error MallocHost\n");
   }

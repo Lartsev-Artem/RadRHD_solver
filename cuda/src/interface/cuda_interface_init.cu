@@ -55,8 +55,8 @@ int cuda::interface::InitDevice(const std::string &address, const grid_direction
     mem_protected::CpyToDevice(device_host_ptr.normals, dev_norm.data(), dev_norm.size() * sizeof(dev_norm[0]));
     mem_protected::CpyToDevice(device_host_ptr.volume, volume.data(), N * sizeof(volume[0]));
     mem_protected::CpyToDevice(device_host_ptr.areas, areas_faces.data(), CELL_SIZE * N * sizeof(areas_faces[0]));
-  }
 #endif
+  }
   return e_completion_success;
 }
 

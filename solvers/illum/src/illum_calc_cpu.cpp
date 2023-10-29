@@ -144,7 +144,7 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
 
 void illum::cpu::CalculateIllumParam(const grid_directions_t &grid_direction, grid_t &grid) {
 
-#ifndef USE_CUDA
+#if !defined USE_CUDA
   GetEnergy(grid_direction, grid);
   GetStream(grid_direction, grid);
   GetImpuls(grid_direction, grid);

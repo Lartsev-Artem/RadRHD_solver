@@ -54,6 +54,8 @@ int illum::RunIllumModule() {
   if (files_sys::bin::ReadRadiationTrace(grid_direction.size, glb_files, vec_x, face_states, vec_x0, sorted_id_cell, inner_bound_code))
     RETURN_ERR("Error reading trace part\n");
 
+  WRITE_LOG("Start Illum solver()\n");
+
   cpu::CalculateIllum(grid_direction, face_states, neighbours, inner_bound_code,
                       vec_x0, vec_x, sorted_id_cell, grid);
 

@@ -12,7 +12,9 @@
 #define CUDA_DEF_H
 
 #include "dbgdef.h"
+#include "solvers_config.h"
 #include <string>
+
 
 /*! \addtogroup cuda Модуль расчёта излучения на видеокарте
     @{
