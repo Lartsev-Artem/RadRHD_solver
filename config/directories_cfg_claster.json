@@ -9,5 +9,6 @@
     "name_file_vtk": "/nethome/student/FS18/FS2-x1/Lartsev/tests/data/sphereR05.vtk",
     "solve_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/build/Solve/Solve",
     "solve_configuration": "/nethome/student/FS18/FS2-x1/Lartsev/solver/config/solve_cfg.json",
-    "add_dir_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/build/add_dir/"
+    "add_dir_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/build/add_dir/",
+    "tab_func_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/tab_func/"
 }

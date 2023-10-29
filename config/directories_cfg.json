@@ -9,5 +9,6 @@
     "name_file_vtk": "/home/artem/projects/solver/tests/data/sphereR05.vtk",
     "solve_address": "/home/artem/projects/solver/build/Solve/Solve",
     "solve_configuration": "/home/artem/projects/solver/config/solve_cfg.json",
-    "add_dir_address": "/home/artem/projects/solver/build/add_dir/"
+    "add_dir_address": "/home/artem/projects/solver/build/add_dir/",
+    "tab_func_address": "/home/artem/projects/solver/tab_func/"
 }

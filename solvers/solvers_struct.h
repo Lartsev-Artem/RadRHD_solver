@@ -15,6 +15,22 @@
 extern solve_mode_t _solve_mode;
 extern hllc_value_t _hllc_cfg;
 
+struct TableFunc {
+  int Nx, Ny;
+
+  Type step_x, step_y;
+  Type min_x, min_y;
+  Type max_x, max_y;
+
+  std::vector<Type> data;
+
+  TableFunc(int nx = 0, int ny = 0) : Nx(nx), Ny(ny) {
+    data.resize(nx * ny, 0);
+  }
+
+  Type operator()(Type x, Type y);
+};
+
 /**
  * @brief Структура потоков
  * @warning операторы написаны строго под hllc в той реализации, в которой есть

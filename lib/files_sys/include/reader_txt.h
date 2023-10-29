@@ -13,6 +13,8 @@
 #include <vector>
 
 #include "geo_types.h"
+#include "solvers_struct.h"
+
 #include "global_def.h"
 
 /*! \addtogroup file_sys Файловый модуль
@@ -105,6 +107,14 @@ int ReadSphereDirectionCartesian(const std::string &file_sphere_direction,
  */
 int ReadInitBoundarySetInFaces(const std::string &file_face_id, std::map<IntId, FaceCell> &inter_faces);
 
+/**
+ * @brief Чтение табулированной функции из файла
+ *
+ * @param file_func полное имя файла с расширением
+ * @param tab_func структура табулированной функции
+ * @return int ::e_type_completion
+ */
+int ReadTableFunc(const std::string &file_func, TableFunc &tab_func);
 } // namespace txt
 } // namespace files_sys
 

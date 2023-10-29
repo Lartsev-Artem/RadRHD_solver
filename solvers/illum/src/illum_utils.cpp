@@ -4,6 +4,8 @@
 #include "dbgdef.h"
 #include "global_value.h"
 
+TableFunc t_cooling_function;
+
 /**
  * @brief Точное решение уравнения переноса (вдоль луча) в ячейке
  *
@@ -126,28 +128,35 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
   case e_grid_cfg_full_init: // HLLC + Illum для конуса
   {
     // переход к размерным параметрам
-    Type S = int_scattering * kRadiation;
-    Type d = cell.phys_val.d * kDensity;
-    Type p = cell.phys_val.p * kPressure;
-    Type T = p / (d * kR_gas);
+    Type S = int_scattering;
+    Type d = cell.phys_val.d;
+    Type p = cell.phys_val.p;
+
+    constexpr Type coefT = (kM_hydrogen / k_boltzmann) * (kDist * kDist) / (kTime * kTime);
+    Type T = coefT * (p / d); // размерная
 
 #if GEOMETRY_TYPE == Cone
     if (x[0] < 0.05) { //источник
       d = 0.1;
       p = 0.01;
-      T = p / (d * R);
+      T = coefT * (p / d); // размерная
     }
 #endif
 
-    Type Ie = 2 * pow(k_boltzmann * PI * T, 4) / (15 * kH_plank * kH_plank * kH_plank * kC_Light * kC_Light);
-    Type betta = kSigma_thomson * d / kM_hydrogen;
-    Type alpha = betta; // alpha = ???
+    Type T2 = T * T;
+    Type T4 = T2 * T2;
 
+    Type L = t_cooling_function(log(d * kMass / (kDist * kDist * kDist)), log(T));
+    Type alpha = exp(L) / (4 * kStefanBoltzmann * T4) * kDist;
+
+    constexpr Type kP = k_boltzmann * PI;
+    constexpr Type coefIe = 2 * (kP * kP * kP * kP) / (15 * kH_plank * kH_plank * kH_plank * kC_Light * kC_Light);
+    Type Ie = (coefIe * (kTime * kTime * kTime / kMass)) * (T4);
     Type Q = alpha * Ie;
-    Type ss = s * kDist;
-    Type I0 = I_0 * kRadiation;
 
-    return std::max(0.0, GetI(ss, Q, S, I0, alpha + betta, betta) / kRadiation);
+    Type betta = (kSigma_thomson / kM_hydrogen * kDist) * d;
+
+    return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
   }
 
   default:

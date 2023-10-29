@@ -111,6 +111,7 @@ static void from_json(const nlohmann::json &j, illum_timer_t &p) {
   X(std::string, trace_address)                                             \
   X(std::string, solve_address)                                             \
   X(std::string, add_dir_address)                                           \
+  X(std::string, tab_func_address)                                          \
   /*---------------Настроичные файлы-------------------*/   \
   X(std::string, name_file_hllc_set)                                        \
   X(std::string, hllc_init_value)                                           \

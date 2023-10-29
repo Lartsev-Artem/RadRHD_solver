@@ -7,6 +7,28 @@
 solve_mode_t _solve_mode;
 hllc_value_t _hllc_cfg;
 
+Type TableFunc::operator()(Type x, Type y) {
+  if (x < min_x) {
+    x = min_x;
+  }
+
+  if (y < min_y) {
+    y = min_y;
+  }
+
+  if (x > max_x) {
+    x = max_x;
+  }
+
+  if (y > max_y) {
+    y = max_y;
+  }
+
+  int i = std::min((int)((round(x) - min_x) / step_x), Nx - 1);
+  int j = std::min((int)((round(y) - min_y) / step_y), Ny - 1);
+  return data[Ny * i + j];
+}
+
 flux_t flux_t::operator+(const flux_t &x) const {
   return flux_t(d + x.d, v + x.v, p + x.p);
 }

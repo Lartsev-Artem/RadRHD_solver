@@ -16,6 +16,7 @@
 #include "json/json_struct.h"
 
 extern global_files_t glb_files;
+extern TableFunc t_cooling_function; ///< табличная функция охлаждения
 
 constexpr double PI = 3.1415926535897932384626433832795; ///<число пи
 
@@ -47,16 +48,18 @@ constexpr double k_boltzmann = 1.3807 * 1e-16;            ///< постоянн�
 constexpr double kSigma_thomson = 6.65210 * 1e-25;        ///< сечение томсоновского рассеяния [m^2]
 constexpr double kM_hydrogen = 1.6735575 * 1e-24;         ///< масса водорода[кг]
 constexpr double kDistAccretor = 3.88190065213158 * 1e10; ///< характерное расстояние
+constexpr double kStefanBoltzmann = 5.670374419 * 10e-5;  ///< постоянная Стефана-Больцмана[ эрг·с^−1·см^−2·К^−4]
 
 #else //СИ
 
-constexpr double kC_Light = 299792458.0;           ///<скорость света в м/c
-constexpr double kC_LightInv = (1.0 / (kC_Light)); ///< обратная величина к скорости света
-constexpr double kR_gas = 8.314;                   ///< газовая постоянная [ Дж/(моль*К)]
-constexpr double kH_plank = 6.62 * 1e-34;          ///< постоянная Планка[кг * м^2 /с]
-constexpr double k_boltzmann = 1.38 * 1e-23;       ///< постоянная Больцмана[Дж/K] = [ кг*м^2/(с^2*T)]
-constexpr double kSigma_thomson = 6.65210 * 1e-29; ///< сечение томсоновского рассеяния [m^2]
-constexpr double kM_hydrogen = 1.6735575 * 1e-27;  ///< масса водорода[кг]
+constexpr double kC_Light = 299792458.0;                 ///<скорость света в м/c
+constexpr double kC_LightInv = (1.0 / (kC_Light));       ///< обратная величина к скорости света
+constexpr double kR_gas = 8.314;                         ///< газовая постоянная [ Дж/(моль*К)]
+constexpr double kH_plank = 6.62 * 1e-34;                ///< постоянная Планка[кг * м^2 /с]
+constexpr double k_boltzmann = 1.38 * 1e-23;             ///< постоянная Больцмана[Дж/K] = [ кг*м^2/(с^2*T)]
+constexpr double kSigma_thomson = 6.65210 * 1e-29;       ///< сечение томсоновского рассеяния [m^2]
+constexpr double kM_hydrogen = 1.6735575 * 1e-27;        ///< масса водорода[кг]
+constexpr double kStefanBoltzmann = 5.670374419 * 10e-8; ///< постоянная Стефана-Больцмана[Вт*м^-2*К^−4]
 #endif
 
 constexpr double kEarthMass = (5.9722 * 1e25); ///< масса Земли в кг
@@ -150,4 +153,6 @@ constexpr double kRadiation = (kDensity * kVelocity * kVelocity * kVelocity); //
 #define F_ABSORPCOEF "AbsorpCoef.bin"
 #define F_RADLOOSERATE "radEnLooseRate.bin"
 #endif
+
+#define F_COOLING_FUNC "rcf_H.dat"
 #endif //! GLOBAL_VALUE
