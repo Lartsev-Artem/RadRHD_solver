@@ -10,6 +10,10 @@
 #if !defined TRACE_MAIN_H && defined MAKE_TRACE
 #define TRACE_MAIN_H
 
+#ifdef DEBUG
+// #define ONLY_ONE_DIRECTION ///< позволяет выбрать фиксированное направление
+#endif
+
 /*! \addtogroup trace Модуль предварительной трассировки
     \brief Модуляь реализует трассировку сквозь сетку по выбранным направлениям.
     \note требует построенные графы обхода сетки (модуль ::graph)

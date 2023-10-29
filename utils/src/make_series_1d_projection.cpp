@@ -14,7 +14,7 @@ int FUNC_NAME(MakeSeries1dProjection)(int argc, char *argv[]) {
     printf("Input: ");
     printf("path\\Solve_i\n");
     printf("base_address\\ \n");
-    printf("Axis: X,Y,Z\n");
+    printf("Axis: X,Y,Z, R\n");
     printf("number of projections\n");
     return e_completion_fail;
   }
@@ -36,6 +36,10 @@ int FUNC_NAME(MakeSeries1dProjection)(int argc, char *argv[]) {
 
   case 'Z':
     axis_idx = 2;
+    break;
+
+  case 'R':
+    axis_idx = 4;
     break;
 
   default:
@@ -78,7 +82,7 @@ int FUNC_NAME(MakeSeries1dProjection)(int argc, char *argv[]) {
       if (components == 1) {
 
         for (int i = 0; i < size_grid; i++)
-          ofile << centers[i][axis_idx] << ' ' << data->GetTuple1(i) << "\n";
+          ofile << ((axis_idx == 4) ? centers[i].norm() : centers[i][axis_idx]) << ' ' << data->GetTuple1(i) << "\n";
 
       } else {
         VectorX v(components);
@@ -88,7 +92,7 @@ int FUNC_NAME(MakeSeries1dProjection)(int argc, char *argv[]) {
             v[j] = tuple[j];
           }
 
-          ofile << centers[i][axis_idx] << ' ' << v.norm() << "\n";
+          ofile << ((axis_idx == 4) ? centers[i].norm() : centers[i][axis_idx]) << ' ' << v.norm() << "\n";
         }
       }
       ofile.close();

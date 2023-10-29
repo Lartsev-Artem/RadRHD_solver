@@ -41,7 +41,6 @@ int trace::RunTracesModule() {
   std::vector<IntId> neighbours;
 
   grid_directions_t grid_direction;
-  std::vector<std::vector<IntId>> sorted_graph;
 
   auto start_clock = tick::steady_clock::now();
 
@@ -51,16 +50,6 @@ int trace::RunTracesModule() {
   err |= files_sys::bin::ReadSimple(name_file_vertex, vertexs);
   err |= files_sys::bin::ReadNormals(name_file_normals, normals);
   err |= files_sys::txt::ReadSphereDirectionCartesian(glb_files.name_file_sphere_direction, grid_direction);
-
-  sorted_graph.resize(grid_direction.size / np + 1);
-
-  int loc_dir = 0;
-  for (int i = myid; i < grid_direction.size; i += np, loc_dir++) {
-    err |= files_sys::bin::ReadSimple(glb_files.graph_address + F_GRAPH + std::to_string(i) + ".bin", sorted_graph[loc_dir]);
-  }
-  if (err != 0) {
-    RETURN_ERR("error during reading\n");
-  }
 
   WRITE_LOG("Reading time trace prebuild %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 
@@ -76,6 +65,8 @@ int trace::RunTracesModule() {
     }
   }
 
+  std::vector<IntId> sorted_graph;
+
   int num_cell;
   Vector3 direction;
 
@@ -84,21 +75,27 @@ int trace::RunTracesModule() {
   std::vector<cell_local> vec_x0;
 
   /*---------------------------------- далее FOR по направлениям----------------------------------*/
-  int loc_num_dir = 0;
 #if defined ONLY_ONE_DIRECTION
   for (int num_direction = 0; num_direction < 1; num_direction++)
 #else
-  for (int num_direction = myid; num_direction < grid_direction.size; num_direction += np, loc_num_dir++)
+  for (int num_direction = myid; num_direction < grid_direction.size; num_direction += np)
 #endif
   {
+
+#if defined ONLY_ONE_DIRECTION
+    num_direction = 0;
+#endif
+
     direction = grid_direction.directions[num_direction].dir;
+
+    DIE_IF(files_sys::bin::ReadSimple(glb_files.graph_address + F_GRAPH + std::to_string(num_direction) + ".bin", sorted_graph));
 
     vec_x0.clear();
     vec_x0.reserve(CELL_SIZE * count_cells);
 
     /*---------------------------------- далее FOR по ячейкам----------------------------------*/
     for (int h = 0; h < count_cells; ++h) {
-      num_cell = sorted_graph[loc_num_dir][h];
+      num_cell = sorted_graph[h];
 
       bits_flag_t face_state = 0;
       intersection::FindInAndOutFaces(direction, normals[num_cell], face_state);

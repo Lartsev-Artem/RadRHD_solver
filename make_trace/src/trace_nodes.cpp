@@ -233,7 +233,8 @@ static int CalculateNodeValue(const int num_cell, const Normals &normal, const s
     }
 
     if (num_in_face == CELL_SIZE - 1) {
-      EXIT_ERR("Not found inner face\n");
+      EXIT_ERR("Not found inner face. cell= %d, p=(%lf, %lf, %lf),  dir=(%lf, %lf, %lf) \n", num_cell,
+               x[0], x[1], x[2], direction[0], direction[1], direction[2]);
     }
 
   } // for num_in_face

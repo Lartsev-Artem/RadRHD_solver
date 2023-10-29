@@ -16,11 +16,13 @@
  * @return значение луча в конце отрезка интегрирования
  * @note осуществляется предельный переход для среды без поглощения
  */
-static inline Type GetI(Type s, Type Q, Type S, Type I_0, Type k, Type betta) {
-  if (k > 1e-10)
-    return (exp(-k * s) * (I_0 * k + (exp(k * s) - 1) * (Q + S * betta))) / k;
-  else
-    return (1 - s * k) * (I_0 + s * (Q + S * betta));
+static inline Type GetI(Type s, Type Q, Type S, Type I_0, Type alpha, Type betta) {
+  Type k = alpha + betta;
+  if (s * k > 1e-10) {
+    Type src = (alpha * Q + betta * S) / k;
+    return (exp(-k * s) * (I_0 - src) + src);
+  } else
+    return (1 - s * k) * (I_0 + s * (alpha * Q + S * betta));
 }
 
 Type illum::BoundaryConditions(const int type_bound, const int type_obj, const Vector3 &inter_coef) {
@@ -77,7 +79,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
       alpha = 1;
       betta = 0;
     }
-    return std::max(0.0, GetI(s, Q, S, I_0, alpha + betta, betta));
+    return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
 #endif
 #if GEOMETRY_TYPE == Cone
     Type Q = 0;
@@ -91,7 +93,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
       alpha = 1;
       betta = 2;
     }
-    return std::max(0.0, GetI(s, Q, S, I_0, alpha + betta, betta));
+    return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
 #endif
 
     D_LD;
@@ -105,14 +107,14 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     Type alpha = cell.illum_val.absorp_coef;
     Type betta = alpha / 2; // просто из головы
 
-    return std::max(0.0, GetI(s, Q, S, I_0, alpha + betta, betta));
+    return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
 #elif GEOMETRY_TYPE == MAIN_ELLIPSE
 
     const Type ss = s * kDistAccretor;         // числа --- переход к размерным параметрам
     Type Q = cell.illum_val.rad_en_loose_rate; // Q=alpha*Ie
     Type alpha = cell.phys_val.d * cell.illum_val.absorp_coef;
     Type betta = cell.phys_val.d * (kSigma_thomson / kM_hydrogen);
-    return std::max(0.0, GetI(s, Q, S, I_0, alpha + betta, betta));
+    return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
     // I = I_0 * exp(-alpha * ss) + Q * (1 - exp(-alpha * ss)) / alpha;
     // I = I_0 * (1 - alpha * ss) + Q * ss;
 #else

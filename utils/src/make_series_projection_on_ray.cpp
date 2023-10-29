@@ -17,7 +17,7 @@ int FUNC_NAME(MakeSeries1dRayProjection)(int argc, char *argv[]) {
     printf("direction: X Y Z\n");
     printf("origin: X Y Z\n");
     printf("max iter\n");
-    printf("Axis projection: X,Y,Z\n");
+    printf("Axis projection: X,Y,Z,R\n");
     return e_completion_fail;
   }
 
@@ -43,6 +43,10 @@ int FUNC_NAME(MakeSeries1dRayProjection)(int argc, char *argv[]) {
 
   case 'Z':
     axis_idx = 2;
+    break;
+
+  case 'R':
+    axis_idx = 4;
     break;
 
   default:
@@ -95,7 +99,7 @@ int FUNC_NAME(MakeSeries1dRayProjection)(int argc, char *argv[]) {
 
         for (int id = 0; id < cells_id.size(); id++) {
           int i = cells_id[id];
-          ofile << centers[i][axis_idx] << ' ' << data->GetTuple1(i) << "\n";
+          ofile << ((axis_idx == 4) ? centers[i].norm() : centers[i][axis_idx]) << ' ' << data->GetTuple1(i) << "\n";
         }
 
       } else {
@@ -107,7 +111,7 @@ int FUNC_NAME(MakeSeries1dRayProjection)(int argc, char *argv[]) {
             v[j] = tuple[j];
           }
 
-          ofile << centers[i][axis_idx] << ' ' << v.norm() << "\n";
+          ofile << ((axis_idx == 4) ? centers[i].norm() : centers[i][axis_idx]) << ' ' << v.norm() << "\n";
         }
       }
       ofile.close();

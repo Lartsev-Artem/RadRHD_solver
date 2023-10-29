@@ -171,13 +171,13 @@ Type intersection::RayIntersectsTriangle(const Vector3 &ray_orig, const Vector3 
   Type u = inv_det * s.dot(h);
 
   if (u < 0.0 || u > 1.0)
-    return -1;
+    return -2;
 
   Vector3 q = s.cross(edge1);
   Type v = inv_det * ray_dir.dot(q);
 
   if (v < 0.0 || u + v > 1.0)
-    return -1;
+    return -3;
 
   Type dist = inv_det * edge2.dot(q); // расстояние до плоскости
 
@@ -187,7 +187,7 @@ Type intersection::RayIntersectsTriangle(const Vector3 &ray_orig, const Vector3 
     return dist;
   }
 
-  return -1; //Это означает, что линия пересекла треугольник против хода луча
+  return -4; //Это означает, что линия пересекла треугольник против хода луча
 }
 
 #ifdef USE_VTK

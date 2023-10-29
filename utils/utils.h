@@ -67,6 +67,15 @@ void UtilsHelp(int argc, T str, T2 msg = "") {
 int ReBuildNetgenToVTK(int argc, char **argv);
 
 /**
+ * @brief Функция переводит формат netgen mesh в текстовый формат VTK (узлы до 16 знаков!)
+ *
+ * @param[in] argc кол-во аргументов (требуется 2)
+ * @param[in] argv массив char** содержит {файл_nethen[in] файл_vtk[out] }
+ * @return int ::e_type_completion
+ */
+int ReBuildNetgenMeshToVTK(int argc, char **argv);
+
+/**
  * @brief Функция переводит нейтральный формат netgen в текстовый формат поверхности VTK
  *
  * @param[in] argc  кол-во аргументов (требуется 2)

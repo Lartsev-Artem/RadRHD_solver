@@ -14,7 +14,7 @@ int FUNC_NAME(Make1dProjection)(int argc, char *argv[]) {
     printf("Input: ");
     printf("path\\grid.vtk\n");
     printf("base_address\\ \n");
-    printf("Axis: X,Y,Z\n");
+    printf("Axis: X,Y,Z, R\n");
     return e_completion_fail;
   }
 
@@ -34,6 +34,10 @@ int FUNC_NAME(Make1dProjection)(int argc, char *argv[]) {
 
   case 'Z':
     axis_idx = 2;
+    break;
+
+  case 'R':
+    axis_idx = 4;
     break;
 
   default:
@@ -70,9 +74,13 @@ int FUNC_NAME(Make1dProjection)(int argc, char *argv[]) {
     std::ofstream ofile;
     OPEN_FSTREAM(ofile, (base_address + name_data + "1d_" + axis + ".txt").c_str());
     if (components == 1) {
-
-      for (int i = 0; i < size_grid; i++)
-        ofile << centers[i][axis_idx] << ' ' << data->GetTuple1(i) << "\n";
+      if (axis_idx != 4) {
+        for (int i = 0; i < size_grid; i++)
+          ofile << centers[i][axis_idx] << ' ' << data->GetTuple1(i) << "\n";
+      } else {
+        for (int i = 0; i < size_grid; i++)
+          ofile << centers[i].norm() << ' ' << data->GetTuple1(i) << "\n";
+      }
 
     } else {
       VectorX v(components);
@@ -82,7 +90,10 @@ int FUNC_NAME(Make1dProjection)(int argc, char *argv[]) {
           v[j] = tuple[j];
         }
 
-        ofile << centers[i][axis_idx] << ' ' << v.norm() << "\n";
+        if (axis_idx != 4)
+          ofile << centers[i][axis_idx] << ' ' << v.norm() << "\n";
+        else
+          ofile << centers[i].norm() << ' ' << v.norm() << "\n";
       }
     }
     ofile.close();
