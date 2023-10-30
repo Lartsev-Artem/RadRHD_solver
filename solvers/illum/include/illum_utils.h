@@ -108,7 +108,12 @@ Type ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coef, grid
  * @param[in] inter_coef коэффицинты интерполяции текущей грани
  * @return определяющее значение на входящей грани для текущего выходящего узла
  */
-Type GetIllumeFromInFace(const int neigh_id, Vector3 &inter_coef);
+Type GetIllumeFromInFace(const int neigh_id, Vector3 &inter_coef
+#ifdef INTERPOLATION_ON_FACES
+                         ,
+                         const Vector2 &x0 = Vector2::Zero()
+#endif
+);
 } // namespace illum
 
 #endif //! ILLUM_UTILS_H

@@ -5,7 +5,7 @@
 #include "global_value.h"
 #include "linear_alg.h"
 
-#define MAX_ITER 20
+#define MAX_ITER 40
 
 void rhllc::GetConvValueStab(flux_t &W, flux_t &U) {
 

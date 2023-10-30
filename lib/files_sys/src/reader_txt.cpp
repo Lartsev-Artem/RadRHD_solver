@@ -108,7 +108,8 @@ int files_sys::txt::ReadTableFunc(const std::string &file_func, TableFunc &tab_f
     lambda.min_y = std::min(lambda.min_y, temperature[i]);
   }
 
-  WRITE_LOG("Tab func: %dx%d: hx=%lf hy%lf maxX= %lf maxY%lf minX= %lf minY= %lf\n",
+  WRITE_LOG("Tab func: %dx%d: hx=%lf hy=%lf maxX= %lf maxY=%lf minX= %lf minY= %lf\n",
+            lambda.Nx, lambda.Ny,
             lambda.step_x, lambda.step_y,
             lambda.max_x, lambda.max_y,
             lambda.min_x, lambda.min_y);

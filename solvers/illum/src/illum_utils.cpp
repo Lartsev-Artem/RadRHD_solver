@@ -164,6 +164,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
   }
 }
 
+static const BaseTetra_t tetra;
 Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, int mpi_dir_shift) {
 
   Type norm = -1;
@@ -174,6 +175,7 @@ Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coe
     for (int i = 0; i < CELL_SIZE; i++) {
 
       Vector3 Il = inter_coef[num_cell * CELL_SIZE + i];
+
       const Type curI = (Il[0] + Il[1] + Il[2]) / 3; //  среднее на грани (в идеале переход к ax+by+c)
       const int id = mpi_dir_shift + CELL_SIZE * (shift_dir + num_cell) + i;
 
@@ -192,7 +194,12 @@ Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coe
   return norm;
 }
 
-Type illum::GetIllumeFromInFace(const int neigh_id, Vector3 &inter_coef) {
+Type illum::GetIllumeFromInFace(const int neigh_id, Vector3 &inter_coef
+#ifdef INTERPOLATION_ON_FACES
+                                ,
+                                const Vector2 &x0
+#endif
+) {
 
 #ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
   if (neigh_id != e_bound_inner_source) //при использовании трассировки сквозь границу, внутренняя грань определена до этого
@@ -209,10 +216,9 @@ Type illum::GetIllumeFromInFace(const int neigh_id, Vector3 &inter_coef) {
 
 #ifdef INTERPOLATION_ON_FACES
 
-#pragma error("Unsupported config")
+  //#pragma error("Unsupported config")
 
-  Vector2 x0_local = X0[ShiftX0 + posX0++];
-  Type I_x0 = x0_local[0] * coef[0] + x0_local[1] * coef[1] + coef[2];
+  Type I_x0 = x0[0] * coef[0] + x0[1] * coef[1] + coef[2];
 
 #else
   /// \note сейчас храним значения а не коэффициента интерполяции

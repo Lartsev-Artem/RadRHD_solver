@@ -13,7 +13,9 @@
 #include "geo_types.h"
 #include "global_def.h"
 #include "prj_config.h"
+#include "solvers_struct.h"
 #include "json/json_struct.h"
+
 
 extern global_files_t glb_files;
 extern TableFunc t_cooling_function; ///< табличная функция охлаждения

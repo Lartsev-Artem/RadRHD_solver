@@ -5,7 +5,7 @@
 
 #include "intersections.h"
 
-static const trace::BaseTetra_t base_tetra_geo; ///< стандартный единичный тетраэдр с узлами интерполяции
+static const BaseTetra_t base_tetra_geo; ///< стандартный единичный тетраэдр с узлами интерполяции
 
 int trace::GetInterpolationNodes(const std::vector<Eigen::Matrix4d> &vertexs, std::vector<BasePointTetra> &vec_x) {
 
