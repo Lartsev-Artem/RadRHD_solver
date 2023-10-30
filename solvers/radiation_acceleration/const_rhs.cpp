@@ -141,6 +141,58 @@ void RadSourceFunction(int cell, grid_t &grid, Vector4 &G) {
     G[i + 1] = q * u[i] - rho * (tot_op * uD[i] + scat_op * u[i] * (gamma2 + uuD)) * Ur + rhogamma * (tot_op * Fr[i] + scat_op * 2.0 * uF * u[i]);
 }
 
+void MyRadSourceFunction(int cell, grid_t &grid, Vector4 &G) {
+  int i, j;
+  static int comps = 4;
+  double u2, gamma, gamma2, D, uD[4], uuD, uF;
+  double B, rhogamma, q;
+
+  /*-- Set opacities --*/
+  double abs_op, scat_op, tot_op;
+  abs_op = g_absorptionCoeff;
+  scat_op = g_scatteringCoeff;
+  tot_op = g_totalOpacity;
+
+  const Vector3 &v = grid.cells[cell].phys_val.v;
+  const Type rho = grid.cells[cell].phys_val.d;
+  const Type prs = grid.cells[cell].phys_val.p;
+  const Type Ur = grid.energy[cell];
+  const Vector3 &Fr = grid.stream[cell];
+  const Matrix3 &Tr = grid.impuls[cell];
+
+  Matrix4 T;
+  T(0, 0) = Ur;
+  T(1, 0) = T(0, 1) = Fr[0];
+  T(2, 0) = T(0, 2) = Fr[1];
+  T(3, 0) = T(0, 3) = Fr[2];
+  for (size_t j = 0; j < 3; j++) {
+    for (size_t k = 0; k < 3; k++)
+      T(j + 1, k + 1) = Tr(j, k);
+  }
+  gamma = v.dot(v);
+  gamma2 = 1.0 / (1.0 - gamma);
+  gamma = sqrt(gamma2);
+  Vector4 u(gamma, v[0] * gamma, v[1] * gamma, v[2] * gamma);
+
+  /*-- Compute products involving the proper velocity --*/
+  uuD = 0.;
+  for (i = 0; i < comps; i++) {
+    uD[i] = 0.;
+    for (j = 0; j < comps; j++) {
+      uD[i] += u[j] * T(i, j);
+      uuD += u[i] * u[j] * T(i, j);
+    }
+  }
+
+  /*-- Compute some useful quantities --*/
+  rhogamma = rho * gamma;
+  B = Blackbody(GetTemperature(rho, prs));
+
+  for (i = 0; i < comps; i++) {
+    G[i] = -abs_op * rho * (B * u[i] + uD[i]) - scat_op * rho * (uD[i] + uuD * u[i]);
+  }
+}
+
 #if 0
 int RadIterToPrim(double *x, grid_t &rad_data)
 /*!
@@ -595,15 +647,15 @@ int rhllc::RadRHDTest() {
 #pragma omp parallel for
   for (int i = 0; i < grid.size; i++) {
     if (grid.cells[i].geo.center[0] < 0.5) {
-      grid.energy[i] = 1;
-      grid.stream[i] = Vector3(0.1, 0, 0);
+      grid.energy[i] = 10;
+      grid.stream[i] = Vector3(5, 0, 0);
       grid.impuls[i] = Matrix3::Zero();
       grid.impuls[i](0, 0) = grid.impuls[i](1, 1) = grid.impuls[i](2, 2) = grid.energy[i];
     } else {
       grid.energy[i] = 0;
       grid.stream[i] = Vector3(0, 0, 0);
       grid.impuls[i] = Matrix3::Zero();
-      grid.impuls[i](0, 0) = grid.impuls[i](1, 1) = grid.impuls[i](2, 2) = grid.energy[i];
+      grid.impuls[i](0, 0) = grid.impuls[i](1, 1) = grid.impuls[i](2, 2) = grid.energy[i] / 3;
     }
     grid.cells[i].phys_val.d = 1;
     grid.cells[i].phys_val.p = 10;
@@ -673,7 +725,7 @@ int rhllc::RadRHDTest() {
       // G << grid.energy[cell], grid.stream[cell][0], grid.stream[cell][1], grid.stream[cell][2];
 #else
       Vector4 G;
-      RadSourceFunction(cell, grid, G);
+      MyRadSourceFunction(cell, grid, G);
       /*
       u[ENG]   += dt*S[0] ;
          u[ENR]   -= dt*S[0] ;
