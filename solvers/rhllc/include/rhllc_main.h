@@ -17,9 +17,7 @@
  *
  */
 namespace rhllc {
-
 int RunRhllcModule();
-int RadRHDTest();
 } // namespace rhllc
 
 #endif //! RHLLC_MAIN_H
