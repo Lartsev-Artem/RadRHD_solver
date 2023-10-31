@@ -139,7 +139,7 @@ struct elem_t {
 
 #ifndef USE_CUDA
 struct grid_t {
-  int size;
+  IdType size;
   std::vector<elem_t> cells;
   std::vector<face_t> faces;
 
@@ -154,11 +154,11 @@ struct grid_t {
 #else
   grid_t() : size(0) {}
 #endif
-  void InitMemory(const uint32_t num_cells, const uint32_t num_directions);
+  void InitMemory(const IdType num_cells, const IdType num_directions);
 };
 #else
 struct grid_t {
-  int size;
+  IdType size;
   std::vector<elem_t> cells;
   std::vector<face_t> faces;
   std::vector<std::vector<Vector3>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
@@ -166,8 +166,8 @@ struct grid_t {
   Type *Illum;
   Type *scattering;
 
-  int loc_size;
-  int loc_shift;
+  IdType loc_size;
+  IdType loc_shift;
 
   Type *divstream;
   Vector3 *divimpuls;
@@ -178,7 +178,7 @@ struct grid_t {
   Matrix3 *impuls;
 #endif
 
-  void InitMemory(const uint32_t num_cells, const uint32_t num_directions);
+  void InitMemory(const IdType num_cells, const IdType num_directions);
 
   grid_t() : size(0), loc_size(0), loc_shift(0), Illum(nullptr), scattering(nullptr),
              divstream(nullptr), divimpuls(nullptr)

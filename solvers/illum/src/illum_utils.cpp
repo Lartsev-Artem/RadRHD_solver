@@ -27,7 +27,7 @@ static inline Type GetI(Type s, Type Q, Type S, Type I_0, Type alpha, Type betta
     return (1 - s * k) * (I_0 + s * (alpha * Q + S * betta));
 }
 
-Type illum::BoundaryConditions(const int type_bound, const int type_obj, const Vector3 &inter_coef) {
+Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, const Vector3 &inter_coef) {
   switch (type_bound) {
 
   case e_bound_free:
@@ -164,18 +164,18 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
   }
 }
 
-Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, int mpi_dir_shift) {
+Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
 
   Type norm = -1;
-  const int shift_dir = num_dir * grid.size;
+  const IdType shift_dir = num_dir * grid.size;
 
-  for (uint32_t num_cell = 0; num_cell < grid.size; num_cell++) {
+  for (IdType num_cell = 0; num_cell < grid.size; num_cell++) {
 
-    for (int i = 0; i < CELL_SIZE; i++) {
+    for (IdType i = 0; i < CELL_SIZE; i++) {
 
       Vector3 Il = inter_coef[num_cell * CELL_SIZE + i];
       const Type curI = (Il[0] + Il[1] + Il[2]) / 3; //  среднее на грани (в идеале переход к ax+by+c)
-      const int id = mpi_dir_shift + CELL_SIZE * (shift_dir + num_cell) + i;
+      const IdType id = mpi_dir_shift + CELL_SIZE * (shift_dir + num_cell) + i;
 
       // if (curI < 1e-15) // защита от деления на ноль
       //        norm = 1;
@@ -192,7 +192,7 @@ Type illum::ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coe
   return norm;
 }
 
-Type illum::GetIllumeFromInFace(const int neigh_id, Vector3 &inter_coef) {
+Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef) {
 
 #ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
   if (neigh_id != e_bound_inner_source) //при использовании трассировки сквозь границу, внутренняя грань определена до этого

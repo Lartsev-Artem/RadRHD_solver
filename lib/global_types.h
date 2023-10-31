@@ -10,9 +10,10 @@
 #include <string>
 
 typedef double Type;
-typedef int IntId;
+typedef int IntId; ///< номера ячеек. Используются в графах, для хранения
 typedef uint8_t State;
 typedef uint8_t bits_flag_t; ///< битовые флаги
+typedef int64_t IdType;      ///< номера ячеек в глобальной нумерации. т.е. (dir*size_grid*size_face). используется в расчётах. Знаковый т.к. хранит признак границы
 
 typedef uint8_t ShortId;
 typedef const std::string &file_name_t;

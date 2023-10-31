@@ -17,14 +17,14 @@
 namespace tick = std::chrono;
 
 struct mpi_sender_t {
-  int size;                               ///< размер секции по направлениям (не по запросам)
+  IdType size;                            ///< размер секции по направлениям (не по запросам)
   std::vector<MPI_Request> requests_rcv;  //все запросы сообщений отправки и принятия
   std::vector<MPI_Status> status_rcv;     //статусы всех обменов
   std::vector<int> flags_send_to_gpu;     //флаги указывающие на отправку пакета на gpu
   std::vector<MPI_Request> requests_send; //все запросы сообщений отправки и принятия
 };
 
-static std::vector<int> disp_illum;
+static std::vector<IdType> disp_illum;
 static mpi_sender_t section_1;
 static mpi_sender_t section_2;
 static MPI_Comm MPI_COMM_ILLUM = MPI_COMM_WORLD;
@@ -34,8 +34,8 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
   int np = get_mpi_np();
   int myid = get_mpi_id();
 
-  std::vector<int> disp;
-  std::vector<int> send_count;
+  std::vector<IdType> disp;
+  std::vector<IdType> send_count;
 
   GetSend(np, grid_dir.size, send_count);
   GetDisp(np, grid_dir.size, disp);
@@ -45,21 +45,24 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
     disp_illum[i] = disp[i] * CELL_SIZE * grid.size;
   }
 
-  const int size_first_section = 1 * send_count[0] / 3; // первый узел будем потенциально разгружать(на всех узла должно хватать направлений)
+  ///\todo: динамический выбор в зависимости от размера сетки. первый блок не должен превышать 2^31
+  const IdType size_first_section = 1 * send_count[0] / 3; // первый узел будем потенциально разгружать(на всех узла должно хватать направлений)
   section_1.size = size_first_section;
   {
     //==================first rcv ==============================
     section_1.requests_rcv.resize(np - 1, MPI_REQUEST_NULL);
     section_1.status_rcv.resize(np - 1);
     section_1.flags_send_to_gpu.resize(np - 1, 0);
-    const int size_msg = grid.size * CELL_SIZE * size_first_section;
+    const IdType size_msg = grid.size * CELL_SIZE * size_first_section;
+
+    DIE_IF(size_msg > ((2 << 31) - 1));
 
     int cc = 0;
     for (int src = 0; src < np; src++) {
       if (src == myid)
         continue;
       int tag = src;
-      MPI_Recv_init(grid.Illum + disp_illum[tag] /*size_msg * tag*/, size_msg, MPI_DOUBLE, src, tag, MPI_COMM_ILLUM, &section_1.requests_rcv[cc++]);
+      MPI_Recv_init(grid.Illum + disp_illum[tag] /*size_msg * tag*/, (int)size_msg, MPI_DOUBLE, src, tag, MPI_COMM_ILLUM, &section_1.requests_rcv[cc++]);
     }
 
     //==================first send ==============================
@@ -69,29 +72,31 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
     for (int id = 0; id < np; id++) {
       if (id == myid)
         continue;
-      MPI_Send_init(grid.Illum + disp_illum[myid] /*size_msg * myid*/, size_msg, MPI_DOUBLE, id, myid, MPI_COMM_ILLUM, &section_1.requests_send[cc++]);
+      MPI_Send_init(grid.Illum + disp_illum[myid] /*size_msg * myid*/, (int)size_msg, MPI_DOUBLE, id, myid, MPI_COMM_ILLUM, &section_1.requests_send[cc++]);
     }
   }
 
   //======================MPI_INIT=========================
 
-  const int local_size = send_count[myid];
-  const int size_second_section = local_size - size_first_section;
+  const IdType local_size = send_count[myid];
+  const IdType size_second_section = local_size - size_first_section;
   section_2.size = size_second_section;
   {
-    const int N = grid_dir.size - (size_first_section * np) - size_second_section;
+    const IdType N = grid_dir.size - (size_first_section * np) - size_second_section;
     section_2.requests_rcv.resize(N, MPI_REQUEST_NULL);
     section_2.status_rcv.resize(N);
     section_2.flags_send_to_gpu.resize(N, 0);
 
-    int size_msg = grid.size * CELL_SIZE;
+    IdType size_msg = grid.size * CELL_SIZE;
+    DIE_IF(size_msg > ((2 << 31) - 1));
+
     int cc = 0;
     for (int src = 0; src < np; src++) {
       if (src == myid)
         continue;
       for (int j = size_first_section; j < send_count[src]; j++) {
         int tag = disp[src] + j;
-        MPI_Recv_init(grid.Illum + size_msg * tag, size_msg, MPI_DOUBLE, src, tag, MPI_COMM_ILLUM, &section_2.requests_rcv[cc++ /*tag - local_size*/]);
+        MPI_Recv_init(grid.Illum + size_msg * tag, (int)size_msg, MPI_DOUBLE, src, tag, MPI_COMM_ILLUM, &section_2.requests_rcv[cc++ /*tag - local_size*/]);
       }
     }
 
@@ -104,7 +109,7 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
         if (id == myid)
           continue;
 
-        MPI_Send_init(grid.Illum + (disp[myid] + num_direction) * size_msg, size_msg, MPI_DOUBLE, id, tag, MPI_COMM_ILLUM, &section_2.requests_send[(np - 1) * (num_direction - size_first_section) + cc++]);
+        MPI_Send_init(grid.Illum + (disp[myid] + num_direction) * size_msg, (int)size_msg, MPI_DOUBLE, id, tag, MPI_COMM_ILLUM, &section_2.requests_send[(np - 1) * (num_direction - size_first_section) + cc++]);
       }
     }
   }
@@ -117,15 +122,15 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
                                      const std::vector<std::vector<cell_local>> &vec_x0, std::vector<BasePointTetra> &vec_x,
                                      const std::vector<std::vector<IntId>> &sorted_id_cell, grid_t &grid) {
 
-  const int n_illum = grid.size * CELL_SIZE;
+  const IdType n_illum = grid.size * CELL_SIZE;
 
   int np = get_mpi_np();
   int myid = get_mpi_id();
 
   DIE_IF(np <= 1); //на одном узле не работает. Тогда надо закрывать пересылки mpi
 
-  const int local_size = grid_direction.loc_size;
-  const int local_disp = grid_direction.loc_shift;
+  const IdType local_size = grid_direction.loc_size;
+  const IdType local_disp = grid_direction.loc_shift;
 
   int iter = 0;    ///< номер итерации
   double norm = 0; ///< норма ошибки
@@ -150,7 +155,7 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
     }
 
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
-    const int count_directions = grid_direction.size;
+    const IdType count_directions = grid_direction.size;
 
 #pragma omp parallel default(none) firstprivate(count_directions, n_illum, myid, np, local_disp, local_size)     \
     shared(sorted_id_cell, neighbours, face_states, vec_x0, vec_x, grid, norm, disp_illum, section_1, section_2, \
@@ -173,22 +178,22 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
       std::vector<Vector3> *inter_coef = &grid.inter_coef_all[omp_get_thread_num()]; ///< указатель на коэффициенты интерполяции по локальному для потока направлению
 
 #pragma omp for
-      for (int num_direction = 0; num_direction < section_1.size; ++num_direction) {
+      for (IdType num_direction = 0; num_direction < section_1.size; ++num_direction) {
 
         const cell_local *X0_ptr = vec_x0[num_direction].data(); ///< индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
         const IntId *code_bound = inner_bound_code[num_direction].data();
         /*---------------------------------- далее FOR по ячейкам----------------------------------*/
-        for (int h = 0; h < count_cells; ++h) {
+        for (IdType h = 0; h < count_cells; ++h) {
 
-          const int num_cell = sorted_id_cell[num_direction][h];
-          const int face_block_id = num_cell * CELL_SIZE;
+          const IdType num_cell = sorted_id_cell[num_direction][h];
+          const IdType face_block_id = num_cell * CELL_SIZE;
 
           elem_t *cell = &grid.cells[num_cell];
 
           // расчитываем излучения на выходящих гранях
           for (ShortId num_out_face = 0; num_out_face < CELL_SIZE; ++num_out_face) {
 
-            const int neigh_id = neighbours[face_block_id + num_out_face]; ///< сосед к текущей грани
+            const IdType neigh_id = neighbours[face_block_id + num_out_face]; ///< сосед к текущей грани
 
             // если эта грань входящая и граничная, то пропускаем её
             if (CHECK_BIT(face_states[num_direction][num_cell], num_out_face) == e_face_type_in) {
@@ -212,7 +217,7 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
 
             Vector3 I;
             // структура аналогичная  ::trace::GetLocNodes(...)
-            for (int num_node = 0; num_node < 3; ++num_node) {
+            for (ShortId num_node = 0; num_node < 3; ++num_node) {
 
               Vector3 &x = vec_x[num_cell].x[num_out_face][num_node];
               ShortId num_in_face = X0_ptr->in_face_id;
@@ -251,23 +256,23 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
       }
 
 #pragma omp for
-      for (int num_direction = section_1.size; num_direction < local_size; num_direction++) {
+      for (IdType num_direction = section_1.size; num_direction < local_size; num_direction++) {
 
         const cell_local *X0_ptr = vec_x0[num_direction].data(); ///< индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
         const IntId *code_bound = inner_bound_code[num_direction].data();
 
         /*---------------------------------- далее FOR по ячейкам----------------------------------*/
-        for (int h = 0; h < count_cells; ++h) {
+        for (IdType h = 0; h < count_cells; ++h) {
 
-          const int num_cell = sorted_id_cell[num_direction][h];
-          const int face_block_id = num_cell * CELL_SIZE;
+          const IdType num_cell = sorted_id_cell[num_direction][h];
+          const IdType face_block_id = num_cell * CELL_SIZE;
 
           elem_t *cell = &grid.cells[num_cell];
 
           // расчитываем излучения на выходящих гранях
           for (ShortId num_out_face = 0; num_out_face < CELL_SIZE; ++num_out_face) {
 
-            const int neigh_id = neighbours[face_block_id + num_out_face]; ///< сосед к текущей грани
+            const IdType neigh_id = neighbours[face_block_id + num_out_face]; ///< сосед к текущей грани
 
             // если эта грань входящая и граничная, то пропускаем её
             if (CHECK_BIT(face_states[num_direction][num_cell], num_out_face) == e_face_type_in) {
@@ -291,7 +296,7 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
 
             Vector3 I;
             // структура аналогичная  ::trace::GetLocNodes(...)
-            for (int num_node = 0; num_node < 3; ++num_node) {
+            for (ShortId num_node = 0; num_node < 3; ++num_node) {
 
               Vector3 &x = vec_x[num_cell].x[num_out_face][num_node];
               ShortId num_in_face = X0_ptr->in_face_id;

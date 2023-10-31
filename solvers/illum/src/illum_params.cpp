@@ -9,7 +9,7 @@ void illum::GetEnergy(const grid_directions_t &grid_direction, grid_t &grid) {
 #pragma omp parallel default(none) shared(grid_direction, grid)
   {
 #pragma omp for
-    for (int i = 0; i < grid.size; i++) {
+    for (IdType i = 0; i < grid.size; i++) {
       elem_t &el = grid.cells[i];
       el.illum_val.energy = direction_integrator::IntegrateByCell(el.illum_val.illum, grid_direction);
     }
@@ -21,7 +21,7 @@ void illum::GetStream(const grid_directions_t &grid_direction, grid_t &grid) {
 #pragma omp parallel default(none) shared(grid_direction, grid)
   {
 #pragma omp for
-    for (int i = 0; i < grid.cells.size(); i++) {
+    for (IdType i = 0; i < grid.cells.size(); i++) {
       elem_t &el = grid.cells[i];
 
       Vector3 Stream[CELL_SIZE];
@@ -48,7 +48,7 @@ void illum::GetImpuls(const grid_directions_t &grid_direction, grid_t &grid) {
 #pragma omp parallel default(none) shared(grid_direction, grid)
   {
 #pragma omp for
-    for (int i = 0; i < grid.cells.size(); i++) {
+    for (IdType i = 0; i < grid.cells.size(); i++) {
       elem_t &el = grid.cells[i];
 
       Matrix3 Impuls[CELL_SIZE];

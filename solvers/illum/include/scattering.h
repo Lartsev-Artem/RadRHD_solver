@@ -41,7 +41,7 @@ inline double Gamma(const Vector3 &direction, const Vector3 &direction2) {
  * @param[in] grid_direction сфера направлений
  * @return значение интеграла
  */
-Type GetIntScatteringByDirection(const int num_cell_shift, const Vector3 &direction, const int size_one_direction, const Type *illum_old,
+Type GetIntScatteringByDirection(const IdType num_cell_shift, const Vector3 &direction, const IdType size_one_direction, const Type *illum_old,
                                  const grid_directions_t &grid_direction);
 
 /**

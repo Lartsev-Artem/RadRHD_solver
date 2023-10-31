@@ -83,7 +83,7 @@ illum_value_t::illum_value_t(const int num_dir) {
 }
 
 #ifndef USE_CUDA
-void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions) {
+void grid_t::InitMemory(const IdType num_cells, const IdType num_directions) {
 
   DIE_IF(cells.size() != num_cells);
 
@@ -101,7 +101,7 @@ void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions)
   }
 
   if (get_mpi_id() == 0) {
-    for (int i = 0; i < size; i++) {
+    for (IdType i = 0; i < size; i++) {
       cells[i].illum_val.illum.resize(num_directions * CELL_SIZE, 0);
     }
   }
@@ -116,7 +116,7 @@ grid_t::~grid_t() {
 #endif
 #else // CUDA
 #include "cuda_interface.h"
-void grid_t::InitMemory(const uint32_t num_cells, const uint32_t num_directions) {
+void grid_t::InitMemory(const IdType num_cells, const IdType num_directions) {
 
   DIE_IF(cells.size() != num_cells);
 

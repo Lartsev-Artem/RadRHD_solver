@@ -72,7 +72,7 @@ inline Matrix3 GetAverageByCell(const Matrix3 *array) {
  * @param[in] inter_coef  коэффициенты интерполяции на потонциально определяющий границу грани
  * @return значение излучения
  */
-Type BoundaryConditions(const int type_bound, const int type_obj = e_ray_intersect_none, const Vector3 &inter_coef = Vector3 ::Zero());
+Type BoundaryConditions(const IdType type_bound, const IntId type_obj = e_ray_intersect_none, const Vector3 &inter_coef = Vector3 ::Zero());
 
 /**
  * @brief Функция возвращает текущее накопленное значение вдоль луча
@@ -99,7 +99,7 @@ Type GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scat
  * @return возвращает норму ошибки на текущей итерации
  * @warning сейчас коэффициенты интерполяции == значения в узлах на гранях
  */
-Type ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, int mpi_dir_shift = 0);
+Type ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift = 0);
 
 /**
  * @brief Функция возвращает значение на определяющей грани
@@ -108,7 +108,7 @@ Type ReCalcIllum(const int num_dir, const std::vector<Vector3> &inter_coef, grid
  * @param[in] inter_coef коэффицинты интерполяции текущей грани
  * @return определяющее значение на входящей грани для текущего выходящего узла
  */
-Type GetIllumeFromInFace(const int neigh_id, Vector3 &inter_coef);
+Type GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef);
 } // namespace illum
 
 #endif //! ILLUM_UTILS_H

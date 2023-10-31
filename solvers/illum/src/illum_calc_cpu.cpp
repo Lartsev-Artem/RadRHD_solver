@@ -33,30 +33,30 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
 
     norm = -1;
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
-    const int count_directions = grid_direction.size;
+    const IdType count_directions = grid_direction.size;
 
 #pragma omp parallel default(none) firstprivate(count_directions) shared(sorted_id_cell, neighbours, face_states, inner_bound_code, vec_x0, vec_x, grid, norm)
     {
-      const int count_cells = grid.size;
+      const IdType count_cells = grid.size;
 
       Type loc_norm = -1;
       std::vector<Vector3> *inter_coef = &grid.inter_coef_all[omp_get_thread_num()]; ///< указатель на коэффициенты интерполяции по локальному для потока направлению
 
 #pragma omp for
-      for (int num_direction = 0; num_direction < count_directions; ++num_direction) {
+      for (IdType num_direction = 0; num_direction < count_directions; ++num_direction) {
 
         const cell_local *X0_ptr = vec_x0[num_direction].data(); ///< индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
         const IntId *code_bound = inner_bound_code[num_direction].data();
         /*---------------------------------- далее FOR по ячейкам----------------------------------*/
-        for (int h = 0; h < count_cells; ++h) {
+        for (IdType h = 0; h < count_cells; ++h) {
 
-          const int num_cell = sorted_id_cell[num_direction][h];
+          const IdType num_cell = sorted_id_cell[num_direction][h];
           elem_t *cell = &grid.cells[num_cell];
 
           // расчитываем излучения на выходящих гранях
           for (ShortId num_out_face = 0; num_out_face < CELL_SIZE; ++num_out_face) {
 
-            const int neigh_id = neighbours[num_cell * CELL_SIZE + num_out_face]; ///< сосед к текущей грани
+            const IdType neigh_id = neighbours[num_cell * CELL_SIZE + num_out_face]; ///< сосед к текущей грани
 
             // если эта грань входящая и граничная, то пропускаем её
             if (CHECK_BIT(face_states[num_direction][num_cell], num_out_face) == e_face_type_in) {
@@ -80,7 +80,7 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
 
             Vector3 I;
             // структура аналогичная  ::trace::GetLocNodes(...)
-            for (int num_node = 0; num_node < 3; ++num_node) {
+            for (ShortId num_node = 0; num_node < 3; ++num_node) {
 
               Vector3 &x = vec_x[num_cell].x[num_out_face][num_node];
               ShortId num_in_face = X0_ptr->in_face_id;
@@ -163,30 +163,30 @@ int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction
 
   /*---------------------------------- далее FOR по направлениям----------------------------------*/
 
-  const int size_directions = grid_direction.loc_size;
+  const IdType size_directions = grid_direction.loc_size;
 
 #pragma omp parallel default(none) firstprivate(size_directions) shared(sorted_id_cell, neighbours, face_states, inner_bound_code, vec_x0, vec_x, grid)
   {
-    const int count_cells = grid.size;
+    const IdType count_cells = grid.size;
 
     Type loc_norm = -1;
     std::vector<Vector3> *inter_coef = &grid.inter_coef_all[omp_get_thread_num()]; ///< указатель на коэффициенты интерполяции по локальному для потока направлению
 
 #pragma omp for
-    for (int num_direction = 0; num_direction < size_directions; ++num_direction) {
+    for (IdType num_direction = 0; num_direction < size_directions; ++num_direction) {
 
       const cell_local *X0_ptr = vec_x0[num_direction].data(); ///< индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
       const IntId *code_bound = inner_bound_code[num_direction].data();
       /*---------------------------------- далее FOR по ячейкам----------------------------------*/
-      for (int h = 0; h < count_cells; ++h) {
+      for (IdType h = 0; h < count_cells; ++h) {
 
-        const int num_cell = sorted_id_cell[num_direction][h];
+        const IdType num_cell = sorted_id_cell[num_direction][h];
         elem_t *cell = &grid.cells[num_cell];
 
         // расчитываем излучения на выходящих гранях
         for (ShortId num_out_face = 0; num_out_face < CELL_SIZE; ++num_out_face) {
 
-          const int neigh_id = neighbours[num_cell * CELL_SIZE + num_out_face]; ///< сосед к текущей грани
+          const IdType neigh_id = neighbours[num_cell * CELL_SIZE + num_out_face]; ///< сосед к текущей грани
 
           // если эта грань входящая и граничная, то пропускаем её
           if (CHECK_BIT(face_states[num_direction][num_cell], num_out_face) == e_face_type_in) {
@@ -210,7 +210,7 @@ int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction
 
           Vector3 I;
           // структура аналогичная  ::trace::GetLocNodes(...)
-          for (int num_node = 0; num_node < 3; ++num_node) {
+          for (ShortId num_node = 0; num_node < 3; ++num_node) {
 
             Vector3 &x = vec_x[num_cell].x[num_out_face][num_node];
             ShortId num_in_face = X0_ptr->in_face_id;

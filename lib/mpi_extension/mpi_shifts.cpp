@@ -1,6 +1,6 @@
 #include "mpi_shifts.h"
 
-void GetSend(const int np, const int n, std::vector<int> &send_count) {
+void GetSend(const int np, const IdType n, std::vector<IdType> &send_count) {
 
   send_count.assign(np, n / np);
 
@@ -11,7 +11,7 @@ void GetSend(const int np, const int n, std::vector<int> &send_count) {
   }
 }
 
-void GetDisp(const int np, const int n, std::vector<int> &disp) {
+void GetDisp(const int np, const IdType n, std::vector<IdType> &disp) {
 
   disp.assign(np, 0);
   int a = n % np;

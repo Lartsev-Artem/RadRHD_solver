@@ -7,7 +7,7 @@ namespace integ = illum::direction_integrator;
 Type integ::IntegrateByCell(const std::vector<Type> &Illum, const grid_directions_t &grid_direction) {
 
   Type res = 0;
-  int i = 0;
+  IdType i = 0;
   for (auto &dir : grid_direction.directions) {
     res += GetAverageByCell(&Illum[i * CELL_SIZE]) * dir.area;
     i++;
@@ -17,7 +17,7 @@ Type integ::IntegrateByCell(const std::vector<Type> &Illum, const grid_direction
 }
 
 void integ::IntegrateByFace3(const std::vector<Type> &Illum, const grid_directions_t &grid_direction, Vector3 *stream_face) {
-  int i = 0;
+  IdType i = 0;
   for (int f = 0; f < CELL_SIZE; f++) {
     stream_face[f] = Vector3::Zero();
   }
@@ -35,7 +35,7 @@ void integ::IntegrateByFace3(const std::vector<Type> &Illum, const grid_directio
 
 void integ::IntegrateByFace9(const std::vector<Type> &Illum, const grid_directions_t &grid_direction, Matrix3 *impuls_face) {
 
-  int i = 0;
+  IdType i = 0;
   for (int f = 0; f < CELL_SIZE; f++) {
     impuls_face[f] = Matrix3::Zero();
   }
