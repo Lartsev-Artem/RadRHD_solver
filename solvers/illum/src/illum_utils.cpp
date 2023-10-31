@@ -3,6 +3,7 @@
 #include "illum_utils.h"
 #include "dbgdef.h"
 #include "global_value.h"
+#include "radRHD_utils.h"
 
 TableFunc t_cooling_function;
 
@@ -63,7 +64,7 @@ Type illum::BoundaryConditions(const int type_bound, const int type_obj, const V
   }
 }
 
-Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, const elem_t &cell) {
+Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, elem_t &cell) {
   switch (_solve_mode.class_vtk) {
 
   case e_grid_cfg_default:
@@ -131,9 +132,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     Type S = int_scattering;
     Type d = cell.phys_val.d;
     Type p = cell.phys_val.p;
-
-    constexpr Type coefT = (kM_hydrogen / k_boltzmann) * (kDist * kDist) / (kTime * kTime);
-    Type T = coefT * (p / d); // размерная
+    Type T = rad_rhd::GetTemperature(p, d); // размерная
 
 #if GEOMETRY_TYPE == Cone
     if (x[0] < 0.05) { //источник
@@ -149,12 +148,13 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     Type L = t_cooling_function(log(d * kMass / (kDist * kDist * kDist)), log(T));
     Type alpha = exp(L) / (4 * kStefanBoltzmann * T4) * kDist;
 
-    constexpr Type kP = k_boltzmann * PI;
-    constexpr Type coefIe = 2 * (kP * kP * kP * kP) / (15 * kH_plank * kH_plank * kH_plank * kC_Light * kC_Light);
-    Type Ie = (coefIe * (kTime * kTime * kTime / kMass)) * (T4);
+    Type Ie = rad_rhd::Blackbody(T);
     Type Q = alpha * Ie;
 
     Type betta = (kSigma_thomson / kM_hydrogen * kDist) * d;
+
+    cell.illum_val.absorp_coef = alpha;
+    cell.illum_val.scat_coef = betta;
 
     return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
   }

@@ -85,7 +85,7 @@ Type BoundaryConditions(const int type_bound, const int type_obj = e_ray_interse
  * @return значение излучения
  * @warning завязано на тип геометрии и конфигурацию решения ::e_grid_vtk_config_t
  */
-Type GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, const elem_t &cell);
+Type GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, elem_t &cell);
 
 /**
  * @brief Функция переводит данные расчёта излучения в структуру решателя

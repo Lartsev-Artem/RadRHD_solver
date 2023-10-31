@@ -54,6 +54,7 @@ inline T Blackbody(T temperature) {
  * @tparam T float-point-type
  * \param [in]	rho Input mass density.
  * \param [in]	prs Input (gas) pressure.
+ * \note размерная величина!
  * @return gas temperature
  */
 template <typename T>
