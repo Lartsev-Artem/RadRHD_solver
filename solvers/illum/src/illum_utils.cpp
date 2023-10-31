@@ -3,6 +3,7 @@
 #include "illum_utils.h"
 #include "dbgdef.h"
 #include "global_value.h"
+#include "radRHD_utils.h"
 
 TableFunc t_cooling_function;
 
@@ -63,7 +64,7 @@ Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, co
   }
 }
 
-Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, const elem_t &cell) {
+Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, elem_t &cell) {
   switch (_solve_mode.class_vtk) {
 
   case e_grid_cfg_default:
@@ -131,9 +132,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     Type S = int_scattering;
     Type d = cell.phys_val.d;
     Type p = cell.phys_val.p;
-
-    constexpr Type coefT = (kM_hydrogen / k_boltzmann) * (kDist * kDist) / (kTime * kTime);
-    Type T = coefT * (p / d); // размерная
+    Type T = rad_rhd::GetTemperature(p, d); // размерная
 
 #if GEOMETRY_TYPE == Cone
     if (x[0] < 0.05) { //источник
@@ -149,12 +148,13 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     Type L = t_cooling_function(log(d * kMass / (kDist * kDist * kDist)), log(T));
     Type alpha = exp(L) / (4 * kStefanBoltzmann * T4) * kDist;
 
-    constexpr Type kP = k_boltzmann * PI;
-    constexpr Type coefIe = 2 * (kP * kP * kP * kP) / (15 * kH_plank * kH_plank * kH_plank * kC_Light * kC_Light);
-    Type Ie = (coefIe * (kTime * kTime * kTime / kMass)) * (T4);
+    Type Ie = rad_rhd::Blackbody(T);
     Type Q = alpha * Ie;
 
     Type betta = (kSigma_thomson / kM_hydrogen * kDist) * d;
+
+    cell.illum_val.absorp_coef = alpha;
+    cell.illum_val.scat_coef = betta;
 
     return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
   }
@@ -164,6 +164,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
   }
 }
 
+static const BaseTetra_t tetra;
 Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
 
   Type norm = -1;
@@ -174,6 +175,7 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_
     for (IdType i = 0; i < CELL_SIZE; i++) {
 
       Vector3 Il = inter_coef[num_cell * CELL_SIZE + i];
+
       const Type curI = (Il[0] + Il[1] + Il[2]) / 3; //  среднее на грани (в идеале переход к ax+by+c)
       const IdType id = mpi_dir_shift + CELL_SIZE * (shift_dir + num_cell) + i;
 
@@ -192,7 +194,12 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_
   return norm;
 }
 
-Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef) {
+Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
+#ifdef INTERPOLATION_ON_FACES
+                                ,
+                                const Vector2 &x0
+#endif
+) {
 
 #ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
   if (neigh_id != e_bound_inner_source) //при использовании трассировки сквозь границу, внутренняя грань определена до этого
@@ -209,10 +216,9 @@ Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef) {
 
 #ifdef INTERPOLATION_ON_FACES
 
-#pragma error("Unsupported config")
+  //#pragma error("Unsupported config")
 
-  Vector2 x0_local = X0[ShiftX0 + posX0++];
-  Type I_x0 = x0_local[0] * coef[0] + x0_local[1] * coef[1] + coef[2];
+  Type I_x0 = x0[0] * coef[0] + x0[1] * coef[1] + coef[2];
 
 #else
   /// \note сейчас храним значения а не коэффициента интерполяции

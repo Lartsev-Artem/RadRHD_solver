@@ -102,6 +102,7 @@ struct cell_local // для каждой ячейки и каждого напр
 
 struct illum_value_t {
   Type absorp_coef;
+  Type scat_coef;
   Type rad_en_loose_rate;
 
 //в противном случае эти структуры вынесены как указатели в сетку и не привязаны к ячейкам

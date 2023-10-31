@@ -16,6 +16,10 @@
 #include <chrono>
 namespace tick = std::chrono;
 
+#ifdef INTERPOLATION_ON_FACES
+static const BaseTetra_t tetra;
+#endif
+
 int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const std::vector<std::vector<bits_flag_t>> &face_states,
                                const std::vector<IntId> &neighbours, const std::vector<std::vector<IntId>> &inner_bound_code,
                                const std::vector<std::vector<cell_local>> &vec_x0, std::vector<BasePointTetra> &vec_x,
@@ -84,21 +88,28 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
 
               Vector3 &x = vec_x[num_cell].x[num_out_face][num_node];
               ShortId num_in_face = X0_ptr->in_face_id;
-
+#ifdef INTERPOLATION_ON_FACES
+              Type I_x0 = GetIllumeFromInFace(neighbours[num_cell * CELL_SIZE + num_in_face], (*inter_coef)[num_cell * CELL_SIZE + num_in_face], X0_ptr->x0);
+#else
               Type I_x0 = GetIllumeFromInFace(neighbours[num_cell * CELL_SIZE + num_in_face], (*inter_coef)[num_cell * CELL_SIZE + num_in_face]);
+#endif
               I[num_node] = GetIllum(x, X0_ptr->s, I_x0, grid.scattering[num_direction * count_cells + num_cell], *cell);
 
               X0_ptr++;
             } // num_node
 
-            // если хранить не значения у коэфф. интерполяции
-            {
-                // Vector3 coef;
-                // if (num_out_face == 3)
-                //	coef = inclined_face_inverse * I;// GetInterpolationCoefInverse(inclined_face_inverse, I);
-                // else
-                //	coef = straight_face_inverse * I;// GetInterpolationCoefInverse(straight_face_inverse, I);
+#ifdef INTERPOLATION_ON_FACES
+            Type i3 = (I[0] + I[1] + I[2]) / 3;
+            grid.Illum[CELL_SIZE * (num_direction * grid.size + num_cell) + num_out_face] = i3;
+            if (neigh_id >= 0) {
+              grid.Illum[CELL_SIZE * (num_direction * grid.size) + neigh_id] = i3;
             }
+            // если хранить не значения у коэфф. интерполяции
+            if (num_out_face == 3)
+              I = tetra.inclined_face_inverse * I; // GetInterpolationCoefInverse(inclined_face_inverse, I);
+            else
+              I = tetra.straight_face_inverse * I; // GetInterpolationCoefInverse(straight_face_inverse, I);
+#endif
 
             //записываем значение коэффициентов на грани
             (*inter_coef)[num_cell * CELL_SIZE + num_out_face] = I; // coef
@@ -110,8 +121,9 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
           } // num_out_face
         }
         /*---------------------------------- конец FOR по ячейкам----------------------------------*/
-
+#ifndef INTERPOLATION_ON_FACES
         loc_norm = ReCalcIllum(num_direction, *inter_coef, grid);
+#endif
       }
       /*---------------------------------- конец FOR по направлениям----------------------------------*/
 

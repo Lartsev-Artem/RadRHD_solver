@@ -85,7 +85,7 @@ Type BoundaryConditions(const IdType type_bound, const IntId type_obj = e_ray_in
  * @return значение излучения
  * @warning завязано на тип геометрии и конфигурацию решения ::e_grid_vtk_config_t
  */
-Type GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, const elem_t &cell);
+Type GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, elem_t &cell);
 
 /**
  * @brief Функция переводит данные расчёта излучения в структуру решателя
@@ -108,7 +108,12 @@ Type ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, g
  * @param[in] inter_coef коэффицинты интерполяции текущей грани
  * @return определяющее значение на входящей грани для текущего выходящего узла
  */
-Type GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef);
+Type GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
+#ifdef INTERPOLATION_ON_FACES
+                         ,
+                         const Vector2 &x0 = Vector2::Zero()
+#endif
+);
 } // namespace illum
 
 #endif //! ILLUM_UTILS_H

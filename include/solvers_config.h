@@ -24,7 +24,7 @@
 /// но не для ускорения расчёта, т.к. дивергенции считаются  через эти величины
 #ifdef ILLUM
 #define ON_FULL_ILLUM_ARRAYS ///< расчитывать все параметры зависящие от излучения на каждом шаге
-// #define INTERPOLATION_ON_FACES ///< расчитывать линейную 2d интерполяцию на гранях, вместо усреднения
+//#define INTERPOLATION_ON_FACES ///< расчитывать линейную 2d интерполяцию на гранях, вместо усреднения
 
 // #define USE_TRACE_THROUGH_INNER_BOUNDARY ///< использование трассировки сквозь внутреннюю границу (доп. память и эффект луча!)
 
@@ -59,6 +59,10 @@
 
 #if defined HLLC && defined RHLLC
 #error "Bad config. There can be only one task at a time (HLLC or RHLLC)"
+#endif
+
+#if defined RAD_RHD && (!defined RHLLC || !defined ILLUM)
+#error "Bad config. RAD_RHD is only available with RHLLC and ILLUM"
 #endif
 
 #endif //! SOLVE_CONFIG_H

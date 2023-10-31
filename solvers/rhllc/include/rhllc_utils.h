@@ -40,5 +40,21 @@ Type GetTimeStep(const hllc_value_t &hllc_set, const std::vector<elem_t> &cells)
  * @param[inout] cells ячейки сетки
  */
 void HllcPhysToConv(std::vector<elem_t> &cells);
+
+#ifdef DEBUG
+/**
+ * @brief Проверка условия физичности консервативных переменных
+ *
+ * @param U
+ * @return true if bad
+ */
+static inline bool CheckConvState(const flux_t &U) {
+  if (U.p - sqrt(U.d * U.d + U.v.dot(U.v)) < 0) {
+    return true;
+  }
+  return false;
+}
+#endif
+
 } // namespace rhllc
 #endif //! RHLLC_UTILS_H
