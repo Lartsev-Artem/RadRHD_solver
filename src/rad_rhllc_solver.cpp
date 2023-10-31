@@ -1,6 +1,6 @@
 #include "mpi_ext.h"
+#include "radRHD_main.h"
 #include "reader_json.h"
-#include "rhllc_main.h"
 #include "solvers_struct.h"
 
 int main(int argc, char *argv[]) {
@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
     return e_completion_fail;
 
-  rhllc::RadRHDTest();
+  rad_rhd::RadRHD_ConstRadStateTest();
 
   MPI_END;
 #else

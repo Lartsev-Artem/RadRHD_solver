@@ -61,4 +61,8 @@
 #error "Bad config. There can be only one task at a time (HLLC or RHLLC)"
 #endif
 
+#if defined RAD_RHD && (!defined RHLLC || !defined ILLUM)
+#error "Bad config. RAD_RHD is only available with RHLLC and ILLUM"
+#endif
+
 #endif //! SOLVE_CONFIG_H

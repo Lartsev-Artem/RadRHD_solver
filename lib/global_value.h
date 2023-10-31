@@ -16,7 +16,6 @@
 #include "solvers_struct.h"
 #include "json/json_struct.h"
 
-
 extern global_files_t glb_files;
 extern TableFunc t_cooling_function; ///< табличная функция охлаждения
 
@@ -73,7 +72,7 @@ constexpr double kDistMoon = 400000000.;    ///<расстояние до Лун
 constexpr double kDist = 1e6;          ///< характерное расстояние
 constexpr double kMass = (1 * 1e21);   ///< характерная масса
 constexpr double kVelocity = kC_Light; ///< характерная скорость
-
+// constexpr double kTemperature = 4000;         ///< характерная температура
 constexpr double kTime = (kDist / kVelocity); ///< характерное время
 
 // constexpr double kDensity = (kMass / (kDist * kDist * kDist));   ///< характерная плотность
