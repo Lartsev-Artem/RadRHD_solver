@@ -105,7 +105,7 @@ int CalculateIntScattering(const grid_directions_t &grid_dir, grid_t &grid);
  * @param[in] stream id потока
  * @return int ::e_type_completion
  */
-int CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid, const int start_dir, const int end_dir, const e_cuda_stream_id_t stream);
+int CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid, const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream);
 
 /**
  * @brief Барьерная синхронизация с cuda
@@ -133,7 +133,7 @@ void SetStreams();
  * @param[in] shift сдвиг в массиве
  * @param[in] Illum_host массив излучения
  */
-void CudaSendIllumAsync(const int size, const int shift, const Type *Illum_host);
+void CudaSendIllumAsync(const IdType size, const IdType shift, const Type *Illum_host);
 
 } // namespace interface
 

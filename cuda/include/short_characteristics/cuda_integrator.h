@@ -36,7 +36,7 @@ __device__ Type Gamma(const Vector3 &direction, const Vector3 &direction2);
  * @param[in] grid сетка
  * @return  значение интеграла (энергия на ячейке)
  */
-__device__ Type IntegrateByCell(const int num_cell, const geo::grid_directions_device_t *dir, const geo::grid_device_t *grid);
+__device__ Type IntegrateByCell(const IdType num_cell, const geo::grid_directions_device_t *dir, const geo::grid_device_t *grid);
 
 /**
  * @brief Функция интегрирования по направлениям с вектором направления на каждой грани (поток излучения)
@@ -46,7 +46,7 @@ __device__ Type IntegrateByCell(const int num_cell, const geo::grid_directions_d
  * @param[in] grid сетка
  * @param[out] Stream массив векторов длины ::CELL_SIZE(поток на грани
  */
-__device__ void IntegrateByFaces3(const int num_cell, const geo::grid_directions_device_t *dir_grid, geo::grid_device_t *grid, Vector3 *Stream);
+__device__ void IntegrateByFaces3(const IdType num_cell, const geo::grid_directions_device_t *dir_grid, geo::grid_device_t *grid, Vector3 *Stream);
 
 /**
  * @brief Функция интегрирования по направлениям с тензором направления на каждой грани (импульс излучения)
@@ -56,7 +56,7 @@ __device__ void IntegrateByFaces3(const int num_cell, const geo::grid_directions
  * @param grid сетка
  * @param Impuls массив матриц длины ::CELL_SIZE(импульс на грани)
  */
-__device__ void IntegrateByFaces9(const int num_cell, const geo::grid_directions_device_t *dir_grid, geo::grid_device_t *grid, Matrix3 *Impuls);
+__device__ void IntegrateByFaces9(const IdType num_cell, const geo::grid_directions_device_t *dir_grid, geo::grid_device_t *grid, Matrix3 *Impuls);
 
 } // namespace direction_integrator
 } // namespace cuda::device

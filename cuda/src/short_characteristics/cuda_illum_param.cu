@@ -14,9 +14,9 @@
   }
 
 __device__ void cuda::device::MakeEnergy(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
-  const int N = grid->loc_size;
-  const int shift = grid->shift;
-  const int i = blockIdx.x * blockDim.x + threadIdx.x;
+  const IdType N = grid->loc_size;
+  const IdType shift = grid->shift;
+  const IdType i = blockIdx.x * blockDim.x + threadIdx.x;
 
   if (i >= N)
     return;
@@ -27,10 +27,10 @@ __device__ void cuda::device::MakeEnergy(const geo::grid_directions_device_t *di
 
 __device__ void cuda::device::MakeDivStream(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
   //  const int M = dir->size;
-  const int N = grid->loc_size;
-  const int shift = grid->shift;
+  const IdType N = grid->loc_size;
+  const IdType shift = grid->shift;
 
-  int i = blockIdx.x * blockDim.x + threadIdx.x;
+  IdType i = blockIdx.x * blockDim.x + threadIdx.x;
 
   if (i >= N)
     return;
@@ -43,7 +43,7 @@ __device__ void cuda::device::MakeDivStream(const geo::grid_directions_device_t 
 #endif
 
   grid->divstream[i] = 0;
-  int pos = (i + shift) * CELL_SIZE;
+  IdType pos = (i + shift) * CELL_SIZE;
   Type div = 0;
   for (int f = 0; f < CELL_SIZE; f++) {
     Type sum = 0;
@@ -59,10 +59,10 @@ __device__ void cuda::device::MakeDivStream(const geo::grid_directions_device_t 
 
 __device__ void cuda::device::MakeDivImpuls(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
   // const int M = dir->size;
-  const int N = grid->loc_size;
-  const int shift = grid->shift;
+  const IdType N = grid->loc_size;
+  const IdType shift = grid->shift;
 
-  const int i = blockIdx.x * blockDim.x + threadIdx.x;
+  const IdType i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i >= N)
     return;
 
@@ -79,8 +79,8 @@ __device__ void cuda::device::MakeDivImpuls(const geo::grid_directions_device_t 
 
   Vector3 div = Vector3::Zero();
 
-  for (int j = 0; j < CELL_SIZE; j++) {
-    int pos = (i + shift) * CELL_SIZE + j;
+  for (IdType j = 0; j < CELL_SIZE; j++) {
+    IdType pos = (i + shift) * CELL_SIZE + j;
     for (int h = 0; h < 3; h++) {
       Type sum = 0;
       for (int k = 0; k < 3; k++) {

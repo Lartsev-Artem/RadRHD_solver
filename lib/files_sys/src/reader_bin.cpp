@@ -135,8 +135,8 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
   if (ReadSimple(gbl_files.name_file_x, vec_x))
     return e_completion_fail;
 
-  std::vector<IntId> disp;
-  std::vector<IntId> send;
+  std::vector<IdType> disp;
+  std::vector<IdType> send;
 
   int np = get_mpi_np();
   int myid = get_mpi_id();

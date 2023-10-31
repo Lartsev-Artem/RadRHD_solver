@@ -12,16 +12,16 @@ __device__ Type c_dir::Gamma(const Vector3 &direction, const Vector3 &direction2
   return (3. * (1 + sum * sum)) / 4.;
 }
 
-__device__ Type c_dir::IntegrateByCell(const int num_cell, const geo::grid_directions_device_t *dir, const geo::grid_device_t *grid) {
-  const int M = dir->size;
-  const int N = grid->size;
+__device__ Type c_dir::IntegrateByCell(const IdType num_cell, const geo::grid_directions_device_t *dir, const geo::grid_device_t *grid) {
+  const IdType M = dir->size;
+  const IdType N = grid->size;
 
   Type res = 0;
-  for (int i = 0; i < M; i++) {
-    int pos = CELL_SIZE * (N * i + num_cell);
+  for (IdType i = 0; i < M; i++) {
+    IdType pos = CELL_SIZE * (N * i + num_cell);
 
     Type I = 0;
-    for (int k = 0; k < CELL_SIZE; k++) {
+    for (IdType k = 0; k < CELL_SIZE; k++) {
       I += grid->illum[pos + k];
     }
     I /= CELL_SIZE;
@@ -32,17 +32,17 @@ __device__ Type c_dir::IntegrateByCell(const int num_cell, const geo::grid_direc
   return res / dir->full_area;
 }
 
-__device__ void c_dir::IntegrateByFaces3(const int num_cell, const geo::grid_directions_device_t *dir_grid, geo::grid_device_t *grid, Vector3 *Stream) {
+__device__ void c_dir::IntegrateByFaces3(const IdType num_cell, const geo::grid_directions_device_t *dir_grid, geo::grid_device_t *grid, Vector3 *Stream) {
 
-  const int M = dir_grid->size;
-  const int N = grid->size;
+  const IdType M = dir_grid->size;
+  const IdType N = grid->size;
 
   for (int h = 0; h < CELL_SIZE; h++) {
     Stream[h] = Vector3::Zero();
   }
 
-  for (int i = 0; i < M; i++) {
-    int pos = CELL_SIZE * (N * i + num_cell);
+  for (IdType i = 0; i < M; i++) {
+    IdType pos = CELL_SIZE * (N * i + num_cell);
     for (int f = 0; f < CELL_SIZE; f++) {
       Stream[f] += dir_grid->directions[i].dir * (grid->illum[pos + f] * dir_grid->directions[i].area);
     }
@@ -54,16 +54,16 @@ __device__ void c_dir::IntegrateByFaces3(const int num_cell, const geo::grid_dir
   return;
 }
 
-__device__ void c_dir::IntegrateByFaces9(const int num_cell, const geo::grid_directions_device_t *dir_grid, geo::grid_device_t *grid, Matrix3 *Impuls) {
-  const int M = dir_grid->size;
-  const int N = grid->size;
+__device__ void c_dir::IntegrateByFaces9(const IdType num_cell, const geo::grid_directions_device_t *dir_grid, geo::grid_device_t *grid, Matrix3 *Impuls) {
+  const IdType M = dir_grid->size;
+  const IdType N = grid->size;
 
   for (int h = 0; h < CELL_SIZE; h++) {
     Impuls[h] = Matrix3::Zero();
   }
 
-  for (int dir = 0; dir < M; dir++) {
-    int pos = CELL_SIZE * (N * dir + num_cell);
+  for (IdType dir = 0; dir < M; dir++) {
+    IdType pos = CELL_SIZE * (N * dir + num_cell);
     for (int f = 0; f < CELL_SIZE; f++) {
       for (int i = 0; i < 3; i++)
         for (int k = 0; k < 3; k++) {

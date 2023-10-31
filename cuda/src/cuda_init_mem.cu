@@ -9,7 +9,7 @@ namespace mem = cuda::mem_protected;
 
 void cuda::InitDirectionsOnDevice(const grid_directions_t &grid_host, geo::grid_directions_device_t *&grid_device) {
 
-  const int n = grid_host.size;
+  const IdType n = grid_host.size;
 
   DIE_IF(sizeof(geo::direction_device_t) != sizeof(grid_host.directions[0])); //размеры структур на хосте и видеокарте должны быть соразмерны
 
@@ -28,13 +28,13 @@ void cuda::ClearDirectionsOnDevice(geo::grid_directions_device_t *&grid_device) 
 }
 
 void cuda::InitGridOnDevice(const grid_t &grid_host,
-                            const int size_dir, const int start_dir, const int end_dir,
+                            const IdType size_dir, const IdType start_dir, const IdType end_dir,
                             geo::grid_device_t *&grid_device) {
 
-  const int size_grid = grid_host.size;
-  const int num_cell_loc = grid_host.loc_size;
-  const int cell_loc_shift = grid_host.loc_shift;
-  const int loc_size_dir = end_dir - start_dir;
+  const IdType size_grid = grid_host.size;
+  const IdType num_cell_loc = grid_host.loc_size;
+  const IdType cell_loc_shift = grid_host.loc_shift;
+  const IdType loc_size_dir = end_dir - start_dir;
 
   mem::Malloc(sizeof(geo::grid_device_t), (void **)&grid_device); // память под структуру сетки
 

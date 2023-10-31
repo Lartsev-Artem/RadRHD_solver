@@ -45,8 +45,7 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
     disp_illum[i] = disp[i] * CELL_SIZE * grid.size;
   }
 
-  ///\todo: динамический выбор в зависимости от размера сетки. первый блок не должен превышать 2^31
-  const IdType size_first_section = 1 * send_count[0] / 3; // первый узел будем потенциально разгружать(на всех узла должно хватать направлений)
+  const IdType size_first_section = std::max(((1u << 31) / (CELL_SIZE * grid.size)) - 1, 1 * send_count[0] / 3); // первый узел будем потенциально разгружать(на всех узла должно хватать направлений)
   section_1.size = size_first_section;
   {
     //==================first rcv ==============================
@@ -55,7 +54,7 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
     section_1.flags_send_to_gpu.resize(np - 1, 0);
     const IdType size_msg = grid.size * CELL_SIZE * size_first_section;
 
-    DIE_IF(size_msg > ((2 << 31) - 1));
+    DIE_IF(size_msg > ((1u << 31) - 1));
 
     int cc = 0;
     for (int src = 0; src < np; src++) {
@@ -88,7 +87,7 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
     section_2.flags_send_to_gpu.resize(N, 0);
 
     IdType size_msg = grid.size * CELL_SIZE;
-    DIE_IF(size_msg > ((2 << 31) - 1));
+    DIE_IF(size_msg > ((1u << 31) - 1));
 
     int cc = 0;
     for (int src = 0; src < np; src++) {

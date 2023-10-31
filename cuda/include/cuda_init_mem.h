@@ -41,7 +41,7 @@ void ClearDirectionsOnDevice(geo::grid_directions_device_t *&grid_device);
  * @param[out] grid_device указатель на структуру сетки на карте
  */
 void InitGridOnDevice(const grid_t &grid_host,
-                      const int size_dir, const int start_dir, const int end_dir,
+                      const IdType size_dir, const IdType start_dir, const IdType end_dir,
                       cuda::geo::grid_device_t *&grid_device);
 
 /**

@@ -25,7 +25,7 @@ void cuda::interface::SetStreams() {
   CUDA_CALL_FUNC(cudaStreamCreateWithPriority, &cuda_streams[e_cuda_params], cudaStreamNonBlocking, priority_low);
 }
 
-void cuda::interface::CudaSendIllumAsync(const int size, const int shift, const Type *Illum_host) {
+void cuda::interface::CudaSendIllumAsync(const IdType size, const IdType shift, const Type *Illum_host) {
 
   CUDA_CALL_FUNC(cudaMemcpyAsync, device_host_ptr.illum + shift, Illum_host + shift, size * sizeof(Illum_host[0]),
                  cudaMemcpyHostToDevice, cuda_streams[e_cuda_scattering_1]);

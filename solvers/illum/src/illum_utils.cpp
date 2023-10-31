@@ -72,14 +72,14 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
 #if GEOMETRY_TYPE == Sphere
     Type Q = 10;
     Type alpha = 10;
-    Type betta = 0;
+    Type betta = 5;
     Type S = int_scattering;
 
     if ((x - Vector3(0, 0, 0)).norm() > 0.3) // излучающий шар
     {
       Q = 0;
       alpha = 1;
-      betta = 0;
+      betta = 5;
     }
     return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
 #endif

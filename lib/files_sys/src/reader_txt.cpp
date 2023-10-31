@@ -23,8 +23,8 @@ int files_sys::txt::ReadSphereDirectionCartesian(const std::string &file_sphere_
   ifile >> grid_direction.full_area;
   ifile.close();
 
-  std::vector<int> send;
-  std::vector<int> disp;
+  std::vector<IdType> send;
+  std::vector<IdType> disp;
 
   GetDisp(get_mpi_np(), N, disp);
   GetSend(get_mpi_np(), N, send);
@@ -109,6 +109,7 @@ int files_sys::txt::ReadTableFunc(const std::string &file_func, TableFunc &tab_f
   }
 
   WRITE_LOG("Tab func: %dx%d: hx=%lf hy%lf maxX= %lf maxY%lf minX= %lf minY= %lf\n",
+            lambda.Nx, lambda.Ny,
             lambda.step_x, lambda.step_y,
             lambda.max_x, lambda.max_y,
             lambda.min_x, lambda.min_y);

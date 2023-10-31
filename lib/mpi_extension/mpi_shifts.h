@@ -6,6 +6,7 @@
 #ifndef MPI_SHIFTS
 #define MPI_SHIFTS
 
+#include "global_types.h"
 #include <vector>
 
 /**

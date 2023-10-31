@@ -40,8 +40,8 @@ int cuda::interface::CalculateAllParam(const grid_directions_t &grid_dir, grid_t
 }
 
 int cuda::interface::CalculateIntScattering(const grid_directions_t &grid_dir, grid_t &grid) {
-  const int M = grid_dir.size;
-  const int N = grid.size;
+  const IdType M = grid_dir.size;
+  const IdType N = grid.size;
 
   mem_protected::CpyToDevice(device_host_ptr.illum, grid.Illum, N * M * CELL_SIZE * sizeof(grid.Illum[0]));
 
@@ -58,9 +58,9 @@ int cuda::interface::CalculateIntScattering(const grid_directions_t &grid_dir, g
 }
 
 int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid,
-                                                 const int start_dir, const int end_dir, const e_cuda_stream_id_t stream) {
-  const int M = grid_dir.size;
-  const int N = grid.size;
+                                                 const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream) {
+  const IdType M = end_dir - start_dir; // grid_dir.size;
+  const IdType N = grid.size;
 
   CUDA_TREADS_2D(threads);
   CUDA_BLOCKS_2D(blocks, N, M);
@@ -73,8 +73,8 @@ int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_d
 
   CUDA_CALL_FUNC(cudaGetLastError);
 
-  int disp = start_dir * N;
-  int size = (end_dir - start_dir) * N * sizeof(grid.scattering[0]);
+  IdType disp = start_dir * N;
+  IdType size = (end_dir - start_dir) * N * sizeof(grid.scattering[0]);
 
   CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + disp, device_host_ptr.int_scattering + disp, size, cudaMemcpyDeviceToHost, cuda_streams[stream]);
 
@@ -84,7 +84,7 @@ int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_d
 int cuda::interface::CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
 
 #ifndef ONLY_CUDA_SCATTERING
-  const int N_loc = grid.loc_size;
+  const IdType N_loc = grid.loc_size;
 
   CUDA_TREADS_1D(threads);
   CUDA_BLOCKS_1D(blocks, N_loc);

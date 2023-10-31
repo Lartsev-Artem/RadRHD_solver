@@ -33,7 +33,7 @@ int cuda::interface::InitDevice(const std::string &address, const grid_direction
     mem_protected::MallocHost((grid_host.loc_size * sizeof(Matrix3)), &grid_host.impuls);
 #endif
 #ifndef ONLY_CUDA_SCATTERING
-    const int N = grid_host.size;
+    const IdType N = grid_host.size;
     std::vector<Normals> normals;
     std::vector<Type> areas_faces;
     std::vector<Type> volume;

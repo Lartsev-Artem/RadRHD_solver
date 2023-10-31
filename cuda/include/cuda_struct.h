@@ -53,7 +53,7 @@ struct direction_device_t {
  */
 struct grid_directions_device_t {
 
-  int size;                       ///< число направлений
+  IdType size;                    ///< число направлений
   direction_device_t *directions; ///< массив направлений
   Type full_area;                 ///< площадь сферы направлений
 
@@ -67,13 +67,13 @@ struct grid_directions_device_t {
  *
  */
 struct grid_device_t {
-  int size; ///< размер всей сетки
+  IdType size; ///< размер всей сетки
 
-  int loc_size; ///< локальное число ячеек (mpi)
-  int shift;    ///< локальный сдвиг по ячейкам(mpi)
+  IdType loc_size; ///< локальное число ячеек (mpi)
+  IdType shift;    ///< локальный сдвиг по ячейкам(mpi)
 
-  int local_scattering_size; ///< локальный размер по направлениям(потоки)
-  int local_scattering_disp; ///< локальный сдвиг  по направлениям(потоки)
+  IdType local_scattering_size; ///< локальный размер по направлениям(потоки)
+  IdType local_scattering_disp; ///< локальный сдвиг  по направлениям(потоки)
 
   Type *illum;          ///< излучение
   Type *int_scattering; ///< интеграл рессеяния
