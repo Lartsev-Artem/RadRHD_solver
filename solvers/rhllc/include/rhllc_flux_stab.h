@@ -90,6 +90,9 @@ int GetPhysValueStab(const flux_t &U, flux_t &W);
 Type GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
                  const flux_t &phys_val_l, const flux_t &phys_val_r, face_t &f);
 
+Type GetFluxStabVec(const flux_t &conv_val_l, const flux_t &conv_val_r,
+                    const flux_t &phys_val_l, const flux_t &phys_val_r, face_t &f);
+
 } // namespace rhllc
 
 #endif //! RHLLC_FLUX_H

@@ -128,6 +128,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     ///\todo Здесь пересчёт в размерные единицы, потом вычисление излучения и возврат к безразмерным
   case e_grid_cfg_full_init: // HLLC + Illum для конуса
   {
+#ifdef RAD_RHD
     // переход к размерным параметрам
     Type S = int_scattering;
     Type d = cell.phys_val.d;
@@ -157,6 +158,9 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     cell.illum_val.scat_coef = betta;
 
     return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
+#else
+    D_LD;
+#endif
   }
 
   default:

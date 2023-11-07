@@ -262,6 +262,8 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
     F.p = U_L.v[0];
 
     F.v[0] += p_L;
+
+    // WRITE_LOG("L: %lf %lf %lf %lf %lf\n", F.d, F.v[0], F.v[1], F.v[2], F.p);
     //  sweep->press[i] = pL[i];
 
   } else if (lambda_R <= 0.0) {
@@ -270,6 +272,8 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
     F.v = U_R.v * Vel_R[0]; // mx*vx+p
     F.p = U_R.v[0];
     F.v[0] += p_R;
+
+    // WRITE_LOG("R: %lf %lf %lf %lf %lf\n", F.d, F.v[0], F.v[1], F.v[2], F.p);
 
   } else {
 
@@ -351,6 +355,8 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
       F = F_L + usl;
 
       F.v[0] += p_L;
+
+      // WRITE_LOG("UL: %lf %lf %lf %lf %lf\n", F.d, F.v[0], F.v[1], F.v[2], F.p);
     } else {
       flux_t usr;
       Type dif = 1.0 / (lambda_R - us);
@@ -364,6 +370,8 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
       usr *= lambda_R;
       F = F_R + usr;
       F.v[0] += p_R;
+
+      // WRITE_LOG("UR: %lf %lf %lf %lf %lf\n", F.d, F.v[0], F.v[1], F.v[2], F.p);
     }
 #endif // HLL
   }
@@ -374,6 +382,220 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
   f.f *= f.geo.S;
 
   return std::max(lambda_L, lambda_R);
+}
+
+#pragma GCC target("avx2")
+#pragma GCC optimize("O3")
+
+#include <bits/stdc++.h>
+#include <x86intrin.h>
+
+using namespace std;
+
+Type rhllc::GetFluxStabVec(const flux_t &conv_val_l, const flux_t &conv_val_r,
+                           const flux_t &phys_val_l, const flux_t &phys_val_r, face_t &f) {
+  Matrix3 T;
+  GetRotationMatrix(f.geo.n, T);
+
+  alignas(16) Type U_L[5];
+  alignas(16) Type U_R[5];
+  alignas(16) Type F[5];
+
+  const Vector3 &Uvl = T * conv_val_l.v;
+  U_L[0] = conv_val_l[0];
+  U_L[1] = Uvl[0];
+  U_L[2] = Uvl[1];
+  U_L[3] = Uvl[2];
+  U_L[4] = conv_val_l[4];
+
+  const Vector3 &Uvr = T * conv_val_r.v;
+  U_R[0] = conv_val_r[0];
+  U_R[1] = Uvr[0];
+  U_R[2] = Uvr[1];
+  U_R[3] = Uvr[2];
+  U_R[4] = conv_val_r[4];
+
+  const Vector3 &Wvl = T * phys_val_l.v;
+  const Vector3 &Wvr = T * phys_val_r.v;
+
+  alignas(16) Type W_K[10] =
+      {
+          phys_val_l[0],
+          phys_val_r[0],
+
+          Wvl[0],
+          Wvr[0],
+
+          Wvl[1],
+          Wvr[1],
+
+          Wvl[2],
+          Wvr[2],
+
+          phys_val_l[4],
+          phys_val_r[4],
+      };
+
+  //==================== Кэшируем физические переменные слева и справа============================//
+
+  const __m128d ones2 = _mm_set1_pd(1.0);
+  __m128d dk = _mm_load_pd(W_K);
+  __m128d vnk = _mm_load_pd(W_K + 2);
+  __m128d vk = _mm_setr_pd(Wvl.dot(Wvl), Wvr.dot(Wvr));
+  __m128d pk = _mm_load_pd(W_K + 8);
+
+  //=========================Вычисляем релятивистикие параметры============================//
+
+  // 1. / sqrt(1 - VV_L); // фактор Лоренца
+  __m128d gk = _mm_div_pd(ones2, _mm_sqrt_pd(_mm_sub_pd(ones2, vk)));
+
+  // 1 + kGamma_g * p_L / d_L; // энтальпия
+  __m128d hk = _mm_add_pd(ones2, _mm_mul_pd(_mm_set1_pd(kGamma_g), _mm_div_pd(pk, dk)));
+
+  //((kGamma1 * p_L) / (d_L * h_L)); //квадрат скорости звука
+  __m128d cs2 = _mm_div_pd(_mm_mul_pd(_mm_set1_pd(kGamma1), pk), _mm_mul_pd(dk, hk));
+
+  //=========================Вычисляем скорости сигналов============================//
+  __m128d Vn2 = _mm_mul_pd(vnk, vnk); //квадрат нормальной компоненты
+  __m128d Vt2 = _mm_sub_pd(vk, Vn2);  //квадрат нормы - квадрат компоненты
+
+  __m128d s1 = _mm_sub_pd(_mm_sub_pd(ones2, Vn2), _mm_mul_pd(Vt2, cs2)); //(1 - Vn2 - Vt2 * cs2)
+
+  // sqrt(cs2 * (1 - Vn2 - Vt2 * cs2) * (1 - V2_norm));
+  __m128d srootk = _mm_sqrt_pd(_mm_mul_pd(_mm_mul_pd(cs2, s1), _mm_sub_pd(ones2, vk)));
+
+  __m128d s2 = _mm_mul_pd(vnk, _mm_sub_pd(ones2, cs2)); // Vn * (1.0 - cs2)
+  __m128d div = _mm_div_pd(ones2, _mm_sub_pd(ones2, _mm_mul_pd(vk, cs2)));
+  __m128d cmax = _mm_mul_pd(_mm_add_pd(s2, srootk), div); //(Vn * (1.0 - cs2) + sroot_L) / (1.0 - V2_norm * cs2);
+  __m128d cmin = _mm_mul_pd(_mm_sub_pd(s2, srootk), div); //(Vn * (1.0 - cs2) - sroot_L) / (1.0 - V2_norm * cs2);
+
+  //_mm256_store_si256((__m256i*) &c[i], z);
+
+  alignas(16) Type cmax_k[2];
+  alignas(16) Type cmin_k[2];
+
+  _mm_store_pd(cmax_k, cmax);
+  _mm_store_pd(cmin_k, cmin);
+
+  alignas(16) Type lambda_K[2] = {std::min(cmin_k[0], cmin_k[1]), std::max(cmax_k[0], cmax_k[1])};
+
+  /* --------------------------------------------------
+          compute HLLC  flux
+     -------------------------------------------------- */
+  if (lambda_K[0] >= 0.0) {
+    __m256d ul = _mm256_load_pd(U_L);
+    __m256d fl = _mm256_mul_pd(ul, _mm256_set1_pd(Wvl[0]));
+
+    _mm256_store_pd(F, fl);
+    F[4] = U_L[1];
+    F[1] += W_K[8];
+
+    // WRITE_LOG("L: %lf %lf %lf %lf %lf\n", F[0], F[1], F[2], F[3], F[4]);
+
+  } else if (lambda_K[1] <= 0.0) {
+
+    __m256d ur = _mm256_load_pd(U_R);
+    __m256d fr = _mm256_mul_pd(ur, _mm256_set1_pd(Wvr[0]));
+    _mm256_store_pd(F, fr);
+
+    F[4] = U_R[1];
+    F[1] += W_K[9];
+
+    // WRITE_LOG("R: %lf %lf %lf %lf %lf\n", F[0], F[1], F[2], F[3], F[4]);
+  } else {
+
+    /* ---------------------------------------
+                       get u*
+       --------------------------------------- */
+
+    __m128d L2 = _mm_load_pd(lambda_K);
+
+    __m128d Uv = _mm_setr_pd(U_L[1], U_R[1]);
+    __m128d Up = _mm_setr_pd(U_L[4], U_R[4]);
+    __m128d Fv2 = _mm_mul_pd(Uv, vnk);
+
+    __m128d Ak = _mm_sub_pd(_mm_mul_pd(L2, Up), Uv);
+    __m128d Bk = _mm_sub_pd(_mm_sub_pd(_mm_mul_pd(L2, Uv), pk), Fv2);
+
+    alignas(16) Type A[2];
+    _mm_store_pd(A, Ak);
+    alignas(16) Type B[2];
+    _mm_store_pd(B, Bk);
+
+    Type a = A[1] * lambda_K[0] - A[0] * lambda_K[1];
+    Type b = A[0] + B[0] * lambda_K[1] - A[1] - B[1] * lambda_K[0];
+    Type c = B[1] - B[0];
+
+    /*
+          if (fabs(a) > 1.e-9){
+            usp = 0.5*(- b + sqrt(b*b - 4.0*a*c))/a;
+            usm = 0.5*(- b - sqrt(b*b - 4.0*a*c))/a;
+          }else{
+            usp = usm = -c/b;
+          }
+    */
+    Type scrh = -0.5 * (b + SIGN(b) * sqrt(b * b - 4.0 * a * c));
+    Type us = c / scrh;
+
+    Type ps = (A[0] * us - B[0]) / (1.0 - us * lambda_K[0]);
+
+    __m256d ul = _mm256_load_pd(U_L);
+    __m256d ur = _mm256_load_pd(U_R);
+
+    __m256d fl = _mm256_mul_pd(ul, _mm256_set1_pd(Wvl[0]));
+    __m256d fr = _mm256_mul_pd(ur, _mm256_set1_pd(Wvr[0]));
+
+    __m128d dif2 = _mm_div_pd(ones2, _mm_sub_pd(L2, _mm_set1_pd(us)));
+
+    alignas(16) Type sUb[2];
+    _mm_store_pd(sUb, _mm_sub_pd(L2, vnk));
+    alignas(16) Type f_usl[4];
+    if (us >= 0.0) {
+      Type dd = 1.0 / (lambda_K[0] - us);
+
+      f_usl[0] = U_L[0] * (sUb[0]);
+      f_usl[1] = (lambda_K[0] * (U_L[4] + ps) - U_L[1]) * us;
+      f_usl[2] = U_L[2] * sUb[0];
+      f_usl[3] = U_L[3] * sUb[0];
+
+      __m256d f4 = _mm256_load_pd(f_usl);
+      f4 = _mm256_mul_pd(f4, _mm256_set1_pd(dd));
+      f4 = _mm256_sub_pd(f4, ul);
+      f4 = _mm256_mul_pd(f4, _mm256_set1_pd(lambda_K[0]));
+      f4 = _mm256_add_pd(f4, fl);
+
+      _mm256_store_pd(F, f4);
+      F[4] = (f_usl[1] * dd);
+      F[1] += W_K[8];
+
+      // WRITE_LOG("UL: %lf %lf %lf %lf %lf\n", F[0], F[1], F[2], F[3], F[4]);
+
+    } else {
+      Type dd = 1.0 / (lambda_K[1] - us);
+
+      f_usl[0] = U_R[0] * (sUb[1]);
+      f_usl[1] = (lambda_K[1] * (U_R[4] + ps) - U_R[1]) * us;
+      f_usl[2] = U_R[2] * sUb[1];
+      f_usl[3] = U_R[3] * sUb[1];
+      __m256d f4 = _mm256_load_pd(f_usl);
+      f4 = _mm256_mul_pd(f4, _mm256_set1_pd(dd));
+      f4 = _mm256_sub_pd(f4, ur);
+      f4 = _mm256_mul_pd(f4, _mm256_set1_pd(lambda_K[1]));
+      f4 = _mm256_add_pd(f4, fr);
+
+      _mm256_store_pd(F, f4);
+      F[4] = (f_usl[1] * dd);
+      F[1] += W_K[9];
+
+      // WRITE_LOG("UR: %lf %lf %lf %lf %lf\n", F[0], F[1], F[2], F[3], F[4]);
+    }
+  }
+
+  _mm256_storeu_pd(&f.f.d, _mm256_mul_pd(_mm256_load_pd(F), _mm256_set1_pd(f.geo.S)));
+  f.f.p = F[4] * f.geo.S;
+
+  f.f.v = (T.transpose()) * f.f.v;
+  return std::max(lambda_K[0], lambda_K[1]);
 }
 
 #undef MAX_ITER
