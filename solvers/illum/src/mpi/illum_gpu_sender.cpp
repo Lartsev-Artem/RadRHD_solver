@@ -266,7 +266,7 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
 #pragma omp single // nowait
       {
         MPI_Startall(section_1.requests_send.size(), section_1.requests_send.data());
-        cuda::interface::CudaSendIllumAsync(section_1.size * n_illum, disp_illum[myid], grid.Illum);
+        // cuda::interface::CudaSendIllumAsync(section_1.size * n_illum, disp_illum[myid], grid.Illum);
 
         section_2.flags_send_to_gpu.assign(section_2.flags_send_to_gpu.size(), 0); // nowait
         MPI_Startall(section_2.requests_rcv.size(), section_2.requests_rcv.data());
@@ -346,11 +346,11 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
             for (int i = 0; i < section_1.requests_rcv.size(); i++) {
               if (!section_1.flags_send_to_gpu[i]) {
                 MPI_Test(&section_1.requests_rcv[i], &section_1.flags_send_to_gpu[i], &section_1.status_rcv[i]); //проверяем все запросы принятия сообщения
-                if (section_1.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
-                {
-                  const int src = section_1.status_rcv[i].MPI_TAG;
-                  cuda::interface::CudaSendIllumAsync(n_illum * section_1.size, disp_illum[src], grid.Illum);
-                }
+                // if (section_1.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
+                // {
+                //   const int src = section_1.status_rcv[i].MPI_TAG;
+                //   cuda::interface::CudaSendIllumAsync(n_illum * section_1.size, disp_illum[src], grid.Illum);
+                // }
               }
             }
           }
@@ -362,10 +362,10 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
             for (int i = 0; i < section_2.requests_rcv.size(); i++) {
               if (!section_2.flags_send_to_gpu[i]) {
                 MPI_Test(&section_2.requests_rcv[i], &section_2.flags_send_to_gpu[i], &section_2.status_rcv[i]); //проверяем все запросы принятия сообщения
-                if (section_2.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
-                {
-                  cuda::interface::CudaSendIllumAsync(n_illum, n_illum * (section_2.status_rcv[i].MPI_TAG), grid.Illum); //переслать данные на gpu
-                }
+                // if (section_2.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
+                // {
+                //   cuda::interface::CudaSendIllumAsync(n_illum, n_illum * (section_2.status_rcv[i].MPI_TAG), grid.Illum); //переслать данные на gpu
+                // }
               }
             }
           }
@@ -396,13 +396,13 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
         if (!section_1.flags_send_to_gpu[i]) {
           ready = false;
           MPI_Test(&section_1.requests_rcv[i], &section_1.flags_send_to_gpu[i], &section_1.status_rcv[i]); //проверяем все запросы принятия сообщения
-          if (section_1.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
-          {
-            int src = (section_1.status_rcv[i].MPI_TAG);
-            DIE_IF(src >= disp_illum.size())
+          // if (section_1.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
+          // {
+          //   int src = (section_1.status_rcv[i].MPI_TAG);
+          //   DIE_IF(src >= disp_illum.size())
 
-            cuda::interface::CudaSendIllumAsync(n_illum * section_1.size, disp_illum[src], grid.Illum);
-          }
+          //   cuda::interface::CudaSendIllumAsync(n_illum * section_1.size, disp_illum[src], grid.Illum);
+          // }
         }
       }
     } while (!ready);
@@ -413,10 +413,10 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
         if (!section_2.flags_send_to_gpu[i]) {
           ready = false;
           MPI_Test(&section_2.requests_rcv[i], &section_2.flags_send_to_gpu[i], &section_2.status_rcv[i]); //проверяем все запросы принятия сообщения
-          if (section_2.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
-          {
-            cuda::interface::CudaSendIllumAsync(n_illum, n_illum * (section_2.status_rcv[i].MPI_TAG), grid.Illum); //переслать данные на gpu
-          }
+          // if (section_2.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
+          // {
+          //   cuda::interface::CudaSendIllumAsync(n_illum, n_illum * (section_2.status_rcv[i].MPI_TAG), grid.Illum); //переслать данные на gpu
+          // }
         }
       }
 

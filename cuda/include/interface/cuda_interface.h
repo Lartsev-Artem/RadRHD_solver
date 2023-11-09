@@ -52,6 +52,8 @@ namespace interface {
  */
 int InitDevice(const std::string &address, const grid_directions_t &grid_dir_host, grid_t &grid_host);
 
+int InitDeviceExtraSize(const std::string &address, const grid_directions_t &grid_dir_host, grid_t &grid_host);
+
 /**
  * @brief удаление структур на видеокарте
  *
