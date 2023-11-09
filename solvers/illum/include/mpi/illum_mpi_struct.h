@@ -3,9 +3,9 @@
 
 #include "geo_types.h"
 
-namespace illum {
-
 extern MPI_Datatype MPI_RECV_ILLUM_T; ///< структура дл отправки по направлению, а приему по ячейкам
+
+namespace illum {
 
 void MpiInitStruct(const grid_directions_t &grid);
 } // namespace illum
