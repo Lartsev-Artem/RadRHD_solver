@@ -47,7 +47,7 @@ static mpi_sender_t section_1;
 static mpi_sender_t section_2;
 static MPI_Comm MPI_COMM_ILLUM = MPI_COMM_WORLD;
 
-void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_t &grid) {
+void illum::gpu_async::NewInitSender(const grid_directions_t &grid_dir, const grid_t &grid) {
 
   int np = get_mpi_np();
   int myid = get_mpi_id();
@@ -135,10 +135,10 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
   return;
 }
 
-int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, const std::vector<std::vector<bits_flag_t>> &face_states,
-                                     const std::vector<IntId> &neighbours, const std::vector<std::vector<IntId>> &inner_bound_code,
-                                     const std::vector<std::vector<cell_local>> &vec_x0, std::vector<BasePointTetra> &vec_x,
-                                     const std::vector<std::vector<IntId>> &sorted_id_cell, grid_t &grid) {
+int illum::gpu_async::NewCalculateIllum(const grid_directions_t &grid_direction, const std::vector<std::vector<bits_flag_t>> &face_states,
+                                        const std::vector<IntId> &neighbours, const std::vector<std::vector<IntId>> &inner_bound_code,
+                                        const std::vector<std::vector<cell_local>> &vec_x0, std::vector<BasePointTetra> &vec_x,
+                                        const std::vector<std::vector<IntId>> &sorted_id_cell, grid_t &grid) {
 
   const IdType n_illum = grid.size * CELL_SIZE;
 
@@ -424,8 +424,8 @@ int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, co
 
     if (_solve_mode.max_number_of_iter >= 1) // пропуск первой итерации
     {
-      cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, 0, section_1.size, cuda::e_cuda_scattering_1);
-      cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, section_1.size, local_size, cuda::e_cuda_scattering_2);
+      cuda::interface::CalculateIntScatteringMultiDev(grid_direction, grid, 0, section_1.size, cuda::e_cuda_scattering_1);
+      // cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, section_1.size, local_size, cuda::e_cuda_scattering_2);
     }
 
     MPI_Wait(&rq_norm, MPI_STATUS_IGNORE);

@@ -33,4 +33,21 @@ int GetDirectionDataFromFace(const int size_grid, const int num_dir, const Type 
   return e_completion_success;
 }
 
+/// \todo rename
+template <typename Type>
+int GetDirectionDataFromCellOrder(const int size_grid, const int size_dir, const int num_dir, const Type *data_on_face, const Type zero, std::vector<Type> &data_in_cell) {
+
+  if (data_on_face == nullptr)
+    RETURN_ERR("data_on_face hasn't enough data\n");
+
+  data_in_cell.assign(size_grid, zero);
+
+  for (int j = 0; j < size_grid; j++) {
+    {
+      data_in_cell[j] = data_on_face[j * size_dir + num_dir];
+    }
+  }
+  return e_completion_success;
+}
+
 #endif //! CONVERT_FACE_TO_CELL_H

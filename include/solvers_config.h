@@ -38,11 +38,11 @@
 #endif
 
 #ifdef HLLC
-#define HLLC_MPI ///< расчёт hllc с технологией MPI
+// #define HLLC_MPI ///< расчёт hllc с технологией MPI
 #endif
 
 #ifdef RHLLC
-#define RHLLC_MPI ///< расчёт реляивиской постановки с технологией MPI
+// #define RHLLC_MPI ///< расчёт реляивиской постановки с технологией MPI
 #endif
 
 #endif //! USE_MPI

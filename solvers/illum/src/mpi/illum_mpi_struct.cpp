@@ -1,4 +1,5 @@
 #include "illum_mpi_struct.h"
+#include "mpi.h"
 
 MPI_Datatype MPI_RECV_ILLUM_T;
 

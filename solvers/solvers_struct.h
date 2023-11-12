@@ -164,6 +164,8 @@ struct grid_t {
   std::vector<face_t> faces;
   std::vector<std::vector<Vector3>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
 
+  IdType size_dir; ///< связанный размер сетки направлений
+
   Type *Illum;
   Type *scattering;
 
@@ -181,7 +183,7 @@ struct grid_t {
 
   void InitMemory(const IdType num_cells, const IdType num_directions);
 
-  grid_t() : size(0), loc_size(0), loc_shift(0), Illum(nullptr), scattering(nullptr),
+  grid_t() : size(0), size_dir(0), loc_size(0), loc_shift(0), Illum(nullptr), scattering(nullptr),
              divstream(nullptr), divimpuls(nullptr)
 #ifdef ON_FULL_ILLUM_ARRAYS
              ,

@@ -125,6 +125,7 @@ void grid_t::InitMemory(const IdType num_cells, const IdType num_directions) {
   size = num_cells;
   loc_size = size;
   loc_shift = 0;
+  size_dir = num_directions;
 
   inter_coef_all.resize(omp_get_max_threads());
   for (size_t i = 0; i < inter_coef_all.size(); i++) {

@@ -35,8 +35,10 @@ __global__ void cuda::kernel::GetS_MPI_multy_device(const geo::grid_directions_d
 #include "cuda_memory.h"
 #include "cuda_struct.h"
 
-void cuda::interface::CudaSendIllumAsync(const IdType size, const IdType shift, const Type *Illum_host) {
+void cuda::interface::CudaSendIllumAsyncMultiDev(const IdType size, const IdType shift, const Type *Illum_host) {
 
+  D_LD;
+#if 0
   int Ndev = 3; ///< число карт
   CUDA_CALL_FUNC(cudaGetDeviceCount, &Ndev);
 
@@ -62,16 +64,18 @@ void cuda::interface::CudaSendIllumAsync(const IdType size, const IdType shift, 
     cuda::mem_protected::CpyToHostAsync(Illum_host + disp[i], device_host_ptr.illum, send[i] * sizeof(Illum_host[0]));
 
     // sync if dev=1 and split config
-  }
 
-  for (int i = 0; i < Ndev; i++) {
+}
 
-    // Set device
-    CUDA_CALL_FUNC(cudaSetDevice, i);
+for (int i = 0; i < Ndev; i++) {
 
-    // Wait for all operations to finish
-    // cudaStreamSynchronize(plan[i].stream);
-  }
+  // Set device
+  CUDA_CALL_FUNC(cudaSetDevice, i);
+
+  // Wait for all operations to finish
+  // cudaStreamSynchronize(plan[i].stream);
+}
+#endif
 }
 
 struct multi_gpu_config_t {
@@ -115,22 +119,23 @@ void InitGridOnDeviceMultiCuda(int id_dev, const grid_t &grid_host,
 
 #include "mpi_shifts.h"
 
-std::vector<cuda::geo::grid_directions_device_t *> grid_dir_device;
-std::vector<cuda::geo::grid_device_t *> grid_device;
+std::vector<cuda::geo::grid_directions_device_t *> grid_dir_deviceN;
+std::vector<cuda::geo::grid_device_t *> grid_deviceN;
 
 int cuda::interface::InitDeviceExtraSize(const std::string &address, const grid_directions_t &grid_dir_host, grid_t &grid_host) {
 
   CUDA_CALL_FUNC(cudaGetDeviceCount, &gpu_conf.GPU_N);
+  gpu_conf.GPU_N = 1; /// \todo fix it
   GetSend(gpu_conf.GPU_N, grid_host.size, gpu_conf.size);
   GetDisp(gpu_conf.GPU_N, grid_host.size, gpu_conf.disp);
 
-  grid_dir_device.resize(gpu_conf.GPU_N);
-  grid_device.resize(gpu_conf.GPU_N);
+  grid_dir_deviceN.resize(gpu_conf.GPU_N);
+  grid_deviceN.resize(gpu_conf.GPU_N);
 
   for (int dev_id = 0; dev_id < gpu_conf.GPU_N; dev_id++) {
     CUDA_CALL_FUNC(cudaSetDevice, dev_id);
-    InitDirectionsOnDevice(grid_dir_host, grid_dir_device[dev_id]);
-    InitGridOnDeviceMultiCuda(dev_id, grid_host, grid_dir_host.size, grid_dir_host.loc_shift, grid_dir_host.loc_shift + grid_dir_host.loc_size, grid_device[dev_id]); /// \todo сдвиги в сетку и сюда сразу передавать геометрию
+    InitDirectionsOnDevice(grid_dir_host, grid_dir_deviceN[dev_id]);
+    InitGridOnDeviceMultiCuda(dev_id, grid_host, grid_dir_host.size, grid_dir_host.loc_shift, grid_dir_host.loc_shift + grid_dir_host.loc_size, grid_deviceN[dev_id]); /// \todo сдвиги в сетку и сюда сразу передавать геометрию
   }
 
   /// \todo это отдельно, т.к. относится к инициализации хоста
@@ -153,25 +158,6 @@ int cuda::interface::InitDeviceExtraSize(const std::string &address, const grid_
   return e_completion_success;
 }
 
-__device__ Type IntegrateByCell(const IdType num_cell, const geo::grid_directions_device_t *dir, const geo::grid_device_t *grid) {
-  const IdType M = dir->size;
-  const IdType N = grid->size;
-
-  Type res = 0;
-  for (IdType i = 0; i < M; i++) {
-    IdType pos = CELL_SIZE * (N * i + num_cell);
-
-    Type I = 0;
-    for (IdType k = 0; k < CELL_SIZE; k++) {
-      I += grid->illum[pos + k];
-    }
-    I /= CELL_SIZE;
-
-    res += I * dir->directions[i].area;
-  }
-
-  return res / dir->full_area;
-}
 __device__ void MakeEnergy(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
   const IdType N = grid->loc_size;
   const IdType shift = grid->shift;

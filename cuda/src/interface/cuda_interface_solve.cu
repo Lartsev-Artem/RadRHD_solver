@@ -81,6 +81,34 @@ int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_d
   return e_completion_success;
 }
 
+int cuda::interface::CalculateIntScatteringMultiDev(const grid_directions_t &grid_dir, grid_t &grid,
+                                                    const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream) {
+  const IdType M = end_dir - start_dir; // grid_dir.size;
+  const IdType N = grid.size;
+
+  CUDA_TREADS_2D(threads);
+  CUDA_BLOCKS_2D(blocks, N, M);
+
+  // dim3 threads(32, 16);
+  // dim3 blocks((N + 32 - 1) / 32, (M + 16 - 1) / 16);
+
+  cudaMemcpyAsync(device_host_ptr.illum, grid.Illum, N * sizeof(grid.Illum[0]),
+                  cudaMemcpyHostToDevice, cuda_streams[e_cuda_scattering_1]);
+
+  // надо как то дать задержку второму потоку, относительно первого
+  kernel::GetS_MPI_multy_device<<<blocks, threads, 0, cuda_streams[stream]>>>(grid_dir_device, grid_device, 0, grid.size, start_dir, end_dir);
+
+  CUDA_CALL_FUNC(cudaGetLastError);
+
+  // cuda::mem_protected::CpyToHostAsync(Illum_host + disp[i], device_host_ptr.illum, send[i] * sizeof(Illum_host[0]));
+  IdType disp = start_dir * N;
+  IdType size = (end_dir - start_dir) * N * sizeof(grid.scattering[0]);
+
+  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + disp, device_host_ptr.int_scattering + disp, size, cudaMemcpyDeviceToHost, cuda_streams[stream]);
+
+  return e_completion_success;
+}
+
 int cuda::interface::CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
 
 #ifndef ONLY_CUDA_SCATTERING

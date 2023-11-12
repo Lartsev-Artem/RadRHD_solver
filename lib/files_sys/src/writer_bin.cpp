@@ -157,7 +157,8 @@ static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid
 
 #ifdef ILLUM
   std::vector<Type> illum;
-  GetDirectionDataFromFace(grid.size, 0, grid.Illum, 0.0, illum);
+  // GetDirectionDataFromFace(grid.size, 0, grid.Illum, 0.0, illum);
+  GetDirectionDataFromCellOrder(grid.size, grid.size_dir, 0, grid.Illum, 0.0, illum);
   files_sys::bin::WriteSimple(main_dir + F_ILLUM, illum);
 
 #if !defined USE_CUDA

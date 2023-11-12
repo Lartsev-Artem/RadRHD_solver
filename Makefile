@@ -1,13 +1,13 @@
 # defining project config 
-DEFCONF 		= SOLVERS RHLLC LINUX DEBUG BUILD_GRAPH MAKE_TRACE ILLUM  USE_CUDA #USE_MPI
+DEFCONF 		= SOLVERS  LINUX DEBUG BUILD_GRAPH MAKE_TRACE ILLUM  USE_CUDA USE_MPI
 #DEFCONF 		= SOLVERS DEBUG RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI USE_CUDA
 
 # defining working directories
 LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension
 LIB_SRC = lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometry/src
 
-CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteristics cuda/include/ray_tracing
-CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/src/ray_tracing
+CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteristics cuda/include/ray_tracing cuda/include/short_characteristics/extra_size
+CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/src/ray_tracing cuda/src/short_characteristics/extra_size
 
 SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include solvers/ray_tracing/include solvers/illum/include/mpi solvers/illum/include/add_directions solvers/RadRHD/include
 SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src solvers/ray_tracing/src solvers/illum/src/mpi solvers/illum/src/add_directions solvers/RadRHD/src

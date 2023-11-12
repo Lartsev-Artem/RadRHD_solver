@@ -32,8 +32,8 @@ __global__ void GetS_MPI(const geo::grid_directions_device_t *dir, geo::grid_dev
 
 __global__ void GetS_MPI_Stream(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid, const IdType start, const IdType end);
 
-__global__ void cuda::kernel::GetS_MPI_multy_device(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid,
-                                                    const IdType startCell, const IdType endCell, const IdType start, const IdType end);
+__global__ void GetS_MPI_multy_device(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid,
+                                      const IdType startCell, const IdType endCell, const IdType start, const IdType end);
 
 } // namespace kernel
 } // namespace cuda

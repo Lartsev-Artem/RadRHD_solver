@@ -125,6 +125,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
 #endif
   }
 
+#if RAD_RHD
     ///\todo Здесь пересчёт в размерные единицы, потом вычисление излучения и возврат к безразмерным
   case e_grid_cfg_full_init: // HLLC + Illum для конуса
   {
@@ -158,6 +159,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
 
     return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
   }
+#endif
 
   default:
     D_LD;

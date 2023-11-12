@@ -11,5 +11,6 @@ namespace illum {
 
 int RunIllumModule();
 int RunIllumMpiModule();
+int RunIllumExtraModule();
 } // namespace illum
 #endif //! ILLUM_MAIN_H
