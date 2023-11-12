@@ -41,6 +41,7 @@ int illum::RunIllumExtraModule() {
   }
 
   grid.InitMemory(grid.cells.size(), grid_direction.size);
+  grid.local_Illum.resize(grid_direction.loc_size * grid.size);
 
   if (illum::InitRadiationState(glb_files.base_address, grid)) {
     DIE_IF(_solve_mode.class_vtk == e_grid_cfg_radiation); //в иных случаях допускает пропуск инициализации

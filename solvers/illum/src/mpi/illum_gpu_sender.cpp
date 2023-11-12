@@ -1,3 +1,5 @@
+/// \todo ReCalcIllum должен пересылать в локальный массив тот же что и ReCalcIllumLocal т.к.
+
 #if defined ILLUM && defined SOLVERS && defined USE_MPI && defined USE_CUDA
 #include "illum_calc_gpu_async.h"
 
@@ -20,16 +22,16 @@ static void ReCalcLocalIllum(const grid_directions_t &dir_grid, grid_t &grid) {
   // const IdType id = mpi_dir_shift + CELL_SIZE * (shift_dir + num_cell) + i;
   int start = dir_grid.loc_shift * grid.size * CELL_SIZE;
   int size = dir_grid.loc_size * grid.size * CELL_SIZE;
-  std::vector<Type> buffer(size);
-  buffer.assign(grid.Illum + start, grid.Illum + start + size);
+  // std::vector<Type> buffer(size);
+  // buffer.assign(grid.local_Illum , grid.Illum + start + size);
 
   int M = dir_grid.size;
-  int N = grid.size * CELL_SIZE;
+  int N = grid.size; // * CELL_SIZE;
 
 #pragma omp parallel for
   for (size_t i = dir_grid.loc_shift; i < dir_grid.loc_shift + dir_grid.loc_size; i++) {
     for (size_t j = 0; j < N; j++) {
-      grid.Illum[j * M + i] = buffer[(i - dir_grid.loc_shift) * N + j];
+      grid.Illum[j * M + i] = grid.local_Illum[(i - dir_grid.loc_shift) * N + j];
     }
   }
 }
@@ -43,12 +45,13 @@ struct mpi_sender_t {
 };
 
 static std::vector<IdType> disp_illum;
-static mpi_sender_t section_1;
+// static mpi_sender_t section_1;
 static mpi_sender_t section_2;
 static MPI_Comm MPI_COMM_ILLUM = MPI_COMM_WORLD;
 
 void illum::gpu_async::NewInitSender(const grid_directions_t &grid_dir, const grid_t &grid) {
 
+  MpiInitStruct(grid_dir);
   int np = get_mpi_np();
   int myid = get_mpi_id();
 
@@ -60,42 +63,43 @@ void illum::gpu_async::NewInitSender(const grid_directions_t &grid_dir, const gr
 
   disp_illum.resize(np);
   for (int i = 0; i < np; i++) {
-    disp_illum[i] = disp[i] * CELL_SIZE * grid.size;
+    disp_illum[i] = disp[i] * grid.size;
   }
 
-  const IdType size_first_section = std::max(((1u << 31) / (CELL_SIZE * grid.size)) - 1, 1 * send_count[0] / 3); // первый узел будем потенциально разгружать(на всех узла должно хватать направлений)
-  section_1.size = size_first_section;
-  {
-    //==================first rcv ==============================
-    section_1.requests_rcv.resize(np - 1, MPI_REQUEST_NULL);
-    section_1.status_rcv.resize(np - 1);
-    section_1.flags_send_to_gpu.resize(np - 1, 0);
-    const IdType size_msg = grid.size * CELL_SIZE * size_first_section;
+  // const IdType size_first_section = std::min(((1u << 31) / (grid.size)) - 1, 1 * send_count[0] / 3); // первый узел будем потенциально разгружать(на всех узла должно хватать направлений)
+  // section_1.size = size_first_section;
+  // {
+  //   //==================first rcv ==============================
+  //   section_1.requests_rcv.resize(np - 1, MPI_REQUEST_NULL);
+  //   section_1.status_rcv.resize(np - 1);
+  //   section_1.flags_send_to_gpu.resize(np - 1, 0);
+  //   const IdType size_msg = grid.size * size_first_section;
 
-    DIE_IF(size_msg > ((1u << 31) - 1));
+  //   DIE_IF(size_msg > ((1u << 31) - 1));
 
-    int cc = 0;
-    for (int src = 0; src < np; src++) {
-      if (src == myid)
-        continue;
-      int tag = src;
-      // MPI_Recv_init(grid.Illum + disp_illum[tag] /*size_msg * tag*/, (int)size_msg, MPI_DOUBLE, src, tag, MPI_COMM_ILLUM, &section_1.requests_rcv[cc++]);
-      MPI_Recv_init(grid.Illum + tag /*size_msg * tag*/, (int)size_msg, MPI_RECV_ILLUM_T, src, tag, MPI_COMM_ILLUM, &section_1.requests_rcv[cc++]);
-    }
+  //   int cc = 0;
+  //   for (int src = 0; src < np; src++) {
+  //     if (src == myid)
+  //       continue;
+  //     int tag = src;
+  //     // MPI_Recv_init(grid.Illum + disp_illum[tag] /*size_msg * tag*/, (int)size_msg, MPI_DOUBLE, src, tag, MPI_COMM_ILLUM, &section_1.requests_rcv[cc++]);
+  //     MPI_Recv_init(grid.Illum + tag /*size_msg * tag*/, (int)size_msg, MPI_RECV_ILLUM_T, src, tag, MPI_COMM_ILLUM, &section_1.requests_rcv[cc++]);
+  //   }
 
-    //==================first send ==============================
+  //   //==================first send ==============================
 
-    cc = 0;
-    section_1.requests_send.resize(np - 1, MPI_REQUEST_NULL);
-    for (int id = 0; id < np; id++) {
-      if (id == myid)
-        continue;
-      MPI_Send_init(grid.Illum + disp_illum[myid] /*size_msg * myid*/, (int)size_msg, MPI_DOUBLE, id, myid, MPI_COMM_ILLUM, &section_1.requests_send[cc++]);
-    }
-  }
+  //   cc = 0;
+  //   section_1.requests_send.resize(np - 1, MPI_REQUEST_NULL);
+  //   for (int id = 0; id < np; id++) {
+  //     if (id == myid)
+  //       continue;
+  //     MPI_Send_init(grid.local_Illum.data() /*+ disp_illum[myid]*/ /*size_msg * myid*/, (int)size_msg, MPI_DOUBLE, id, myid, MPI_COMM_ILLUM, &section_1.requests_send[cc++]);
+  //   }
+  // }
 
-  //======================MPI_INIT=========================
+  // //======================MPI_INIT=========================
 
+  int size_first_section = 0;
   const IdType local_size = send_count[myid];
   const IdType size_second_section = local_size - size_first_section;
   section_2.size = size_second_section;
@@ -105,7 +109,7 @@ void illum::gpu_async::NewInitSender(const grid_directions_t &grid_dir, const gr
     section_2.status_rcv.resize(N);
     section_2.flags_send_to_gpu.resize(N, 0);
 
-    IdType size_msg = grid.size * CELL_SIZE;
+    IdType size_msg = grid.size;
     DIE_IF(size_msg > ((1u << 31) - 1));
 
     int cc = 0;
@@ -127,7 +131,7 @@ void illum::gpu_async::NewInitSender(const grid_directions_t &grid_dir, const gr
         if (id == myid)
           continue;
 
-        MPI_Send_init(grid.Illum + (disp[myid] + num_direction) * size_msg, (int)size_msg, MPI_DOUBLE, id, tag, MPI_COMM_ILLUM, &section_2.requests_send[(np - 1) * (num_direction - size_first_section) + cc++]);
+        MPI_Send_init(grid.local_Illum.data() + (/*disp[myid]*/ +num_direction) * size_msg, (int)size_msg, MPI_DOUBLE, id, tag, MPI_COMM_ILLUM, &section_2.requests_send[(np - 1) * (num_direction - size_first_section) + cc++]);
       }
     }
   }
@@ -140,7 +144,7 @@ int illum::gpu_async::NewCalculateIllum(const grid_directions_t &grid_direction,
                                         const std::vector<std::vector<cell_local>> &vec_x0, std::vector<BasePointTetra> &vec_x,
                                         const std::vector<std::vector<IntId>> &sorted_id_cell, grid_t &grid) {
 
-  const IdType n_illum = grid.size * CELL_SIZE;
+  const IdType n_illum = grid.size;
 
   int np = get_mpi_np();
   int myid = get_mpi_id();
@@ -158,33 +162,33 @@ int illum::gpu_async::NewCalculateIllum(const grid_directions_t &grid_direction,
     auto start_clock = tick::steady_clock::now();
     norm = -1;
 
-    if (section_1.requests_send[0] != MPI_REQUEST_NULL) {
-      MPI_Waitall(section_1.requests_send.size(), section_1.requests_send.data(), MPI_STATUSES_IGNORE);
-    }
+    // if (section_1.requests_send[0] != MPI_REQUEST_NULL) {
+    //   MPI_Waitall(section_1.requests_send.size(), section_1.requests_send.data(), MPI_STATUSES_IGNORE);
+    // }
     if (section_2.requests_send[0] != MPI_REQUEST_NULL) {
       MPI_Waitall(section_2.requests_send.size(), section_2.requests_send.data(), MPI_STATUSES_IGNORE);
     }
     cuda::interface::CudaSyncStream(cuda::e_cuda_scattering_1);
 
-    if (myid == 0) {
-      //самый высоких приоритет, т.к. надо расчитать, до конфликта с асинхронной отправкой
-      cuda::interface::CalculateAllParamAsync(grid_direction, grid, cuda::e_cuda_params); //запустим расчёт параметров здесь
-                                                                                          // на выходе получим ответ за 1 шаг до сходимости, но зато без ожидания на выходе
-    }
+    // if (myid == 0) {
+    //   //самый высоких приоритет, т.к. надо расчитать, до конфликта с асинхронной отправкой
+    //   cuda::interface::CalculateAllParamAsync(grid_direction, grid, cuda::e_cuda_params); //запустим расчёт параметров здесь
+    //                                                                                       // на выходе получим ответ за 1 шаг до сходимости, но зато без ожидания на выходе
+    // }
 
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
     const IdType count_directions = grid_direction.size;
 
-#pragma omp parallel default(none) firstprivate(count_directions, n_illum, myid, np, local_disp, local_size)     \
+    // #pragma omp parallel default(none) firstprivate(count_directions, n_illum, myid, np, local_disp, local_size)     \
     shared(sorted_id_cell, neighbours, face_states, vec_x0, vec_x, grid, norm, disp_illum, section_1, section_2, \
            inner_bound_code)
     {
 #pragma omp single
       {
-        section_1.flags_send_to_gpu.assign(section_1.flags_send_to_gpu.size(), 0);
-        if (np > 1) {
-          MPI_Startall(section_1.requests_rcv.size(), section_1.requests_rcv.data());
-        }
+        // section_1.flags_send_to_gpu.assign(section_1.flags_send_to_gpu.size(), 0);
+        // if (np > 1) {
+        //   MPI_Startall(section_1.requests_rcv.size(), section_1.requests_rcv.data());
+        // }
       }
 
       const int count_th = omp_get_num_threads();
@@ -195,6 +199,7 @@ int illum::gpu_async::NewCalculateIllum(const grid_directions_t &grid_direction,
       Type loc_norm = -1;
       std::vector<Vector3> *inter_coef = &grid.inter_coef_all[omp_get_thread_num()]; ///< указатель на коэффициенты интерполяции по локальному для потока направлению
 
+#if 0
 #pragma omp for
       for (IdType num_direction = 0; num_direction < section_1.size; ++num_direction) {
 
@@ -260,12 +265,12 @@ int illum::gpu_async::NewCalculateIllum(const grid_directions_t &grid_direction,
         loc_norm = ReCalcIllum(num_direction, *inter_coef, grid, disp_illum[myid]);
       }
       /*--------------------------------конец первой секции---------------------------------*/
-
+#endif
 #pragma omp flush
 
 #pragma omp single // nowait
       {
-        MPI_Startall(section_1.requests_send.size(), section_1.requests_send.data());
+        // MPI_Startall(section_1.requests_send.size(), section_1.requests_send.data());
         // cuda::interface::CudaSendIllumAsync(section_1.size * n_illum, disp_illum[myid], grid.Illum);
 
         section_2.flags_send_to_gpu.assign(section_2.flags_send_to_gpu.size(), 0); // nowait
@@ -274,7 +279,7 @@ int illum::gpu_async::NewCalculateIllum(const grid_directions_t &grid_direction,
       }
 
 #pragma omp for
-      for (IdType num_direction = section_1.size; num_direction < local_size; num_direction++) {
+      for (IdType num_direction = 0; num_direction < local_size; num_direction++) {
 
         const cell_local *X0_ptr = vec_x0[num_direction].data(); ///< индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
         const IntId *code_bound = inner_bound_code[num_direction].data();
@@ -340,22 +345,23 @@ int illum::gpu_async::NewCalculateIllum(const grid_directions_t &grid_direction,
 
 #pragma omp critical
         {
-          if (num_th == 0) //вместо критической секции пусть всегда первая нить управляет отправкой
-          {
-            // пересылаем первую пачку сообщений
-            for (int i = 0; i < section_1.requests_rcv.size(); i++) {
-              if (!section_1.flags_send_to_gpu[i]) {
-                MPI_Test(&section_1.requests_rcv[i], &section_1.flags_send_to_gpu[i], &section_1.status_rcv[i]); //проверяем все запросы принятия сообщения
-                // if (section_1.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
-                // {
-                //   const int src = section_1.status_rcv[i].MPI_TAG;
-                //   cuda::interface::CudaSendIllumAsync(n_illum * section_1.size, disp_illum[src], grid.Illum);
-                // }
-              }
-            }
-          }
+          // if (num_th == 0) //вместо критической секции пусть всегда первая нить управляет отправкой
+          // {
+          //   // пересылаем первую пачку сообщений
+          //   for (int i = 0; i < section_1.requests_rcv.size(); i++) {
+          //     if (!section_1.flags_send_to_gpu[i]) {
+          //       MPI_Test(&section_1.requests_rcv[i], &section_1.flags_send_to_gpu[i], &section_1.status_rcv[i]); //проверяем все запросы принятия сообщения
+          //       // if (section_1.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
+          //       // {
+          //       //   const int src = section_1.status_rcv[i].MPI_TAG;
+          //       //   cuda::interface::CudaSendIllumAsync(n_illum * section_1.size, disp_illum[src], grid.Illum);
+          //       // }
+          //     }
+          //   }
+          // }
 
-          MPI_Startall(np - 1, section_2.requests_send.data() + ((num_direction - section_1.size) * (np - 1)));
+          // MPI_Startall(np - 1, section_2.requests_send.data() + ((num_direction - section_1.size) * (np - 1)));
+          MPI_Startall(np - 1, section_2.requests_send.data() + ((num_direction - 0) * (np - 1)));
 
           if ((num_th == (count_th - 1)) && np > 1) // отличный от нулевого поток
           {
@@ -390,22 +396,22 @@ int illum::gpu_async::NewCalculateIllum(const grid_directions_t &grid_direction,
     ReCalcLocalIllum(grid_direction, grid);
 
     bool ready = true;
-    do {
-      ready = true;
-      for (int i = 0; i < section_1.requests_rcv.size(); i++) {
-        if (!section_1.flags_send_to_gpu[i]) {
-          ready = false;
-          MPI_Test(&section_1.requests_rcv[i], &section_1.flags_send_to_gpu[i], &section_1.status_rcv[i]); //проверяем все запросы принятия сообщения
-          // if (section_1.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
-          // {
-          //   int src = (section_1.status_rcv[i].MPI_TAG);
-          //   DIE_IF(src >= disp_illum.size())
+    // do {
+    //   ready = true;
+    //   for (int i = 0; i < section_1.requests_rcv.size(); i++) {
+    //     if (!section_1.flags_send_to_gpu[i]) {
+    //       ready = false;
+    //       MPI_Test(&section_1.requests_rcv[i], &section_1.flags_send_to_gpu[i], &section_1.status_rcv[i]); //проверяем все запросы принятия сообщения
+    //       // if (section_1.flags_send_to_gpu[i])                                                              // если обмен завершён, но отправки не было
+    //       // {
+    //       //   int src = (section_1.status_rcv[i].MPI_TAG);
+    //       //   DIE_IF(src >= disp_illum.size())
 
-          //   cuda::interface::CudaSendIllumAsync(n_illum * section_1.size, disp_illum[src], grid.Illum);
-          // }
-        }
-      }
-    } while (!ready);
+    //       //   cuda::interface::CudaSendIllumAsync(n_illum * section_1.size, disp_illum[src], grid.Illum);
+    //       // }
+    //     }
+    //   }
+    // } while (!ready);
 
     do {
       ready = true;
@@ -424,7 +430,7 @@ int illum::gpu_async::NewCalculateIllum(const grid_directions_t &grid_direction,
 
     if (_solve_mode.max_number_of_iter >= 1) // пропуск первой итерации
     {
-      cuda::interface::CalculateIntScatteringMultiDev(grid_direction, grid, 0, section_1.size, cuda::e_cuda_scattering_1);
+      cuda::interface::CalculateIntScatteringMultiDev(grid_direction, grid, 0, 0, cuda::e_cuda_scattering_1);
       // cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, section_1.size, local_size, cuda::e_cuda_scattering_2);
     }
 

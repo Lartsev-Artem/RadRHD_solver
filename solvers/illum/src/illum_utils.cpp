@@ -167,6 +167,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
 }
 
 static const BaseTetra_t tetra;
+#if 0 /*! \todo switch extra size*/
 Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
 
   Type norm = -1;
@@ -195,6 +196,36 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_
 
   return norm;
 }
+#else
+Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
+
+  Type norm = -1;
+  const IdType shift_dir = num_dir * grid.size;
+
+  for (IdType num_cell = 0; num_cell < grid.size; num_cell++) {
+
+    Type sumI = 0;
+    for (IdType i = 0; i < CELL_SIZE; i++) {
+
+      Vector3 Il = inter_coef[num_cell * CELL_SIZE + i];
+
+      const Type curI = (Il[0] + Il[1] + Il[2]) / 3; //  среднее на грани (в идеале переход к ax+by+c)
+      sumI += curI;
+    }
+    sumI /= CELL_SIZE;
+
+    const IdType id = (shift_dir + num_cell); // + mpi_dir_shift;
+
+    // if (curI < 1e-15) // защита от деления на ноль
+    //        norm = 1;
+    norm = std::max(norm, fabs((grid.local_Illum[id] - sumI) / sumI));
+
+    grid.local_Illum[id] = sumI;
+  }
+
+  return norm;
+}
+#endif
 
 Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
 #ifdef INTERPOLATION_ON_FACES

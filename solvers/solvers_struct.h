@@ -166,6 +166,7 @@ struct grid_t {
 
   IdType size_dir; ///< связанный размер сетки направлений
 
+  std::vector<Type> local_Illum;
   Type *Illum;
   Type *scattering;
 
