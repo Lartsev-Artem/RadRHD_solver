@@ -8,10 +8,10 @@ int main(int argc, char *argv[]) {
 #ifdef ILLUM
   MPI_START(argc, argv);
 
-  int a = 0;
-  while (a == 0) {
-    sleep(5);
-  }
+  // int a = 0;
+  // while (a == 0) {
+  //   sleep(5);
+  // }
 
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";
   if (argc > 1)

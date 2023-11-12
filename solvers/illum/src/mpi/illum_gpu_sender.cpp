@@ -179,8 +179,8 @@ int illum::gpu_async::NewCalculateIllum(const grid_directions_t &grid_direction,
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
     const IdType count_directions = grid_direction.size;
 
-    // #pragma omp parallel default(none) firstprivate(count_directions, n_illum, myid, np, local_disp, local_size)     \
-    shared(sorted_id_cell, neighbours, face_states, vec_x0, vec_x, grid, norm, disp_illum, section_1, section_2, \
+#pragma omp parallel default(none) firstprivate(count_directions, n_illum, myid, np, local_disp, local_size) \
+    shared(sorted_id_cell, neighbours, face_states, vec_x0, vec_x, grid, norm, disp_illum, section_2,        \
            inner_bound_code)
     {
 #pragma omp single
