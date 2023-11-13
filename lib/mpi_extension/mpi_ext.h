@@ -27,6 +27,21 @@
 
 #ifdef USE_MPI
 #include <mpi.h>
+/**
+ * @brief Get the mpi id process on comm
+ *
+ * @param[in] comm - communicator
+ * @return int8_t id
+ */
+int8_t get_mpi_id(const MPI_Comm &comm);
+
+/**
+ * @brief Get the mpi count nodes on comm
+ *
+ * @param[in] comm - communicator
+ * @return int8_t count nodes
+ */
+int8_t get_mpi_np(const MPI_Comm &comm);
 
 extern MPI_Datatype MPI_flux_t;            ///< mpi-тип для перессылки структуры ::flux_t
 extern MPI_Datatype MPI_flux_illum_elem_t; ///< mpi-тип для перессылки структуры

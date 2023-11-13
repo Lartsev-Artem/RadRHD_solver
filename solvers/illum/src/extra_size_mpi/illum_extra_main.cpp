@@ -3,8 +3,9 @@
 
 #include "global_types.h"
 #include "illum_add_dir.h"
-#include "illum_calc_gpu_async.h"
+#include "illum_extra_calc.h"
 #include "illum_init_data.h"
+#include "illum_mpi_sender.h"
 
 #include "reader_bin.h"
 #include "reader_txt.h"
@@ -55,7 +56,7 @@ int illum::RunIllumExtraModule() {
   WRITE_LOG("Init mpi device\n");
 #endif
 
-  gpu_async::NewInitSender(grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
+  extra_size::InitSender(MPI_COMM_WORLD, grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
   WRITE_LOG("Init mpi sender\n");
 
   //перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
@@ -64,7 +65,7 @@ int illum::RunIllumExtraModule() {
 
   MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
-  gpu_async::NewCalculateIllum(grid_direction, face_states, neighbours, inner_bound_code, vec_x0, vec_x, sorted_id_cell, grid);
+  extra_size::CalculateIllum(grid_direction, face_states, neighbours, inner_bound_code, vec_x0, vec_x, sorted_id_cell, grid);
 
   WRITE_LOG("end calculate illum\n");
 

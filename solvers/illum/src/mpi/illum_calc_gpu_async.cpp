@@ -16,6 +16,8 @@
 #include <chrono>
 namespace tick = std::chrono;
 
+#include "illum_mpi_sender.h"
+#if 0
 struct mpi_sender_t {
   IdType size;                            ///< размер секции по направлениям (не по запросам)
   std::vector<MPI_Request> requests_rcv;  //все запросы сообщений отправки и принятия
@@ -115,7 +117,7 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
 
   return;
 }
-
+#endif
 int illum::gpu_async::CalculateIllum(const grid_directions_t &grid_direction, const std::vector<std::vector<bits_flag_t>> &face_states,
                                      const std::vector<IntId> &neighbours, const std::vector<std::vector<IntId>> &inner_bound_code,
                                      const std::vector<std::vector<cell_local>> &vec_x0, std::vector<BasePointTetra> &vec_x,

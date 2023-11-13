@@ -5,6 +5,7 @@
 #include "illum_add_dir.h"
 #include "illum_calc_gpu_async.h"
 #include "illum_init_data.h"
+#include "illum_mpi_sender.h"
 
 #include "reader_bin.h"
 #include "reader_txt.h"

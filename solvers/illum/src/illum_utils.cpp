@@ -167,7 +167,6 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
 }
 
 static const BaseTetra_t tetra;
-#if 0 /*! \todo switch extra size*/
 Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
 
   Type norm = -1;
@@ -196,8 +195,8 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_
 
   return norm;
 }
-#else
-Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
+
+Type illum::extra_size::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid) {
 
   Type norm = -1;
   const IdType shift_dir = num_dir * grid.size;
@@ -225,7 +224,24 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_
 
   return norm;
 }
-#endif
+void illum::extra_size::ReCalcLocalIllum(const grid_directions_t &dir_grid, grid_t &grid) {
+
+#pragma omp parallel
+  {
+    int M = dir_grid.size;
+    int N = grid.size; // * CELL_SIZE;
+
+    int dir_start = dir_grid.loc_shift;
+    int dir_end = dir_grid.loc_shift + dir_grid.loc_size;
+
+#pragma omp for
+    for (size_t i = dir_start; i < dir_end; i++) {
+      for (size_t j = 0; j < N; j++) {
+        grid.Illum[j * M + i] = grid.local_Illum[(i - dir_start) * N + j];
+      }
+    }
+  }
+}
 
 Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
 #ifdef INTERPOLATION_ON_FACES
