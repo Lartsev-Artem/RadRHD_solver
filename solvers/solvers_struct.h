@@ -15,20 +15,29 @@
 extern solve_mode_t _solve_mode;
 extern hllc_value_t _hllc_cfg;
 
+/**
+ * @brief Структура хранящая и организующая доступ к табулированной функция двух переменных
+ *
+ */
 struct TableFunc {
-  int Nx, Ny;
+  int Nx; ///< число узлов по первой переменной x
+  int Ny; ///< число узлов по второй переменной y
 
-  Type step_x, step_y;
-  Type min_x, min_y;
-  Type max_x, max_y;
+  Type step_x; ///< шаг табуляции по x
+  Type step_y; ///< шаг табуляции по y
+  Type min_x;  ///< минимальное значение аргумента x
+  Type min_y;  ///< минимальное значение аргумента y
+  Type max_x;  ///< максимальное значение аргумента ч
+  Type max_y;  ///< максимальное значение аргумента y
 
-  std::vector<Type> data;
+  std::vector<Type> data; ///< значения табулированной функции в формате (x*Ny + y)
 
   TableFunc(int nx = 0, int ny = 0) : Nx(nx), Ny(ny) {
     data.resize(nx * ny, 0);
   }
 
-  Type operator()(Type x, Type y);
+  /// \todo линейная интерполяция за пределы табуляции
+  Type operator()(Type x, Type y); ///< безопасный доступ к значению функции
 };
 
 /**
@@ -64,33 +73,50 @@ struct bound_size_t {
   int right;
 };
 
+/**
+ * @brief Геометрия грани
+ *
+ */
 struct geo_face_t {
-  int id_l;
-  int id_r;
+  int id_l; ///< номер "левой" ячейки. всегда определена
+  int id_r; ///< номер "правой" ячейки. включает признак границы
 
-  Vector3 n;
-  Type S;
+  Vector3 n; ///< нормаль к грани (не ориентирована)
+  Type S;    ///< площадь грани
 
   geo_face_t() : id_l(0), id_r(0), n(Vector3(0, 0, 0)), S(0) {}
 };
 
+/**
+ * @brief структура грани
+ *
+ */
 struct face_t {
-  flux_t f;
-  geo_face_t geo; // геометрия ячейки
+  flux_t f;       ///< поток определенный на грани
+  geo_face_t geo; ///< геометрия ячейки
   face_t(){};
 };
 
+/**
+ * @brief Геометрия ячейки
+ *
+ */
 struct geo_cell_t {
-  int id_faces[CELL_SIZE];
-  Type V;
-  bool sign_n[CELL_SIZE];
-  Vector3 center;
+  int id_faces[CELL_SIZE]; ///< номера связанных граней в нумерации face_t
+  Type V;                  ///< объем ячейки
+  ///\todo битовый флаг. На его основе убрать ветвление
+  bool sign_n[CELL_SIZE]; ///< знак нормали соответствующей грани
+  Vector3 center;         ///< центр ячейки
 
   geo_cell_t() : id_faces{0, 0, 0, 0}, V(0),
                  sign_n{true, true, true, true},
                  center(Vector3(0, 0, 0)) {}
 };
 
+/**
+ * @brief структура определяющей ячейки для трассировки МКХ
+ *
+ */
 struct cell_local // для каждой ячейки и каждого направления
 {
 #ifdef INTERPOLATION_ON_FACES
@@ -100,10 +126,14 @@ struct cell_local // для каждой ячейки и каждого напр
   ShortId in_face_id; ///< id выходной грани
 };
 
+/**
+ * @brief  данные на сетке связанные с излучением
+ *
+ */
 struct illum_value_t {
-  Type absorp_coef;
-  Type scat_coef;
-  Type rad_en_loose_rate;
+  Type absorp_coef;       ///< коэффициент поглощения (не ослабления!)
+  Type scat_coef;         ///< коэффициент рассеяния
+  Type rad_en_loose_rate; ///< источник равновесного излучения
 
 //в противном случае эти структуры вынесены как указатели в сетку и не привязаны к ячейкам
 #if !defined USE_CUDA
@@ -121,7 +151,21 @@ struct illum_value_t {
   Vector3 div_impuls;
 #endif
 
-  illum_value_t(const int num_dir = 0);
+  illum_value_t(const int num_dir = 0) : absorp_coef(0),
+                                         rad_en_loose_rate(0)
+
+#ifndef USE_CUDA
+                                         ,
+                                         energy(0),
+                                         stream(Vector3::Zero()),
+                                         impuls(Matrix3::Zero()),
+                                         div_stream(0),
+                                         div_impuls(Vector3::Zero()){
+                                             illum.resize(num_dir * CELL_SIZE, 0)}
+#else
+  {
+  }
+#endif
 };
 
 struct elem_t {

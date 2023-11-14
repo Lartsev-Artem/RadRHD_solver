@@ -67,21 +67,6 @@ Type &flux_t::operator[](const int i) {
   return *((Type *)((uint8_t *)&(*this) + sizeof(Type) * i));
 }
 
-illum_value_t::illum_value_t(const int num_dir) {
-
-  absorp_coef = 0;
-  rad_en_loose_rate = 0;
-
-#ifndef USE_CUDA
-  illum.resize(num_dir * CELL_SIZE, 0);
-  energy = 0;
-  stream = Vector3::Zero();
-  impuls = Matrix3::Zero();
-  div_stream = 0;
-  div_impuls = Vector3::Zero();
-#endif
-}
-
 #ifndef USE_CUDA
 void grid_t::InitMemory(const IdType num_cells, const IdType num_directions) {
 
