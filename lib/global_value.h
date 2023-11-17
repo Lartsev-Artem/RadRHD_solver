@@ -16,7 +16,6 @@
 #include "solvers_struct.h"
 #include "json/json_struct.h"
 
-
 extern global_files_t glb_files;
 extern TableFunc t_cooling_function; ///< табличная функция охлаждения
 
@@ -93,6 +92,8 @@ constexpr double kRadiation = (kDensity * kVelocity * kVelocity * kVelocity); //
 #define F_LOG "File_Logs.txt"
 
 //------------------- Файлы трассировки ------------------//
+#define F_GRAPH_BOUND_FACE "graph_bound_faces"
+#define F_GRAPH_BODY_FACE "graph_cell_faces"
 #define F_X0_LOC "LocX0"
 #define F_X "X.bin"
 #define F_STATE_FACE "state_face"

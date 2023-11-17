@@ -29,6 +29,8 @@
 // #define USE_TRACE_THROUGH_INNER_BOUNDARY ///< использование трассировки сквозь внутреннюю границу (доп. память и эффект луча!)
 
 // #define ONLY_CUDA_SCATTERING ///< отключает весь расчет на видеокарте, кроме рассеяния
+
+#define TRANSFER_CELL_TO_FACE ///< перенос трассировки с ячеек на грани
 #endif
 
 #ifdef USE_MPI

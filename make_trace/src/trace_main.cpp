@@ -30,7 +30,14 @@ int trace::RunTracesModule() {
   const std::string name_file_neigh = glb_files.base_address + F_NEIGHBOR;
 
   //--------------------------------создающиеся файлы----------------------------------------
+
+#ifdef TRANSFER_CELL_TO_FACE
+  const std::string name_file_graph_bound = glb_files.graph_address + F_GRAPH_BOUND_FACE;
+  const std::string name_file_graph_body = glb_files.graph_address + F_GRAPH_BODY_FACE;
+#else
   const std::string name_file_state_face = glb_files.illum_geo_address + F_STATE_FACE;
+#endif
+
   const std::string name_file_x = glb_files.illum_geo_address + F_X;
   const std::string name_file_x0_loc = glb_files.illum_geo_address + F_X0_LOC;
 
@@ -50,6 +57,11 @@ int trace::RunTracesModule() {
   err |= files_sys::bin::ReadSimple(name_file_vertex, vertexs);
   err |= files_sys::bin::ReadNormals(name_file_normals, normals);
   err |= files_sys::txt::ReadSphereDirectionCartesian(glb_files.name_file_sphere_direction, grid_direction);
+
+#ifdef TRANSFER_CELL_TO_FACE
+  std::vector<elem_t> cells_elem;
+  err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, cells_elem);
+#endif
 
   WRITE_LOG("Reading time trace prebuild %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
 
@@ -71,8 +83,13 @@ int trace::RunTracesModule() {
   Vector3 direction;
 
   // массивы записи в файл:
-  std::vector<bits_flag_t> face_states(count_cells, 0); //битовое поле: 0=> выходящая грань,  1=> входящая
   std::vector<cell_local> vec_x0;
+#ifdef TRANSFER_CELL_TO_FACE
+  std::vector<IntId> graph_bound_faces;
+  std::vector<IntId> graph_cell_faces;
+#else
+  std::vector<bits_flag_t> face_states(count_cells, 0); //битовое поле: 0=> выходящая грань,  1=> входящая
+#endif
 
   /*---------------------------------- далее FOR по направлениям----------------------------------*/
 #if defined ONLY_ONE_DIRECTION
@@ -92,6 +109,12 @@ int trace::RunTracesModule() {
 
     vec_x0.clear();
     vec_x0.reserve(CELL_SIZE * count_cells);
+#ifdef TRANSFER_CELL_TO_FACE
+    graph_bound_faces.clear();
+    graph_bound_faces.reserve(10000);
+    graph_cell_faces.clear();
+    graph_cell_faces.reserve(cells_elem.size());
+#endif
 
     /*---------------------------------- далее FOR по ячейкам----------------------------------*/
     for (int h = 0; h < count_cells; ++h) {
@@ -99,7 +122,9 @@ int trace::RunTracesModule() {
 
       bits_flag_t face_state = 0;
       intersection::FindInAndOutFaces(direction, normals[num_cell], face_state);
+#ifndef TRANSFER_CELL_TO_FACE
       face_states[num_cell] = face_state;
+#endif
 
       for (ShortId num_out_face = 0; num_out_face < CELL_SIZE; ++num_out_face) {
         if (CHECK_BIT(face_state, num_out_face) == e_face_type_out) // выходящие грани
@@ -107,13 +132,39 @@ int trace::RunTracesModule() {
           GetLocNodes(num_cell, num_out_face, grid, vertexs[num_cell],
                       face_state, direction, normals[num_cell], neighbours,
                       vec_x[num_cell], vec_x0);
+
+#ifdef TRANSFER_CELL_TO_FACE
+          graph_cell_faces.push_back(num_cell);
+          graph_cell_faces.push_back(cells_elem[num_cell].geo.id_faces[num_out_face]); //это вместо graph
+#endif
         }
+#ifdef TRANSFER_CELL_TO_FACE
+        //==e_face_type_in
+        else if (neighbours[num_cell * CELL_SIZE + num_out_face] < 0) ///< сосед к текущей грани
+        {
+          graph_bound_faces.push_back(cells_elem[num_cell].geo.id_faces[num_out_face]); //номера граней на сетке
+        }
+#endif
       }
     }
     /*---------------------------------- конец FOR по ячейкам----------------------------------*/
 
+#ifdef TRANSFER_CELL_TO_FACE
+
+    if (files_sys::bin::WriteSimple(name_file_graph_bound + std::to_string(num_direction) + ".bin", graph_bound_faces))
+      RETURN_ERR("Error graph_bound_faces");
+
+    if (files_sys::bin::WriteSimple(name_file_graph_body + std::to_string(num_direction) + ".bin", graph_cell_faces))
+      RETURN_ERR("Error graph_cell_faces");
+
+#ifndef DEBUG
+    std::remove(glb_files.graph_address + F_GRAPH + std::to_string(num_direction) + ".bin"); //удаляем граф по ячейкам
+#endif
+
+#else
     if (files_sys::bin::WriteSimple(name_file_state_face + std::to_string(num_direction) + ".bin", face_states))
       RETURN_ERR("Error face_states");
+#endif
 
     if (files_sys::bin::WriteSimple(name_file_x0_loc + std::to_string(num_direction) + ".bin", vec_x0))
       RETURN_ERR("Error vec_x0");
