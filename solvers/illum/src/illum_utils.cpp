@@ -236,4 +236,66 @@ Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
   return I_x0;
 }
 
+#if 0
+__m256d _mm256_exp_pd(__m256d x)
+{
+   Type X[4];
+   _mm256_storeu_pd(X,x);  
+return _mm256_setr_pd(
+    exp(X[0]),  
+    exp(X[1]),
+    exp(X[2]),
+    exp(X[3])
+  );
+}
+
+Type VGetIllum(const Type *sss, const Type *III_0, const Type int_scattering,  Type d,Type p , Type *I)//elem_t &cell) 
+{  
+    __m256d s=_mm256_loadu_pd(sss);
+   __m256d I_0=_mm256_loadu_pd(III_0);
+    // переход к размерным параметрам
+    Type S = int_scattering;
+    // Type d = cell.phys_val.d;
+    // Type p = cell.phys_val.p;
+    Type T = p*d; // rad_rhd::GetTemperature(p, d); // размерная
+
+    Type T2 = T * T;
+    Type T4 = T2 * T2;
+
+    Type L = log(d * kMass / (kDist * kDist * kDist)), log(T); //t_cooling_function(log(d * kMass / (kDist * kDist * kDist)), log(T));
+    Type alpha = exp(L) / (4 * kStefanBoltzmann * T4) * kDist;
+
+    Type Ie = T4*alpha;// rad_rhd::Blackbody(T);
+    Type Q = alpha * Ie;
+
+    Type betta = (kSigma_thomson / kM_hydrogen * kDist) * d;
+
+  __m256d A = _mm256_set1_pd(-alpha);
+  __m256d B = _mm256_set1_pd(-betta);
+  __m256d SS = _mm256_set1_pd(S);
+  __m256d IE = _mm256_set1_pd(Q);
+
+  __m256d K=_mm256_add_pd(A,B);
+
+  // Type src = (alpha * Q + betta * S) / k;
+  __m256d SRC=_mm256_div_pd(_mm256_add_pd(_mm256_mul_pd(A,IE),_mm256_mul_pd(B,SS)), K);
+
+ __m256d EXP = _mm256_exp_pd(_mm256_mul_pd(K,s));
+
+__m256d II = _mm256_sub_pd(_mm256_add_pd(I_0, SRC), SRC);
+__m256d res = _mm256_mul_pd(EXP, II);
+  _mm256_storeu_pd(I,  _mm256_max_pd(_mm256_set1_pd(0), res));
+
+
+
+  // Type k = alpha + betta;
+  // if (s * k > 1e-10) {
+  //   Type src = (alpha * Q + betta * S) / k;
+  //   return (exp(-k * s) * (I_0 - src) + src);
+  // } else
+  //   return (1 - s * k) * (I_0 + s * (alpha * Q + S * betta));
+    // return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
+  return 0;
+}
+#endif
 #endif //! defined ILLUM && defined SOLVERS
