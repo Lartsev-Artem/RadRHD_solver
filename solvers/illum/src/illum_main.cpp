@@ -39,7 +39,6 @@ int illum::RunIllumModule() {
   if (err) {
     RETURN_ERR("Error reading \n");
   }
-
   grid.InitMemory(grid.cells.size(), grid_direction.size);
 
   if (illum::InitRadiationState(glb_files.base_address, grid)) {

@@ -1,6 +1,7 @@
 #if defined ILLUM && defined SOLVERS //&& !defined USE_MPI
 #include "illum_calc_cpu.h"
 
+#ifndef TRANSFER_CELL_TO_FACE
 #include "illum_params.h"
 #include "illum_utils.h"
 #include "scattering.h"
@@ -256,4 +257,6 @@ int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction
 
   return e_completion_success;
 }
+
+#endif
 #endif //! defined ILLUM && defined SOLVERS  && !defined USE_MPI

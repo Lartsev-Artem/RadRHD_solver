@@ -72,12 +72,23 @@ int trace::RunTracesModule() {
   }
 
   if (myid == 0) {
+
+#ifdef TRANSFER_CELL_TO_FACE
+    std::vector<face_node_points> vec_face_x;
+    GetInterpolationNodesOnFace(vec_x, vec_face_x);
+    if (files_sys::bin::WriteSimple(name_file_x, vec_face_x)) {
+      RETURN_ERR("Error writing %s\n", name_file_x.c_str());
+    }
+    vec_face_x.clear();
+#else
     if (files_sys::bin::WriteSimple(name_file_x, vec_x)) {
       RETURN_ERR("Error writing %s\n", name_file_x.c_str());
     }
+#endif
   }
 
-  std::vector<IntId> sorted_graph;
+  std::vector<IntId>
+      sorted_graph;
 
   int num_cell;
   Vector3 direction;
@@ -86,7 +97,7 @@ int trace::RunTracesModule() {
   std::vector<cell_local> vec_x0;
 #ifdef TRANSFER_CELL_TO_FACE
   std::vector<IntId> graph_bound_faces;
-  std::vector<IntId> graph_cell_faces;
+  std::vector<graph_pair_t> graph_cell_faces;
 #else
   std::vector<bits_flag_t> face_states(count_cells, 0); //битовое поле: 0=> выходящая грань,  1=> входящая
 #endif
@@ -134,8 +145,10 @@ int trace::RunTracesModule() {
                       vec_x[num_cell], vec_x0);
 
 #ifdef TRANSFER_CELL_TO_FACE
-          graph_cell_faces.push_back(num_cell);
-          graph_cell_faces.push_back(cells_elem[num_cell].geo.id_faces[num_out_face]); //это вместо graph
+          graph_pair_t buf;
+          buf.cell = num_cell;
+          buf.face = cells_elem[num_cell].geo.id_faces[num_out_face];
+          graph_cell_faces.push_back(buf); //это вместо graph
 #endif
         }
 #ifdef TRANSFER_CELL_TO_FACE

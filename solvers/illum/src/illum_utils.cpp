@@ -232,4 +232,33 @@ Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
   return I_x0;
 }
 
+Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
+
+  Type norm = -1;
+  const IdType shift_dir = num_dir * grid.size;
+
+#if 0 //на ячейках
+  for (size_t cell = 0; cell < grid.size; cell++) {
+    IdType id = mpi_dir_shift + (shift_dir + cell);
+    Type curI = 0;
+    for (size_t j = 0; j < CELL_SIZE; j++) {
+      curI += inter_coef[grid.cells[cell].geo.id_faces[j]];
+    }
+    curI /= 4;
+    norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
+    grid.Illum[id] = curI;
+  }
+#else //на гранях
+  for (size_t cell = 0; cell < grid.size; cell++) {
+    for (size_t j = 0; j < CELL_SIZE; j++) {
+      IdType id = mpi_dir_shift + CELL_SIZE * (shift_dir + cell) + j;
+      Type curI = inter_coef[grid.cells[cell].geo.id_faces[j]];
+      norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
+      grid.Illum[id] = curI;
+    }
+  }
+#endif
+  return norm;
+}
+
 #endif //! defined ILLUM && defined SOLVERS

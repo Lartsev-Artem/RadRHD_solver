@@ -101,6 +101,7 @@ Type GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scat
  */
 Type ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift = 0);
 
+Type ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, IdType mpi_dir_shift = 0);
 /**
  * @brief Функция возвращает значение на определяющей грани
  *

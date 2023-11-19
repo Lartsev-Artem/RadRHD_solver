@@ -168,6 +168,23 @@ struct illum_value_t {
 #endif
 };
 
+/**
+ * @brief связанная пара ячейка-грань в графе обхода ячеек
+ *
+ */
+struct graph_pair_t {
+  IntId face; ///< номер грани на которой проходит расчёт излучения
+  IntId cell; ///< номер ячейки, сквозь которую идет трассировка
+};
+
+/**
+ * @brief координаты узлов на гране
+ *
+ */
+struct face_node_points {
+  Vector3 x[3];
+};
+
 struct elem_t {
   flux_t phys_val;
   flux_t conv_val;
@@ -204,9 +221,15 @@ struct grid_t {
 #else
 struct grid_t {
   IdType size;
+  IdType size_face;
+
   std::vector<elem_t> cells;
   std::vector<face_t> faces;
+#ifndef TRANSFER_CELL_TO_FACE
   std::vector<std::vector<Vector3>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
+#else
+  std::vector<std::vector<Type>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
+#endif
 
   Type *Illum;
   Type *scattering;
@@ -225,7 +248,7 @@ struct grid_t {
 
   void InitMemory(const IdType num_cells, const IdType num_directions);
 
-  grid_t() : size(0), loc_size(0), loc_shift(0), Illum(nullptr), scattering(nullptr),
+  grid_t() : size(0), size_face(0), loc_size(0), loc_shift(0), Illum(nullptr), scattering(nullptr),
              divstream(nullptr), divimpuls(nullptr)
 #ifdef ON_FULL_ILLUM_ARRAYS
              ,

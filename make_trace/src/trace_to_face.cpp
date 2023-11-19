@@ -49,3 +49,18 @@ void trace::GetGraphFaces(const grid_t &grid,
 
   return;
 }
+
+int trace::GetInterpolationNodesOnFace(grid_t &grid, const std::vector<BasePointTetra> &vec_x, std::vector<face_node_points> &vec_face_x) {
+
+  vec_face_x.resize(grid.faces.size());
+
+  for (size_t num_cell = 0; num_cell < vec_x.size(); ++num_cell) {
+    for (int face = 0; face < CELL_SIZE; face++) {
+      for (int node = 0; node < 3; node++) {
+        vec_face_x[grid.cells[num_cell].geo.id_faces[face]].x[node] = vec_x[num_cell](face, node);
+      }
+    }
+  }
+
+  return e_completion_success;
+}

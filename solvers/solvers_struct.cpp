@@ -110,10 +110,15 @@ void grid_t::InitMemory(const IdType num_cells, const IdType num_directions) {
   size = num_cells;
   loc_size = size;
   loc_shift = 0;
+  size_face = faces.size();
 
   inter_coef_all.resize(omp_get_max_threads());
   for (size_t i = 0; i < inter_coef_all.size(); i++) {
+#ifndef TRANSFER_CELL_TO_FACE
     inter_coef_all[i].resize(size * CELL_SIZE);
+#else
+    inter_coef_all[i].resize(size_face);
+#endif
   }
 }
 grid_t::~grid_t() {

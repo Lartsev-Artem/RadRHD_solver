@@ -197,7 +197,17 @@
     "*.txx": "cpp",
     "__functional_03": "cpp",
     "__string": "cpp",
-    "target": "cpp"
+    "target": "cpp",
+    "csetjmp": "cpp",
+    "barrier": "cpp",
+    "charconv": "cpp",
+    "coroutine": "cpp",
+    "cuchar": "cpp",
+    "source_location": "cpp",
+    "latch": "cpp",
+    "scoped_allocator": "cpp",
+    "span": "cpp",
+    "syncstream": "cpp"
   },
   "cSpell.words": [
     "ifile",
