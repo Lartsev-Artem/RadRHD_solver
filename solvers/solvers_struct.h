@@ -172,17 +172,13 @@ struct illum_value_t {
  * @brief связанная пара ячейка-грань в графе обхода ячеек
  *
  */
-struct graph_pair_t {
-  IntId face; ///< номер грани на которой проходит расчёт излучения
-  IntId cell; ///< номер ячейки, сквозь которую идет трассировка
-};
-
-/**
- * @brief координаты узлов на гране
- *
- */
-struct face_node_points {
-  Vector3 x[3];
+union graph_pair_t {
+  struct
+  {
+    uint32_t loc_face : 2; ///< локальный номер грани на которой проходит расчёт излучения
+    IntId cell : 30;       ///< номер ячейки, сквозь которую идет трассировка
+  };
+  uint32_t bits;
 };
 
 struct elem_t {

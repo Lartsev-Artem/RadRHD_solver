@@ -4,8 +4,8 @@
  *
  */
 
-#if !defined TRACE_STRUCT_H && defined MAKE_TRACE
-#define TRACE_STRUCT_H
+#if !defined TRACE_TO_FACE_H && defined MAKE_TRACE
+#define TRACE_TO_FACE_H
 
 #include "solvers_struct.h"
 
@@ -35,7 +35,5 @@ void GetBoundGraphFaces(const grid_t &grid, const std::vector<IntId> &neighbours
 void GetGraphFaces(const grid_t &grid,
                    const std::vector<bits_flag_t> &face_states, const std::vector<IntId> &sorted_id_cell,
                    std::vector<IntId> &graph_cell_faces);
-
-int GetInterpolationNodesOnFace(grid_t &grid, const std::vector<BasePointTetra> &vec_x, std::vector<face_node_points> &vec_face_x);
 } // namespace trace
-#endif //! TRACE_STRUCT_H
+#endif //! TRACE_TO_FACE_H

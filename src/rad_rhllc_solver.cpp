@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[]) {
 
-#ifdef RHLLC
+#ifdef RAD_RHD
   MPI_START(argc, argv);
 
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";

@@ -174,4 +174,53 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
 
   return e_completion_success;
 }
+
+int files_sys::bin::ReadRadiationFaceTrace(const int count_dir, const global_files_t &gbl_files,
+                                           std::vector<BasePointTetra> &vec_x,
+                                           std::vector<std::vector<cell_local>> &vec_x0,
+                                           std::vector<std::vector<graph_pair_t>> &sorted_graph,
+                                           std::vector<std::vector<IntId>> &sorted_id_bound_face,
+                                           std::vector<std::vector<IntId>> &inner_bound_code) {
+  if (ReadSimple(gbl_files.name_file_x, vec_x))
+    return e_completion_fail;
+
+  std::vector<IdType> disp;
+  std::vector<IdType> send;
+
+  int np = get_mpi_np();
+  int myid = get_mpi_id();
+
+  GetDisp(np, count_dir, disp);
+  GetSend(np, count_dir, send);
+
+  vec_x0.resize(send[myid]);
+
+  sorted_id_bound_face.resize(send[myid]);
+  sorted_graph.resize(send[myid]);
+  inner_bound_code.resize(send[myid]);
+
+  for (int i = 0; i < send[myid]; i++) {
+
+    if (ReadSimple(gbl_files.name_file_x0_loc + std::to_string(disp[myid] + i) + ".bin", vec_x0[i]))
+      return e_completion_fail;
+
+    if (ReadSimple(gbl_files.graph_address + F_GRAPH_BOUND_FACE + std::to_string(disp[myid] + i) + ".bin", sorted_id_bound_face[i]))
+      return e_completion_fail;
+
+    if (ReadSimple(gbl_files.graph_address + F_GRAPH_BODY_FACE + std::to_string(disp[myid] + i) + ".bin", sorted_graph[i]))
+      return e_completion_fail;
+  }
+
+#ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
+  for (int i = 0; i < send[myid]; i++) {
+    if (ReadSimple(gbl_files.name_file_res + std::to_string(disp[myid] + i) + ".bin", inner_bound_code[i])) {
+      WRITE_LOG("WARNING!!! inner bound[%d] didn't read\n", i);
+      inner_bound_code.clear();
+      break;
+    }
+  }
+#endif
+
+  return e_completion_success;
+}
 #endif //! ILLUM

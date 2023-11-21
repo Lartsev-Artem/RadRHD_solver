@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[]) {
 
-#if defined ILLUM && !defined TRANSFER_CELL_TO_FACE
+#if defined ILLUM && defined TRANSFER_CELL_TO_FACE
   MPI_START(argc, argv);
 
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";
@@ -16,11 +16,12 @@ int main(int argc, char *argv[]) {
     return e_completion_fail;
 
   if (get_mpi_np() == 1) {
-    illum::RunIllumModule();
+    illum::RunIllumFacesModule();
   }
 #ifdef USE_MPI
   else {
-    illum::RunIllumMpiModule();
+    D_LD;
+    // illum::RunIllumMpiModule();
   }
 #endif
 

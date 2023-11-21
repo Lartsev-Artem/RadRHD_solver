@@ -1,16 +1,16 @@
 #if defined ILLUM && defined SOLVERS //&& !defined USE_MPI
 #include "illum_calc_cpu.h"
 
+#ifdef USE_CUDA
+#include "cuda_interface.h"
+#endif
+
 #ifndef TRANSFER_CELL_TO_FACE
 #include "illum_params.h"
 #include "illum_utils.h"
 #include "scattering.h"
 
 #include "solvers_struct.h"
-
-#ifdef USE_CUDA
-#include "cuda_interface.h"
-#endif
 
 #include <omp.h>
 
@@ -95,7 +95,6 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
               Type I_x0 = GetIllumeFromInFace(neighbours[num_cell * CELL_SIZE + num_in_face], (*inter_coef)[num_cell * CELL_SIZE + num_in_face]);
 #endif
               I[num_node] = GetIllum(x, X0_ptr->s, I_x0, grid.scattering[num_direction * count_cells + num_cell], *cell);
-
               X0_ptr++;
             } // num_node
 
@@ -153,17 +152,6 @@ int illum::cpu::CalculateIllum(const grid_directions_t &grid_direction, const st
   } while (norm > _solve_mode.accuracy && iter < _solve_mode.max_number_of_iter);
 
   return e_completion_success;
-}
-
-void illum::cpu::CalculateIllumParam(const grid_directions_t &grid_direction, grid_t &grid) {
-
-#if !defined USE_CUDA
-  GetEnergy(grid_direction, grid);
-  GetStream(grid_direction, grid);
-  GetImpuls(grid_direction, grid);
-#else
-  cuda::interface::CalculateAllParam(grid_direction, grid);
-#endif
 }
 
 int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction,
@@ -259,4 +247,15 @@ int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction
 }
 
 #endif
+
+void illum::cpu::CalculateIllumParam(const grid_directions_t &grid_direction, grid_t &grid) {
+
+#if !defined USE_CUDA
+  GetEnergy(grid_direction, grid);
+  GetStream(grid_direction, grid);
+  GetImpuls(grid_direction, grid);
+#else
+  cuda::interface::CalculateAllParam(grid_direction, grid);
+#endif
+}
 #endif //! defined ILLUM && defined SOLVERS  && !defined USE_MPI

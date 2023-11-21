@@ -7,9 +7,13 @@
  */
 #if !defined ILLUM_MAIN_H && defined ILLUM && defined SOLVERS
 #define ILLUM_MAIN_H
+
+#include "solvers_config.h"
 namespace illum {
 
 int RunIllumModule();
 int RunIllumMpiModule();
+
+int RunIllumFacesModule();
 } // namespace illum
 #endif //! ILLUM_MAIN_H

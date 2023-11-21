@@ -6,12 +6,12 @@
 #include "global_types.h"
 #include "global_value.h"
 #include "intersections.h"
+#include "mpi_ext.h"
 #include "reader_bin.h"
 #include "reader_txt.h"
 #include "solvers_struct.h"
+#include "trace_to_face.h"
 #include "writer_bin.h"
-
-#include "mpi_ext.h"
 
 #include <chrono>
 namespace tick = std::chrono;
@@ -59,8 +59,9 @@ int trace::RunTracesModule() {
   err |= files_sys::txt::ReadSphereDirectionCartesian(glb_files.name_file_sphere_direction, grid_direction);
 
 #ifdef TRANSFER_CELL_TO_FACE
-  std::vector<elem_t> cells_elem;
-  err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, cells_elem);
+  grid_t geo_grid;
+  err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, geo_grid.cells);
+  err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, geo_grid.faces);
 #endif
 
   WRITE_LOG("Reading time trace prebuild %lf\n", (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
@@ -72,23 +73,12 @@ int trace::RunTracesModule() {
   }
 
   if (myid == 0) {
-
-#ifdef TRANSFER_CELL_TO_FACE
-    std::vector<face_node_points> vec_face_x;
-    GetInterpolationNodesOnFace(vec_x, vec_face_x);
-    if (files_sys::bin::WriteSimple(name_file_x, vec_face_x)) {
-      RETURN_ERR("Error writing %s\n", name_file_x.c_str());
-    }
-    vec_face_x.clear();
-#else
     if (files_sys::bin::WriteSimple(name_file_x, vec_x)) {
       RETURN_ERR("Error writing %s\n", name_file_x.c_str());
     }
-#endif
   }
 
-  std::vector<IntId>
-      sorted_graph;
+  std::vector<IntId> sorted_graph;
 
   int num_cell;
   Vector3 direction;
@@ -124,7 +114,7 @@ int trace::RunTracesModule() {
     graph_bound_faces.clear();
     graph_bound_faces.reserve(10000);
     graph_cell_faces.clear();
-    graph_cell_faces.reserve(cells_elem.size());
+    graph_cell_faces.reserve(2 * geo_grid.cells.size());
 #endif
 
     /*---------------------------------- далее FOR по ячейкам----------------------------------*/
@@ -147,7 +137,7 @@ int trace::RunTracesModule() {
 #ifdef TRANSFER_CELL_TO_FACE
           graph_pair_t buf;
           buf.cell = num_cell;
-          buf.face = cells_elem[num_cell].geo.id_faces[num_out_face];
+          buf.loc_face = num_out_face;
           graph_cell_faces.push_back(buf); //это вместо graph
 #endif
         }
@@ -155,7 +145,7 @@ int trace::RunTracesModule() {
         //==e_face_type_in
         else if (neighbours[num_cell * CELL_SIZE + num_out_face] < 0) ///< сосед к текущей грани
         {
-          graph_bound_faces.push_back(cells_elem[num_cell].geo.id_faces[num_out_face]); //номера граней на сетке
+          graph_bound_faces.push_back(geo_grid.cells[num_cell].geo.id_faces[num_out_face]); //номера граней на сетке
         }
 #endif
       }

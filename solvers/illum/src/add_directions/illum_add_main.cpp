@@ -1,5 +1,6 @@
 #if defined SOLVERS && defined ILLUM
 #include "illum_add_main.h"
+#ifndef TRANSFER_CELL_TO_FACE
 #include "global_value.h"
 
 #include "global_types.h"
@@ -81,4 +82,5 @@ int illum::additional_direction::RunModule() {
   return e_completion_success;
 }
 
+#endif
 #endif //! SOLVERS
