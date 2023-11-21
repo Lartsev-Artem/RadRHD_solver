@@ -63,7 +63,7 @@ int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
           uint32_t num_loc_face = fc_pair.loc_face;
           elem_t *cell = &grid.cells[num_cell];
 
-          Vector3 I;
+          Type I = 0;
           // структура аналогичная  ::trace::GetLocNodes(...)
           for (ShortId num_node = 0; num_node < 3; ++num_node) {
 
@@ -75,12 +75,12 @@ int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
             Type I_x0 = (*inter_coef)[in_face_id]; //Здесь даже если попадаем на границу, она должна быть определена.
 #endif
             const Vector3 &x = vec_x[num_cell].x[num_loc_face][num_node];
-            I[num_node] = GetIllum(x, X0_ptr->s, I_x0, grid.scattering[num_direction * count_cells + num_cell], *cell);
+            I += GetIllum(x, X0_ptr->s, I_x0, grid.scattering[num_direction * count_cells + num_cell], *cell);
             X0_ptr++;
           } // num_node
 
           //записываем значение коэффициентов на грани
-          (*inter_coef)[cell->geo.id_faces[num_loc_face]] = (I[0] + I[1] + I[2]) / 3.;
+          (*inter_coef)[cell->geo.id_faces[num_loc_face]] = I / 3.;
         }
 
         /*---------------------------------- конец FOR по ячейкам----------------------------------*/
