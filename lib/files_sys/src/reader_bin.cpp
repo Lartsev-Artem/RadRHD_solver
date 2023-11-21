@@ -176,14 +176,10 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
 }
 
 int files_sys::bin::ReadRadiationFaceTrace(const int count_dir, const global_files_t &gbl_files,
-                                           std::vector<BasePointTetra> &vec_x,
                                            std::vector<std::vector<cell_local>> &vec_x0,
                                            std::vector<std::vector<graph_pair_t>> &sorted_graph,
                                            std::vector<std::vector<IntId>> &sorted_id_bound_face,
                                            std::vector<std::vector<IntId>> &inner_bound_code) {
-  if (ReadSimple(gbl_files.name_file_x, vec_x))
-    return e_completion_fail;
-
   std::vector<IdType> disp;
   std::vector<IdType> send;
 

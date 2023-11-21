@@ -263,4 +263,136 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coe
   return norm;
 }
 
+#pragma GCC target("avx2")
+#pragma GCC optimize("O3")
+
+#include <bits/stdc++.h>
+#include <x86intrin.h>
+static inline __m256d _mm256_exp_pd(__m256d x) {
+  alignas(32) Type X[4];
+  _mm256_store_pd(X, x);
+  return _mm256_setr_pd(
+      exp(X[0]),
+      exp(X[1]),
+      exp(X[2]),
+      0);
+}
+Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs) {
+
+  alignas(32) Type Icur[4];
+  __m256d RHS = _mm256_set1_pd(rhs);
+  __m256d S = _mm256_load_pd(s);
+  __m256d I_0 = _mm256_load_pd(I0);
+
+  __m256d EXP = _mm256_exp_pd(_mm256_mul_pd(_mm256_set1_pd(-k), S));
+  __m256d I = _mm256_add_pd(_mm256_mul_pd(_mm256_sub_pd(I_0, RHS), EXP), RHS);
+  _mm256_store_pd(Icur, _mm256_max_pd(_mm256_set1_pd(0), I));
+  return (Icur[0] + Icur[1] + Icur[2]) / 3.;
+}
+#pragma GCC pop("O3");
+
+Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k) {
+  switch (_solve_mode.class_vtk) {
+
+  case e_grid_cfg_default:
+  case e_grid_cfg_static_illum: {
+
+#if GEOMETRY_TYPE == Sphere
+    Type Q = 10;
+    Type alpha = 10;
+    Type betta = 5;
+    const Type S = int_scattering;
+    if ((x - Vector3(0, 0, 0)).norm() > 0.3) // излучающий шар
+    {
+      Q = 0;
+      alpha = 1;
+      betta = 5;
+    }
+    k = alpha + betta;
+    return (alpha * Q + betta * S) / k;
+#endif
+#if GEOMETRY_TYPE == Cone
+    Type Q = 0;
+    Type alpha = 0.5;
+    Type betta = 0.5;
+    Type S = int_scattering;
+
+    if (x[0] < 0.06) // излучающий слой
+    {
+      Q = 10;
+      alpha = 1;
+      betta = 2;
+    }
+    k = alpha + betta;
+    return (alpha * Q + betta * S) / k;
+#endif
+
+    D_LD;
+  }
+
+  case e_grid_cfg_radiation: // test task
+  {
+    Type S = int_scattering;
+#if GEOMETRY_TYPE == TEST_ELLIPSE
+    Type Q = cell.illum_val.rad_en_loose_rate; // Q=alpha*Ie
+    Type alpha = cell.illum_val.absorp_coef;
+    Type betta = alpha / 2; // просто из головы
+
+    k = alpha + betta;
+    return (alpha * Q + betta * S) / k;
+#elif GEOMETRY_TYPE == MAIN_ELLIPSE
+
+    // const Type ss = s * kDistAccretor;         // числа --- переход к размерным параметрам
+    Type Q = cell.illum_val.rad_en_loose_rate; // Q=alpha*Ie
+    Type alpha = cell.phys_val.d * cell.illum_val.absorp_coef;
+    Type betta = cell.phys_val.d * (kSigma_thomson / kM_hydrogen);
+    k = alpha + betta;
+    return (alpha * Q + betta * S) / k;
+#else
+    D_LD;
+#endif
+  }
+
+#ifdef RAD_RHD
+    ///\todo Здесь пересчёт в размерные единицы, потом вычисление излучения и возврат к безразмерным
+  case e_grid_cfg_full_init: // HLLC + Illum для конуса
+  {
+    // переход к размерным параметрам
+    Type S = int_scattering;
+    Type d = cell.phys_val.d;
+    Type p = cell.phys_val.p;
+    Type T = rad_rhd::GetTemperature(p, d); // размерная
+
+#if GEOMETRY_TYPE == Cone
+    if (x[0] < 0.05) { //источник
+      d = 0.1;
+      p = 0.01;
+      T = coefT * (p / d); // размерная
+    }
+#endif
+
+    Type T2 = T * T;
+    Type T4 = T2 * T2;
+
+    Type L = t_cooling_function(log(d * kMass / (kDist * kDist * kDist)), log(T));
+    Type alpha = exp(L) / (4 * kStefanBoltzmann * T4) * kDist;
+
+    Type Ie = rad_rhd::Blackbody(T);
+    Type Q = alpha * Ie;
+
+    Type betta = (kSigma_thomson / kM_hydrogen * kDist) * d;
+
+    cell.illum_val.absorp_coef = alpha;
+    cell.illum_val.scat_coef = betta;
+
+    k = alpha + betta;
+    return (alpha * Q + betta * S) / k;
+  }
+#endif
+
+  default:
+    D_LD;
+  }
+}
+
 #endif //! defined ILLUM && defined SOLVERS

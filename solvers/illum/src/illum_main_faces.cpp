@@ -23,7 +23,6 @@ int illum::RunIllumFacesModule() {
   grid_t grid;
   grid_directions_t grid_direction;
 
-  std::vector<BasePointTetra> vec_x;
   std::vector<std::vector<cell_local>> vec_x0;
 
   std::vector<std::vector<graph_pair_t>> sorted_graph;
@@ -49,13 +48,13 @@ int illum::RunIllumFacesModule() {
 #endif
 
   //перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
-  if (files_sys::bin::ReadRadiationFaceTrace(grid_direction.size, glb_files, vec_x, vec_x0, sorted_graph, sorted_id_bound_face, inner_bound_code))
+  if (files_sys::bin::ReadRadiationFaceTrace(grid_direction.size, glb_files, vec_x0, sorted_graph, sorted_id_bound_face, inner_bound_code))
     RETURN_ERR("Error reading trace part\n");
 
   WRITE_LOG("Start Illum solver()\n");
 
   cpu::CalculateIllumFace(grid_direction, inner_bound_code,
-                          vec_x0, vec_x, sorted_graph, sorted_id_bound_face, grid);
+                          vec_x0, sorted_graph, sorted_id_bound_face, grid);
 
   cpu::CalculateIllumParam(grid_direction, grid);
 
