@@ -185,7 +185,7 @@ int ReadRadiationTrace(const int count_dir, const global_files_t &gbl_files,
                        std::vector<std::vector<IntId>> &inner_bound_code);
 
 int ReadRadiationFaceTrace(const int count_dir, const global_files_t &gbl_files,
-                           std::vector<std::vector<cell_local>> &vec_x0,
+                           std::vector<align_cell_local> &vec_x0,
                            std::vector<std::vector<graph_pair_t>> &sorted_graph,
                            std::vector<std::vector<IntId>> &sorted_id_bound_face,
                            std::vector<std::vector<IntId>> &inner_bound_code);

@@ -30,7 +30,7 @@ int CalculateAdditionalIllum(const grid_directions_t &grid_direction, const std:
 
 int CalculateIllumFace(const grid_directions_t &grid_direction,
                        const std::vector<std::vector<IntId>> &inner_bound_code,
-                       const std::vector<std::vector<cell_local>> &vec_x0,
+                       const std::vector<align_cell_local> &vec_x0,
                        const std::vector<std::vector<graph_pair_t>> &sorted_graph,
                        const std::vector<std::vector<IntId>> &sorted_id_bound_face,
                        grid_t &grid);

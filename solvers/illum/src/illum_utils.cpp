@@ -302,7 +302,7 @@ Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Typ
     Type alpha = 10;
     Type betta = 5;
     const Type S = int_scattering;
-    if ((x - Vector3(0, 0, 0)).norm() > 0.3) // излучающий шар
+    if ((x - Vector3::Zero()).norm() > 0.3) // излучающий шар
     {
       Q = 0;
       alpha = 1;

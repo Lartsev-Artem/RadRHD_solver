@@ -85,6 +85,7 @@ int trace::RunTracesModule() {
 
   // массивы записи в файл:
   std::vector<cell_local> vec_x0;
+
 #ifdef TRANSFER_CELL_TO_FACE
   std::vector<IntId> graph_bound_faces;
   std::vector<graph_pair_t> graph_cell_faces;
@@ -168,9 +169,13 @@ int trace::RunTracesModule() {
     if (files_sys::bin::WriteSimple(name_file_state_face + std::to_string(num_direction) + ".bin", face_states))
       RETURN_ERR("Error face_states");
 #endif
-
+#ifdef TRANSFER_CELL_TO_FACE
+    WRITE_FILE_ELEM((name_file_x0_loc + "_s" + std::to_string(num_direction) + ".bin").c_str(), vec_x0, s);
+    WRITE_FILE_ELEM((name_file_x0_loc + "_id" + std::to_string(num_direction) + ".bin").c_str(), vec_x0, in_face_id);
+#else
     if (files_sys::bin::WriteSimple(name_file_x0_loc + std::to_string(num_direction) + ".bin", vec_x0))
       RETURN_ERR("Error vec_x0");
+#endif
 
     WRITE_LOG("End trace direction number # %d\n", num_direction);
   }

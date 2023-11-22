@@ -23,19 +23,6 @@ int files_sys::bin::WriteNormals(const std::string &name_file_normals, std::vect
   return e_completion_success;
 }
 
-// поэлементная запись данных в файл
-#define WRITE_FILE_ELEM(name_file, data, value)  \
-  {                                              \
-    FILE *f;                                     \
-    OPEN_FILE(f, name_file, "wb");               \
-    int n = data.size();                         \
-    fwrite(&n, sizeof(int), 1, f);               \
-    for (auto &el : data) {                      \
-      fwrite(&el.value, sizeof(el.value), 1, f); \
-    }                                            \
-    fclose(f);                                   \
-  }
-
 /// \todo CHECK THIS!!!
 #ifdef RHLLC_MPI
 #error "todo module"

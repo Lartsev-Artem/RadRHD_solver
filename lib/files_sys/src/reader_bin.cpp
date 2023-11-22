@@ -176,7 +176,7 @@ int files_sys::bin::ReadRadiationTrace(const int count_dir, const global_files_t
 }
 
 int files_sys::bin::ReadRadiationFaceTrace(const int count_dir, const global_files_t &gbl_files,
-                                           std::vector<std::vector<cell_local>> &vec_x0,
+                                           std::vector<align_cell_local> &vec_x0,
                                            std::vector<std::vector<graph_pair_t>> &sorted_graph,
                                            std::vector<std::vector<IntId>> &sorted_id_bound_face,
                                            std::vector<std::vector<IntId>> &inner_bound_code) {
@@ -197,7 +197,11 @@ int files_sys::bin::ReadRadiationFaceTrace(const int count_dir, const global_fil
 
   for (int i = 0; i < send[myid]; i++) {
 
-    if (ReadSimple(gbl_files.name_file_x0_loc + std::to_string(disp[myid] + i) + ".bin", vec_x0[i]))
+    if (ReadSimple(gbl_files.name_file_x0_loc + "_id" + std::to_string(disp[myid] + i) + ".bin", vec_x0[i].in_face_id))
+      return e_completion_fail;
+
+    vec_x0[i].s.resize(vec_x0[i].in_face_id.size());
+    if (ReadSimple(gbl_files.name_file_x0_loc + "_s" + std::to_string(disp[myid] + i) + ".bin", vec_x0[i].s.data()))
       return e_completion_fail;
 
     if (ReadSimple(gbl_files.graph_address + F_GRAPH_BOUND_FACE + std::to_string(disp[myid] + i) + ".bin", sorted_id_bound_face[i]))

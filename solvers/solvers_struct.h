@@ -12,6 +12,8 @@
 
 #include "solvers_config.h"
 
+#include "aligned_vector.h"
+
 extern solve_mode_t _solve_mode;
 extern hllc_value_t _hllc_cfg;
 
@@ -124,6 +126,14 @@ struct cell_local // для каждой ячейки и каждого напр
 #endif
   Type s;             ///< расстояние x0-x
   ShortId in_face_id; ///< id выходной грани
+};
+struct align_cell_local // для каждой ячейки и каждого направления
+{
+#ifdef INTERPOLATION_ON_FACES
+  Vector2 x0; ///< локальная координата входного узла для интерполяции
+#endif
+  std_ext::aligned_vector<Type, 32> s; ///< расстояние x0-x
+  std::vector<ShortId> in_face_id;     ///< id выходной грани
 };
 
 /**

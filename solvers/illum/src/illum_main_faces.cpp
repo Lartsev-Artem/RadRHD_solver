@@ -23,7 +23,7 @@ int illum::RunIllumFacesModule() {
   grid_t grid;
   grid_directions_t grid_direction;
 
-  std::vector<std::vector<cell_local>> vec_x0;
+  std::vector<align_cell_local> vec_x0;
 
   std::vector<std::vector<graph_pair_t>> sorted_graph;
   std::vector<std::vector<IntId>> sorted_id_bound_face;

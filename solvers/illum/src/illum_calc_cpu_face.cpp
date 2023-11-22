@@ -16,10 +16,10 @@
 
 #include <chrono>
 namespace tick = std::chrono;
-#include "reader_bin.h"
+
 int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
                                    const std::vector<std::vector<IntId>> &inner_bound_code,
-                                   const std::vector<std::vector<cell_local>> &vec_x0,
+                                   const std::vector<align_cell_local> &vec_x0,
                                    const std::vector<std::vector<graph_pair_t>> &sorted_graph,
                                    const std::vector<std::vector<IntId>> &sorted_id_bound_face,
                                    grid_t &grid) {
@@ -55,27 +55,29 @@ int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
           (*inter_coef)[num_face] = illum::BoundaryConditions(neigh_id); //значение на грани ( или коэффициенты интерполяции)
         }
 
-        alignas(32) Type s[4];
-        alignas(32) Type I0[4];
-        const cell_local *X0_ptr = vec_x0[num_direction].data(); ///< индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
+        // индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
+        const Type *s = vec_x0[num_direction].s.data();
+        const ShortId *in_face = vec_x0[num_direction].in_face_id.data();
         /*---------------------------------- далее FOR по неосвященным граням----------------------------------*/
         for (auto fc_pair : sorted_graph[num_direction]) {
 
-          IntId num_cell = fc_pair.cell;
-          uint32_t num_loc_face = fc_pair.loc_face;
+          const IntId num_cell = fc_pair.cell;
+          const uint32_t num_loc_face = fc_pair.loc_face;
           elem_t *cell = &grid.cells[num_cell];
           const Vector3 &x = cell->geo.center; // vec_x[num_cell].x[num_loc_face][num_node];
 #if 1
-#pragma unroll
-          for (ShortId num_node = 0; num_node < 3; ++num_node) {
-            I0[num_node] = (*inter_coef)[cell->geo.id_faces[X0_ptr->in_face_id]];
-            s[num_node] = X0_ptr->s;
-            X0_ptr++;
-          }
-          Type k;
           const Type S = grid.scattering[num_direction * count_cells + num_cell];
-          const Type src = GetRhs(x, S, *cell, k);
-          (*inter_coef)[cell->geo.id_faces[num_loc_face]] = GetIllum(I0, s, k, src);
+          Type k;
+          const Type rhs = GetRhs(x, S, *cell, k);
+
+          alignas(32) Type I0[4] =
+              {(*inter_coef)[cell->geo.id_faces[*(in_face)]],
+               (*inter_coef)[cell->geo.id_faces[*(in_face + 1)]],
+               (*inter_coef)[cell->geo.id_faces[*(in_face + 2)]],
+               0};
+          (*inter_coef)[cell->geo.id_faces[num_loc_face]] = GetIllum(I0, s, k, rhs);
+          s += 3;
+          in_face += 3;
 #else
           Type I = 0;
           // структура аналогичная  ::trace::GetLocNodes(...)
