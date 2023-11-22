@@ -200,7 +200,7 @@ int files_sys::bin::ReadRadiationFaceTrace(const int count_dir, const global_fil
     if (ReadSimple(gbl_files.name_file_x0_loc + "_id" + std::to_string(disp[myid] + i) + ".bin", vec_x0[i].in_face_id))
       return e_completion_fail;
 
-    vec_x0[i].s.resize(vec_x0[i].in_face_id.size());
+    vec_x0[i].s.resize(NODE_SIZE * vec_x0[i].in_face_id.size());
     if (ReadSimple(gbl_files.name_file_x0_loc + "_s" + std::to_string(disp[myid] + i) + ".bin", vec_x0[i].s.data()))
       return e_completion_fail;
 

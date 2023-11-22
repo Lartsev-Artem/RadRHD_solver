@@ -171,7 +171,16 @@ int trace::RunTracesModule() {
 #endif
 #ifdef TRANSFER_CELL_TO_FACE
     WRITE_FILE_ELEM((name_file_x0_loc + "_s" + std::to_string(num_direction) + ".bin").c_str(), vec_x0, s);
-    WRITE_FILE_ELEM((name_file_x0_loc + "_id" + std::to_string(num_direction) + ".bin").c_str(), vec_x0, in_face_id);
+    std::vector<face_loc_id_t> compress_id(vec_x0.size() / NODE_SIZE);
+    face_loc_id_t val;
+    for (size_t i = 0; i < compress_id.size(); i++) {
+      val.a = vec_x0[i * NODE_SIZE + 0].in_face_id;
+      val.b = vec_x0[i * NODE_SIZE + 1].in_face_id;
+      val.c = vec_x0[i * NODE_SIZE + 2].in_face_id;
+      compress_id[i].bits = val.bits;
+    }
+
+    files_sys::bin::WriteSimple(name_file_x0_loc + "_id" + std::to_string(num_direction) + ".bin", compress_id);
 #else
     if (files_sys::bin::WriteSimple(name_file_x0_loc + std::to_string(num_direction) + ".bin", vec_x0))
       RETURN_ERR("Error vec_x0");

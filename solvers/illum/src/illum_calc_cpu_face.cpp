@@ -57,7 +57,7 @@ int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
 
         // индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
         const Type *s = vec_x0[num_direction].s.data();
-        const ShortId *in_face = vec_x0[num_direction].in_face_id.data();
+        const face_loc_id_t *in_face = vec_x0[num_direction].in_face_id.data();
         /*---------------------------------- далее FOR по неосвященным граням----------------------------------*/
         for (auto fc_pair : sorted_graph[num_direction]) {
 
@@ -69,19 +69,19 @@ int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
           const Type S = grid.scattering[num_direction * count_cells + num_cell];
           Type k;
           const Type rhs = GetRhs(x, S, *cell, k);
-
+          const face_loc_id_t id_in_faces = *(in_face);
+          ++in_face;
           alignas(32) Type I0[4] =
-              {(*inter_coef)[cell->geo.id_faces[*(in_face)]],
-               (*inter_coef)[cell->geo.id_faces[*(in_face + 1)]],
-               (*inter_coef)[cell->geo.id_faces[*(in_face + 2)]],
+              {(*inter_coef)[cell->geo.id_faces[id_in_faces.a]],
+               (*inter_coef)[cell->geo.id_faces[id_in_faces.b]],
+               (*inter_coef)[cell->geo.id_faces[id_in_faces.c]],
                0};
           (*inter_coef)[cell->geo.id_faces[num_loc_face]] = GetIllum(I0, s, k, rhs);
-          s += 3;
-          in_face += 3;
+          s += NODE_SIZE;
 #else
           Type I = 0;
           // структура аналогичная  ::trace::GetLocNodes(...)
-          for (ShortId num_node = 0; num_node < 3; ++num_node) {
+          for (ShortId num_node = 0; num_node < NODE_SIZE; ++num_node) {
 
             IntId in_face_id = cell->geo.id_faces[X0_ptr->in_face_id]; //из локального номера в глобальный
 

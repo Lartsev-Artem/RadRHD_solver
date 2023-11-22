@@ -15,6 +15,8 @@
  */
 #define CELL_SIZE (NUMBER_OF_MEASUREMENTS + 1)
 
+#define NODE_SIZE 3 ///< число узлов интерполяции на грани
+
 #define CONVERT_TO_STRING(s, ...) #s #__VA_ARGS__
 
 /**

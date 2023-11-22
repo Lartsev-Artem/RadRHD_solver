@@ -127,13 +127,26 @@ struct cell_local // для каждой ячейки и каждого напр
   Type s;             ///< расстояние x0-x
   ShortId in_face_id; ///< id выходной грани
 };
+
+/// \brief сжатая битовая структура для хранения локальных номеров граней
+union face_loc_id_t {
+  struct
+  {
+    uint8_t a : 2;
+    uint8_t b : 2;
+    uint8_t c : 2;
+    uint8_t d : 2;
+  };
+  uint8_t bits;
+};
+
 struct align_cell_local // для каждой ячейки и каждого направления
 {
 #ifdef INTERPOLATION_ON_FACES
   Vector2 x0; ///< локальная координата входного узла для интерполяции
 #endif
-  std_ext::aligned_vector<Type, 32> s; ///< расстояние x0-x
-  std::vector<ShortId> in_face_id;     ///< id выходной грани
+  std_ext::aligned_vector<Type, 32> s;   ///< расстояние x0-x
+  std::vector<face_loc_id_t> in_face_id; ///< id выходной грани
 };
 
 /**
