@@ -23,7 +23,7 @@ int rhllc::RunRhllcModule() {
   if (err) {
     RETURN_ERR("Error reading \n");
   }
-  grid.InitMemory(grid.cells.size(), 0);
+  grid.InitMemory(grid.cells.size(), grid_directions_t(0));
 
   DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
 

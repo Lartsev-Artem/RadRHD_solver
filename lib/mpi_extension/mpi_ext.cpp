@@ -33,6 +33,18 @@ int8_t get_mpi_np() {
   return np;
 }
 
+int8_t get_mpi_id(const MPI_Comm &comm) {
+  int rank;
+  MPI_Comm_rank(comm, &rank);
+  return (int8_t)rank;
+}
+
+int8_t get_mpi_np(const MPI_Comm &comm) {
+  int size;
+  MPI_Comm_size(comm, &size);
+  return (int8_t)size;
+}
+
 MPI_Datatype MPI_flux_t;
 MPI_Datatype MPI_flux_illum_elem_t;
 MPI_Datatype MPI_hllc_value_t;

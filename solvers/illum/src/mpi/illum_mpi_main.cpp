@@ -1,10 +1,12 @@
 #if defined SOLVERS && defined ILLUM && defined USE_MPI
 #include "illum_main.h"
 
+#ifndef TRANSFER_CELL_TO_FACE
 #include "global_types.h"
 #include "illum_add_dir.h"
 #include "illum_calc_gpu_async.h"
 #include "illum_init_data.h"
+#include "illum_mpi_sender.h"
 
 #include "reader_bin.h"
 #include "reader_txt.h"
@@ -40,7 +42,7 @@ int illum::RunIllumMpiModule() {
     RETURN_ERR("Error reading \n");
   }
 
-  grid.InitMemory(grid.cells.size(), grid_direction.size);
+  grid.InitMemory(grid.cells.size(), grid_direction);
 
   if (illum::InitRadiationState(glb_files.base_address, grid)) {
     DIE_IF(_solve_mode.class_vtk == e_grid_cfg_radiation); //в иных случаях допускает пропуск инициализации
@@ -93,4 +95,5 @@ int illum::RunIllumMpiModule() {
   return e_completion_success;
 }
 
+#endif //! TRANSFER_CELL_TO_FACE
 #endif //! SOLVERS

@@ -89,7 +89,7 @@ struct grid_directions_t {
   IdType loc_shift;
   std::vector<direction_s> directions;
   Type full_area;
-  grid_directions_t(const IdType N = 0) : size(N), directions(N) {}
+  grid_directions_t(const IdType N = 0) : size(N), loc_size(N), loc_shift(0) directions(N) {}
 };
 
 //это узлы интерполяции на гранях

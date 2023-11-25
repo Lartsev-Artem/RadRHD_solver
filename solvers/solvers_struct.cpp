@@ -101,12 +101,13 @@ grid_t::~grid_t() {
 #endif
 #else // CUDA
 #include "cuda_interface.h"
-void grid_t::InitMemory(const IdType num_cells, const IdType num_directions) {
+void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_grid) {
 
   DIE_IF(cells.size() != num_cells);
 
   // loc_size = hllc_loc_size[myid].right - hllc_loc_size[id].left;
 
+  size_dir = dir_grid.size;
   size = num_cells;
   loc_size = size;
   loc_shift = 0;
@@ -118,6 +119,10 @@ void grid_t::InitMemory(const IdType num_cells, const IdType num_directions) {
     inter_coef_all[i].resize(size * CELL_SIZE);
 #else
     inter_coef_all[i].resize(size_face);
+#endif
+
+#ifdef SEPARATE_GPU
+    local_Illum.resize(dir_grid.loc_size * size);
 #endif
   }
 }

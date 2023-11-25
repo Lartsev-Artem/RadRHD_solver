@@ -70,13 +70,18 @@ int WriteSimple(const Str_Type name_file, const std::vector<T> &data) {
 template <typename Str_Type, typename T>
 int WriteSimple(const Str_Type name_file, const int n, const T *data) {
 
-  FILE *f;
-  OPEN_FILE(f, std::string(name_file).c_str(), "wb");
+  if (data != nullptr) {
+    FILE *f;
+    OPEN_FILE(f, std::string(name_file).c_str(), "wb");
 
-  fwrite(&n, sizeof(int), 1, f);
-  fwrite(data, sizeof(T), n, f);
-  fclose(f);
-  return e_completion_success;
+    fwrite(&n, sizeof(int), 1, f);
+    fwrite(data, sizeof(T), n, f);
+    fclose(f);
+    return e_completion_success;
+  }
+
+  WRITE_LOG("no data for %s\n", std::string(name_file).c_str());
+  return e_completion_fail;
 }
 
 /**

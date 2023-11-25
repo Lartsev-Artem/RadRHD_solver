@@ -79,14 +79,17 @@ size_t ReadSimple(const std::string &name_file, T *data) {
     return e_completion_fail;
   }
   // data.resize(n);
+if (data != nullptr) 
+{
   if (fread(data, sizeof(T), n, f) != n) {
     return e_completion_fail;
   }
 
   fclose(f);
-
-  // WRITE_LOG("Read %s success\n", name_file.c_str());
   return e_completion_success;
+}
+  WRITE_LOG("Read %s fail. No alloc memory\n", name_file.c_str());
+  return e_completion_fail;
 }
 
 /**

@@ -239,8 +239,9 @@ struct grid_t {
 };
 #else
 struct grid_t {
-  IdType size;
-  IdType size_face;
+  IdType size;      ///< размер сетки (число ячеек)
+  IdType size_face; ///< число граней
+  IdType size_dir;  ///< число направлений
 
   std::vector<elem_t> cells;
   std::vector<face_t> faces;
@@ -252,6 +253,10 @@ struct grid_t {
 
   Type *Illum;
   Type *scattering;
+
+#ifdef SEPARATE_GPU
+  std::vector<Type> local_Illum; ///< излучение на ячейках хранящееся по локальным направлениям (для mpi-отправки)
+#endif
 
   IdType loc_size;
   IdType loc_shift;
@@ -265,9 +270,9 @@ struct grid_t {
   Matrix3 *impuls;
 #endif
 
-  void InitMemory(const IdType num_cells, const IdType num_directions);
+  void InitMemory(const IdType num_cells, const grid_directions_t &dir_grid);
 
-  grid_t() : size(0), size_face(0), loc_size(0), loc_shift(0), Illum(nullptr), scattering(nullptr),
+  grid_t() : size(0), size_face(0), size_dir(0), loc_size(0), loc_shift(0), Illum(nullptr), scattering(nullptr),
              divstream(nullptr), divimpuls(nullptr)
 #ifdef ON_FULL_ILLUM_ARRAYS
              ,

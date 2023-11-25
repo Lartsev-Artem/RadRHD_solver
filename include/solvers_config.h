@@ -31,6 +31,14 @@
 // #define ONLY_CUDA_SCATTERING ///< отключает весь расчет на видеокарте, кроме рассеяния
 
 #define TRANSFER_CELL_TO_FACE ///< перенос трассировки с ячеек на грани
+
+#define SEPARATE_GPU ///< разделение данных на видеокарте
+
+#ifdef SEPARATE_GPU
+#define MULTI_GPU  ///< расчёт с применением нескольких карт на одном узле
+#define SINGLE_GPU ///< разделенной расчет, но с одной картой (система очереди)
+#endif
+
 #endif
 
 #ifdef USE_MPI
@@ -50,6 +58,10 @@
 #endif //! USE_MPI
 
 /* ============== Check config project =============== */
+
+#if defined MULTI_GPU && defined SINGLE_GPU
+#error "Bad config. A single type of separation is needed !!!"
+#endif
 
 #if defined USE_CUDA && !defined ILLUM
 #error "Bad config. CUDA only with ILLUM!!!"

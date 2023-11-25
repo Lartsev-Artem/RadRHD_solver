@@ -47,7 +47,7 @@ int illum::additional_direction::RunModule() {
     RETURN_ERR("Error reading \n");
   }
 
-  grid.InitMemory(grid.cells.size(), grid_direction.size);
+  grid.InitMemory(grid.cells.size(), grid_direction);
 
   if (illum::InitRadiationState(glb_files.base_address, grid)) {
     DIE_IF(_solve_mode.class_vtk == e_grid_cfg_radiation); //в иных случаях допускает пропуск инициализации
