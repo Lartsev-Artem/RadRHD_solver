@@ -85,7 +85,7 @@ __global__ void cuda::kernel::GetS_MPI_multi_device(const geo::grid_directions_d
   const IdType i = blockIdx.x * blockDim.x + threadIdx.x;
   const IdType k = blockIdx.y * blockDim.y + threadIdx.y;
 
-  if (i >= size_loc || k >= end_dir || k < start_dir)
+  if (i >= size_loc || k >= end_dir)
     return;
 
   const IdType M = dir->size;

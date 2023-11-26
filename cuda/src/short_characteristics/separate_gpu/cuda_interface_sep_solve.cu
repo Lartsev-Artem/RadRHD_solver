@@ -5,6 +5,7 @@
 #include "cuda_memory.h"
 
 #include "cuda_interface.h"
+#include "cuda_multi_interface.h"
 
 #include "cuda_illum_param.h"
 #include "cuda_scattering.h"
@@ -19,26 +20,49 @@ int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_d
   const IdType M = end_dir - start_dir;
   const IdType N = grid.size;
 
+  const int id_dev = 0;
+
   CUDA_TREADS_2D(threads);
   CUDA_BLOCKS_2D(blocks, N, M);
 
-  cudaMemcpyAsync(device_host_ptr.illum, grid.Illum, N * sizeof(grid.Illum[0]),
+  cudaMemcpyAsync(device_host_ptrN[id_dev].illum, grid.Illum, N * sizeof(grid.Illum[0]),
                   cudaMemcpyHostToDevice, cuda_streams[e_cuda_scattering_1]);
 
-  kernel::GetS_MPI_multi_device<<<blocks, threads, 0, cuda_streams[stream]>>>(grid_dir_device, grid_device, grid.size - 0, start_dir, end_dir);
+  kernel::GetS_MPI_multi_device<<<blocks, threads, 0, cuda_streams[stream]>>>(grid_dir_deviceN[id_dev], grid_deviceN[id_dev], grid.size - 0, start_dir, end_dir);
 
   CUDA_CALL_FUNC(cudaGetLastError);
 
   IdType disp = start_dir * N;
   IdType size = (end_dir - start_dir) * N * sizeof(grid.scattering[0]);
 
-  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + disp, device_host_ptr.int_scattering + disp, size, cudaMemcpyDeviceToHost, cuda_streams[stream]);
+  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + disp, device_host_ptrN[id_dev].int_scattering + disp, size, cudaMemcpyDeviceToHost, cuda_streams[stream]);
 
   return e_completion_success;
 }
 
-int cuda::interface::CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
-  /// \todo реализация
+#include "cuda_illum_sep_param.h"
+int cuda::interface::separate_device::CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
+
+#ifdef ON_FULL_ILLUM_ARRAYS
+#ifndef ONLY_CUDA_SCATTERING
+  const int id_dev = 0;
+  const IdType N_loc = gpu_config.size[id_dev];
+
+  CUDA_TREADS_1D(threads);
+  CUDA_BLOCKS_1D(blocks, N_loc);
+
+  cuda::separate_device::kernel::MakeIllumParam<<<blocks, threads, 0, cuda_streams[st]>>>(grid_dir_deviceN[id_dev], grid_deviceN[id_dev]);
+
+  CUDA_CALL_FUNC(cudaGetLastError);
+
+  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.energy, device_host_ptrN[id_dev].energy, N_loc * sizeof(grid.energy[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
+  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.stream, device_host_ptrN[id_dev].stream, N_loc * sizeof(grid.stream[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
+  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.impuls, device_host_ptrN[id_dev].impuls, N_loc * sizeof(grid.impuls[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
+#endif
+#endif
+
+  return e_completion_success;
+
   return 0;
 }
 

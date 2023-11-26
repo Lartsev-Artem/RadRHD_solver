@@ -1,7 +1,7 @@
 #if defined ILLUM && defined SOLVERS && defined USE_MPI && defined USE_CUDA
 
 #include "illum_calc_gpu_async.h"
-#ifdef TRANSFER_CELL_TO_FACE
+#if defined TRANSFER_CELL_TO_FACE && defined SEPARATE_GPU
 #include "illum_mpi_sender.h"
 #include "illum_utils.h"
 
@@ -50,8 +50,8 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
     const IdType count_directions = grid_direction.size;
 
-#pragma omp parallel default(none) firstprivate(count_directions, myid, np, local_disp, local_size) \
-    shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, disp_illum, section_1)
+    // #pragma omp parallel default(none) firstprivate(count_directions, myid, np, local_disp, local_size) \
+//     shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1)
     {
 
       const int count_th = omp_get_num_threads();
@@ -112,18 +112,13 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 #pragma omp critical
         {
           MPI_Startall(np - 1, section_1.requests_send.data() + ((num_direction - 0) * (np - 1)));
-        }
-      }
-      /*---------------------------------- конец FOR по направлениям----------------------------------*/
 
-      if (loc_norm > norm) {
-#pragma omp critical
-        {
           if (loc_norm > norm) {
             norm = loc_norm;
           }
         }
       }
+      /*---------------------------------- конец FOR по направлениям----------------------------------*/
     } // parallel
 
     MPI_Request rq_norm;
@@ -138,7 +133,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
     }
 
     MPI_Wait(&rq_norm, MPI_STATUS_IGNORE);
-    norm = glob_norm;
+    norm = fabs(glob_norm);
 
     WRITE_LOG("End iter number#: %d, norm=%.16lf, time= %lf\n", iter, norm,
               (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);

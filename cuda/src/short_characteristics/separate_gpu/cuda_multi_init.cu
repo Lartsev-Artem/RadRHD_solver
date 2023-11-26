@@ -5,7 +5,9 @@
 namespace sep = cuda::separate_device;
 namespace mem = cuda::mem_protected;
 
-void sep::InitDirectionsOnMultiDevice(const grid_directions_t &grid_host, geo::device_host_ptr_t &device_host_ptr, geo::grid_directions_device_t *&grid_device) {
+void sep::InitDirectionsOnMultiDevice(const grid_directions_t &grid_host,
+                                      geo::device_host_ptr_t &device_host_ptr,
+                                      geo::grid_directions_device_t *&grid_device) {
 
   const IdType n = grid_host.size;
 

@@ -64,14 +64,16 @@ int illum::RunIllumMultiGpuModule() {
 
   WRITE_LOG("end calculate illum\n");
 
-/// \todo ...
-#if 0 // def USE_CUDA
+  cuda::interface::CudaWait();
+  cuda::interface::CudaSyncStream(cuda::e_cuda_scattering_1);
+
   if (get_mpi_id() == 0) {
-    cuda::interface::CalculateAllParam(grid_direction, grid);
+    cuda_sep::CalculateAllParamAsync(grid_direction, grid, cuda::e_cuda_params);
   }
   cuda::interface::CudaWait();
   cuda::interface::CudaSyncStream(cuda::e_cuda_params);
-#endif
+
+  MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
   if (get_mpi_id() == 0) {
     files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);

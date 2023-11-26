@@ -265,6 +265,7 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coe
   return norm;
 }
 
+#ifdef SEPARATE_GPU
 Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp) {
   Type norm = -1;
   const IdType shift_dir = num_dir * grid.size;
@@ -285,6 +286,7 @@ Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Ty
 
   return norm;
 }
+#endif
 
 #pragma GCC target("avx2")
 #pragma GCC optimize("O3")

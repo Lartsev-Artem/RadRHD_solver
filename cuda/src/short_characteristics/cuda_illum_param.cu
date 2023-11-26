@@ -4,7 +4,7 @@
 
 #include "global_def.h"
 
-#ifndef TRANSFER_CELL_TO_FACE
+#ifndef ILLUM_ON_CELL
 
 #ifdef ON_FULL_ILLUM_ARRAYS
 #define CUDA_CONVERT_FACE_TO_CELL(val, size, src) \
@@ -106,37 +106,5 @@ __global__ void cuda::kernel::MakeIllumParam(const cuda::geo::grid_directions_de
   device::MakeDivImpuls(dir, grid);
 }
 
-#else
-__device__ void cuda::device::MakeEnergy(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
-
-  const IdType i = blockIdx.x * blockDim.x + threadIdx.x;
-  const IdType N = grid->loc_size;
-  const IdType M = dir->size;
-
-  if (i >= N)
-    return;
-
-  Type sum = 0;
-  for (IdType k = 0; k < M; k++) {
-    sum += grid->illum[M * i + k] * dir->directions[k].area;
-  }
-
-  grid->energy[i] = sum / dir->full_area; // direction_integrator::IntegrateByCell(shift + i, dir, grid);
-}
-
-///\todo наполнение функций
-__device__ void cuda::device::MakeStream(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
-}
-__device__ void cuda::device::MakeImpuls(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
-}
-
-/// \note если данные на ячейках, то дивергенции на прямую не посчитать (для rad_rhd они не нужны)
-__global__ void cuda::kernel::MakeIllumParam(const cuda::geo::grid_directions_device_t *dir, cuda::geo::grid_device_t *grid) {
-  // эти функции можно объденить в одну. Тогда будет одно общее обращение в память к illum
-  device::MakeEnergy(dir, grid);
-  device::MakeStream(dir, grid);
-  device::MakeImpuls(dir, grid);
-}
-#endif //! TRANSFER_CELL_TO_FACE
-
+#endif
 #endif //! USE_CUDA

@@ -32,7 +32,7 @@
 
 #define TRANSFER_CELL_TO_FACE ///< перенос трассировки с ячеек на грани
 
-#define SEPARATE_GPU ///< разделение данных на видеокарте
+// #define SEPARATE_GPU ///< разделение данных на видеокарте
 
 #ifdef SEPARATE_GPU
 #define ILLUM_ON_CELL ///< излучения хранится на ячейках, а не на гранях
@@ -49,11 +49,11 @@
 #endif
 
 #ifdef HLLC
-#define HLLC_MPI ///< расчёт hllc с технологией MPI
+// #define HLLC_MPI ///< расчёт hllc с технологией MPI
 #endif
 
 #ifdef RHLLC
-#define RHLLC_MPI ///< расчёт реляивиской постановки с технологией MPI
+// #define RHLLC_MPI ///< расчёт реляивиской постановки с технологией MPI
 #endif
 
 #endif //! USE_MPI

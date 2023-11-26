@@ -10,7 +10,7 @@
       "stopAtEntry": false,
       "externalConsole": false,
       "cwd": "/home/artem/projects/solver",
-      "program": "/home/artem/projects/solver/build/run",
+      "program": "/home/artem/projects/solver/build/bin/illum_multi_gpu_solver",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

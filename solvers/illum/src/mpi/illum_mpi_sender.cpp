@@ -6,6 +6,7 @@
 MPI_Comm MPI_COMM_ILLUM = MPI_COMM_WORLD;
 illum::mpi_sender_t section_1;
 
+#ifdef SEPARATE_GPU
 void illum::separate_gpu::InitSender(const MPI_Comm &comm, const grid_directions_t &grid_dir, const grid_t &grid) {
 
   MpiInitStruct(grid_dir);
@@ -56,6 +57,7 @@ void illum::separate_gpu::InitSender(const MPI_Comm &comm, const grid_directions
   WRITE_LOG("Init mpi sender\n");
   return;
 }
+#endif
 
 illum::mpi_sender_t section_2;
 std::vector<IdType> disp_illum;

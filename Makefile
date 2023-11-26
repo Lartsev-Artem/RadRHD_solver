@@ -1,5 +1,5 @@
 # defining project config 
-DEFCONF 		= SOLVERS LINUX DEBUG BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA USE_MPI
+DEFCONF 		= SOLVERS LINUX DEBUG BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA  USE_MPI
 #DEFCONF 		= SOLVERS DEBUG RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI USE_CUDA
 
 # defining working directories
@@ -54,8 +54,8 @@ LINK_SRC		= $(filter-out $(EXE_OBJ),$(OBJS))
 #######################################################################
 
 CXX             = mpic++
-CPPFLAGS        = $(DEF_SET) -fopenmp  -Ofast -fPIE
-CXXFLAGS        = -std=c++17 #-g #-Wall -Wextra -std=c++11
+CPPFLAGS        = $(DEF_SET) -fopenmp -fPIE #-Ofast
+CXXFLAGS        = -std=c++17 -g #-Wall -Wextra -std=c++11
 
 NVCC 				= nvcc
 NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp" --expt-relaxed-constexpr #-gencode arch=compute_70,code=sm_70 #совместимость с Eigen3

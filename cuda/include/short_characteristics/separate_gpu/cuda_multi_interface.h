@@ -41,6 +41,8 @@ void ClearDevice();
  */
 void ClearHost(grid_t &grid_host);
 
+int CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st);
+
 } // namespace separate_device
 
 } // namespace interface

@@ -140,6 +140,7 @@ illum_on_face - излучение на гранях по всем направ�
 //   return 0;
 // }
 
+#include "writer_txt.h"
 static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid_t &grid) {
 
 #ifdef ILLUM
@@ -150,6 +151,7 @@ static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid
   GetCellDataBySelectedDirection(grid.size, grid.size_dir, 0, grid.Illum, illum);
 #endif
   files_sys::bin::WriteSimple(main_dir + F_ILLUM, illum);
+  files_sys::txt::WriteSimple(main_dir + F_ILLUM + ".txt", illum);
 
 #if !defined USE_CUDA
   WRITE_FILE_ELEM((main_dir + F_ENERGY).c_str(), grid.cells, illum_val.energy);

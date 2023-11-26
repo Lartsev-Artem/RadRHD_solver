@@ -24,6 +24,10 @@ namespace cuda {
  */
 namespace mem_protected {
 
+#ifdef DEBUG
+static double full_device_mem = 0;
+#endif
+
 /**
  * @brief Выделение памяти на карте
  *
@@ -34,7 +38,10 @@ namespace mem_protected {
  */
 template <typename dataType, typename sizeT>
 void inline Malloc(sizeT size, dataType **data) {
-  WRITE_LOG("Malloc %lf Mb\n", ((double)size / 1024 / 1024));
+#ifdef DEBUG
+  full_device_mem += ((double)size / 1024 / 1024);
+  WRITE_LOG("Malloc +%lf Mb. full=%lf\n", ((double)size / 1024 / 1024), full_device_mem);
+#endif
   if (CheckError(cudaMalloc((void **)data, size))) {
     EXIT_ERR("Error cudaMalloc\n");
   }

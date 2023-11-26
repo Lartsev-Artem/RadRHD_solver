@@ -5,6 +5,7 @@
 
 #include "mpi_shifts.h"
 
+#ifdef SEPARATE_GPU
 cuda::multi_gpu_config_t gpu_config;
 
 std::vector<cuda::geo::grid_directions_device_t *> grid_dir_deviceN;
@@ -70,3 +71,5 @@ void cuda::interface::separate_device::ClearHost(grid_t &grid_host) {
 
   WRITE_LOG("Free host arrays\n");
 }
+
+#endif //! SEPARATE_GPU

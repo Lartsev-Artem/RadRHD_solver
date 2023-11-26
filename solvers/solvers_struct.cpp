@@ -115,14 +115,14 @@ void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_gri
 
   inter_coef_all.resize(omp_get_max_threads());
   for (size_t i = 0; i < inter_coef_all.size(); i++) {
-#ifndef TRANSFER_CELL_TO_FACE
+#ifndef ILLUM_ON_CELL
     inter_coef_all[i].resize(size * CELL_SIZE);
 #else
     inter_coef_all[i].resize(size_face);
 #endif
 
 #ifdef SEPARATE_GPU
-    local_Illum.resize(dir_grid.loc_size * size);
+    local_Illum.resize(dir_grid.loc_size * size, 0);
 #endif
   }
 }
