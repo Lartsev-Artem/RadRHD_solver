@@ -1,48 +1,76 @@
-#if defined ILLUM && defined SOLVERS //&& !defined USE_MPI
-#include "illum_calc_cpu.h"
+#if defined ILLUM && defined SOLVERS && defined USE_MPI && defined USE_CUDA
 
-#if defined TRANSFER_CELL_TO_FACE && !defined SEPARATE_GPU
-#include "illum_params.h"
+#include "illum_calc_gpu_async.h"
+#ifdef TRANSFER_CELL_TO_FACE
+#include "illum_mpi_sender.h"
 #include "illum_utils.h"
-#include "scattering.h"
 
-#include "solvers_struct.h"
-
-#ifdef USE_CUDA
 #include "cuda_interface.h"
-#endif
 
 #include <omp.h>
 
 #include <chrono>
 namespace tick = std::chrono;
 
-int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
-                                   const std::vector<std::vector<IntId>> &inner_bound_code,
-                                   const std::vector<align_cell_local> &vec_x0,
-                                   const std::vector<std::vector<graph_pair_t>> &sorted_graph,
-                                   const std::vector<std::vector<IntId>> &sorted_id_bound_face,
-                                   grid_t &grid) {
+int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
+                                        const std::vector<std::vector<IntId>> &inner_bound_code,
+                                        const std::vector<align_cell_local> &vec_x0,
+                                        const std::vector<std::vector<graph_pair_t>> &sorted_graph,
+                                        const std::vector<std::vector<IntId>> &sorted_id_bound_face,
+                                        grid_t &grid) {
+
+  int np = get_mpi_np();
+  int myid = get_mpi_id();
+
+  DIE_IF(np <= 1); //на одном узле не работает. Тогда надо закрывать пересылки mpi
+
+  const IdType local_size = grid_direction.loc_size;
+  const IdType local_disp = grid_direction.loc_shift;
 
   int iter = 0;    ///< номер итерации
   double norm = 0; ///< норма ошибки
 
   do {
     auto start_clock = tick::steady_clock::now();
-
     norm = -1;
+
+    if (section_1.requests_send[0] != MPI_REQUEST_NULL) {
+      MPI_Waitall(section_1.requests_send.size(), section_1.requests_send.data(), MPI_STATUSES_IGNORE);
+    }
+    cuda::interface::CudaSyncStream(cuda::e_cuda_scattering_1);
+
+#ifdef MULTI_GPU //если разделение в порядке очереди надо запускать расчёт до пересылки новых данных
+    if (myid == 0) {
+      //самый высоких приоритет, т.к. надо расчитать, до конфликта с асинхронной отправкой
+      cuda::interface::CalculateAllParamAsync(grid_direction, grid, cuda::e_cuda_params); //запустим расчёт параметров здесь
+                                                                                          // на выходе получим ответ за 1 шаг до сходимости, но зато без ожидания на выходе
+    }
+#endif
+
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
     const IdType count_directions = grid_direction.size;
 
-#pragma omp parallel default(none) firstprivate(count_directions) shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm)
+#pragma omp parallel default(none) firstprivate(count_directions, myid, np, local_disp, local_size) \
+    shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, disp_illum, section_1)
     {
+
+      const int count_th = omp_get_num_threads();
+      const int num_th = omp_get_thread_num();
+
       const IdType count_cells = grid.size;
 
       Type loc_norm = -1;
       std::vector<Type> *inter_coef = &grid.inter_coef_all[omp_get_thread_num()]; ///< указатель на коэффициенты интерполяции по локальному для потока направлению
 
+#pragma omp single // nowait
+      {
+        section_1.flags_send_to_gpu.assign(section_1.flags_send_to_gpu.size(), 0); // nowait
+        MPI_Startall(section_1.requests_rcv.size(), section_1.requests_rcv.data());
+        cuda::interface::CudaSyncStream(cuda::e_cuda_scattering_1);
+      }
+
 #pragma omp for
-      for (IdType num_direction = 0; num_direction < count_directions; ++num_direction) {
+      for (IdType num_direction = 0; num_direction < local_size; num_direction++) {
 
         /*---------------------------------- FOR по граничным граням----------------------------------*/
 #ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
@@ -64,7 +92,6 @@ int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
           const uint32_t num_loc_face = fc_pair.loc_face;
           elem_t *cell = &grid.cells[num_cell];
           const Vector3 &x = cell->geo.center; // vec_x[num_cell].x[num_loc_face][num_node];
-#if 1
           const Type S = grid.scattering[num_direction * count_cells + num_cell];
           Type k;
           const Type rhs = GetRhs(x, S, *cell, k);
@@ -77,31 +104,15 @@ int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
                0};
           (*inter_coef)[cell->geo.id_faces[num_loc_face]] = GetIllum(I0, s, k, rhs);
           s += NODE_SIZE;
-#else
-          Type I = 0;
-          // структура аналогичная  ::trace::GetLocNodes(...)
-          for (ShortId num_node = 0; num_node < NODE_SIZE; ++num_node) {
-
-            IntId in_face_id = cell->geo.id_faces[X0_ptr->in_face_id]; //из локального номера в глобальный
-
-#ifdef INTERPOLATION_ON_FACES
-#pragma error "need convert coef interpolation to face_value"
-#else
-            Type I_x0 = (*inter_coef)[in_face_id]; //Здесь даже если попадаем на границу, она должна быть определена.
-#endif
-            const Vector3 &x = vec_x[num_cell].x[num_loc_face][num_node];
-            I += GetIllum(x, X0_ptr->s, I_x0, grid.scattering[num_direction * count_cells + num_cell], *cell);
-            X0_ptr++;
-          } // num_node
-            //записываем значение коэффициентов на грани
-          (*inter_coef)[cell->geo.id_faces[num_loc_face]] = I / 3.;
-#endif
         }
-
         /*---------------------------------- конец FOR по ячейкам----------------------------------*/
-#ifndef INTERPOLATION_ON_FACES
-        loc_norm = ReCalcIllum(num_direction, *inter_coef, grid);
-#endif
+
+        loc_norm = separate_gpu::ReCalcIllum(num_direction, *inter_coef, grid, local_disp);
+
+#pragma omp critical
+        {
+          MPI_Startall(np - 1, section_1.requests_send.data() + ((num_direction - 0) * (np - 1)));
+        }
       }
       /*---------------------------------- конец FOR по направлениям----------------------------------*/
 
@@ -115,14 +126,19 @@ int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
       }
     } // parallel
 
+    MPI_Request rq_norm;
+    Type glob_norm = -1;
+    MPI_Iallreduce(&norm, &glob_norm, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_ILLUM, &rq_norm);
+
+    MPI_Waitall(section_1.requests_rcv.size(), section_1.requests_rcv.data(), MPI_STATUSES_IGNORE);
+
     if (_solve_mode.max_number_of_iter >= 1) // пропуск первой итерации
     {
-#ifndef USE_CUDA
-      scattering::CalculateIntCPU(grid_direction, grid);
-#else
-      cuda::interface::CalculateIntScattering(grid_direction, grid);
-#endif
+      cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, 0, local_size, cuda::e_cuda_scattering_1);
     }
+
+    MPI_Wait(&rq_norm, MPI_STATUS_IGNORE);
+    norm = glob_norm;
 
     WRITE_LOG("End iter number#: %d, norm=%.16lf, time= %lf\n", iter, norm,
               (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
@@ -131,6 +147,5 @@ int illum::cpu::CalculateIllumFace(const grid_directions_t &grid_direction,
 
   return e_completion_success;
 }
-
-#endif // calc on face
+#endif //! TRANSFER_CELL_TO_FACE
 #endif //! defined ILLUM && defined SOLVERS  && !defined USE_MPI

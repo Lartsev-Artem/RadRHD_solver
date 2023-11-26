@@ -15,7 +15,7 @@ struct mpi_sender_t {
   std::vector<MPI_Request> requests_send; //все запросы сообщений отправки и принятия
 };
 
-namespace gpu_separate {
+namespace separate_gpu {
 /**
  * @brief Инициализация MPI обмена, для типа хранения по ячейкам с раздельным расчетом на видеокарте
  *
@@ -24,7 +24,7 @@ namespace gpu_separate {
  * @param[in] grid сетка пространственная
  */
 void InitSender(const MPI_Comm &comm, const grid_directions_t &grid_dir, const grid_t &grid);
-} // namespace gpu_separate
+} // namespace separate_gpu
 
 namespace gpu_async {
 

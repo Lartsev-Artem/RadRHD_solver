@@ -239,27 +239,50 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coe
   Type norm = -1;
   const IdType shift_dir = num_dir * grid.size;
 
-#if 0 //на ячейках
+#ifdef ILLUM_ON_CELL //на ячейках
   for (size_t cell = 0; cell < grid.size; cell++) {
-    IdType id = mpi_dir_shift + (shift_dir + cell);
     Type curI = 0;
     for (size_t j = 0; j < CELL_SIZE; j++) {
       curI += inter_coef[grid.cells[cell].geo.id_faces[j]];
     }
-    curI /= 4;
+    curI /= CELL_SIZE;
+
+    IdType id = mpi_dir_shift + (shift_dir + cell);
     norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
     grid.Illum[id] = curI;
   }
 #else //на гранях
   for (size_t cell = 0; cell < grid.size; cell++) {
     for (size_t j = 0; j < CELL_SIZE; j++) {
-      IdType id = mpi_dir_shift + CELL_SIZE * (shift_dir + cell) + j;
       Type curI = inter_coef[grid.cells[cell].geo.id_faces[j]];
+
+      IdType id = mpi_dir_shift + CELL_SIZE * (shift_dir + cell) + j;
       norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
       grid.Illum[id] = curI;
     }
   }
 #endif
+  return norm;
+}
+
+Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp) {
+  Type norm = -1;
+  const IdType shift_dir = num_dir * grid.size;
+
+  for (size_t cell = 0; cell < grid.size; cell++) {
+    Type curI = 0;
+    for (size_t j = 0; j < CELL_SIZE; j++) {
+      curI += inter_coef[grid.cells[cell].geo.id_faces[j]];
+    }
+    curI /= CELL_SIZE;
+
+    IdType id = (shift_dir + cell);
+    norm = std::max(norm, fabs((grid.local_Illum[id] - curI) / curI));
+    grid.local_Illum[id] = curI;
+
+    grid.Illum[cell * grid.size_dir + (num_dir + dir_disp)] = curI;
+  }
+
   return norm;
 }
 

@@ -6,7 +6,7 @@
 MPI_Comm MPI_COMM_ILLUM = MPI_COMM_WORLD;
 illum::mpi_sender_t section_1;
 
-void illum::gpu_separate::InitSender(const MPI_Comm &comm, const grid_directions_t &grid_dir, const grid_t &grid) {
+void illum::separate_gpu::InitSender(const MPI_Comm &comm, const grid_directions_t &grid_dir, const grid_t &grid) {
 
   MpiInitStruct(grid_dir);
   int np = get_mpi_np(comm);
@@ -53,6 +53,7 @@ void illum::gpu_separate::InitSender(const MPI_Comm &comm, const grid_directions
     }
   }
 
+  WRITE_LOG("Init mpi sender\n");
   return;
 }
 
@@ -142,6 +143,7 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
     }
   }
 
+  WRITE_LOG("Init mpi sender\n");
   return;
 }
 

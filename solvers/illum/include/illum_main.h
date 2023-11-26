@@ -15,5 +15,7 @@ int RunIllumModule();
 int RunIllumMpiModule();
 
 int RunIllumFacesModule();
+int RunIllumMultiGpuModule();
+
 } // namespace illum
 #endif //! ILLUM_MAIN_H

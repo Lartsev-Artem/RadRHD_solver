@@ -5,7 +5,9 @@
 #include "cuda_interface.h"
 #endif
 
-#ifndef TRANSFER_CELL_TO_FACE
+#if !defined SEPARATE_GPU
+
+#if !defined TRANSFER_CELL_TO_FACE
 #include "illum_params.h"
 #include "illum_utils.h"
 #include "scattering.h"
@@ -246,7 +248,7 @@ int illum::cpu::CalculateAdditionalIllum(const grid_directions_t &grid_direction
   return e_completion_success;
 }
 
-#endif
+#endif //! TRANSFER_CELL_TO_FACE
 
 void illum::cpu::CalculateIllumParam(const grid_directions_t &grid_direction, grid_t &grid) {
 
@@ -258,4 +260,6 @@ void illum::cpu::CalculateIllumParam(const grid_directions_t &grid_direction, gr
   cuda::interface::CalculateAllParam(grid_direction, grid);
 #endif
 }
+
+#endif //! SEPARATE_GPU
 #endif //! defined ILLUM && defined SOLVERS  && !defined USE_MPI

@@ -13,6 +13,8 @@
 
 using namespace cuda::geo;
 
+#ifndef SEPARATE_GPU
+
 int cuda::interface::CalculateAllParam(const grid_directions_t &grid_dir, grid_t &grid) {
 
 #ifndef ONLY_CUDA_SCATTERING
@@ -80,7 +82,6 @@ int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_d
 
   return e_completion_success;
 }
-
 int cuda::interface::CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
 
 #ifndef ONLY_CUDA_SCATTERING
@@ -105,5 +106,7 @@ int cuda::interface::CalculateAllParamAsync(const grid_directions_t &grid_dir, g
 
   return e_completion_success;
 }
+
+#endif //! SEPARATE_GPU
 
 #endif //! USE_CUDA

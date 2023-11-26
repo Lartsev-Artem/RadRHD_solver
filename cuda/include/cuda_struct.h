@@ -133,7 +133,21 @@ struct device_host_ptr_t {
 };
 
 } // namespace geo
+
+struct multi_gpu_config_t {
+  int GPU_N;
+  std::vector<IdType> size;
+  std::vector<IdType> disp;
+};
+
 } // namespace cuda
+
+#ifdef SEPARATE_GPU
+extern cuda::multi_gpu_config_t gpu_config;
+extern std::vector<cuda::geo::grid_directions_device_t *> grid_dir_deviceN;
+extern std::vector<cuda::geo::grid_device_t *> grid_deviceN;
+extern std::vector<cuda::geo::device_host_ptr_t> device_host_ptrN;
+#endif
 
 extern cuda::geo::grid_directions_device_t *grid_dir_device; ///< сфера направлений
 extern cuda::geo::grid_device_t *grid_device;                ///< сетка

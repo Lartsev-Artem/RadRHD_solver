@@ -18,7 +18,19 @@ int CalculateIllum(const grid_directions_t &grid_direction, const std::vector<st
                    const std::vector<std::vector<cell_local>> &vec_x0, std::vector<BasePointTetra> &vec_x,
                    const std::vector<std::vector<int>> &sorted_id_cell, grid_t &grid);
 #endif
-
 } // namespace gpu_async
+
+namespace separate_gpu {
+
+#ifdef TRANSFER_CELL_TO_FACE
+int CalculateIllum(const grid_directions_t &grid_direction,
+                   const std::vector<std::vector<IntId>> &inner_bound_code,
+                   const std::vector<align_cell_local> &vec_x0,
+                   const std::vector<std::vector<graph_pair_t>> &sorted_graph,
+                   const std::vector<std::vector<IntId>> &sorted_id_bound_face,
+                   grid_t &grid);
+#endif
+} // namespace separate_gpu
+
 } // namespace illum
 #endif

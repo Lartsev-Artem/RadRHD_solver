@@ -127,6 +127,21 @@ Type GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
 #endif
 );
 
+namespace separate_gpu {
+/**
+ * @brief Функция переводит данные расчёта излучения в структуру решателя
+ *
+ * \note Пишет сразу в 2 массива. Глобальным с нумераций по ячейкам
+ * и локальный массив на отправку по направлениям
+ * @param[in] num_dir номер направления (локальный)
+ * @param[in] inter_coef значения на гранях по данному направлению
+ * @param[inout] grid сетка с излучением
+ * @param[in] dir_disp - сдвиг по локальным направлениям
+ * @return возвращает норму ошибки на текущей итерации
+ */
+Type ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp = 0);
+} // namespace separate_gpu
+
 /**
  * @brief
  *

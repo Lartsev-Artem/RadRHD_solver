@@ -32,6 +32,18 @@ __global__ void GetS_MPI(const geo::grid_directions_device_t *dir, geo::grid_dev
 
 __global__ void GetS_MPI_Stream(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid, const IdType start, const IdType end);
 
+/**
+ * @brief Расчет интеграла рассеяния с mpi разделением по направлениям и gpu разделением по ячейкам
+ *
+ * @param[in] dir сетка направлений
+ * @param[inout] grid пространственная сетка(определены только массивы значений и размеры)
+ * @param[in] size_loc локальное число ячеек для текущего ядра
+ * @param[in] start_dir начало локальных направлений
+ * @param[in] end_dir конец локальных направлений
+ */
+__global__ void GetS_MPI_multi_device(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid,
+                                      const IdType size_loc, const IdType start_dir, const IdType end_dir);
+
 } // namespace kernel
 } // namespace cuda
 #endif //! CUDA_SCATTERING_H

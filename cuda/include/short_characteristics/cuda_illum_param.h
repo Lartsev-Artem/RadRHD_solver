@@ -32,6 +32,24 @@ __device__ void MakeEnergy(const geo::grid_directions_device_t *dir, geo::grid_d
 #endif
 
 /**
+ * @brief Функция расчёта потока излучения на сетке
+ *
+ * @param[in] dir сфера направлений
+ * @param[inout] grid сетка
+ * @warning предварительно должно быть вычислено излучение
+ */
+__device__ void MakeStream(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid);
+
+/**
+ * @brief  Функция расчёта импульса излучения на сетке
+ *
+ * @param[in] dir сфера направлений
+ * @param[inout] grid сетка
+ * @warning предварительно должно быть вычислено излучение
+ */
+__device__ void MakeImpuls(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid);
+
+/**
  * @brief Функция расчёта потока и дивергенции потока излучения на сетке
  *
  * @param[in] dir сфера направлений

@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[]) {
 
-#if defined ILLUM && defined TRANSFER_CELL_TO_FACE && !defined SEPARATE_GPU
+#if defined SEPARATE_GPU
   MPI_START(argc, argv);
 
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";
@@ -16,12 +16,11 @@ int main(int argc, char *argv[]) {
     return e_completion_fail;
 
   if (get_mpi_np() == 1) {
-    illum::RunIllumFacesModule();
+    D_LD;
   }
 #ifdef USE_MPI
   else {
-    D_LD;
-    // illum::RunIllumMpiModule();
+    illum::RunIllumMultiGpuModule();
   }
 #endif
 
