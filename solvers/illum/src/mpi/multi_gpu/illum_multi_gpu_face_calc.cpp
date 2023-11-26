@@ -6,11 +6,13 @@
 #include "illum_utils.h"
 
 #include "cuda_interface.h"
+#include "cuda_multi_interface.h"
 
 #include <omp.h>
 
 #include <chrono>
 namespace tick = std::chrono;
+namespace cuda_sep = cuda::interface::separate_device;
 
 int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
                                         const std::vector<std::vector<IntId>> &inner_bound_code,
@@ -92,7 +94,8 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           const uint32_t num_loc_face = fc_pair.loc_face;
           elem_t *cell = &grid.cells[num_cell];
           const Vector3 &x = cell->geo.center; // vec_x[num_cell].x[num_loc_face][num_node];
-          const Type S = grid.scattering[num_direction * count_cells + num_cell];
+          const Type S = grid.scattering[num_cell * local_size + num_direction];
+          // const Type S = grid.scattering[num_direction * count_cells + num_cell];
           Type k;
           const Type rhs = GetRhs(x, S, *cell, k);
           const face_loc_id_t id_in_faces = *(in_face);
@@ -129,7 +132,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 
     if (_solve_mode.max_number_of_iter >= 1) // пропуск первой итерации
     {
-      cuda::interface::CalculateIntScatteringAsync(grid_direction, grid, 0, local_size, cuda::e_cuda_scattering_1);
+      cuda_sep::CalculateIntScatteringAsync(grid_direction, grid, 0, local_size, cuda::e_cuda_scattering_1);
     }
 
     MPI_Wait(&rq_norm, MPI_STATUS_IGNORE);
@@ -141,6 +144,6 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
   } while (norm > _solve_mode.accuracy && iter < _solve_mode.max_number_of_iter);
 
   return e_completion_success;
-}
+} // namespace cuda::interface::separate_device::intillum::separate_gpu::CalculateIllum(constgrid_directions_t&grid_direction,conststd::vector<std::vector<IntId>>&inner_bound_code,conststd::vector<align_cell_local>&vec_x0,conststd::vector<std::vector<graph_pair_t>>&sorted_graph,conststd::vector<std::vector<IntId>>&sorted_id_bound_face,grid_t&grid)
 #endif //! TRANSFER_CELL_TO_FACE
 #endif //! defined ILLUM && defined SOLVERS  && !defined USE_MPI

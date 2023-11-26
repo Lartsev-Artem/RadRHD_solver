@@ -15,14 +15,22 @@ std::vector<cuda::geo::device_host_ptr_t> device_host_ptrN;
 int cuda::interface::separate_device::InitDevice(const grid_directions_t &grid_dir_host, grid_t &grid_host) {
 
   CUDA_CALL_FUNC(cudaGetDeviceCount, &gpu_config.GPU_N);
+#ifdef SINGLE_GPU
+  gpu_config.GPU_N = GPU_DIV_PARAM;
+#endif
   GetSend(gpu_config.GPU_N, grid_host.size, gpu_config.size);
   GetDisp(gpu_config.GPU_N, grid_host.size, gpu_config.disp);
 
-  device_host_ptrN.resize(gpu_config.GPU_N);
-  grid_dir_deviceN.resize(gpu_config.GPU_N);
-  grid_deviceN.resize(gpu_config.GPU_N);
+  int _dev_n = gpu_config.GPU_N; //реальное число карт
+#ifdef SINGLE_GPU
+  _dev_n = 1;
+#endif
 
-  for (int dev_id = 0; dev_id < gpu_config.GPU_N; dev_id++) {
+  device_host_ptrN.resize(_dev_n);
+  grid_dir_deviceN.resize(_dev_n);
+  grid_deviceN.resize(_dev_n);
+
+  for (int dev_id = 0; dev_id < _dev_n; dev_id++) {
     CUDA_CALL_FUNC(cudaSetDevice, dev_id);
     cuda::separate_device::InitDirectionsOnMultiDevice(grid_dir_host, device_host_ptrN[dev_id], grid_dir_deviceN[dev_id]);
     cuda::separate_device::InitMultiDeviceGrid(dev_id, gpu_config, grid_host, grid_dir_host, device_host_ptrN[dev_id], grid_deviceN[dev_id]);

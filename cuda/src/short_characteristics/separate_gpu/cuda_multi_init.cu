@@ -70,7 +70,8 @@ void sep::InitMultiDeviceGrid(int id_dev, const multi_gpu_config_t &gpu_conf, co
 void sep::ClearDirectionsOnMultiDevice(const multi_gpu_config_t &gpu_conf, std::vector<geo::device_host_ptr_t> &device_host_ptrs,
                                        std::vector<geo::grid_directions_device_t *> &grid_devices) {
 
-  for (size_t i = 0; i < gpu_conf.GPU_N; i++) {
+  DIE_IF(device_host_ptrs.size() != grid_devices.size())
+  for (size_t i = 0; i < grid_devices.size(); i++) {
     mem::FreeMem(device_host_ptrs[i].directions); // удаляем массив внутри структуры
     mem::FreeMem(grid_devices[i]);                // удаляем саму структуру
   }
@@ -79,7 +80,9 @@ void sep::ClearDirectionsOnMultiDevice(const multi_gpu_config_t &gpu_conf, std::
 void sep::ClearGridOnMultiDevice(multi_gpu_config_t &gpu_conf, std::vector<geo::device_host_ptr_t> &device_host_ptrs,
                                  std::vector<geo::grid_device_t *> &grid_devices) {
 
-  for (size_t i = 0; i < gpu_conf.GPU_N; i++) {
+  DIE_IF(device_host_ptrs.size() != grid_devices.size())
+
+  for (size_t i = 0; i < grid_devices.size(); i++) {
     mem::FreeMem(device_host_ptrs[i].illum);
     mem::FreeMem(device_host_ptrs[i].int_scattering);
 

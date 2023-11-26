@@ -1,6 +1,7 @@
 #ifdef USE_CUDA
 
 #include "cuda_def.h"
+#include "cuda_illum_sep_param.h"
 #include "cuda_init_mem.h"
 #include "cuda_memory.h"
 
@@ -15,8 +16,62 @@
 using namespace cuda::geo;
 
 #ifdef SEPARATE_GPU
-int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid,
-                                                 const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream) {
+
+#ifdef MULTI_GPU
+int cuda::interface::separate_device::CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid,
+                                                                  const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream) {
+#pragma error "todo this section"
+}
+#elif defined SINGLE_GPU
+int cuda::interface::separate_device::CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid,
+                                                                  const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream) {
+
+  const IdType M_loc = end_dir - start_dir;
+  const IdType M = grid_dir.size;
+  constexpr int id_dev = 0;
+
+  for (int it = 0; it < GPU_DIV_PARAM; it++) {
+
+    const IdType N = gpu_config.size[it];
+    const IdType dispN = gpu_config.disp[it];
+    CUDA_TREADS_2D(threads);
+    CUDA_BLOCKS_2D(blocks, N, M_loc);
+
+    cudaMemcpyAsync(device_host_ptrN[id_dev].illum, grid.Illum + M * dispN, M * N * sizeof(grid.Illum[0]),
+                    cudaMemcpyHostToDevice, cuda_streams[stream]);
+
+    CudaSyncStream(e_cuda_scattering_2);
+
+    kernel::GetS_MPI_multi_device<<<blocks, threads, 0, cuda_streams[stream]>>>(grid_dir_deviceN[id_dev], grid_deviceN[id_dev], N, start_dir, end_dir);
+
+    CUDA_CALL_FUNC(cudaGetLastError);
+
+    IdType size = M_loc * N * sizeof(grid.scattering[0]);
+
+    CudaSyncStream(stream);
+
+    CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + dispN, device_host_ptrN[id_dev].int_scattering, size, cudaMemcpyDeviceToHost, cuda_streams[e_cuda_scattering_2]);
+
+    {
+      CudaSyncStream(e_cuda_params);
+      CudaSyncStream(e_cuda_scattering_2);
+
+      if (grid_dir.loc_shift == 0) {
+
+        cuda::interface::separate_device::CalculateAllParamAsync(0, it, grid_dir, grid, e_cuda_params);
+      }
+      CudaSyncStream(e_cuda_params);
+      CudaSyncStream(e_cuda_scattering_2);
+    }
+  }
+
+  return e_completion_success;
+}
+#endif
+
+#if 0 // DBG
+int cuda::interface::separate_device::CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid,
+                                                                  const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream) {
   const IdType M = end_dir - start_dir;
   const IdType N = grid.size;
 
@@ -38,14 +93,14 @@ int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_d
   CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + disp, device_host_ptrN[id_dev].int_scattering + disp, size, cudaMemcpyDeviceToHost, cuda_streams[stream]);
   return e_completion_success;
 }
+#endif
 
-#include "cuda_illum_sep_param.h"
-int cuda::interface::separate_device::CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
+int cuda::interface::separate_device::CalculateAllParamAsync(const int id_dev, const int im_dev, const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
 
 #ifdef ON_FULL_ILLUM_ARRAYS
 #ifndef ONLY_CUDA_SCATTERING
-  const int id_dev = 0;
-  const IdType N_loc = gpu_config.size[id_dev];
+  const IdType N_loc = gpu_config.size[im_dev];
+  const IdType host_disp = gpu_config.disp[im_dev];
 
   CUDA_TREADS_1D(threads);
   CUDA_BLOCKS_1D(blocks, N_loc);
@@ -54,15 +109,13 @@ int cuda::interface::separate_device::CalculateAllParamAsync(const grid_directio
 
   CUDA_CALL_FUNC(cudaGetLastError);
 
-  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.energy, device_host_ptrN[id_dev].energy, N_loc * sizeof(grid.energy[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
-  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.stream, device_host_ptrN[id_dev].stream, N_loc * sizeof(grid.stream[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
-  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.impuls, device_host_ptrN[id_dev].impuls, N_loc * sizeof(grid.impuls[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
+  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.energy + host_disp, device_host_ptrN[id_dev].energy, N_loc * sizeof(grid.energy[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
+  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.stream + host_disp, device_host_ptrN[id_dev].stream, N_loc * sizeof(grid.stream[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
+  CUDA_CALL_FUNC(cudaMemcpyAsync, grid.impuls + host_disp, device_host_ptrN[id_dev].impuls, N_loc * sizeof(grid.impuls[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
 #endif
 #endif
 
   return e_completion_success;
-
-  return 0;
 }
 
 #endif //! SEPARATE_GPU

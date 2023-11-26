@@ -80,7 +80,6 @@ __global__ void cuda::kernel::GetS_MPI_Stream(const geo::grid_directions_device_
 
 __global__ void cuda::kernel::GetS_MPI_multi_device(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid,
                                                     const IdType size_loc, const IdType start_dir, const IdType end_dir) {
-  const IdType N = grid->size;
 
   const IdType i = blockIdx.x * blockDim.x + threadIdx.x;
   const IdType k = blockIdx.y * blockDim.y + threadIdx.y;
@@ -100,7 +99,8 @@ __global__ void cuda::kernel::GetS_MPI_multi_device(const geo::grid_directions_d
     scatter += device::direction_integrator::Gamma(all_dir[num_direction].dir, cur_dir) * I * all_dir[num_direction].area;
   }
 
-  grid->int_scattering[k * N + i] = scatter / dir->full_area;
+  grid->int_scattering[i * grid->local_scattering_size + k] = scatter / dir->full_area;
+  // grid->int_scattering[k * N + i] = scatter / dir->full_area;
 }
 
 #endif //! USE_CUDA

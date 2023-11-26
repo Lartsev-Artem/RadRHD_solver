@@ -26,6 +26,7 @@ namespace mem_protected {
 
 #ifdef DEBUG
 static double full_device_mem = 0;
+static double full_host_mem = 0;
 #endif
 
 /**
@@ -40,7 +41,7 @@ template <typename dataType, typename sizeT>
 void inline Malloc(sizeT size, dataType **data) {
 #ifdef DEBUG
   full_device_mem += ((double)size / 1024 / 1024);
-  WRITE_LOG("Malloc +%lf Mb. full=%lf\n", ((double)size / 1024 / 1024), full_device_mem);
+  WRITE_LOG("Malloc +%lf Kb. full=%lf Mb\n", ((double)size / 1024), full_device_mem);
 #endif
   if (CheckError(cudaMalloc((void **)data, size))) {
     EXIT_ERR("Error cudaMalloc\n");
@@ -57,7 +58,10 @@ void inline Malloc(sizeT size, dataType **data) {
  */
 template <typename dataType, typename sizeT>
 void inline MallocHost(sizeT size, dataType **data) {
-  WRITE_LOG("MallocHost %lf Mb\n", ((double)size / 1024 / 1024));
+#ifdef DEBUG
+  full_host_mem += ((double)size / 1024 / 1024);
+  WRITE_LOG("MallocHost +%lf Kb, full=%lf Mb\n", ((double)size / 1024), full_host_mem);
+#endif
   if (CheckError(cudaMallocHost((void **)data, size))) {
     EXIT_ERR("Error MallocHost\n");
   }
