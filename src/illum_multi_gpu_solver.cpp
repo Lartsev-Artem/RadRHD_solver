@@ -8,16 +8,6 @@ int main(int argc, char *argv[]) {
 #if defined SEPARATE_GPU
   MPI_START(argc, argv);
 
-  int a;
-  if (get_mpi_id() == 0) {
-    scanf("%d", &a);
-    while (a == 0) {
-      sleep(1);
-    }
-  }
-
-  MPI_BARRIER(MPI_COMM_WORLD);
-
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";
   if (argc > 1)
     file_config = argv[1];

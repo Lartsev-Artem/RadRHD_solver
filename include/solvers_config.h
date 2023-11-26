@@ -32,7 +32,7 @@
 
 #define TRANSFER_CELL_TO_FACE ///< перенос трассировки с ячеек на грани
 
-// #define SEPARATE_GPU ///< разделение данных на видеокарте
+#define SEPARATE_GPU ///< разделение данных на видеокарте
 
 #ifdef SEPARATE_GPU
 #define ILLUM_ON_CELL ///< излучения хранится на ячейках, а не на гранях

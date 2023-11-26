@@ -25,8 +25,8 @@ int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_d
   CUDA_TREADS_2D(threads);
   CUDA_BLOCKS_2D(blocks, N, M);
 
-  cudaMemcpyAsync(device_host_ptrN[id_dev].illum, grid.Illum, N * sizeof(grid.Illum[0]),
-                  cudaMemcpyHostToDevice, cuda_streams[e_cuda_scattering_1]);
+  cudaMemcpyAsync(device_host_ptrN[id_dev].illum, grid.Illum, grid_dir.size * N * sizeof(grid.Illum[0]),
+                  cudaMemcpyHostToDevice, cuda_streams[stream]);
 
   kernel::GetS_MPI_multi_device<<<blocks, threads, 0, cuda_streams[stream]>>>(grid_dir_deviceN[id_dev], grid_deviceN[id_dev], grid.size - 0, start_dir, end_dir);
 
@@ -36,7 +36,6 @@ int cuda::interface::CalculateIntScatteringAsync(const grid_directions_t &grid_d
   IdType size = (end_dir - start_dir) * N * sizeof(grid.scattering[0]);
 
   CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + disp, device_host_ptrN[id_dev].int_scattering + disp, size, cudaMemcpyDeviceToHost, cuda_streams[stream]);
-
   return e_completion_success;
 }
 
