@@ -65,6 +65,17 @@ int CalculateAllParamAsync(const int id_dev, const int im_dev, const grid_direct
  */
 int CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid, const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream);
 
+#ifdef MULTI_GPU
+/**
+ * @brief Расчёт энергии, импульса и излучения на нескольких картах
+ *
+ * @param[in] grid_dir сфера направлений
+ * @param[in] grid сетка
+ * @param[in] st id потока
+ * @return int ::e_type_completion
+ */
+int CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st);
+#endif
 } // namespace separate_device
 
 } // namespace interface

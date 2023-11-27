@@ -20,7 +20,24 @@ using namespace cuda::geo;
 #ifdef MULTI_GPU
 int cuda::interface::separate_device::CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid,
                                                                   const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream) {
-#pragma error "todo this section"
+  const IdType M_loc = end_dir - start_dir;
+  const IdType M = grid_dir.size;
+
+  for (int id_dev = 0; id_dev < gpu_config.GPU_N; id_dev++) {
+
+    const IdType N = gpu_config.size[id_dev];
+    const IdType dispN = gpu_config.disp[id_dev];
+    CUDA_TREADS_2D(threads);
+    CUDA_BLOCKS_2D(blocks, N, M_loc);
+
+    CUDA_CALL_FUNC(cudaSetDevice, id_dev);
+
+    cudaMemcpyAsync(device_host_ptrN[id_dev].illum, grid.Illum + M * dispN, M * N * sizeof(grid.Illum[0]), cudaMemcpyHostToDevice, cuda_streams[stream]);
+
+    kernel::GetS_MPI_multi_device<<<blocks, threads, 0, cuda_streams[stream]>>>(grid_dir_deviceN[id_dev], grid_deviceN[id_dev], N, start_dir, end_dir);
+
+    CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + dispN, device_host_ptrN[id_dev].int_scattering, M_loc * N * sizeof(grid.scattering[0]), cudaMemcpyDeviceToHost, cuda_streams[stream]);
+  }
 }
 #elif defined SINGLE_GPU
 int cuda::interface::separate_device::CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid,
@@ -117,6 +134,23 @@ int cuda::interface::separate_device::CalculateAllParamAsync(const int id_dev, c
 
   return e_completion_success;
 }
+
+#ifdef MULTI_GPU
+int cuda::interface::separate_device::CalculateAllParamAsync(const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
+
+  for (int id_dev = 0; id_dev < GPU_DIV_PARAM; id_dev++) {
+
+    CUDA_CALL_FUNC(cudaSetDevice, id_dev);
+
+    CudaSyncStream(e_cuda_scattering_1); //ждем излучения
+    CudaSyncStream(st);                  //теоретически ждем предыдущую итерацию
+
+    CalculateAllParamAsync(id_dev, id_dev, grid_dir, grid, st);
+  }
+
+  return e_completion_success;
+}
+#endif
 
 #endif //! SEPARATE_GPU
 
