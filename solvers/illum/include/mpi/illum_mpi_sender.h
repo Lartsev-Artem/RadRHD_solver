@@ -1,8 +1,17 @@
+/**
+ * @file illum_mpi_sender.h
+ * @brief Вспомогательные структуры для mpi обмена
+ *
+ */
 #if !defined ILLUM_MPI_SENDER_H && defined ILLUM && defined SOLVERS && defined USE_MPI
 #define ILLUM_MPI_SENDER_H
 
 #include "geo_types.h"
 #include "solvers_struct.h"
+
+/*! \addtogroup illum Модуль расчёта излучения
+    @{
+*/
 
 namespace illum {
 

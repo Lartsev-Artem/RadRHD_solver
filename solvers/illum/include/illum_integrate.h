@@ -8,6 +8,10 @@
 
 #include "geo_types.h"
 
+/*! \addtogroup illum Модуль расчёта излучения
+    @{
+*/
+
 namespace illum {
 
 /**

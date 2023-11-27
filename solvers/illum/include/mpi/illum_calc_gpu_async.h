@@ -1,8 +1,16 @@
-
+/**
+ * @file illum_calc_gpu_async.h
+ * @brief Вызов основного расчета излучения
+ *
+ */
 #if !defined ILLUM_PART_H && defined ILLUM && defined SOLVERS
 #define ILLUM_PART_H
 #include "geo_types.h"
 #include "solvers_struct.h"
+
+/*! \addtogroup illum Модуль расчёта излучения
+    @{
+*/
 
 namespace illum {
 
@@ -20,6 +28,10 @@ int CalculateIllum(const grid_directions_t &grid_direction, const std::vector<st
 #endif
 } // namespace gpu_async
 
+/**
+ * @brief Пространство имён расчёта излучения на  видеокарте с асинхронной пересылкой между процессами и несколькими видеокартами на узле
+ *
+ */
 namespace separate_gpu {
 
 #ifdef TRANSFER_CELL_TO_FACE

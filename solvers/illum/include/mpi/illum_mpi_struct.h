@@ -1,7 +1,16 @@
+/**
+ * @file illum_mpi_struct.h
+ * @brief Новые типы данных MPI
+ *
+ */
 #if !defined ILLUM_MPI_STRUCT_H && defined ILLUM && defined SOLVERS && defined USE_MPI
 #define ILLUM_MPI_STRUCT_H
 
 #include "geo_types.h"
+
+/*! \addtogroup illum Модуль расчёта излучения
+    @{
+*/
 
 extern MPI_Datatype MPI_RECV_ILLUM_T; ///< структура дл отправки по направлению, а приему по ячейкам
 

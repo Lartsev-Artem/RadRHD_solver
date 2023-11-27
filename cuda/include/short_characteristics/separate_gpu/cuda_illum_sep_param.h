@@ -1,8 +1,11 @@
 /**
- * @file cuda_illum_param.h
- * @brief Функции расчёта параметров зависящих от излучения
-
+ * @file cuda_illum_sep_param.h
+ * @brief Функции расчёта параметров зависящих от излучения c разделением по видеокартам
+ * \note отличается порядок хранения+ излучения хранится на ячейках.
+ * Вычисление дивергенций в явном виде недоступны
+ *
  */
+
 #if !defined CUDA_ILLUM_SEP_PARAM_H && defined USE_CUDA
 #define CUDA_ILLUM_SEP_PARAM_H
 

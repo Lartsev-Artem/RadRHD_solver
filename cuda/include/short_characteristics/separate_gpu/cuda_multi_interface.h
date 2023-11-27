@@ -1,4 +1,9 @@
-
+/**
+ * @file cuda_multi_interface.h
+ * @brief Файл хранит методы  через которые можно обращаться через cpp код,
+ * скомпилированный без nvcc
+ *
+ */
 #if !defined CUDA_MULTI_INTERFACE_H && defined USE_CUDA
 #define CUDA_MULTI_INTERFACE_H
 

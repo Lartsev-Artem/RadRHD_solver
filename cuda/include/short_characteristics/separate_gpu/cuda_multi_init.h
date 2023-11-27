@@ -1,3 +1,8 @@
+/**
+ * @file cuda_multi_init.h
+ * @brief Инициализация нескольких карт (физических или мнимых)
+ *
+ */
 #if !defined CUDA_MULTI_INIT_H && defined USE_CUDA
 #define CUDA_MULTI_INIT_H
 

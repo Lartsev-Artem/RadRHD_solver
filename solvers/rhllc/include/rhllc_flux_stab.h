@@ -1,6 +1,7 @@
 /**
- * @file rhllc_flux_stub.h
+ * @file rhllc_flux_stab.h
  * @brief Расчёт состояние RHD. За основу взят код PLUTO.
+ *
  */
 #if !defined RHLLC_FLUX_STAB_H && defined SOLVERS
 #define RHLLC_FLUX_STAB

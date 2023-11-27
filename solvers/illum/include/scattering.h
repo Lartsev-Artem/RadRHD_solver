@@ -9,6 +9,10 @@
 #include "geo_types.h"
 #include "solvers_struct.h"
 
+/*! \addtogroup illum Модуль расчёта излучения
+    @{
+*/
+
 namespace illum {
 
 /**

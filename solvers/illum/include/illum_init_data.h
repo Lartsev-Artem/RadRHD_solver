@@ -8,6 +8,10 @@
 
 #include "solvers_struct.h"
 
+/*! \addtogroup illum Модуль расчёта излучения
+    @{
+*/
+
 namespace illum {
 
 /**
