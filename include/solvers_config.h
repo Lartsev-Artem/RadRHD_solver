@@ -34,6 +34,8 @@
 
 #define SEPARATE_GPU ///< разделение данных на видеокарте
 
+#define SPECTRUM ///< перенос в полной постановке, без серой материи
+
 #ifdef SEPARATE_GPU
 #define ILLUM_ON_CELL ///< излучения хранится на ячейках, а не на гранях
 // #define MULTI_GPU     ///< расчёт с применением нескольких карт на одном узле
@@ -44,7 +46,7 @@
 #endif
 #endif
 
-#endif
+#endif //! ILLUM
 
 #ifdef USE_MPI
 

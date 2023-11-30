@@ -33,6 +33,8 @@ Type EddTensor(int i, int j, const Type U, const Vector3 &F);
  */
 void GetRadSource(const int cell, const grid_t &grid, Vector4 &G);
 
+#include "illum_rad_func.h"
+#if 0
 /**
  * @brief  Compute the blackbody intensity corresponding to the input temperature.
  *
@@ -63,6 +65,7 @@ inline T GetTemperature(T rho, T prs) {
   // constexpr T g_idealGasConst = (kM_hydrogen / k_boltzmann) * (kDist * kDist) / (kTime * kTime);
   return g_idealGasConst * prs / rho;
 }
+#endif
 }; // namespace rad_rhd
 
 #endif //! RADRHD_UTILS_H

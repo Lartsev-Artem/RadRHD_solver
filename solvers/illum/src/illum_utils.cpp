@@ -3,7 +3,7 @@
 #include "illum_utils.h"
 #include "dbgdef.h"
 #include "global_value.h"
-#include "radRHD_utils.h"
+#include "illum_rad_func.h"
 
 TableFunc t_cooling_function;
 
@@ -133,7 +133,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     Type S = int_scattering;
     Type d = cell.phys_val.d;
     Type p = cell.phys_val.p;
-    Type T = rad_rhd::GetTemperature(p, d); // размерная
+    Type T = GetTemperature(d, p); // размерная
 
 #if GEOMETRY_TYPE == Cone
     if (x[0] < 0.05) { //источник
@@ -149,8 +149,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     Type L = t_cooling_function(log(d * kMass / (kDist * kDist * kDist)), log(T));
     Type alpha = exp(L) / (4 * kStefanBoltzmann * T4) * kDist;
 
-    Type Ie = rad_rhd::Blackbody(T);
-    Type Q = alpha * Ie;
+    Type Q = Blackbody(T);
 
     Type betta = (kSigma_thomson / kM_hydrogen * kDist) * d;
 
@@ -164,6 +163,43 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
   default:
     D_LD;
   }
+}
+
+Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, elem_t &cell) {
+
+  Type f0, f1;
+  Type S = int_scattering;
+  Type d = cell.phys_val.d;
+  Type p = cell.phys_val.p;
+  Type T = GetTemperature(d, p); // размерная
+
+#if GEOMETRY_TYPE == Sphere
+  T = 27;
+#endif
+
+  Type T2 = T * T;
+  Type T4 = T2 * T2;
+
+  Type L = t_cooling_function(log(d * kMass / (kDist * kDist * kDist)), log(T));
+  Type kSB = SigmaSB(T, f0, f1);
+  Type alpha = exp(L) / (4 * kSB * T4) * kDist;
+
+  Type Q = kSB * T4 / PI;
+
+  Type betta = 0; // (kSigma_thomson / kM_hydrogen * kDist) * d;
+
+  Type Q = 10;
+  Type alpha = 10;
+  Type betta = 5;
+  Type S = int_scattering;
+
+  if ((x - Vector3(0, 0, 0)).norm() > 0.3) // излучающий шар
+  {
+    Q = 0;
+    alpha = 1;
+    betta = 5;
+  }
+  return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
 }
 
 static const BaseTetra_t tetra;
@@ -386,7 +422,7 @@ Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Typ
     Type S = int_scattering;
     Type d = cell.phys_val.d;
     Type p = cell.phys_val.p;
-    Type T = rad_rhd::GetTemperature(p, d); // размерная
+    Type T = illum::GetTemperature(p, d); // размерная
 
 #if GEOMETRY_TYPE == Cone
     if (x[0] < 0.05) { //источник
@@ -402,7 +438,7 @@ Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Typ
     Type L = t_cooling_function(log(d * kMass / (kDist * kDist * kDist)), log(T));
     Type alpha = exp(L) / (4 * kStefanBoltzmann * T4) * kDist;
 
-    Type Ie = rad_rhd::Blackbody(T);
+    Type Ie = illum::Blackbody(T);
     Type Q = alpha * Ie;
 
     Type betta = (kSigma_thomson / kM_hydrogen * kDist) * d;
