@@ -165,6 +165,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
   }
 }
 
+#if 0
 Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, elem_t &cell) {
 
   Type f0, f1;
@@ -201,7 +202,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
   }
   return std::max(0.0, GetI(s, Q, S, I_0, alpha, betta));
 }
-
+#endif
 static const BaseTetra_t tetra;
 Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
 
