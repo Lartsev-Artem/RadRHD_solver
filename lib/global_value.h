@@ -50,6 +50,8 @@ constexpr double kSigma_thomson = 6.65210 * 1e-25;        ///< сечение т
 constexpr double kM_hydrogen = 1.6735575 * 1e-24;         ///< масса водорода[кг]
 constexpr double kDistAccretor = 3.88190065213158 * 1e10; ///< характерное расстояние
 constexpr double kStefanBoltzmann = 5.670374419 * 1e-5;   ///< постоянная Стефана-Больцмана[ эрг·с^−1·см^−2·К^−4]
+constexpr double kM_electron = 9.109383701528 * 1e-28;    ///< масса электрона [г]
+constexpr double kR_electron = 2.8179403 * 1e-13;         ///< радиус электрона [см]
 
 #else //СИ
 
@@ -61,6 +63,8 @@ constexpr double k_boltzmann = 1.38 * 1e-23;            ///< постоянна�
 constexpr double kSigma_thomson = 6.65210 * 1e-29;      ///< сечение томсоновского рассеяния [m^2]
 constexpr double kM_hydrogen = 1.6735575 * 1e-27;       ///< масса водорода[кг]
 constexpr double kStefanBoltzmann = 5.670374419 * 1e-8; ///< постоянная Стефана-Больцмана[Вт*м^-2*К^−4]
+constexpr double kM_electron = 9.109383701528 * 1e-31;  ///< масса электрона [кг]
+constexpr double kR_electron = 2.8179403 * 1e-15;       ///< радиус электрона [м]
 #endif
 
 constexpr double kEarthMass = (5.9722 * 1e25); ///< масса Земли в кг

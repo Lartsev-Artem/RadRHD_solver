@@ -2,17 +2,25 @@
 
 #include "global_value.h"
 
+namespace ksplit {
+constexpr double betta = 35000;
+constexpr double frq0 = 1e24;
+constexpr int N = 1000;
+} // namespace ksplit
+
 void get_splitting_spectrum(std::vector<Type> &spectrum) {
 
-  const int n = 1000;
-  const Type betta = 40000; // 45000;
-  const Type a = 1e20;
-  const Type b = 0;
-
-  spectrum.resize(n);
-  for (int x = 0; x < n; x++) {
-    spectrum[x] = a * exp(-x * x / betta) + b;
+  spectrum.resize(ksplit::N);
+  for (int x = 0; x < ksplit::N; x++) {
+    spectrum[x] = ksplit::frq0 * exp(-x * x / ksplit::betta);
   }
+}
+
+int get_frq_idx(double frq) {
+  if (frq > ksplit::frq0) {
+    return ksplit::N - 1;
+  }
+  return floor(sqrt(-ksplit::betta * log(frq / ksplit::frq0)));
 }
 
 static inline double q1(double x) {

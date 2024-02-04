@@ -47,6 +47,14 @@
 void get_splitting_spectrum(std::vector<Type> &spectrum);
 
 /**
+ * @brief Функция возвращает номер интервала в разбиении (обратная к splitting функция)
+ *
+ * @param frq частота фотона
+ * @return индекс в массиве
+ */
+int get_frq_idx(double frq);
+
+/**
  * @brief Функция вычисляет равновесное излучение по закону Планка в частотном диапазоне
  *
  * @param T температура в Кельвинах
