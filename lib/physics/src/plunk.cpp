@@ -18,9 +18,9 @@ void get_splitting_spectrum(std::vector<Type> &spectrum) {
 
 int get_frq_idx(double frq) {
   if (frq > ksplit::frq0) {
-    return ksplit::N - 1;
+    return 0; // ksplit::N - 1;
   }
-  return floor(sqrt(-ksplit::betta * log(frq / ksplit::frq0)));
+  return std::min((int)sqrt(-ksplit::betta * log(frq / ksplit::frq0)), 1000);
 }
 
 static inline double q1(double x) {
