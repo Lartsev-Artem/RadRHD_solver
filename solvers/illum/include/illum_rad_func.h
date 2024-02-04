@@ -4,6 +4,11 @@
 #include "geo_types.h"
 #include "global_value.h"
 
+/**
+  @note
+ * rho=m_h*n (плотность с концентрацией)
+   phs = nkT (давление с концетрацией)
+ */
 namespace illum {
 
 /**
@@ -108,7 +113,8 @@ inline T Blackbody(T temperature) {
 template <typename T>
 inline T GetTemperature(T rho, T prs) {
   // constexpr T g_idealGasConst = 1; //PLUTO
-  constexpr T g_idealGasConst = (kM_hydrogen / k_boltzmann); // * (kDist * kDist) / (kTime * kTime);
+  // constexpr T g_idealGasConst = (kM_hydrogen / k_boltzmann); // * (kDist * kDist) / (kTime * kTime);
+  constexpr T g_idealGasConst = (kM_hydrogen / k_boltzmann) * kPressure / kDensity; // * (kDist * kDist) / (kTime * kTime);
   return g_idealGasConst * prs / rho;
 }
 }; // namespace illum
