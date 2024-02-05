@@ -12,9 +12,12 @@ CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/sr
 SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include solvers/ray_tracing/include solvers/illum/include/mpi solvers/illum/include/add_directions solvers/RadRHD/include
 SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src solvers/ray_tracing/src solvers/illum/src/mpi solvers/illum/src/add_directions solvers/RadRHD/src solvers/illum/src/mpi/multi_gpu
 
+RESOURCES_DIR = resources
+
 SRCDIR          = src graph/src make_trace/src ${LIB_SRC} ${SOLVERS_SRC}
 INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR}  ${CUDA_INCDIR} ${SOLVERS_DIR}
-BUILDDIR        = build
+
+export BUILDDIR        = build
 OBJDIR          = $(BUILDDIR)/objs
 DEPDIR          = $(BUILDDIR)/dep
 EXEDIR          = $(BUILDDIR)/bin
@@ -55,11 +58,11 @@ LINK_SRC		= $(filter-out $(EXE_OBJ),$(OBJS))
 
 # icpc:  -fast -O3 -xHost -ipo
 # gcc:  -Ofast march=cpu-type    -flto (-fwhole-program)
-CXX             = mpic++
+export CXX      = mpic++
 CPPFLAGS        = $(DEF_SET) -fopenmp -fPIE -Ofast
 CXXFLAGS        = -std=c++17 #-g #-Wall -Wextra -std=c++11
 
-NVCC 				= nvcc
+export NVCC 		= nvcc
 NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp" --expt-relaxed-constexpr #-gencode arch=compute_70,code=sm_70 #совместимость с Eigen3
 NVCC_FLAGS 			= $(DEF_SET) -O2  -dc $(NVCC_OTHER_FLAGS)  #-gencode arch=compute_52,code=sm_52
 
@@ -98,6 +101,7 @@ $(PROGRAM): %: $(OBJS) $(EXE)
 %.d: %.cpp
 	mkdir -p $(OBJDIR)
 	mkdir -p $(DEPDIR)
+	$(MAKE) -f $(RESOURCES_DIR)/makefile gen_header_value SRC_FILE=lib/global_consts.h
 	$(COMPILE.cpp) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@
 
 %.o: %.cu
