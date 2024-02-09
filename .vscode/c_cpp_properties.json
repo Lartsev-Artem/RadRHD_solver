@@ -31,7 +31,8 @@
                 "${workspaceFolder}/lib/mpi_extension",
                 "${workspaceFolder}/cuda/include",
                 "${workspaceFolder}/cuda/src",
-                "${workspaceFolder}/solvers/RadRHD/include"
+                "${workspaceFolder}/solvers/RadRHD/include",
+                "${workspaceFolder}/lib/calculator"
             ],
             "defines": [
                 "BUILD_GRAPH",

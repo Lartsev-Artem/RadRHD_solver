@@ -17,12 +17,13 @@ RESOURCES_DIR = resources
 SRCDIR          = src graph/src make_trace/src ${LIB_SRC} ${SOLVERS_SRC}
 INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR}  ${CUDA_INCDIR} ${SOLVERS_DIR}
 
-export BUILDDIR        = build
-OBJDIR          = $(BUILDDIR)/objs
-DEPDIR          = $(BUILDDIR)/dep
-EXEDIR          = $(BUILDDIR)/bin
+export ROOT_DIR 	:= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+export BUILDDIR     = build
+OBJDIR          	= $(BUILDDIR)/objs
+DEPDIR          	= $(BUILDDIR)/dep
+EXEDIR          	= $(BUILDDIR)/bin
 
-SRCEXE 			= src
+SRCEXE 				= src
 
 # specify the list of directories in which the search should be performed.
 vpath %.cpp 		$(SRCDIR) 
@@ -73,11 +74,10 @@ COMPILE.cpp     = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
 COMPILE.cu     	= $(NVCC) $(NVCC_FLAGS) $(NVCC_OTHER_FLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
 LINK.cpp 		= $(NVCC) -ccbin=$(CXX) $(NVCC_OTHER_FLAGS)
 
-all: $(PROGRAM)
-
+all: $(PROGRAM)	
 
 #Make executable file. Early was $(addprefix $(OBJDIR)/, $^)
-$(PROGRAM): %: $(OBJS) $(EXE)
+$(PROGRAM): %: prebuild $(OBJS) $(EXE)
 #	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./, $^) $(LOADLIBES) $(LDLIBS) -o $@ 
 #	mv $(PROGRAM) $(BUILDDIR)
 	mkdir -p $(BUILDDIR)/graph
@@ -86,9 +86,13 @@ $(PROGRAM): %: $(OBJS) $(EXE)
 	mkdir -p $(BUILDDIR)/trace
 	mkdir -p $(BUILDDIR)/add_dir
 
+# actions before the building process, but after dependens
+prebuild:
+	mkdir -p $(EXEDIR)	
+	$(MAKE) -f $(RESOURCES_DIR)/makefile gen_header_value SRC_FILE=$(ROOT_DIR)/lib/global_consts.h
+
 # Linking executable files files from all .o in combination with all .h
 %.exe: %.cpp
-	mkdir -p $(EXEDIR)
 	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./$(OBJDIR)/, $(LINK_SRC)) $(patsubst %.exe, ./$(OBJDIR)/%.o,$@) $(LOADLIBES) $(LDLIBS) -o $(patsubst %.exe, %,$@)
 	mv $(patsubst %.exe, %,$@) $(EXEDIR)
 
@@ -97,16 +101,15 @@ $(PROGRAM): %: $(OBJS) $(EXE)
 	$(COMPILE.cpp) -c $<
 	mv $@ $(OBJDIR)/$@
 
+%.o: %.cu
+	$(COMPILE.cu) -c $<
+	mv $@ $(OBJDIR)/$@
+
 # Creates the dependecy rules
 %.d: %.cpp
 	mkdir -p $(OBJDIR)
 	mkdir -p $(DEPDIR)
-	$(MAKE) -f $(RESOURCES_DIR)/makefile gen_header_value SRC_FILE=lib/global_consts.h
 	$(COMPILE.cpp) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@
-
-%.o: %.cu
-	$(COMPILE.cu) -c $<
-	mv $@ $(OBJDIR)/$@
 
 %.d: %.cu
 	mkdir -p $(OBJDIR)

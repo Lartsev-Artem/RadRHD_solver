@@ -1,11 +1,6 @@
 /**
  * @file global_consts.h
- * @author your name (you@domain.com)
- * @brief
- * @version 0.1
- * @date 2024-02-05
- *
- * @copyright Copyright (c) 2024
+ * @brief Файл содержит глобальные определения всех констант
  *
  */
 #ifndef GLOBAL_CONSTS_H
@@ -16,7 +11,7 @@ constexpr double PI = 3.1415926535897932384626433832795; ///<число пи
 constexpr double kMinPressure = 1e-12;
 constexpr double kMinDensity = 1e-12;
 
-constexpr double kGamma1 = 4. / 3; ///< показатель адиабаты
+constexpr double kGamma1 = 4.0 / 3; ///< показатель адиабаты
 constexpr double kGamma_g = kGamma1 / (kGamma1 - 1.0);
 
 #if 1 //СГС
