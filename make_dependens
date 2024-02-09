@@ -1,0 +1,24 @@
+#export SRCDIR CUDA_SRCDIR
+
+WHITE	=\033[0m
+RED		=\033[0;31m
+GREEN	=\033[0;32m
+YELLOW	=\033[0;33m
+
+SRCS 			= $(foreach dir,$(SRCDIR),$(wildcard $(dir)/*.cpp))
+DEP_FILES       = $(patsubst %.cpp, %.d, $(notdir $(SRCS)))
+
+CUDA_SRCS 		= $(foreach dir,$(CUDA_SRCDIR),$(wildcard $(dir)/*.cu))
+CUDA_DEP_FILES  = $(patsubst %.cu, %.dd, $(notdir $(CUDA_SRCS)))
+
+all:
+	echo "$(RED) dependens ready!!! $(WHITE)"
+
+%.d:	
+	$(COMPILE.cpp) $(foreach dir,$(SRCDIR),$(wildcard $(dir)/$(@:.d=.cpp)))  -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@
+
+%.dd:	
+	$(COMPILE.cu) $(foreach dir,$(CUDA_SRCDIR),$(wildcard $(dir)/$(@:.dd=.cu))) -MM -MT $(addprefix $(OBJDIR)/, $(@:.dd=.o)) > $(DEPDIR)/$(@:.dd=.d)
+	
+include $(DEP_FILES)
+include $(CUDA_DEP_FILES)

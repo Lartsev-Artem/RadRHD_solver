@@ -147,11 +147,11 @@ extern global_files_t glb_files;
 
 #ifdef DEBUG
 #include <unistd.h>
-#define GDB_ATTACH \
-  {                \
-    int i = 0;     \
-    while (i == 0) \
-      sleep(1);    \
+#define GDB_ATTACH      \
+  {                     \
+    volatile int i = 0; \
+    while (i == 0)      \
+      sleep(1);         \
   }
 #endif
 

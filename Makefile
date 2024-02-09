@@ -7,20 +7,20 @@ LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/
 LIB_SRC = lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometry/src lib/physics/src
 
 CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteristics cuda/include/ray_tracing cuda/include/short_characteristics/separate_gpu
-CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/src/ray_tracing cuda/src/short_characteristics/separate_gpu
+export CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/src/ray_tracing cuda/src/short_characteristics/separate_gpu
 
 SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include solvers/ray_tracing/include solvers/illum/include/mpi solvers/illum/include/add_directions solvers/RadRHD/include
 SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src solvers/ray_tracing/src solvers/illum/src/mpi solvers/illum/src/add_directions solvers/RadRHD/src solvers/illum/src/mpi/multi_gpu
 
 RESOURCES_DIR = resources
 
-SRCDIR          = src graph/src make_trace/src ${LIB_SRC} ${SOLVERS_SRC}
-INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR}  ${CUDA_INCDIR} ${SOLVERS_DIR}
+export SRCDIR          = src graph/src make_trace/src ${LIB_SRC} ${SOLVERS_SRC}
+INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR}  ${CUDA_INCDIR} ${SOLVERS_DIR} build/resources
 
 export ROOT_DIR 	:= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 export BUILDDIR     = build
-OBJDIR          	= $(BUILDDIR)/objs
-DEPDIR          	= $(BUILDDIR)/dep
+export OBJDIR       = $(BUILDDIR)/objs
+export DEPDIR       = $(BUILDDIR)/dep
 EXEDIR          	= $(BUILDDIR)/bin
 
 SRCEXE 				= src
@@ -70,14 +70,14 @@ NVCC_FLAGS 			= $(DEF_SET) -O2  -dc $(NVCC_OTHER_FLAGS)  #-gencode arch=compute_
 PROGRAM         = run
 #TARGET_ARCH	=
 
-COMPILE.cpp     = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
-COMPILE.cu     	= $(NVCC) $(NVCC_FLAGS) $(NVCC_OTHER_FLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
-LINK.cpp 		= $(NVCC) -ccbin=$(CXX) $(NVCC_OTHER_FLAGS)
+export COMPILE.cpp	= $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
+export COMPILE.cu	= $(NVCC) $(NVCC_FLAGS) $(NVCC_OTHER_FLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
+export LINK.cpp 	= $(NVCC) -ccbin=$(CXX) $(NVCC_OTHER_FLAGS)
 
 all: $(PROGRAM)	
 
 #Make executable file. Early was $(addprefix $(OBJDIR)/, $^)
-$(PROGRAM): %: prebuild $(OBJS) $(EXE)
+$(PROGRAM): %: $(OBJS) $(EXE)
 #	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./, $^) $(LOADLIBES) $(LDLIBS) -o $@ 
 #	mv $(PROGRAM) $(BUILDDIR)
 	mkdir -p $(BUILDDIR)/graph
@@ -86,10 +86,13 @@ $(PROGRAM): %: prebuild $(OBJS) $(EXE)
 	mkdir -p $(BUILDDIR)/trace
 	mkdir -p $(BUILDDIR)/add_dir
 
-# actions before the building process, but after dependens
+# actions before the building process,
 prebuild:
+	mkdir -p $(OBJDIR)
+	mkdir -p $(DEPDIR)
 	mkdir -p $(EXEDIR)	
-	$(MAKE) -f $(RESOURCES_DIR)/makefile gen_header_value SRC_FILE=$(ROOT_DIR)/lib/global_consts.h
+	$(MAKE) -f $(RESOURCES_DIR)/makefile gen_header_value SRC_FILE=$(ROOT_DIR)/lib/global_consts.h		
+	$(MAKE) -f make_dependens	 
 
 # Linking executable files files from all .o in combination with all .h
 %.exe: %.cpp
@@ -106,19 +109,20 @@ prebuild:
 	mv $@ $(OBJDIR)/$@
 
 # Creates the dependecy rules
-%.d: %.cpp
-	mkdir -p $(OBJDIR)
-	mkdir -p $(DEPDIR)
-	$(COMPILE.cpp) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@
+#%.d: %.cpp
+#	mkdir -p $(OBJDIR)
+#	mkdir -p $(DEPDIR)
+#	$(COMPILE.cpp) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@
 
-%.d: %.cu
-	mkdir -p $(OBJDIR)
-	mkdir -p $(DEPDIR)
-	$(COMPILE.cu) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@	
+#%.d: %.cu
+#	mkdir -p $(OBJDIR)
+#	mkdir -p $(DEPDIR)
+#	$(COMPILE.cu) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@	
 
 # Includes all .h files
-include $(DEP_FILES)
-include $(CUDA_DEP_FILES)
+#include $(DEP_FILES)
+#include $(CUDA_DEP_FILES)
+
 
 # Cleans complete project
 .PHONY: clean

@@ -32,7 +32,8 @@
                 "${workspaceFolder}/cuda/include",
                 "${workspaceFolder}/cuda/src",
                 "${workspaceFolder}/solvers/RadRHD/include",
-                "${workspaceFolder}/lib/calculator"
+                "${workspaceFolder}/lib/calculator",
+                "${workspaceFolder}/build/resources"
             ],
             "defines": [
                 "BUILD_GRAPH",

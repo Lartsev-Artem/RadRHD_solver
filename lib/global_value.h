@@ -1,7 +1,6 @@
 /**
  * @file global_value.h
  * @brief Файл содержит глобальные константы
- * \todo физические константы
  */
 
 #ifndef GLOBAL_VALUE
@@ -16,6 +15,9 @@
 #include "prj_config.h"
 #include "solvers_struct.h"
 #include "json/json_struct.h"
+
+#include "log_global_consts.h"
+#define LOG(val) log_##val
 
 extern global_files_t glb_files;
 extern TableFunc t_cooling_function; ///< табличная функция охлаждения
