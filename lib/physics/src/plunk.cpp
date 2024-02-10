@@ -10,10 +10,11 @@ constexpr int N = 1000;
 
 void get_splitting_spectrum(std::vector<Type> &spectrum) {
 
-  spectrum.resize(ksplit::N);
+  spectrum.resize(ksplit::N + 1, 0);
   for (int x = 0; x < ksplit::N; x++) {
     spectrum[x] = ksplit::frq0 * exp(-x * x / ksplit::betta);
   }
+  std::reverse(spectrum.begin(), spectrum.end()); //по возрастанию
 }
 
 int get_frq_idx(double frq) {
@@ -43,9 +44,7 @@ static inline double f_Goldin(double x) {
 
 static double f_Goldin_sigma_log(double T, double nu, double nu0) {
 
-  if (nu0 > nu) {
-    abort();
-  }
+  DIE_IF(nu0 > nu);
 
   constexpr double k_plankB = 2 * (k_boltzmann * k_boltzmann * k_boltzmann * k_boltzmann) / (kC_Light * kC_Light * kH_plank * kH_plank * kH_plank);
   constexpr double k_Log_plankB = -12.7917563178452838;
@@ -76,12 +75,18 @@ static double f_Goldin_sigma_log(double T, double nu, double nu0) {
   }
 }
 
-double B_Plank(double T, double nu, double nu0) {
-  return (T * T * T * T) * exp(f_Goldin_sigma_log(T, nu, nu0));
+double B_Plank(double T) {
+  const double T2 = T * T;
+  return (T2 * T2) * kStefanBoltzmann;
 }
 
+double B_Plank(double T, double nu, double nu0) {
+  return exp(B_Plank_log(T, nu, nu0));
+}
+
+/// \todo log(T) уже вычислен выше по коду
 double B_Plank_log(double T, double nu, double nu0) {
-  return 4 * log(T) + (f_Goldin_sigma_log(T, nu, nu0));
+  return 4.0 * log(T) + (f_Goldin_sigma_log(T, nu, nu0));
 }
 
 #if 0 // test for Wolfram plot

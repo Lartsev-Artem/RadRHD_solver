@@ -3,8 +3,8 @@
  * @brief Функции расчета излучения без видеокарты с использованием одного узла и нескольких потоков
  *
  */
-#if !defined ILLUM_PART_H && defined ILLUM && defined SOLVERS
-#define ILLUM_PART_H
+#if !defined ILLUM_CALC_CPU_H && defined ILLUM && defined SOLVERS
+#define ILLUM_CALC_CPU_H
 #include "geo_types.h"
 #include "solvers_struct.h"
 
@@ -43,4 +43,4 @@ int CalculateIllumFace(const grid_directions_t &grid_direction,
 
 } // namespace illum
 
-#endif //! ILLUM_PART_H
+#endif //! ILLUM_CALC_CPU_H

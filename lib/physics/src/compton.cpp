@@ -30,7 +30,7 @@ double get_scat_coef(double frq) {
 
 double get_scat_coef(double frq, double vel, double cosf) {
   constexpr double hmc = kH_plank / (kM_electron * kC_Light * kC_Light);
-  double velC = vel / kC_Light;
+  double velC = vel * (1. / kC_Light);
   double lorenz = 1. / sqrt(1. - (velC * velC));
   return sigma(2 * hmc * frq * lorenz * (1. - velC * cosf));
 }

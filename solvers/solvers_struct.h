@@ -183,8 +183,9 @@ struct illum_value_t {
                                          stream(Vector3::Zero()),
                                          impuls(Matrix3::Zero()),
                                          div_stream(0),
-                                         div_impuls(Vector3::Zero()){
-                                             illum.resize(num_dir * CELL_SIZE, 0)}
+                                         div_impuls(Vector3::Zero()) {
+    illum.resize(num_dir * CELL_SIZE, 0);
+  }
 #else
   {
   }

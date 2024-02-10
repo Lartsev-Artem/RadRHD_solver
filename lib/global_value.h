@@ -24,7 +24,7 @@ extern TableFunc t_cooling_function; ///< табличная функция ох
 
 //! (в случае сплошной области задаётся так, чтобы сфера не пересекала расчётную область)
 #if GEOMETRY_TYPE == Sphere
-const Vector3 kCenterPoint(10, 0, 0);    ///< центр внутренней сферы на сетке
+const Vector3 kCenterPoint(0, 0, 0);     ///< центр внутренней сферы на сетке
 constexpr double kInternalRadius = 0.31; ///< радиус внутренней сферы (с запасом)
 #elif (GEOMETRY_TYPE == TEST_ELLIPSE) || (GEOMETRY_TYPE == MAIN_ELLIPSE)
 const Vector3 kCenterPoint(1, 0, 0);     ///< центр внутренней сферы на сетке

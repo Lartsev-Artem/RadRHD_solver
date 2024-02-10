@@ -51,6 +51,32 @@ int WriteSimple(const Str_Type name_file, const stdT &data) {
   return e_completion_success;
 }
 
+template <typename Str_Type, typename stdT>
+int WriteSimple(const Str_Type name_file, const stdT &x, const stdT &y) {
+  std::ofstream ofile;
+  OPEN_FSTREAM(ofile, std::string(name_file).c_str());
+
+  if (x.size() != y.size()) {
+    RETURN_ERR("size x!= size y\n");
+  }
+
+  ofile << x.size() << '\n';
+
+  auto it = y.data();
+  if (typeid(*x.begin()) == typeid(double)) { //если размер данных double, то выводить
+    for (auto el : x) {
+      ofile << std::setprecision(16) << el << ' ' << *it << '\n';
+      it++;
+    }
+  } else {
+    for (auto el : y)
+      ofile << el << ' ' << *it << '\n';
+  }
+
+  ofile.close();
+  return e_completion_success;
+}
+
 /**
  * @brief
  *

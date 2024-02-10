@@ -2,6 +2,7 @@
  * @file parser_header.cpp
  * @brief Функция парсит файл с constexpr константами и формирует на его основе новый файл с вычисленными значениями f(x)
  * @date 2024-02-09
+ * @todo сейчас #if #else #endif блок. Добавить #if #endif
  *
  */
 #include <algorithm>

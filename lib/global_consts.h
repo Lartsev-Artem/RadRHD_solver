@@ -6,8 +6,9 @@
 #ifndef GLOBAL_CONSTS_H
 #define GLOBAL_CONSTS_H
 
-constexpr double PI = 3.1415926535897932384626433832795; ///<число пи
-
+constexpr double k_exp = 2.7182818284590452353602874713527; ///<число e
+constexpr double PI = 3.1415926535897932384626433832795;    ///<число пи
+constexpr double PI4 = 4 * PI;
 constexpr double kMinPressure = 1e-12;
 constexpr double kMinDensity = 1e-12;
 
@@ -48,6 +49,7 @@ constexpr double kSunMass = (1.9891 * 1e31);   ///< масса Солнца в �
 constexpr double kDistSun = (149.6 * 10e9); ///< расстояние до Солнца в м
 constexpr double kDistMoon = 400000000.;    ///<расстояние до Луны в м
 
+#if 0
 constexpr double kDist = 1e6;          ///< характерное расстояние
 constexpr double kMass = (1 * 1e21);   ///< характерная масса
 constexpr double kVelocity = kC_Light; ///< характерная скорость
@@ -58,8 +60,17 @@ constexpr double kTime = (kDist / kVelocity); ///< характерное вре
 // constexpr double kPressure = (kMass / (kDist * kTime * kTime));  ///< характерное давление
 // constexpr double kRadiation = (kMass / (kTime * kTime * kTime)); ///< характерное излучение
 
-constexpr double kDensity = (3.34 * 10e-14);                                  ///< характерная плотность
+// constexpr double kDensity = (3.34 * 10e-14);                                  ///< характерная плотность
+// constexpr double kPressure = (kDensity * kVelocity * kVelocity);              ///< характерное давление
+// constexpr double kRadiation = (kDensity * kVelocity * kVelocity * kVelocity); ///< характерное излучение
+#else
+constexpr double kDist = 1;
+constexpr double kMass = 1;                   ///< характерная масса
+constexpr double kVelocity = 1;               ///< характерная скорость
+constexpr double kTime = (kDist / kVelocity); ///< характерное время
+constexpr double kDensity = 1;
 constexpr double kPressure = (kDensity * kVelocity * kVelocity);              ///< характерное давление
-constexpr double kRadiation = (kDensity * kVelocity * kVelocity * kVelocity); ///< характерное излучение
+constexpr double kRadiation = (kDensity * kVelocity * kVelocity * kVelocity); ///< характерное излучение;
+#endif
 
 #endif //! GLOBAL_CONSTS_H

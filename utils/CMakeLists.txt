@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.10)
 
 project(utils VERSION 1.0) 
 
+############################### Запуск ########################################
+# cmake -B build -DINSTALL=ON   #OFF -  для сборки в библиотеку
+# cmake --build build -j4
+###############################################################################
+
 get_directory_property(IS_SUBPROJECT PARENT_DIRECTORY)
 
 option(INSTALL "install executable files" OFF)
@@ -14,8 +19,11 @@ set(MAIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/..")
 set(MAIN_SUB_DIRS "include" "lib" "solvers" "make_trace")
 
 include_directories("${MAIN_DIR}/include") #путь к файлу prj_config.h
+include_directories("${MAIN_DIR}/build/resources") # путь к динамическим файлам \todo: этот cmakeList должен генерировать эти файлы в свой build, а не лезть в общий проект
 include("${MAIN_DIR}/cmake_modules.cmake")  # функции cmake    
 
+#add_custom_target(libvz
+#                  /usr/bin/make -f "${MAIN_DIR}/resources/makefile" BUILDDIR=${CMAKE_CURRENT_BINARY_DIR})
 
 # задаём собственную конфигурацию
 if(INSTALL)

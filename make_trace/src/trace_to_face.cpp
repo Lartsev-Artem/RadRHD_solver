@@ -1,4 +1,4 @@
-
+#ifdef MAKE_TRACE
 #include "trace_to_face.h"
 
 void trace::GetBoundGraphFaces(const grid_t &grid, const std::vector<IntId> &neighbours,
@@ -49,3 +49,4 @@ void trace::GetGraphFaces(const grid_t &grid,
 
   return;
 }
+#endif

@@ -12,7 +12,7 @@ CUDA_SRCS 		= $(foreach dir,$(CUDA_SRCDIR),$(wildcard $(dir)/*.cu))
 CUDA_DEP_FILES  = $(patsubst %.cu, %.dd, $(notdir $(CUDA_SRCS)))
 
 all:
-	echo "$(RED) dependens ready!!! $(WHITE)"
+	echo "$(GREEN) dependens ready!!! $(WHITE)"
 
 %.d:	
 	$(COMPILE.cpp) $(foreach dir,$(SRCDIR),$(wildcard $(dir)/$(@:.d=.cpp)))  -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@
