@@ -128,11 +128,12 @@ Type illum::spec::ReCalcIllum(const IdType num_dir, const IdType num_frq, const 
 #else
 Type illum::spec::ReCalcIllum(const IdType num_dir, const std::vector<std::vector<Type>> &inter_coef, grid_t &grid, const IdType dir_disp) {
   Type norm = -1;
-  const IdType shift_dir = num_dir * grid.size * grid.size_frq;
+  const IdType shift_dir = (grid.size_frq * (num_dir + dir_disp));
+  const IdType shift_cell = grid.size_frq * grid.size_dir;
 
-  for (IdType frq = 0; frq < grid.size_frq; frq++) {
-
-    for (IdType cell = 0; cell < grid.size; cell++) {
+  for (IdType cell = 0; cell < grid.size; cell++) {
+    IdType frq_id = cell * shift_cell + shift_dir;
+    for (IdType frq = 0; frq < grid.size_frq; frq++) {
 
       Type curI = 0;
       for (size_t j = 0; j < CELL_SIZE; j++) {
@@ -140,11 +141,9 @@ Type illum::spec::ReCalcIllum(const IdType num_dir, const std::vector<std::vecto
       }
       curI /= CELL_SIZE;
 
-      IdType id = (shift_dir + cell * grid.size_frq + frq); ///\todo это вопрос. см отправку
-      norm = std::max(norm, fabs((grid.local_Illum[id] - curI) / curI));
-      grid.local_Illum[id] = curI; //здесь по направлениям
-
-      grid.Illum[cell * grid.size_frq * grid.size_dir + (grid.size_frq * (num_dir + dir_disp)) + frq] = curI; //здесь по ячейкам
+      IdType id = frq_id + frq;
+      norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
+      grid.Illum[id] = curI; //здесь по ячейкам
     }
   }
 

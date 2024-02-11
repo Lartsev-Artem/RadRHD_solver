@@ -1,3 +1,5 @@
+
+/// \todo: нужна проверка отправлений. Тестовый запуск без видеокарты. Все таки подумать над Illum_loc
 #include "solvers_config.h"
 #if defined SPECTRUM && defined TRANSFER_CELL_TO_FACE
 #include "spec_all.h"

@@ -287,7 +287,7 @@ struct grid_t {
   Type *scattering;
 #endif
 
-#ifdef SEPARATE_GPU
+#if defined SEPARATE_GPU && !defined SPECTRUM
   /// \todo плохо по всем направлениям. Надо кольцевой буфер на несколько циклов с проверкой отправки первого пакета
   /// не забыть оценку нормы в Recalc перенести с local в Illum
   std::vector<Type> local_Illum; ///< излучение на ячейках хранящееся по локальным направлениям (для mpi-отправки)
