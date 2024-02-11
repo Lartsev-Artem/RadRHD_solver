@@ -20,6 +20,9 @@
 extern global_files_t glb_files;
 #define Files_log std::string(glb_files.base_address + "File_Logs.txt").c_str()
 
+#define LIKELY(x) __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+
 /**
  * @brief Вывод сообщения с указанием позиции в коде
  * @param _file файл лога
@@ -54,13 +57,13 @@ extern global_files_t glb_files;
  * @brief Условное прерывание работы программы с указанием места
  *
  */
-#define DIE_IF(_cond) \
-  if (_cond) {        \
-    D_LD;             \
+#define DIE_IF(_cond)    \
+  if (UNLIKELY(_cond)) { \
+    D_LD;                \
   }
 
 #define DIE_IF_ACTION(_cond, _act) \
-  if (_cond) {                     \
+  if (UNLIKELY(_cond)) {           \
     _act;                          \
     D_LD;                          \
   }

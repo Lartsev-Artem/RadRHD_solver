@@ -59,6 +59,62 @@ void illum::separate_gpu::InitSender(const MPI_Comm &comm, const grid_directions
 }
 #endif
 
+#ifdef SPECTRUM
+void illum::spectrum_gpu::InitSender(const MPI_Comm &comm, const grid_directions_t &grid_dir, const grid_t &grid) {
+
+  // MPI_Send(Illum_local.data(), N*F,MPI_DOUBLE,1,0,MPI_COMM_WORLD);
+  // MPI_Recv(Illum.data(), N,subarray2,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+  spectrum::MpiInitStruct(grid);
+
+  int np = get_mpi_np(comm);
+  int myid = get_mpi_id(comm);
+
+  std::vector<IdType> disp;
+  std::vector<IdType> send_count;
+
+  GetSend(np, grid_dir.size, send_count);
+  GetDisp(np, grid_dir.size, disp);
+
+  const IdType size_section = send_count[myid];
+  section_1.size = size_section;
+  {
+    const IdType N = grid_dir.size - size_section;
+    section_1.requests_rcv.resize(N, MPI_REQUEST_NULL);
+    section_1.status_rcv.resize(N);
+    section_1.flags_send_to_gpu.resize(N, 0);
+
+    IdType size_msg = grid.size * grid.size_frq;
+    DIE_IF(size_msg > ((1u << 31) - 1));
+
+    int cc = 0;
+    for (int src = 0; src < np; src++) {
+      if (src == myid)
+        continue;
+      for (int j = 0; j < send_count[src]; j++) {
+        int tag = disp[src] + j;
+        MPI_Recv_init(grid.Illum + tag, (int)grid.size, MPI_SUB_ARRAY_RECV_T, src, tag, comm, &section_1.requests_rcv[cc++]);
+      }
+    }
+
+    section_1.requests_send.resize(size_section * (np - 1), MPI_REQUEST_NULL);
+
+    for (int num_direction = 0; num_direction < size_section; num_direction++) {
+      const int tag = disp[myid] + num_direction; // teg соответствует номеру направления
+      cc = 0;
+      for (int id = 0; id < np; id++) {
+        if (id == myid)
+          continue;
+
+        MPI_Send_init(grid.local_Illum.data() + num_direction * size_msg, (int)size_msg, MPI_DOUBLE, id, tag, comm, &section_1.requests_send[(np - 1) * num_direction + cc++]);
+      }
+    }
+  }
+
+  WRITE_LOG("Init mpi sender\n");
+  return;
+}
+#endif
+
 illum::mpi_sender_t section_2;
 std::vector<IdType> disp_illum;
 void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_t &grid) {

@@ -1,8 +1,8 @@
 #include "solvers_config.h"
 #ifdef SPECTRUM
-#include "illum_utils.h"
-
 #include "compton.h"
+#include "global_value.h"
+#include "illum_utils.h"
 #include "plunk.h"
 
 #include "spec_all.h"
@@ -16,6 +16,7 @@ static inline Type GetI(Type s, Type Q, Type S, Type I_0, Type k) {
     return (1.0 - s * k) * (I_0 + s * (Q + S));
 }
 
+#include <omp.h>
 Type illum::spec::GetIllum(const Vector3 &dir, const Vector3 &x,
                            const Type s,
                            const Type I_0,
@@ -55,16 +56,20 @@ Type illum::spec::GetIllum(const Vector3 &dir, const Vector3 &x,
     Q = alpha * exp(Q);
 
     Type v = cell.phys_val.v.norm();
-    Type cosf = 0;
+    Type betta;
     if (v > 1e-10) {
-      cosf = cell.phys_val.v.dot(dir) / v;
+      Type cosf = cell.phys_val.v.dot(dir) / v;
+      betta = (get_scat_coef(0.5 * (frq1 + frq0), v, cosf) / (kM_hydrogen * kDist)) * d;
+    } else {
+      betta = (get_scat_coef(0.5 * (frq1 + frq0)) / (kM_hydrogen * kDist)) * d;
     }
 
-    Type betta = 0; //(get_scat_coef(0.5 * (frq1 + frq0), v, cosf) / (kM_hydrogen * kDist)) * d;
-
     //    WRITE_LOG("Q=%lf, b=%lf\n", Q, betta);
-    cell.illum_val.absorp_coef = alpha;
-    cell.illum_val.scat_coef = betta;
+
+    cell.illum_val.absorp_coef = alpha; //интегральный (сделать обнуление на старте)
+
+    //здесь нужна интеграл и по частоте и по направлениям. Значит храним по локальному направлению(массив из числа потоков) и интегральный
+    // cell.illum_val.scat_coef_loc[omp_get_num_threads()] += betta;
 
     return std::max(0.0, GetI(s, Q, betta * S, I_0, alpha + betta));
   }
@@ -88,6 +93,7 @@ Type illum::spec::BoundaryConditions(const IdType type_bound, const Type frq0, c
   }
 }
 
+#ifndef SEPARATE_GPU
 /// \todo spectrum: новая размерность в grid под частота
 Type illum::spec::ReCalcIllum(const IdType num_dir, const IdType num_frq, const std::vector<Type> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
 
@@ -119,5 +125,31 @@ Type illum::spec::ReCalcIllum(const IdType num_dir, const IdType num_frq, const 
 #endif
   return norm;
 }
+#else
+Type illum::spec::ReCalcIllum(const IdType num_dir, const std::vector<std::vector<Type>> &inter_coef, grid_t &grid, const IdType dir_disp) {
+  Type norm = -1;
+  const IdType shift_dir = num_dir * grid.size * grid.size_frq;
+
+  for (IdType frq = 0; frq < grid.size_frq; frq++) {
+
+    for (IdType cell = 0; cell < grid.size; cell++) {
+
+      Type curI = 0;
+      for (size_t j = 0; j < CELL_SIZE; j++) {
+        curI += inter_coef[grid.cells[cell].geo.id_faces[j]][frq]; //тут печаль с кэшами
+      }
+      curI /= CELL_SIZE;
+
+      IdType id = (shift_dir + cell * grid.size_frq + frq); ///\todo это вопрос. см отправку
+      norm = std::max(norm, fabs((grid.local_Illum[id] - curI) / curI));
+      grid.local_Illum[id] = curI; //здесь по направлениям
+
+      grid.Illum[cell * grid.size_frq * grid.size_dir + (grid.size_frq * (num_dir + dir_disp)) + frq] = curI; //здесь по ячейкам
+    }
+  }
+
+  return norm;
+}
+#endif
 
 #endif //! SPECTRUM

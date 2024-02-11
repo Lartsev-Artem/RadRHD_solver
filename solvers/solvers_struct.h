@@ -205,11 +205,27 @@ union graph_pair_t {
   uint32_t bits;
 };
 
+struct full_phys_data_t {
+  const flux_t *val;
+  Type T;
+  Type logT;
+  Type lorenz;
+  Type vel;
+  Type alpha;
+  Type betta;
+  Type cosf;
+  full_phys_data_t(const flux_t *src) { Init(src); }
+  full_phys_data_t() {}
+  void Init(const flux_t *src);
+  void InitDirection(const Vector3 &dir);
+};
+
 struct elem_t {
   flux_t phys_val;
   flux_t conv_val;
 
 #if defined ILLUM
+  full_phys_data_t cell_data;
   illum_value_t illum_val;
 #endif
 
@@ -249,13 +265,31 @@ struct grid_t {
 #ifndef TRANSFER_CELL_TO_FACE
   std::vector<std::vector<Vector3>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
 #else
+#ifdef SPECTRUM
+  std::vector<std::vector<std::vector<Type>>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока[thread[frq{cell}]]
+#else
   std::vector<std::vector<Type>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
 #endif
+#endif
 
+#ifdef SPECTRUM
+  IdType size_frq;
+  Type *Illum; //вообще не будем хранить этот массив целиком. Норму ошибки будем брать интегральную на видеокарте
+  Type *scattering;
+  std::vector<Type> spectrum;
+#ifdef SEPARATE_GPU
+  const int loc_illum_size = 10;
+  int loc_illum_wptr = 0;
+  int loc_illum_rptr = 0;
+#endif
+#else
   Type *Illum;
   Type *scattering;
+#endif
 
 #ifdef SEPARATE_GPU
+  /// \todo плохо по всем направлениям. Надо кольцевой буфер на несколько циклов с проверкой отправки первого пакета
+  /// не забыть оценку нормы в Recalc перенести с local в Illum
   std::vector<Type> local_Illum; ///< излучение на ячейках хранящееся по локальным направлениям (для mpi-отправки)
 #endif
 
@@ -278,6 +312,10 @@ struct grid_t {
 #ifdef ON_FULL_ILLUM_ARRAYS
              ,
              energy(nullptr), stream(nullptr), impuls(nullptr)
+#endif
+#ifdef SPECTRUM
+             ,
+             size_frq(0)
 #endif
   {
   }

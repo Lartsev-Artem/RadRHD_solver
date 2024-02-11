@@ -84,6 +84,10 @@ double B_Plank(double T, double nu, double nu0) {
   return exp(B_Plank_log(T, nu, nu0));
 }
 
+double B_Plank(double T, double logT, double nu, double nu0) {
+  return exp(4.0 * logT + (f_Goldin_sigma_log(T, nu, nu0)));
+}
+
 /// \todo log(T) уже вычислен выше по коду
 double B_Plank_log(double T, double nu, double nu0) {
   return 4.0 * log(T) + (f_Goldin_sigma_log(T, nu, nu0));

@@ -5,7 +5,7 @@
 
 int main(int argc, char *argv[]) {
 
-#if defined SEPARATE_GPU
+#if defined SEPARATE_GPU && !defined SPECTRUM
   MPI_START(argc, argv);
 
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";

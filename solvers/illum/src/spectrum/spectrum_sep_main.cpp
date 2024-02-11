@@ -1,25 +1,21 @@
-#if defined SOLVERS && defined ILLUM && defined USE_MPI && defined USE_CUDA
+#if defined SOLVERS && defined ILLUM
 #include "illum_main.h"
-
-#if defined SEPARATE_GPU && !defined SPECTRUM
+#if defined TRANSFER_CELL_TO_FACE && defined SEPARATE_GPU && defined SPECTRUM
 
 #include "global_types.h"
-#include "illum_calc_gpu_async.h"
 #include "illum_init_data.h"
-#include "illum_mpi_sender.h"
+#include "spec_all.h"
 
 #include "reader_bin.h"
 #include "reader_txt.h"
 #include "writer_bin.h"
 
 #include "cuda_interface.h"
-#include "cuda_multi_interface.h"
+#include "illum_mpi_sender.h"
 
-namespace cuda_sep = cuda::interface::separate_device;
+int illum::spec::RunIllumSpectrumModule() {
 
-int illum::RunIllumMultiGpuModule() {
-
-  WRITE_LOG("Start RunIllumMultiGpuModule()\n");
+  WRITE_LOG("Start RunIllumSpectrumModuleMpiSep()\n");
 
   grid_t grid;
   grid_directions_t grid_direction;
@@ -38,7 +34,6 @@ int illum::RunIllumMultiGpuModule() {
   if (err) {
     RETURN_ERR("Error reading \n");
   }
-
   grid.InitMemory(grid.cells.size(), grid_direction);
 
   if (illum::InitRadiationState(glb_files.base_address, grid)) {
@@ -47,30 +42,25 @@ int illum::RunIllumMultiGpuModule() {
 
   WRITE_LOG("Init memory\n");
 
-  cuda_sep::InitDevice(grid_direction, grid);
+  // cuda_sep::InitDevice(grid_direction, grid);
   cuda::interface::SetStreams();
   WRITE_LOG("Init mpi device\n");
 
-  separate_gpu::InitSender(MPI_COMM_WORLD, grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
+  spectrum_gpu::InitSender(MPI_COMM_WORLD, grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
 
   //перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
   if (files_sys::bin::ReadRadiationFaceTrace(grid_direction.size, glb_files, vec_x0, sorted_graph, sorted_id_bound_face, inner_bound_code))
     RETURN_ERR("Error reading trace part\n");
 
-  MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
+  WRITE_LOG("Start Illum solver()\n");
 
-  separate_gpu::CalculateIllum(grid_direction, inner_bound_code,
-                               vec_x0, sorted_graph, sorted_id_bound_face, grid);
+  spec::CalculateIllumFaceMpi(grid_direction, inner_bound_code,
+                              vec_x0, sorted_graph, sorted_id_bound_face, grid);
 
   WRITE_LOG("end calculate illum\n");
 
   cuda::interface::CudaWait();
   cuda::interface::CudaSyncStream(cuda::e_cuda_scattering_1);
-
-  // if (get_mpi_id() == 0) {
-  //   cuda_sep::CalculateAllParamAsync(grid_direction, grid, cuda::e_cuda_params);
-  // }
-
   cuda::interface::CudaSyncStream(cuda::e_cuda_params);
 
   MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
@@ -79,13 +69,12 @@ int illum::RunIllumMultiGpuModule() {
     files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
   }
 
-  cuda_sep::ClearDevice();
-  cuda_sep::ClearHost(grid);
+  //  cuda_sep::ClearDevice();
+  //  cuda_sep::ClearHost(grid);
 
-  WRITE_LOG("end proc illum\n");
-  MPI_BARRIER(MPI_COMM_WORLD);
+  WRITE_LOG("End RunIllumSpectrumModule()\n");
   return e_completion_success;
 }
 
-#endif //! SEPARATE_GPU
+#endif
 #endif //! SOLVERS

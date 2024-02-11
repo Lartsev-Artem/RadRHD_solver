@@ -1,7 +1,7 @@
 #if defined ILLUM && defined SOLVERS && defined USE_MPI && defined USE_CUDA
 
 #include "illum_calc_gpu_async.h"
-#if defined TRANSFER_CELL_TO_FACE && defined SEPARATE_GPU
+#if defined TRANSFER_CELL_TO_FACE && defined SEPARATE_GPU && !defined SPECTRUM
 #include "illum_mpi_sender.h"
 #include "illum_utils.h"
 

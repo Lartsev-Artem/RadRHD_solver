@@ -35,6 +35,17 @@ namespace separate_gpu {
 void InitSender(const MPI_Comm &comm, const grid_directions_t &grid_dir, const grid_t &grid);
 } // namespace separate_gpu
 
+namespace spectrum_gpu {
+/**
+ * @brief Инициализация MPI обмена, для типа хранения по ячейкам с раздельным расчетом на видеокарте
+ *
+ * @param[in] comm коммуниктор для излучения (для случая независимого счета rhd и излучения)
+ * @param[in] grid_dir сетка направлений
+ * @param[in] grid сетка пространственная
+ */
+void InitSender(const MPI_Comm &comm, const grid_directions_t &grid_dir, const grid_t &grid);
+} // namespace spectrum_gpu
+
 namespace gpu_async {
 
 /**

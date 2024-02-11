@@ -28,6 +28,7 @@ double get_scat_coef(double frq);
  * @return полное сечение рассеяния
  */
 double get_scat_coef(double frq, double vel, double cosf);
+double get_scat_coef(double frq, double vel, double cosf, double lorenz);
 
 /**
  * @brief Функция вычисляет комптоновскую частоту в релятивистском приближении

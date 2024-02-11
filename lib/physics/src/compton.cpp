@@ -32,22 +32,40 @@ double get_scat_coef(double frq, double vel, double cosf) {
   constexpr double hmc = kH_plank / (kM_electron * kC_Light * kC_Light);
   double velC = vel * (1. / kC_Light);
   double lorenz = 1. / sqrt(1. - (velC * velC));
-  return sigma(2 * hmc * frq * lorenz * (1. - velC * cosf));
+  return sigma(hmc * frq * lorenz * (1. - velC * cosf)); //чтобы в пределе v=0 получить исходную постановку 2 не нужна
+  // return sigma(2 * hmc * frq * lorenz * (1. - velC * cosf));
+}
+double get_scat_coef(double frq, double vel, double cosf, double lorenz) {
+  constexpr double hmc = kH_plank / (kM_electron * kC_Light * kC_Light);
+  double velC = vel * (1. / kC_Light);
+  return sigma(hmc * frq * lorenz * (1. - velC * cosf)); //чтобы в пределе v=0 получить исходную постановку 2 не нужна
+  // return sigma(2 * hmc * frq * lorenz * (1. - velC * cosf));
 }
 
 double get_compton_frq(double frq, double vel, double cosf, double cosf1, double cosTh) {
 
   constexpr double hmc = kH_plank / (kM_electron * kC_Light * kC_Light);
-  double velC = vel / kC_Light;
+  double velC = vel * (1. / kC_Light);
   double lorenz = 1. / sqrt(1. - (velC * velC));
   double eps = hmc * frq;
 
   return frq * (1. - velC * cosf) / (1. + eps / lorenz * (1 - cosTh) - velC * cosf1);
 }
 
+double get_compton_frq(double frq, double cosTh) {
+  constexpr double hmc = kH_plank / (kM_electron * kC_Light * kC_Light);
+  double eps = hmc * frq;
+  return frq / (1. + eps * (1 - cosTh));
+}
+
 double get_dif_scat_coef(double frq, double vel, double cosf, double cosf1, double cosTh) {
   constexpr double coef = 0.5 * kR_electron * kR_electron;
-  double frq1 = get_compton_frq(frq, vel, cosf, cosf1, cosTh) / frq;
+  double frq1;
+  if (vel > 1e-10) {
+    frq1 = get_compton_frq(frq, vel, cosf, cosf1, cosTh) / frq;
+  } else {
+    frq1 = get_compton_frq(frq, cosTh) / frq;
+  }
   double frq1_inv = 1. / frq1;
   return coef * frq1 * frq1 * (frq1 + frq1_inv + cosTh * cosTh - 1);
 }
@@ -56,10 +74,14 @@ Type get_int_func(const Type frq, const Vector3 &vel, const Vector3 &dir, const 
 
   const double v = vel.norm();
   const double cosTh = dir.dot(dir_scat);
-  const double cosf1 = vel.dot(dir_scat) / v;
-  const double cosf = vel.dot(dir) / v;
-
-  Type frq1 = get_compton_frq(frq, v, cosf, cosf1, cosTh);
+  Type frq1;
+  if (v > 1e-10) {
+    const double cosf1 = vel.dot(dir_scat) / v;
+    const double cosf = vel.dot(dir) / v;
+    frq1 = get_compton_frq(frq, v, cosf, cosf1, cosTh);
+  } else {
+    frq1 = get_compton_frq(frq, cosTh);
+  }
 
   // Type ds = get_dif_scat_coef(frq, v, cosf, cosf1, cosTh);
   constexpr double coef = 0.5 * kR_electron * kR_electron;

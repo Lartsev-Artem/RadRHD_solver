@@ -8,6 +8,7 @@
 static int8_t id = -1;
 static int8_t np = -1;
 
+namespace mpi_private {
 static void init_value(const MPI_Comm &comm) {
   int rank, size;
   MPI_Comm_rank(comm, &rank);
@@ -18,17 +19,18 @@ static void init_value(const MPI_Comm &comm) {
 
   WRITE_LOG("MPI Claster config: %d %d\n", id, np);
 }
+}; // namespace mpi_private
 
 int8_t get_mpi_id() {
   if (id < 0) {
-    init_value(MPI_COMM_WORLD);
+    mpi_private::init_value(MPI_COMM_WORLD);
   }
   return id;
 }
 
 int8_t get_mpi_np() {
   if (np < 0) {
-    init_value(MPI_COMM_WORLD);
+    mpi_private::init_value(MPI_COMM_WORLD);
   }
   return np;
 }

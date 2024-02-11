@@ -25,7 +25,7 @@
  */
 #define OPEN_FSTREAM(file, namefile) \
   file.open(namefile);               \
-  if (!file.is_open())               \
+  if (UNLIKELY(!file.is_open()))     \
     RETURN_ERR("Error : file %s is not open", namefile);
 
 /**
@@ -34,7 +34,7 @@
  */
 #define OPEN_FILE(file, namefile, mod) \
   file = fopen(namefile, mod);         \
-  if (!file)                           \
+  if (UNLIKELY(!file))                 \
     RETURN_ERR("Error : file %s is not open", namefile);
 
 /**

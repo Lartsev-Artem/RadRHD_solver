@@ -72,7 +72,7 @@ double B_Plank(double T);
  * @warning Возможно потеряно деление на Pi
  */
 double B_Plank(double T, double nu, double nu0);
-
+double B_Plank(double T, double logT, double nu, double nu0);
 /**
  * @brief Функция вычисляет логарифм от равновесного излучения по закону Планка в частотном диапазоне
  *

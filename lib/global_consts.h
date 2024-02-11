@@ -43,6 +43,8 @@ constexpr double kM_electron = 9.109383701528 * 1e-31;  ///< масса элек
 constexpr double kR_electron = 2.8179403 * 1e-15;       ///< радиус электрона [м]
 #endif
 
+constexpr double kStefanBoltzmann4 = 4.0 * kStefanBoltzmann;
+
 constexpr double kEarthMass = (5.9722 * 1e25); ///< масса Земли в кг
 constexpr double kSunMass = (1.9891 * 1e31);   ///< масса Солнца в кг
 
