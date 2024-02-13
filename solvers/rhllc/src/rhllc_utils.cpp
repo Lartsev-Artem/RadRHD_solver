@@ -27,6 +27,14 @@ void rhllc::HllcPhysToConv(std::vector<elem_t> &cells) {
   }
 }
 
+void rhllc::HllcConvToPhys(std::vector<elem_t> &cells) {
+
+#pragma omp parallel for
+  for (int i = 0; i < cells.size(); i++) {
+    GetPhysValueStab(cells[i].phys_val, cells[i].conv_val);
+  }
+}
+
 void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, flux_all_t &bound) {
   const int id_l = f.geo.id_l;
   const int id_r = f.geo.id_r;

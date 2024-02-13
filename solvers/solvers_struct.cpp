@@ -154,10 +154,6 @@ void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_gri
 #else
     inter_coef_all[i].resize(size_face);
 #endif
-
-#ifdef SEPARATE_GPU
-    local_Illum.resize(dir_grid.loc_size * size, 0);
-#endif
   }
 }
 #endif

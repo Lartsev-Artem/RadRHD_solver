@@ -14,9 +14,9 @@
 #include "global_types.h"
 #include "prj_config.h"
 
-#include "json/json_struct.h"
-
 #include "mpi_ext.h"
+#include "timer.h"
+#include "json/json_struct.h"
 extern global_files_t glb_files;
 #define Files_log std::string(glb_files.base_address + "File_Logs.txt").c_str()
 
@@ -29,12 +29,12 @@ extern global_files_t glb_files;
  * @param _msg сообщение
  *
  */
-#define WRITE_POS(_file, _msg)                                       \
-  {                                                                  \
-    std::ofstream out(_file, std::ios::app);                         \
-    out << _msg << " :: " << __FILE__ << " " << __FUNCTION__ << ", " \
-        << __LINE__ << "c.\n";                                       \
-    out.close();                                                     \
+#define WRITE_POS(_file, _msg)                                                            \
+  {                                                                                       \
+    std::ofstream out(_file, std::ios::app);                                              \
+    out << Timer::get_time() << _msg << " :: " << __FILE__ << " " << __FUNCTION__ << ", " \
+        << __LINE__ << "c.\n";                                                            \
+    out.close();                                                                          \
   }
 
 /**
@@ -75,13 +75,13 @@ extern global_files_t glb_files;
  * @brief Лог ошибок. вывод в файл
  * \note Лог ошибок включен всегда
  */
-#define WRITE_LOG_ERR(...)                                                \
-  {                                                                       \
-    char buf[1024];                                                       \
-    sprintf(buf, __VA_ARGS__);                                            \
-    std::ofstream out(Files_log, std::ios::app);                          \
-    out << "from " << std::to_string(get_mpi_id()) + ": " << buf << "\n"; \
-    out.close();                                                          \
+#define WRITE_LOG_ERR(...)                                                                     \
+  {                                                                                            \
+    char buf[1024];                                                                            \
+    sprintf(buf, __VA_ARGS__);                                                                 \
+    std::ofstream out(Files_log, std::ios::app);                                               \
+    out << Timer::get_time() << "from " << std::to_string(get_mpi_id()) + ": " << buf << "\n"; \
+    out.close();                                                                               \
   }
 #endif
 
@@ -89,11 +89,11 @@ extern global_files_t glb_files;
  * @brief Лог ошибок. вывод на экран
  *
  */
-#define PRINT_LOG_ERR(...)     \
-  {                            \
-    char buf[1024];            \
-    sprintf(buf, __VA_ARGS__); \
-    printf("%s\n", buf);       \
+#define PRINT_LOG_ERR(...)                             \
+  {                                                    \
+    char buf[1024];                                    \
+    sprintf(buf, __VA_ARGS__);                         \
+    printf("%s %s\n", Timer::get_time().c_str(), buf); \
   }
 
 /**
@@ -132,7 +132,7 @@ extern global_files_t glb_files;
     std::ofstream ofile;                                          \
     ofile.open(Files_log + std::to_string(get_mpi_id()) + ".txt", \
                std::ios::app);                                    \
-    ofile << buf;                                                 \
+    ofile << Timer::get_time() << buf;                            \
     ofile.close();                                                \
   }
 

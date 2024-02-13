@@ -49,7 +49,7 @@ void illum::separate_gpu::InitSender(const MPI_Comm &comm, const grid_directions
         if (id == myid)
           continue;
 
-        MPI_Send_init(grid.local_Illum.data() + num_direction * size_msg, (int)size_msg, MPI_DOUBLE, id, tag, comm, &section_1.requests_send[(np - 1) * num_direction + cc++]);
+        MPI_Send_init(grid.Illum + num_direction * size_msg, (int)size_msg, MPI_DOUBLE, id, tag, comm, &section_1.requests_send[(np - 1) * num_direction + cc++]);
       }
     }
   }

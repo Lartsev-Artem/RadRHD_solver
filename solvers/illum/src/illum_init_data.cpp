@@ -41,10 +41,6 @@ int illum::InitRadiationState(const std::string &address_data, grid_t &grid) {
   }
 #endif
 
-  if (_solve_mode.class_vtk == e_grid_cfg_full_init) {
-    DIE_IF(files_sys::txt::ReadTableFunc(glb_files.tab_func_address + F_COOLING_FUNC, t_cooling_function));
-  }
-
   return e_completion_success;
 }
 

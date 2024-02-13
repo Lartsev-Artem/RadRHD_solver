@@ -41,6 +41,14 @@ Type GetTimeStep(const hllc_value_t &hllc_set, const std::vector<elem_t> &cells)
  */
 void HllcPhysToConv(std::vector<elem_t> &cells);
 
+/**
+ * @brief Функция расчитывает физическое состояние на всей сетки по консервативному
+ *
+ * @note консервативные переменные должно быть записаны
+ * @param[inout] cells ячейки сетки
+ */
+void HllcConvToPhys(std::vector<elem_t> &cells);
+
 #ifdef DEBUG
 /**
  * @brief Проверка условия физичности консервативных переменных

@@ -36,7 +36,7 @@
 #define SEPARATE_GPU ///< разделение данных на видеокарте
 #endif
 
-#define SPECTRUM ///< перенос в полной постановке, без серой материи
+//#define SPECTRUM ///< перенос в полной постановке, без серой материи
 
 #ifdef SEPARATE_GPU
 #define ILLUM_ON_CELL ///< излучения хранится на ячейках, а не на гранях
