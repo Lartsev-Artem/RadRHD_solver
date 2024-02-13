@@ -2,8 +2,9 @@
 
 #include "illum_utils.h"
 #include "dbgdef.h"
+#include "gas_state.h"
 #include "global_value.h"
-#include "illum_rad_func.h"
+#include "plunk.h"
 
 TableFunc t_cooling_function;
 
@@ -149,7 +150,7 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     Type L = t_cooling_function(log(d * kMass / (kDist * kDist * kDist)), log(T));
     Type alpha = exp(L) / (4 * kStefanBoltzmann * T4) * kDist;
 
-    Type Q = Blackbody(T);
+    Type Q = B_Plank(T);
 
     Type betta = (kSigma_thomson / kM_hydrogen * kDist) * d;
 
@@ -302,7 +303,7 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coe
   return norm;
 }
 
-#ifdef SEPARATE_GPU
+#if defined SEPARATE_GPU && !defined SPECTRUM
 Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp) {
   Type norm = -1;
   const IdType shift_dir = num_dir * grid.size;
@@ -423,7 +424,7 @@ Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Typ
     Type S = int_scattering;
     Type d = cell.phys_val.d;
     Type p = cell.phys_val.p;
-    Type T = illum::GetTemperature(p, d); // размерная
+    Type T = GetTemperature(p, d); // размерная
 
 #if GEOMETRY_TYPE == Cone
     if (x[0] < 0.05) { //источник
@@ -439,7 +440,7 @@ Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Typ
     Type L = t_cooling_function(log(d * kMass / (kDist * kDist * kDist)), log(T));
     Type alpha = exp(L) / (4 * kStefanBoltzmann * T4) * kDist;
 
-    Type Ie = illum::Blackbody(T);
+    Type Ie = B_Plank(T);
     Type Q = alpha * Ie;
 
     Type betta = (kSigma_thomson / kM_hydrogen * kDist) * d;

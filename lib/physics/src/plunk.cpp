@@ -8,6 +8,12 @@ constexpr double frq0 = 1e24;
 constexpr int N = 1000;
 } // namespace ksplit
 
+namespace ksplit2 {
+constexpr double betta = 350;
+constexpr double frq0 = 1e24;
+constexpr int N = 100;
+} // namespace ksplit2
+
 void get_splitting_spectrum(std::vector<Type> &spectrum) {
 
   spectrum.resize(ksplit::N + 1, 0);
@@ -77,7 +83,7 @@ static double f_Goldin_sigma_log(double T, double nu, double nu0) {
 
 double B_Plank(double T) {
   const double T2 = T * T;
-  return (T2 * T2) * kStefanBoltzmann;
+  return (T2 * T2) * kStefanBoltzmann / PI;
 }
 
 double B_Plank(double T, double nu, double nu0) {

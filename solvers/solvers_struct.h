@@ -274,18 +274,17 @@ struct grid_t {
 
 #ifdef SPECTRUM
   IdType size_frq;
-  Type *Illum; //вообще не будем хранить этот массив целиком. Норму ошибки будем брать интегральную на видеокарте
-  Type *scattering;
   std::vector<Type> spectrum;
+#endif
+
 #ifdef SEPARATE_GPU
   const int loc_illum_size = 10;
   int loc_illum_wptr = 0;
   int loc_illum_rptr = 0;
 #endif
-#else
+
   Type *Illum;
   Type *scattering;
-#endif
 
 #if defined SEPARATE_GPU && !defined SPECTRUM
   /// \todo плохо по всем направлениям. Надо кольцевой буфер на несколько циклов с проверкой отправки первого пакета

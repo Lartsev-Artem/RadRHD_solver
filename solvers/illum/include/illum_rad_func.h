@@ -1,4 +1,4 @@
-#if !defined ILLUM_RADFUNC_H && defined ILLUM
+#if 0 // !defined ILLUM_RADFUNC_H && defined ILLUM
 #define ILLUM_RADFUNC_H
 
 #include "geo_types.h"

@@ -33,7 +33,7 @@ Type EddTensor(int i, int j, const Type U, const Vector3 &F);
  */
 void GetRadSource(const int cell, const grid_t &grid, Vector4 &G);
 
-#include "illum_rad_func.h"
+// #include "illum_rad_func.h"
 #if 0
 /**
  * @brief  Compute the blackbody intensity corresponding to the input temperature.
