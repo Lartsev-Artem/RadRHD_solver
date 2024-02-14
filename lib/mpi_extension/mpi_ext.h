@@ -43,11 +43,16 @@ int8_t get_mpi_id(const MPI_Comm &comm);
  */
 int8_t get_mpi_np(const MPI_Comm &comm);
 
-extern MPI_Datatype MPI_flux_t;            ///< mpi-тип для перессылки структуры ::flux_t
-extern MPI_Datatype MPI_flux_illum_elem_t; ///< mpi-тип для перессылки структуры
-extern MPI_Datatype MPI_hllc_value_t;      ///< mpi-тип для перессылки структуры
-extern MPI_Datatype MPI_flux_all_t;        ///< mpi-тип для перессылки структуры
-extern MPI_Datatype MPI_flux_elem_t;       ///< mpi-тип для перессылки структуры
+extern MPI_Datatype MPI_phys_val_t;   ///< mpi-тип для перессылки структуры ::elem_t::phys_val
+extern MPI_Datatype MPI_flux_t;       ///< mpi-тип для перессылки структуры ::flux_t
+extern MPI_Datatype MPI_hllc_value_t; ///< mpi-тип для перессылки структуры ::hllc_value_t (динамический расчёт)
+extern MPI_Datatype MPI_flux_elem_t;  ///< mpi-тип для перессылки структуры ::elem_t::phys_val ,elem_t::conv_val
+
+/**
+ * @brief Инициализация структур в MPI_TYPE
+ *
+ */
+void InitMPiStruct();
 
 #define MPI_START(argc, argv) MPI_Init(&argc, &argv);
 #define MPI_END MPI_Finalize();

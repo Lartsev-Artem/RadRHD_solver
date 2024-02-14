@@ -1,9 +1,9 @@
 # defining project config 
-DEFCONF 		= SOLVERS LINUX DEBUG BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA  USE_MPI
+DEFCONF 		= SOLVERS LINUX DEBUG BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA  USE_MPI RAD_RHD RHLLC
 #DEFCONF 		= SOLVERS DEBUG RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI USE_CUDA
 
 # defining working directories
-LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension lib/aligned_vec lib/physics/include
+LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension lib/aligned_vec lib/physics/include lib/output_interface
 LIB_SRC = lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometry/src lib/physics/src
 
 CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteristics cuda/include/ray_tracing cuda/include/short_characteristics/separate_gpu

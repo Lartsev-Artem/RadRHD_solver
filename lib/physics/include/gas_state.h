@@ -52,7 +52,7 @@ inline T GetPressure(T rho, T tem) {
  * @return gas density
  */
 template <typename T>
-inline T GetPressure(T prs, T tem) {
+inline T GetDensity(T prs, T tem) {
   constexpr T g_idealGasConst = (kM_hydrogen / k_boltzmann);
   return (((g_idealGasConst * kPressure / kDensity) * prs) / tem);
 }

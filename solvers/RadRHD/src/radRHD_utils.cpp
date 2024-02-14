@@ -2,6 +2,9 @@
 #include "radRHD_utils.h"
 #include "radRHD_config.h"
 
+#include "gas_state.h"
+#include "plunk.h"
+
 Type rad_rhd::EddTensor(int i, int j, const Type U, const Vector3 &F) {
   /* --------------------------------------------------------
                   Compute the (i,j) component of the Eddington tensor
@@ -88,7 +91,7 @@ void rad_rhd::GetRadSource(const int cell, const grid_t &grid, Vector4 &G) {
 
   /*-- Compute some useful quantities --*/
   Type rhogamma = rho * gamma;
-  Type q = -abs_op * rho * Blackbody(GetTemperature(rho, prs));
+  Type q = -abs_op * rho * B_Plank(GetTemperature(rho, prs));
 
   /*-- Compute source function in the Eulerian frame --*/
   G[0] = q * gamma + rhogamma * (abs_op - scat_op * (u2 + uuD)) * Ur - rho * (abs_op - scat_op * (u2 + gamma2)) * uF;

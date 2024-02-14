@@ -4,6 +4,7 @@
 
 #if defined TRANSFER_CELL_TO_FACE && defined SEPARATE_GPU && !defined SPECTRUM
 #include "radRHD_main.h"
+#include "radRHD_utils.h"
 
 #include "global_types.h"
 #include "global_value.h"
@@ -80,7 +81,7 @@ int rad_rhd::RunRadRHDMpiModule() {
   int res_count = _solve_mode.start_point;
   files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid); // начальное сохранение
 
-  InitPhysOmpMpi(grid.size);
+  InitMPiStruct();
 
   Timer timer;
 
@@ -99,16 +100,30 @@ int rad_rhd::RunRadRHDMpiModule() {
       rhllc::Hllc3dStab(_hllc_cfg.tau, grid);
       rhllc::HllcConvToPhys(grid.cells);
     }
-    // MPI_Bcast(&grid.cells, N, MPI_phys_value_t, , MPI_COMM_WORLD);
 
     // send_all
+    MPI_Bcast(&grid.cells, grid.cells.size(), MPI_phys_val_t, e_hllc_id, MPI_COMM_WORLD);
 
     illum::separate_gpu::CalculateIllum(grid_direction, inner_bound_code, vec_x0, sorted_graph, sorted_id_bound_face, grid);
 
     cuda::interface::CudaSyncStream(cuda::e_cuda_params);
+    cuda::interface::CudaWait();
 
     if (LIKELY(myid == e_hllc_id)) {
-      // GetRad
+#pragma omp parallel for
+      for (int cell = 0; cell < grid.size; cell++) {
+
+        Vector4 G;
+        rad_rhd::GetRadSource(cell, grid, G);
+
+        constexpr Type ds = 1;
+        grid.cells[cell].conv_val.p += ds * _hllc_cfg.tau * G[0];
+        grid.cells[cell].conv_val.v[0] += ds * _hllc_cfg.tau * G[1];
+        grid.cells[cell].conv_val.v[1] += ds * _hllc_cfg.tau * G[2];
+        grid.cells[cell].conv_val.v[2] += ds * _hllc_cfg.tau * G[3];
+
+        rhllc::GetPhysValueStab(grid.cells[cell].conv_val, grid.cells[cell].phys_val);
+      }
     }
 
     if (cur_timer >= _hllc_cfg.save_timer) {

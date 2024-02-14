@@ -47,11 +47,69 @@ int8_t get_mpi_np(const MPI_Comm &comm) {
   return (int8_t)size;
 }
 
+#include "solvers_struct.h"
 MPI_Datatype MPI_flux_t;
-MPI_Datatype MPI_flux_illum_elem_t;
-MPI_Datatype MPI_hllc_value_t;
-MPI_Datatype MPI_flux_all_t;
+MPI_Datatype MPI_phys_val_t;
 MPI_Datatype MPI_flux_elem_t;
+
+MPI_Datatype MPI_hllc_value_t;
+
+#if 1
+void InitMPiStruct() {
+
+  MPI_Type_create_resized(MPI_DOUBLE, 0, sizeof(flux_t), &MPI_flux_t);     // структура потоков
+  MPI_Type_create_resized(MPI_flux_t, 0, sizeof(elem_t), &MPI_phys_val_t); // структура физических переменных
+
+  MPI_Datatype tmp_type;
+  MPI_Type_create_resized(MPI_DOUBLE, 0, sizeof(flux_t) * 2, &tmp_type);
+  MPI_Type_create_resized(tmp_type, 0, sizeof(elem_t), &MPI_flux_elem_t); // перессылка потоков из ячейки
+
+  MPI_Type_create_resized(MPI_hllc_value_t, 0, sizeof(hllc_value_t), &MPI_hllc_value_t); //настройки динамического расчета
+
+  return;
+}
+#else //устаревший формат?
+void InitMPiStruct() {
+
+  // структура потоков
+  {
+    int len[3 + 1] = {1, 3, 1, 1};
+    MPI_Aint pos[4] = {offsetof(flux_t, d), offsetof(flux_t, v), offsetof(flux_t, p), sizeof(flux_t)};
+    MPI_Datatype typ[4] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_UB};
+    MPI_Type_create_struct(4, len, pos, typ, &MPI_flux_t);
+    MPI_Type_commit(&MPI_flux_t);
+  }
+
+  // структура физических переменных
+  {
+    int len[1 + 1] = {1, 1};
+    MPI_Aint pos[2] = {offsetof(elem_t, phys_val), sizeof(elem_t)};
+    MPI_Datatype typ[2] = {MPI_flux_t, MPI_UB};
+    MPI_Type_create_struct(2, len, pos, typ, &MPI_phys_val_t);
+    MPI_Type_commit(&MPI_phys_val_t);
+  }
+
+  // перессылка потоков из ячейки
+  {
+    int len[2 + 1] = {1, 1, 1};
+    MPI_Aint pos[3] = {offsetof(elem_t, phys_val), offsetof(elem_t, conv_val), sizeof(elem_t)};
+    MPI_Datatype typ[3] = {MPI_flux_t, MPI_flux_t, MPI_UB};
+    MPI_Type_create_struct(3, len, pos, typ, &MPI_flux_elem_t);
+    MPI_Type_commit(&MPI_flux_elem_t);
+  }
+
+  //настройки динамического расчета
+  {
+    int len[5 + 1] = {1, 1, 1, 1, 1, 1};
+    MPI_Aint pos[6] = {offsetof(hllc_value_t, T), offsetof(hllc_value_t, CFL), offsetof(hllc_value_t, h_min), offsetof(hllc_value_t, save_timer), offsetof(hllc_value_t, tau), sizeof(hllc_value_t)};
+    MPI_Datatype typ[6] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_UB};
+    MPI_Type_create_struct(6, len, pos, typ, &MPI_hllc_value_t);
+    MPI_Type_commit(&MPI_hllc_value_t);
+  }
+
+  return;
+}
+#endif
 
 #else
 int8_t get_mpi_id() { return 0; }

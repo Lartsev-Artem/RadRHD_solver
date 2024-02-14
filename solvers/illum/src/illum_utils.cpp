@@ -306,7 +306,7 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coe
 #if defined SEPARATE_GPU && !defined SPECTRUM
 Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp) {
   Type norm = -1;
-  const IdType shift_dir = num_dir * grid.size;
+  const IdType shift_dir = num_dir + dir_disp;
 
   for (size_t cell = 0; cell < grid.size; cell++) {
     Type curI = 0;
@@ -315,11 +315,9 @@ Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Ty
     }
     curI /= CELL_SIZE;
 
-    IdType id = (shift_dir + cell);
-    norm = std::max(norm, fabs((grid.local_Illum[id] - curI) / curI));
-    grid.local_Illum[id] = curI;
-
-    grid.Illum[cell * grid.size_dir + (num_dir + dir_disp)] = curI;
+    IdType id = cell * grid.size_dir + shift_dir;
+    norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
+    grid.Illum[id] = curI;
   }
 
   return norm;
