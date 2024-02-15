@@ -57,14 +57,35 @@ MPI_Datatype MPI_hllc_value_t;
 #if 1
 void InitMPiStruct() {
 
-  MPI_Type_create_resized(MPI_DOUBLE, 0, sizeof(flux_t), &MPI_flux_t);     // структура потоков
+  // структура потоков
+  {
+    int len[3] = {1, 3, 1};
+    MPI_Aint pos[3] = {offsetof(flux_t, d), offsetof(flux_t, v), offsetof(flux_t, p)};
+    MPI_Datatype typ[3] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE};
+    MPI_Type_create_struct(3, len, pos, typ, &MPI_flux_t);
+    MPI_Type_commit(&MPI_flux_t);
+  }
+
   MPI_Type_create_resized(MPI_flux_t, 0, sizeof(elem_t), &MPI_phys_val_t); // структура физических переменных
 
-  MPI_Datatype tmp_type;
-  MPI_Type_create_resized(MPI_DOUBLE, 0, sizeof(flux_t) * 2, &tmp_type);
-  MPI_Type_create_resized(tmp_type, 0, sizeof(elem_t), &MPI_flux_elem_t); // перессылка потоков из ячейки
+  // перессылка потоков из ячейки
+  {
+    int len[2] = {1, 1};
+    MPI_Aint pos[2] = {offsetof(elem_t, phys_val), offsetof(elem_t, conv_val)};
+    MPI_Datatype typ[2] = {MPI_flux_t, MPI_flux_t};
+    MPI_Type_create_struct(2, len, pos, typ, &MPI_flux_elem_t);
+    MPI_Type_commit(&MPI_flux_elem_t);
+    MPI_Type_create_resized(MPI_flux_elem_t, 0, sizeof(elem_t), &MPI_flux_elem_t); // структура физических переменных
+  }
 
-  MPI_Type_create_resized(MPI_hllc_value_t, 0, sizeof(hllc_value_t), &MPI_hllc_value_t); //настройки динамического расчета
+  //настройки динамического расчета
+  {
+    int len[5] = {1, 1, 1, 1, 1};
+    MPI_Aint pos[5] = {offsetof(hllc_value_t, T), offsetof(hllc_value_t, CFL), offsetof(hllc_value_t, h_min), offsetof(hllc_value_t, save_timer), offsetof(hllc_value_t, tau)};
+    MPI_Datatype typ[5] = {MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE};
+    MPI_Type_create_struct(5, len, pos, typ, &MPI_hllc_value_t);
+    MPI_Type_commit(&MPI_hllc_value_t);
+  }
 
   return;
 }
