@@ -80,13 +80,19 @@ struct bound_size_t {
  *
  */
 struct geo_face_t {
-  int id_l; ///< номер "левой" ячейки. всегда определена
-  int id_r; ///< номер "правой" ячейки. включает признак границы
+
+  uint32_t id_l : 25; ///< номер "левой" ячейки. всегда определена
+  uint32_t id_l_node : 6;
+  uint32_t is_regular : 1;
+
+  int id_r : 26; ///< номер "правой" ячейки. включает признак границы
+  uint32_t id_r_node : 6;
 
   Vector3 n; ///< нормаль к грани (не ориентирована)
   Type S;    ///< площадь грани
 
-  geo_face_t() : id_l(0), id_r(0), n(Vector3(0, 0, 0)), S(0) {}
+  geo_face_t() : id_l(0), id_r(0), n(Vector3(0, 0, 0)), S(0),
+                 id_l_node(0), id_r_node(0), is_regular(1) {}
 };
 
 /**
@@ -104,14 +110,23 @@ struct face_t {
  *
  */
 struct geo_cell_t {
+
+  struct bits_flag {
+    uint8_t bits;
+    bits_flag(const uint8_t a = 0) : bits(a) {}
+    bool operator[](int i) {
+      return CHECK_BIT(bits, i);
+    }
+  };
+
   int id_faces[CELL_SIZE]; ///< номера связанных граней в нумерации face_t
   Type V;                  ///< объем ячейки
-  ///\todo битовый флаг. На его основе убрать ветвление
-  bool sign_n[CELL_SIZE]; ///< знак нормали соответствующей грани
-  Vector3 center;         ///< центр ячейки
+  Vector3 center;          ///< центр ячейки
+  bits_flag sign_n;        ///< знак нормали соответствующей грани
+  uint8_t node;
 
   geo_cell_t() : id_faces{0, 0, 0, 0}, V(0),
-                 sign_n{true, true, true, true},
+                 sign_n(0x7), node(0),
                  center(Vector3(0, 0, 0)) {}
 };
 

@@ -58,9 +58,9 @@ int ReadSimple(const Str_Type name_file, std::vector<T> &data) {
 }
 
 /**
- * @brief Чтение текстового файла в набор уникальный ключей
+ * @brief Чтение текстового файла без размера данных
  *
- * @tparam Str_Type Str_Type символьны тип
+ * @tparam Str_Type символьны тип
  * @tparam T тип считываемых данных
  * @param[in] name_file полное имя файла с расширением
  * @param[out] data набор std::set
@@ -79,6 +79,33 @@ int ReadSimple(const Str_Type name_file, std::set<T> &data) {
   for (int i = 0; i < size; i++) {
     ifile >> buf;
     data.emplace(buf);
+  }
+
+  ifile.close();
+  return e_completion_success;
+}
+
+/**
+ * @brief Чтение текстового файла в набор уникальный ключей
+ *
+ * @tparam Str_Type Str_Type символьны тип
+ * @tparam T тип считываемых данных
+ * @param[in] name_file полное имя файла с расширением
+ * @param[out] data массив std::vector
+ * @return int ::e_type_completion
+ */
+template <typename Str_Type, typename T>
+int ReadData(const Str_Type name_file, std::vector<T> &data) {
+
+  std::ifstream ifile;
+  OPEN_FSTREAM(ifile, input_file.c_str());
+  int n = std::count(std::istreambuf_iterator<char>(ifile), std::istreambuf_iterator<char>(), '\n');
+  ifile.close();
+
+  data.resize(n);
+  OPEN_FSTREAM(ifile, input_file.c_str());
+  for (size_t i = 0; i < data.size(); i++) {
+    ifile >> data[i];
   }
 
   ifile.close();
