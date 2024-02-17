@@ -159,5 +159,54 @@ void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_gri
 #endif
 grid_t::~grid_t() {
   inter_coef_all.clear();
+#ifdef USE_MPI
+  if (mpi_cfg) {
+    delete mpi_cfg;
+  }
+#endif
+
+#ifdef ILLUM
+  for (auto &el : cells) {
+    if (el.cell_data) {
+      delete el.cell_data;
+    }
+  }
+#endif
 }
 #endif // NOT USE_CUDA
+
+#ifdef ILLUM
+void grid_t::InitFullPhysData() {
+  for (auto &el : cells) {
+    el.cell_data = new full_phys_data_t;
+  }
+}
+#endif
+
+#include "gas_state.h"
+#include "global_value.h"
+#ifdef SPECTRUM
+void full_phys_data_t::InitDirection(const Vector3 &dir) {
+  cosf = 0;
+  if (LIKELY(vel > kC_LightInv)) {
+    cosf = val->v.dot(dir) / vel;
+  }
+}
+#endif
+
+void full_phys_data_t::Init(const flux_t *src) {
+
+  val = src;
+  T = GetTemperature(src->d, src->p);
+  logT = log(T);
+
+  vel = val->v.norm();
+
+  constexpr Type inv_c2 = (1. / (kC_Light * kC_Light));
+  lorenz = 1. / sqrt(1. - vel * vel * inv_c2);
+
+  Type L = t_cooling_function(log(val->d) + LOG(kDensity), logT);
+  Type log_alpha = L - (LOG(kStefanBoltzmann4) + logT) + LOG(kDist);
+  alpha = exp(log_alpha);
+  betta = (kSigma_thomson / kM_hydrogen * kDist) * val->d;
+}

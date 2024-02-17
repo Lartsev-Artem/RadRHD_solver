@@ -228,11 +228,14 @@ struct full_phys_data_t {
   Type vel;
   Type alpha;
   Type betta;
+#ifdef SPECTRUM
   Type cosf;
+  void InitDirection(const Vector3 &dir);
+#endif
+
   full_phys_data_t(const flux_t *src) { Init(src); }
   full_phys_data_t() {}
   void Init(const flux_t *src);
-  void InitDirection(const Vector3 &dir);
 };
 
 struct elem_t {
@@ -240,7 +243,7 @@ struct elem_t {
   flux_t conv_val;
 
 #if defined ILLUM
-  full_phys_data_t cell_data;
+  full_phys_data_t *cell_data = nullptr;
   illum_value_t illum_val;
 #endif
 
@@ -277,6 +280,10 @@ struct grid_t {
 
   std::vector<elem_t> cells;
   std::vector<face_t> faces;
+#ifdef USE_MPI
+  mpi_hllc_t *mpi_cfg;                              ///< конфиг mpi структуры
+#endif
+
 #ifndef TRANSFER_CELL_TO_FACE
   std::vector<std::vector<Vector3>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
 #else
@@ -313,6 +320,11 @@ struct grid_t {
   Matrix3 *impuls;
 #endif
 
+#ifdef ILLUM
+  //! \brief Инициализация памяти под структуру физических данных
+  void InitFullPhysData();
+#endif
+
   void InitMemory(const IdType num_cells, const grid_directions_t &dir_grid);
 
   grid_t() : size(0), size_face(0), size_dir(0), loc_size(0), loc_shift(0), Illum(nullptr), scattering(nullptr),
@@ -325,6 +337,11 @@ struct grid_t {
              ,
              size_frq(0)
 #endif
+#ifdef USE_MPI
+             ,
+             mpi_cfg(nullptr)
+#endif
+
   {
   }
   ~grid_t();

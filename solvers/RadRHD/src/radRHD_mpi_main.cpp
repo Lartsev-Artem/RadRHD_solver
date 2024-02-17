@@ -23,6 +23,7 @@
 #include "rhllc_calc.h"
 #include "rhllc_flux_stab.h"
 #include "rhllc_init.h"
+#include "rhllc_mpi.h"
 #include "rhllc_utils.h"
 
 #ifndef USE_CUDA
@@ -55,11 +56,21 @@ int rad_rhd::RunRadRHDMpiModule() {
   }
 
   grid.InitMemory(grid.cells.size(), grid_direction);
+  grid.InitFullPhysData();
   WRITE_LOG("Init memory\n");
+
+  InitMPiStruct();
 
   // hllc init
   {
+    int np = get_mpi_np();
     DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
+
+    std::vector<int> metis;
+    files_sys::txt::ReadData(glb_files.base_address + F_SEPARATE_METIS(np), metis);
+    grid.mpi_cfg = new mpi_hllc_t;
+    rhllc_mpi::InitMpiConfig(metis, grid, grid.mpi_cfg);
+    metis.clear();
   }
 
   // illum init
@@ -81,8 +92,6 @@ int rad_rhd::RunRadRHDMpiModule() {
   int res_count = _solve_mode.start_point;
   files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid); // начальное сохранение
 
-  InitMPiStruct();
-
   Timer timer;
 
   MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
@@ -96,13 +105,8 @@ int rad_rhd::RunRadRHDMpiModule() {
 
     timer.start_timer();
 
-    if (LIKELY(myid == e_hllc_id)) {
-      rhllc::Hllc3dStab(_hllc_cfg.tau, grid);
-      // rhllc::HllcConvToPhys(grid.cells);
-    }
-
-    // send_all
-    MPI_Bcast(&grid.cells, grid.cells.size(), MPI_phys_val_t, e_hllc_id, MPI_COMM_WORLD);
+    rhllc_mpi::Hllc3dStab(_hllc_cfg.tau, grid);
+    rhllc_mpi::StartPhysCast(*grid.mpi_cfg, grid);
 
     illum::separate_gpu::CalculateIllum(grid_direction, inner_bound_code, vec_x0, sorted_graph, sorted_id_bound_face, grid);
 

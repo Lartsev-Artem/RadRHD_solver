@@ -197,31 +197,6 @@ namespace tick = std::chrono;
 #include "illum_mpi_sender.h"
 namespace cuda_sep = cuda::interface::separate_device;
 
-#include "compton.h"
-
-void full_phys_data_t::InitDirection(const Vector3 &dir) {
-  cosf = 0;
-  if (LIKELY(vel > kC_LightInv)) {
-    cosf = val->v.dot(dir) / vel;
-  }
-}
-void full_phys_data_t::Init(const flux_t *src) {
-
-  val = src;
-  T = 5000.0; // illum::GetTemperature(src->d, src->p);
-  logT = log(T);
-
-  vel = val->v.norm();
-
-  constexpr Type inv_c2 = (1. / (kC_Light * kC_Light));
-  lorenz = 1. / sqrt(1. - vel * vel * inv_c2);
-
-  Type L = t_cooling_function(log(val->d) + LOG(kDensity), logT);
-  Type log_alpha = L - (LOG(kStefanBoltzmann4) + logT) + LOG(kDist);
-  alpha = exp(log_alpha);
-  Type betta = (kSigma_thomson / kM_hydrogen * kDist) * val->d;
-}
-
 #include "plunk.h"
 static Type GetRhs(const Type S, Type frq1, Type frq0, elem_t &cell, Type &k) {
   full_phys_data_t *phys = &cell.cell_data;
