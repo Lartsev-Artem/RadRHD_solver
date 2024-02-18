@@ -69,8 +69,11 @@ struct grid_directions_device_t {
 struct grid_device_t {
   IdType size; ///< размер всей сетки
 
-  IdType loc_size; ///< локальное число ячеек (mpi)
-  IdType shift;    ///< локальный сдвиг по ячейкам(mpi)
+  IdType loc_size_gpu; ///< локальное число ячеек (gpu)
+  IdType shift_gpu;    ///< локальный сдвиг по ячейкам(gpu)
+
+  IdType loc_size_params; ///< локальное число ячеек (mpi)
+  IdType shift_params;    ///< локальный сдвиг по ячейкам(mpi)
 
   IdType local_scattering_size; ///< локальный размер по направлениям(потоки)
   IdType local_scattering_disp; ///< локальный сдвиг  по направлениям(потоки)
@@ -136,8 +139,11 @@ struct device_host_ptr_t {
 
 struct multi_gpu_config_t {
   int GPU_N;
-  std::vector<IdType> size;
-  std::vector<IdType> disp;
+  std::vector<IdType> size; ///< размер по ячейкам на картах
+  std::vector<IdType> disp; ///< сдвиг по ячейкам на картах
+
+  std::vector<IdType> size_params; ///< размер по ячейкам на картах с учётом mpi данных на узле
+  std::vector<IdType> disp_params; ///< сдвиг по ячейкам на картах с учётом mpi данных на узле
 };
 
 } // namespace cuda

@@ -127,7 +127,7 @@ int WriteNormals(const std::string &name_file_normals, std::vector<Normals> &nor
 int WriteSolution(const std::string &main_dir, const grid_t &grid);
 
 /// \todo CHECK THIS!!!
-#ifdef RHLLC_MPI
+#if 1 // def RHLLC_MPI
 #error "todo module"
 template <typename type1>
 void WriteFileVectorMPI(MPI_Comm comm, const std::string &file_name,

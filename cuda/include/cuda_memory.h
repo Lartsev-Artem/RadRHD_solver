@@ -163,6 +163,9 @@ void inline CpyToHostAsyncStream(distType *dist, const srcType *src, size_t size
  */
 template <typename dataType>
 void inline FreeMem(dataType *&data) {
+  if (!data) {
+    return;
+  }
   if (CheckError(cudaFree(data))) {
     EXIT_ERR("Error FreeMem\n");
   }

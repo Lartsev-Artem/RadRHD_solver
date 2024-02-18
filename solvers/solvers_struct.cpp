@@ -200,10 +200,10 @@ void full_phys_data_t::Init(const flux_t *src) {
   T = GetTemperature(src->d, src->p);
   logT = log(T);
 
-  vel = val->v.norm();
+  Type vel2 = val->v.dot(val->v);
+  vel = sqrt(vel2);
 
-  constexpr Type inv_c2 = (1. / (kC_Light * kC_Light));
-  lorenz = 1. / sqrt(1. - vel * vel * inv_c2);
+  lorenz = 1. / sqrt(1. - vel2);
 
   Type L = t_cooling_function(log(val->d) + LOG(kDensity), logT);
   Type log_alpha = L - (LOG(kStefanBoltzmann4) + logT) + LOG(kDist);

@@ -130,7 +130,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 
     MPI_Waitall(section_1.requests_rcv.size(), section_1.requests_rcv.data(), MPI_STATUSES_IGNORE);
 
-    if (_solve_mode.max_number_of_iter >= 1) // пропуск первой итерации
+    if (LIKELY(_solve_mode.max_number_of_iter >= 1)) // пропуск первой итерации
     {
       cuda_sep::CalculateIntScatteringAsync(grid_direction, grid, 0, local_size, cuda::e_cuda_scattering_1);
     }
@@ -144,6 +144,6 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
   } while (norm > _solve_mode.accuracy && iter < _solve_mode.max_number_of_iter);
 
   return e_completion_success;
-} // namespace cuda::interface::separate_device::intillum::separate_gpu::CalculateIllum(constgrid_directions_t&grid_direction,conststd::vector<std::vector<IntId>>&inner_bound_code,conststd::vector<align_cell_local>&vec_x0,conststd::vector<std::vector<graph_pair_t>>&sorted_graph,conststd::vector<std::vector<IntId>>&sorted_id_bound_face,grid_t&grid)
+}
 #endif //! TRANSFER_CELL_TO_FACE
 #endif //! defined ILLUM && defined SOLVERS  && !defined USE_MPI

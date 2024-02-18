@@ -15,21 +15,6 @@
     @{
 */
 
-/**
- * @brief Структура mpi пересылок газодинамической части
- */
-struct mpi_hllc_t {
-  MPI_Comm comm;                         ///< группа на которой считается газовая часть
-  std::vector<IdType> send_cells;        ///< кол-во отправок для каждого процесса
-  std::vector<IdType> disp_cells;        ///< смещения по ячейкам для процессов
-  std::vector<IntId> id_irregular_faces; ///< номера граней с границе областей процессов
-
-  std::vector<MPI_Request> requests_cast_phys;  ///< запросы на передачу физ. переменных
-  std::vector<MPI_Request> requests_send_faces; ///< запросы на передачу потоков грани
-  std::vector<MPI_Request> requests_rcv_faces;  ///< запросы на приём потоков грани
-  mpi_hllc_t() : comm(MPI_COMM_NULL) {}
-};
-
 namespace rhllc_mpi {
 
 /**
@@ -45,6 +30,12 @@ void StartPhysCast(mpi_hllc_t &hllc_st, grid_t &grid);
  * @param[inout] hllc_st структура mpi пересылок
  */
 void SyncPhysCast(mpi_hllc_t &hllc_st);
+
+/**
+ * @brief Синхронизация процессов (после рассылки) с одновременной расчётом физических параметров для излучения
+ * @param[inout] grid сетка
+ */
+void SyncAndCalcPhysCast(grid_t &grid);
 
 /**
  * @brief Инициация рассылки (приёма передачи) физических и консервативных переменных
@@ -69,6 +60,14 @@ void SyncExchangeBoundaryCells(mpi_hllc_t &hllc_st);
 void InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mpi_hllc_t *hllc_st);
 
 void Hllc3dStab(const Type tau, grid_t &grid);
+
+void HllcConvToPhys(grid_t &grid);
+
+/**
+ * @brief Добавление влияния излучения в газовую динамику
+ * @param[inout] grid сетка с вычисленным излучением
+ */
+void AddRadFlux(grid_t &grid);
 } // namespace rhllc_mpi
 
 #endif //! RHLLC_MPI_H

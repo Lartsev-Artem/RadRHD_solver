@@ -22,7 +22,25 @@ void rhllc_mpi::StartPhysCast(mpi_hllc_t &hllc_st, grid_t &grid) {
 
 void rhllc_mpi::SyncPhysCast(mpi_hllc_t &hllc_st) {
   MPI_Waitall(hllc_st.requests_cast_phys.size(), hllc_st.requests_cast_phys.data(), MPI_STATUSES_IGNORE);
-  // MPI_Waitany( int count , MPI_Request array_of_requests[] , int* index , MPI_Status* status);
+}
+
+void rhllc_mpi::SyncAndCalcPhysCast(grid_t &grid) {
+  int myid = get_mpi_id();
+
+  int idx = myid;
+
+  do {
+
+    int start = grid.mpi_cfg->disp_cells[idx];
+    int end = start + grid.mpi_cfg->send_cells[idx];
+
+#pragma omp parallel default(none) firstprivate(start, end) shared(grid) for
+    for (int i = start; i < end; i++) {
+      grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
+    }
+
+    MPI_Waitany(grid.mpi_cfg->requests_cast_phys.size(), grid.mpi_cfg->requests_cast_phys.data(), &idx, MPI_STATUSES_IGNORE);
+  } while (idx != MPI_UNDEFINED);
 }
 
 void rhllc_mpi::StartExchangeBoundaryCells(mpi_hllc_t &hllc_st) {
@@ -190,16 +208,44 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
   MPI_Wait(&rq_max_speed, MPI_STATUS_IGNORE);
 }
 
-void GetAndCalcAllPhysData(grid_t &grid) {
+void rhllc_mpi::HllcConvToPhys(grid_t &grid) {
   int myid = get_mpi_id();
-#pragma omp parallel default(none) firstprivate(myid) shared(grid, glb_files)
-  {
-    int start = grid.mpi_cfg->disp_cells[myid];
-    int end = start + grid.mpi_cfg->send_cells[myid];
+  int start = grid.mpi_cfg->disp_cells[myid];
+  int end = start + grid.mpi_cfg->send_cells[myid];
 
+#pragma omp parallel default(none) firstprivate(start, end) shared(grid)
+  {
 #pragma omp for
     for (int i = start; i < end; i++) {
-      grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
+      rhllc::GetPhysValueStab(grid.cells[i].phys_val, grid.cells[i].conv_val);
+    }
+  }
+}
+
+#include "radRHD_utils.h"
+void rhllc_mpi::AddRadFlux(grid_t &grid) {
+
+  int myid = get_mpi_id();
+  int start = grid.mpi_cfg->disp_cells[myid];
+  int end = start + grid.mpi_cfg->send_cells[myid];
+
+#pragma omp parallel default(none) firstprivate(start, end) shared(grid)
+  {
+    constexpr Type ds = 1.0;
+    Type tau = ds * _hllc_cfg.tau;
+
+#pragma omp for
+    for (int cell = start; cell < end; cell++) {
+
+      Vector4 G;
+      rad_rhd::GetRadSourceOpt(cell, grid, G);
+      G *= tau;
+
+      flux_t &conv_val = grid.cells[cell].conv_val;
+      conv_val.p += G[0];
+      conv_val.v[0] += G[1];
+      conv_val.v[1] += G[2];
+      conv_val.v[2] += G[3];
     }
   }
 }

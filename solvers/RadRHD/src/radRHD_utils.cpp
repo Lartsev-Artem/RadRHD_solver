@@ -100,6 +100,64 @@ void rad_rhd::GetRadSource(const int cell, const grid_t &grid, Vector4 &G) {
     G[i + 1] = q * u[i] - rho * (tot_op * uD[i] + scat_op * u[i] * (gamma2 + uuD)) * Ur + rhogamma * (tot_op * Fr[i] + scat_op * 2.0 * uF * u[i]);
 }
 
+void rad_rhd::GetRadSourceOpt(const int cell_id, const grid_t &grid, Vector4 &G) {
+
+  const elem_t &cell = grid.cells[cell_id];
+  /*-- Set opacities --*/
+  const Type abs_op = cell.cell_data->alpha;  // illum_val.absorp_coef;
+  const Type scat_op = cell.cell_data->betta; // illum_val.scat_coef;
+  const Type tot_op = abs_op + scat_op;
+
+  const Type rho = cell.phys_val.d;
+  const Type prs = cell.phys_val.p;
+  const Vector3 &v = cell.phys_val.v;
+
+#ifdef USE_CUDA
+  const Type Ur = grid.energy[cell_id];
+  const Vector3 &Fr = grid.stream[cell_id];
+  const Matrix3 &Tr = grid.impuls[cell_id];
+#else
+  const Type Ur = grid.cells[cell].illum_val.energy;
+  const Vector3 &Fr = grid.cells[cell].illum_val.stream;
+  const Matrix3 &Tr = grid.cells[cell].illum_val.impuls;
+#endif
+
+  /*-- Compute gamma, gamma^2, u and u^2 --*/
+  const Type gamma = cell.cell_data->lorenz;
+  const Type gamma2 = gamma * gamma;
+  const Type u2 = gamma2 * cell.cell_data->vel * cell.cell_data->vel;
+
+  const Vector3 u = gamma * v;
+
+  /*-- Compute products involving the proper velocity --*/
+  Type uuD = 0.;
+  Type uF = u.dot(Fr);
+  Vector3 uD;
+  Type D;
+  for (int i = 0; i < 3; i++) {
+    uD[i] = 0.;
+    for (int j = 0; j < 3; j++) {
+#if ISOTROPIC_INTENSITY == 1
+      D = EddTensor(j, i, Ur, Fr);
+#else
+      D = Tr(j, i);
+#endif
+      uD[i] += u[j] * D;
+      uuD += u[i] * u[j] * D;
+    }
+  }
+
+  /*-- Compute some useful quantities --*/
+  Type rhogamma = rho * gamma;
+  Type q = -abs_op * rho * B_Plank(cell.cell_data->T);
+
+  /*-- Compute source function in the Eulerian frame --*/
+  G[0] = q * gamma + rhogamma * (abs_op - scat_op * (u2 + uuD)) * Ur - rho * (abs_op - scat_op * (u2 + gamma2)) * uF;
+
+  for (int i = 0; i < 3; i++)
+    G[i + 1] = q * u[i] - rho * (tot_op * uD[i] + scat_op * u[i] * (gamma2 + uuD)) * Ur + rhogamma * (tot_op * Fr[i] + scat_op * 2.0 * uF * u[i]);
+}
+
 #endif //! RAD_RHD
 
 #if 0

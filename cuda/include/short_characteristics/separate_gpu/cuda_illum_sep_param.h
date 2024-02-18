@@ -62,7 +62,7 @@ namespace kernel {
  * @param[inout] grid сетка
  * @return __global__ use cudaGetLastError
  */
-__global__ void MakeIllumParam(const cuda::geo::grid_directions_device_t *dir, cuda::geo::grid_device_t *grid);
+__global__ void MakeIllumParam(const cuda::geo::grid_directions_device_t *dir, cuda::geo::grid_device_t *grid, IdType size_params, IdType shift_params);
 
 } // namespace kernel
 

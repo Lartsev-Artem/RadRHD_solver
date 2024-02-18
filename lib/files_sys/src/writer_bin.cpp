@@ -23,15 +23,11 @@ int files_sys::bin::WriteNormals(const std::string &name_file_normals, std::vect
   return e_completion_success;
 }
 
-/// \todo CHECK THIS!!!
-#ifdef RHLLC_MPI
-#error "todo module"
-#include "../solve_module/MPI_utils.h"
 static inline size_t files_sys::bin::WriteFileSolutionMPI(const std::string &main_dir, const grid_t &grid, const bound_size_t &size) {
   // int np, myid; MPI_GET_INF(np, myid);
-  int myid = claster_cfg.id_hllc;
-  int left = size.left;
-  int right = size.right;
+  int myid = get_mpi_id();
+  int left = grid.mpi_cfg->disp_cells[myid];
+  int right = left + grid.mpi_cfg->send_cells[myid];
 
 #ifdef ILLUM
   if (claster_cfg.comm_illum != MPI_COMM_NULL) {
@@ -71,74 +67,9 @@ static inline size_t files_sys::bin::WriteFileSolutionMPI(const std::string &mai
   return 0;
 }
 
-static inline size_t files_sys::bin::WriteFileSolutionSplit(const std::string &main_dir, const grid_t &grid, const bound_size_t &size) {
-  // int np, myid; MPI_GET_INF(np, myid);
-  int myid = claster_cfg.id_hllc;
-  int left = size.left;
-  int right = size.right;
-
-#ifdef ILLUM
-  if (MPI_IS_ILLUM) {
-    std::vector<Type> illum;
-    GetDirectionDataFromFace(grid.size, 0, grid.Illum, 0.0, illum);
-    WriteSimpleFileBin(main_dir + F_ILLUM, illum);
-
-#if !defined USE_CUDA
-
-    WriteFileVectorMPI(MPI_COMM_ILLUM, main_dir + F_ENERGY, grid.cells, offsetof(illum_value_t, energy), sizeof(Type), left, right);
-    WriteFileVectorMPI(MPI_COMM_ILLUM, main_dir + F_STREAM, grid.cells, offsetof(illum_value_t, stream), sizeof(Vector3), left, right);
-    WriteFileVectorMPI(MPI_COMM_ILLUM, main_dir + F_IMPULS, grid.cells, offsetof(illum_value_t, impuls), sizeof(Matrix3), left, right);
-    WriteFileVectorMPI(MPI_COMM_ILLUM, main_dir + F_DIVSTREAM, grid.cells, offsetof(illum_value_t, div_stream), sizeof(Type), left, right);
-    WriteFileVectorMPI(MPI_COMM_ILLUM, main_dir + F_DIVIMPULS, grid.cells, offsetof(illum_value_t, div_impuls), sizeof(Vector3), left, right);
-#else
-#pragma error "new config like no use_cuda"
-#pragma warning "shift/sizeof(double) or just shift?"
-    WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_ENERGY).c_str(), grid.energy, grid.size, left, right);
-    WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_STREAM).c_str(), grid.stream, grid.size, left, right);
-    WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_IMPULS).c_str(), grid.impuls, grid.size, left, right);
-    WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_DIVSTREAM).c_str(), grid.divstream, grid.size, left, right);
-    WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_DIVIMPULS).c_str(), grid.divimpuls, grid.size, left, right);
-#endif
-#endif
-  }
-
-#if (defined HLLC || defined RHLLC)
-
-  if (MPI_IS_HLLC) {
-    WriteFileVectorMPI(MPI_COMM_HLLC, main_dir + F_DENSITY, grid.cells, offsetof(flux_t, d), sizeof(Type), left, right);
-    WriteFileVectorMPI(MPI_COMM_HLLC, main_dir + F_PRESSURE, grid.cells, offsetof(flux_t, p), sizeof(Type), left, right);
-    WriteFileVectorMPI(MPI_COMM_HLLC, main_dir + F_VELOCITY, grid.cells, offsetof(flux_t, v), sizeof(Vector3), left, right);
-  }
-#endif
-
-  return 0;
-}
-
-#else
-
 // не видет параметры под макросом
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-/*! Пересчет излучения с грани в ячейку в заданном направлении
-num_dir - номер направления
-illum_on_face - излучение на гранях по всем направлениям
-*/
-
-// int GetDirectionIllumFromFace(const int size_grid, const int num_dir, const Type *illum_on_face, std::vector<Type> &illum_in_cell) {
-//   // if (illum_on_face.size() < size_grid* CELL_SIZE +size_grid * num_dir * CELL_SIZE) RETURN_ERR("illum_on_face hasn't enough data\n");
-//   if (illum_on_face == nullptr)
-//     RETURN_ERR("illum_on_face hasn't enough data\n");
-
-//   illum_in_cell.resize(size_grid, 0);
-//   for (size_t j = 0; j < size_grid; j++) {
-//     const int N = num_dir * CELL_SIZE * size_grid + j * CELL_SIZE;
-//     for (size_t k = 0; k < CELL_SIZE; k++) {
-//       illum_in_cell[j] += illum_on_face[N + k];
-//     }
-//     illum_in_cell[j] /= CELL_SIZE;
-//   }
-//   return 0;
-// }
 
 #include "writer_txt.h"
 static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid_t &grid) {
@@ -151,7 +82,7 @@ static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid
   GetCellDataBySelectedDirection(grid.size, grid.size_dir, 0, grid.Illum, illum);
 #endif
   files_sys::bin::WriteSimple(main_dir + F_ILLUM, illum);
-  files_sys::txt::WriteSimple(main_dir + F_ILLUM + ".txt", illum);
+  // files_sys::txt::WriteSimple(main_dir + F_ILLUM + ".txt", illum);
 
 #if !defined USE_CUDA
   WRITE_FILE_ELEM((main_dir + F_ENERGY).c_str(), grid.cells, illum_val.energy);
@@ -190,16 +121,11 @@ static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid
 }
 
 #pragma GCC diagnostic pop
-#endif
 
 int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &grid) {
 
-#ifdef RHLLC_MPI
-  return WriteFileSolutionMPI(main_dir, grid, hllc_loc_size[claster_cfg.id_hllc]);
-#else
   if (get_mpi_id() == 0) {
     return WriteFileSolutionOrder(main_dir, grid);
   }
-#endif
   return e_completion_success;
 }

@@ -97,9 +97,6 @@ int rad_rhd::RunRadRHDMpiModule() {
   MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
   const int myid = get_mpi_id();
-  enum {
-    e_hllc_id = 0
-  };
 
   while (t < _hllc_cfg.T) {
 
@@ -107,28 +104,16 @@ int rad_rhd::RunRadRHDMpiModule() {
 
     rhllc_mpi::Hllc3dStab(_hllc_cfg.tau, grid);
     rhllc_mpi::StartPhysCast(*grid.mpi_cfg, grid);
+    rhllc_mpi::SyncAndCalcPhysCast(grid);
 
     illum::separate_gpu::CalculateIllum(grid_direction, inner_bound_code, vec_x0, sorted_graph, sorted_id_bound_face, grid);
 
     cuda::interface::CudaSyncStream(cuda::e_cuda_params);
     cuda::interface::CudaWait();
 
-    if (LIKELY(myid == e_hllc_id)) {
-#pragma omp parallel for
-      for (int cell = 0; cell < grid.size; cell++) {
+    rhllc_mpi::AddRadFlux(grid);
 
-        Vector4 G;
-        rad_rhd::GetRadSource(cell, grid, G);
-
-        constexpr Type ds = 1;
-        grid.cells[cell].conv_val.p += ds * _hllc_cfg.tau * G[0];
-        grid.cells[cell].conv_val.v[0] += ds * _hllc_cfg.tau * G[1];
-        grid.cells[cell].conv_val.v[1] += ds * _hllc_cfg.tau * G[2];
-        grid.cells[cell].conv_val.v[2] += ds * _hllc_cfg.tau * G[3];
-
-        rhllc::GetPhysValueStab(grid.cells[cell].conv_val, grid.cells[cell].phys_val);
-      }
-    }
+    rhllc_mpi::HllcConvToPhys(grid);
 
     if (cur_timer >= _hllc_cfg.save_timer) {
       DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
@@ -142,7 +127,8 @@ int rad_rhd::RunRadRHDMpiModule() {
     _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg, grid.cells);
 
     WRITE_LOG("it= %lf, time_step=%lf\n", t, timer.get_delta_time_sec());
-    MPI_Bcast(&_hllc_cfg, 1, MPI_hllc_value_t, e_hllc_id, MPI_COMM_WORLD);
+
+    MPI_BARRIER(MPI_COMM_WORLD);
   }
 
   WRITE_LOG("end calculate illum\n");
