@@ -23,56 +23,15 @@ int files_sys::bin::WriteNormals(const std::string &name_file_normals, std::vect
   return e_completion_success;
 }
 
-static inline size_t files_sys::bin::WriteFileSolutionMPI(const std::string &main_dir, const grid_t &grid, const bound_size_t &size) {
-  // int np, myid; MPI_GET_INF(np, myid);
-  int myid = get_mpi_id();
-  int left = grid.mpi_cfg->disp_cells[myid];
-  int right = left + grid.mpi_cfg->send_cells[myid];
-
-#ifdef ILLUM
-  if (claster_cfg.comm_illum != MPI_COMM_NULL) {
-    // todo: это на узле с излучением!
-    std::vector<Type> illum;
-    GetDirectionDataFromFace(grid.size, 0, grid.Illum, 0.0, illum);
-    WriteSimpleFileBin(main_dir + F_ILLUM, illum);
-
-    // int size_illum = illum.size();
-    // WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_ILLUM).c_str(), (illum.data() + left), size_illum, left, right);
-    return 0;
-  }
-
-#if !defined USE_CUDA
-
-  WRITE_FILE_VECTOR_MPI(claster_cfg.comm_hllc, (main_dir + F_ENERGY).c_str(), grid.cells, illum_val.energy, left, right);
-  WRITE_FILE_VECTOR_MPI(claster_cfg.comm_hllc, (main_dir + F_STREAM).c_str(), grid.cells, illum_val.stream, left, right);
-  WRITE_FILE_VECTOR_MPI(claster_cfg.comm_hllc, (main_dir + F_IMPULS).c_str(), grid.cells, illum_val.impuls, left, right);
-  WRITE_FILE_VECTOR_MPI(claster_cfg.comm_hllc, (main_dir + F_DIVSTREAM).c_str(), grid.cells, illum_val.div_stream, left, right);
-  WRITE_FILE_VECTOR_MPI(claster_cfg.comm_hllc, (main_dir + F_DIVIMPULS).c_str(), grid.cells, illum_val.div_impuls, left, right);
-#else
-#pragma warning "shift/sizeof(double) or just shift?"
-  WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_ENERGY).c_str(), grid.energy, grid.size, left, right);
-  WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_STREAM).c_str(), grid.stream, grid.size, left, right);
-  WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_IMPULS).c_str(), grid.impuls, grid.size, left, right);
-  WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_DIVSTREAM).c_str(), grid.divstream, grid.size, left, right);
-  WRITE_FILE_MPI(claster_cfg.comm_hllc, (main_dir + F_DIVIMPULS).c_str(), grid.divimpuls, grid.size, left, right);
-#endif
-#endif
-
-#if (defined HLLC || defined RHLLC)
-  WRITE_FILE_VECTOR_MPI(claster_cfg.comm_hllc, (main_dir + F_DENSITY).c_str(), grid.cells, phys_val.d, left, right);
-  WRITE_FILE_VECTOR_MPI(claster_cfg.comm_hllc, (main_dir + F_PRESSURE).c_str(), grid.cells, phys_val.p, left, right);
-  WRITE_FILE_VECTOR_MPI(claster_cfg.comm_hllc, (main_dir + F_VELOCITY).c_str(), grid.cells, phys_val.v, left, right);
-#endif
-
-  return 0;
-}
-
 // не видет параметры под макросом
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-#include "writer_txt.h"
-static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid_t &grid) {
+int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &grid) {
+
+  if (get_mpi_id() != 0) {
+    return e_completion_success;
+  }
 
 #ifdef ILLUM
   std::vector<Type> illum;
@@ -116,16 +75,52 @@ static inline int WriteFileSolutionOrder(const std::string &main_dir, const grid
   WRITE_FILE_ELEM((main_dir + F_VELOCITY).c_str(), grid.cells, phys_val.v);
 
 #endif
-
-  return 0;
+  return e_completion_success;
 }
 
 #pragma GCC diagnostic pop
 
-int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &grid) {
+#ifdef USE_MPI
 
-  if (get_mpi_id() == 0) {
-    return WriteFileSolutionOrder(main_dir, grid);
-  }
-  return e_completion_success;
+int files_sys::bin::WriteFileSolutionMPI(const std::string &main_dir, const grid_t &grid) {
+
+  int myid = get_mpi_id();
+  IdType left = grid.mpi_cfg->disp_cells[myid];
+  IdType right = left + grid.mpi_cfg->send_cells[myid];
+
+#ifdef ILLUM
+
+  std::vector<Type> illum;
+#ifndef SEPARATE_GPU
+  GetDirectionDataFromFace(grid.size, 0, grid.Illum, 0.0, illum);
+#else
+  GetCellDataBySelectedDirection(grid.size, grid.size_dir, 0, grid.Illum, illum);
+#endif
+  files_sys::bin::WriteSimple(main_dir + F_ILLUM, illum);
+
+#if !defined USE_CUDA
+
+  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_ENERGY).c_str(), grid.cells, illum_val.energy, left, right);
+  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_STREAM).c_str(), grid.cells, illum_val.stream, left, right);
+  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_IMPULS).c_str(), grid.cells, illum_val.impuls, left, right);
+  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_DIVSTREAM).c_str(), grid.cells, illum_val.div_stream, left, right);
+  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_DIVIMPULS).c_str(), grid.cells, illum_val.div_impuls, left, right);
+#else
+#pragma warning "shift/sizeof(double) or just shift?"
+  WriteSimpleMPI(main_dir + F_ENERGY, grid.size, grid.energy, left, right);
+  WriteSimpleMPI(main_dir + F_STREAM, grid.size, grid.stream, left, right);
+  WriteSimpleMPI(main_dir + F_IMPULS, grid.size, grid.impuls, left, right);
+  WriteSimpleMPI(main_dir + F_DIVSTREAM, grid.size, grid.divstream, left, right);
+  WriteSimpleMPI(main_dir + F_DIVIMPULS, grid.size, grid.divimpuls, left, right);
+#endif
+#endif // ILLUM
+
+#if (defined HLLC || defined RHLLC)
+  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_DENSITY).c_str(), grid.cells, phys_val.d, left, right);
+  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_PRESSURE).c_str(), grid.cells, phys_val.p, left, right);
+  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_VELOCITY).c_str(), grid.cells, phys_val.v, left, right);
+#endif
+
+  return 0;
 }
+#endif

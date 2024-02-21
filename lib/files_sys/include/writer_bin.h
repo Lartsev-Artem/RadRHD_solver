@@ -126,9 +126,67 @@ int WriteNormals(const std::string &name_file_normals, std::vector<Normals> &nor
  */
 int WriteSolution(const std::string &main_dir, const grid_t &grid);
 
-/// \todo CHECK THIS!!!
-#if 1 // def RHLLC_MPI
-#error "todo module"
+#ifdef USE_MPI
+#include "mpi_ext.h"
+/**
+ * @brief Запись файлов решения разделённого по узлам
+ *
+ * @param[in] main_dir путь к выходной директории
+ * @param[in] grid сетка
+ * @return int  ::e_type_completion
+ */
+int WriteFileSolutionMPI(const std::string &main_dir, const grid_t &grid);
+
+/**
+ * @brief Запись распределённого по узлам линейного массива размера n в файл
+ *
+ * @tparam Str_Type символьны тип
+ * @tparam T тип записываемых данных
+ * @param[in] file полное имя файла с расширением
+ * @param[in] n размерность массива
+ * @param[in] data массив T*
+ * @param[in] left_offset левая граница данных на узле
+ * @param[in] right_offset правая граница данных на узле
+ * @return int  ::e_type_completion
+ */
+template <typename T, typename Tidx>
+int WriteSimpleMPI(const std::string &file, const Tidx n, const T *data, const Tidx left_offset, const Tidx right_offset) {
+
+  if (data != nullptr) {
+    int myid = get_mpi_id();
+    MPI_Comm comm = MPI_COMM_WORLD;
+
+    MPI_File fh = MPI_FILE_NULL;
+    MPI_File_open(comm, file.c_str(), MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &fh);
+
+    DIE_IF(fh == MPI_FILE_NULL)
+
+    if (myid == 0) {
+      MPI_File_seek(fh, 0, MPI_SEEK_SET);
+      MPI_File_write(fh, &n, 1, MPI_INT, MPI_STATUSES_IGNORE);
+    } else {
+      MPI_File_seek(fh, sizeof(int) + left_offset * sizeof(data[0]), MPI_SEEK_SET);
+    }
+    MPI_File_write(fh, data, (right_offset - left_offset) * sizeof(data[0]) / sizeof(double), MPI_DOUBLE, MPI_STATUSES_IGNORE);
+    MPI_File_close(&fh);
+    return e_completion_success;
+  }
+  WRITE_LOG("no data for %s\n", std::string(name_file).c_str());
+  return e_completion_fail;
+}
+
+/**
+ * @brief Запись данных распределённых по узлам
+ *
+ * @param[in] comm коммуникатор
+ * @param[in] file_name имя файла
+ * @param[in] cells сетка
+ * @param[in] data_offset смещение данных в структуре elem_t
+ * @param[in] size_elem размер записываемых данных
+ * @param[in] left_offset левая граница данных на узле
+ * @param[in] right_offset правая граница данных на узле
+ * @warning Требует проверки
+ */
 template <typename type1>
 void WriteFileVectorMPI(MPI_Comm comm, const std::string &file_name,
                         const std::vector<elem_t> &cells, uint32_t data_offset, uint32_t size_elem,
@@ -156,12 +214,12 @@ void WriteFileVectorMPI(MPI_Comm comm, const std::string &file_name,
   MPI_File_close(&fh);
 }
 
-#define WRITE_FILE_VECTOR_MPI(comm, file, cells, data, left_offset, right_offset)                                  \
+// поэлементная запись данных в файл с разных узлов
+#define WRITE_FILE_ELEM_MPI(comm, file, cells, data, left_offset, right_offset)                                    \
   {                                                                                                                \
     MPI_File fh = MPI_FILE_NULL;                                                                                   \
     MPI_File_open(comm, file, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &fh);                              \
-    if (fh == MPI_FILE_NULL)                                                                                       \
-      D_LD;                                                                                                        \
+    DIE_IF(fh == MPI_FILE_NULL)                                                                                    \
                                                                                                                    \
     if (myid == 0) {                                                                                               \
       MPI_File_seek(fh, 0, MPI_SEEK_SET);                                                                          \
@@ -177,22 +235,6 @@ void WriteFileVectorMPI(MPI_Comm comm, const std::string &file_name,
     MPI_File_close(&fh);                                                                                           \
   }
 
-#define WRITE_FILE_MPI(comm, file, data, n, left_offset, right_offset)                                                          \
-  {                                                                                                                             \
-    MPI_File fh = MPI_FILE_NULL;                                                                                                \
-    MPI_File_open(comm, file, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &fh);                                           \
-    if (fh == MPI_FILE_NULL)                                                                                                    \
-      D_LD;                                                                                                                     \
-                                                                                                                                \
-    if (myid == 0) {                                                                                                            \
-      MPI_File_seek(fh, 0, MPI_SEEK_SET);                                                                                       \
-      MPI_File_write(fh, &n, 1, MPI_INT, MPI_STATUSES_IGNORE);                                                                  \
-    } else {                                                                                                                    \
-      MPI_File_seek(fh, sizeof(int) + left_offset * sizeof(data[0]), MPI_SEEK_SET);                                             \
-    }                                                                                                                           \
-    MPI_File_write(fh, data, (right_offset - left_offset) * sizeof(data[0]) / sizeof(double), MPI_DOUBLE, MPI_STATUSES_IGNORE); \
-    MPI_File_close(&fh);                                                                                                        \
-  }
 #endif
 
 } // namespace bin
