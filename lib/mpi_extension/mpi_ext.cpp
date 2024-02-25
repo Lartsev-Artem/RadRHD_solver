@@ -67,7 +67,6 @@ void InitMPiStruct() {
   }
 
   MPI_Type_create_resized(MPI_flux_t, 0, sizeof(elem_t), &MPI_phys_val_t); // структура физических переменных
-  WRITE_LOG("sizeof(elem_t)= %lu\n", sizeof(elem_t));
 
   // перессылка потоков из ячейки
   {

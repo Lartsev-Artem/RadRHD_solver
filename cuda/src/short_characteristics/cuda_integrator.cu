@@ -9,7 +9,15 @@ namespace c_dir = cuda::device::direction_integrator;
 
 __device__ Type c_dir::Gamma(const Vector3 &direction, const Vector3 &direction2) {
   Type sum = direction.dot(direction2);
-  return (3. * (1 + sum * sum)) / 4.;
+  return (3. * (1. + sum * sum)) / 4.;
+}
+__device__ Type c_dir::GammaT(const Vector3 &direction, const Vector3 &direction2) {
+  Type cos = direction.dot(direction2);
+  if (cos >= 0.9999999) {
+    return 0;
+  }
+  Type cos2 = cos * cos;
+  return (3. * (1. + cos2) * sqrt(1. - cos2)) / 8.;
 }
 
 __device__ Type c_dir::IntegrateByCell(const IdType num_cell, const geo::grid_directions_device_t *dir, const geo::grid_device_t *grid) {

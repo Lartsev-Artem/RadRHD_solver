@@ -114,6 +114,7 @@ int files_sys::txt::ReadTableFunc(const std::string &file_func, TableFunc &tab_f
             lambda.max_x, lambda.max_y,
             lambda.min_x, lambda.min_y);
 
+  tab_func = std::move(lambda);
   return e_completion_success;
 }
 

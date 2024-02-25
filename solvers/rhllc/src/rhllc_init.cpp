@@ -4,6 +4,7 @@
 
 #include "global_value.h"
 
+#include "gas_state.h"
 #include "reader_bin.h"
 
 Type Density(const Vector3 &p) {
@@ -117,12 +118,9 @@ static int SetRHllcValueDefault(std::vector<elem_t> &cells) {
     // el.phys_val.p = Pressure(x) / PRESSURE;
     // el.phys_val.v = Velocity(x) / VELOCITY;
 #elif GEOMETRY_TYPE == Cone
-
-    {
-      el.phys_val.d = 0.5;
-      el.phys_val.p = 0.1;
-      el.phys_val.v = Vector3(0, 0, 0);
-    }
+    el.phys_val.d = kM_hydrogen * 1e14 / kDensity; //  0.1;
+    el.phys_val.p = GetPressure(el.phys_val.d, 1e7);
+    el.phys_val.v = Vector3(0, 0, 0);
 
 #elif GEOMETRY_TYPE == Sphere
     Vector3 x = centers[i];

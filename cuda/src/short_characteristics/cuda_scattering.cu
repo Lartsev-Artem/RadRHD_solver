@@ -78,6 +78,7 @@ __global__ void cuda::kernel::GetS_MPI_Stream(const geo::grid_directions_device_
   grid->int_scattering[k * N + i] = scatter / dir->full_area;
 }
 
+#include "global_consts.h"
 __global__ void cuda::kernel::GetS_MPI_multi_device(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid,
                                                     const IdType size_loc, const IdType start_dir, const IdType end_dir) {
 

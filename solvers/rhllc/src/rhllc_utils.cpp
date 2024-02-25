@@ -3,6 +3,8 @@
 #include "rhllc_flux.h"
 #include "rhllc_flux_stab.h"
 
+#include "gas_state.h"
+
 #include "global_value.h"
 #include "linear_alg.h"
 
@@ -75,17 +77,10 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
     bound.phys_val.p = 0.01;
     GetConvValue(bound.phys_val, bound.conv_val);
 #elif GEOMETRY_TYPE == Cone
-    // bound.phys_val.d = 0.1; // (3 * 1e-8 + 1e-12) / DENSITY;
-    // bound.phys_val.p = 1; // (100 + (1e-2)) / PRESSURE;
-    // bound.phys_val.v = Vector3(1e-4, 0, 0);// (Vector3(1e4, 0, 0)) / VELOCITY;
 
-    /*bound.phys_val.d = Density(Vector3::Zero()) / DENSITY;
-    bound.phys_val.p = Pressure(Vector3::Zero()) / PRESSURE;
-    bound.phys_val.v = Velocity(Vector3::Zero()) / VELOCITY;*/
-
-    bound.phys_val.d = 1;
-    bound.phys_val.p = 1;
-    bound.phys_val.v = Vector3(0.1, 0, 0);
+    bound.phys_val.d = kM_hydrogen * 1e14 / kDensity; //  0.1;
+    bound.phys_val.p = GetPressure(bound.phys_val.d, 1e7);
+    bound.phys_val.v = Vector3(1e3 / kC_Light, 0, 0);
 
     GetConvValue(bound.phys_val, bound.conv_val);
 #else
@@ -94,7 +89,7 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
 #endif
     break;
   case e_bound_lock:
-#if 1
+
     bound.conv_val = cell.conv_val;
     bound.phys_val = cell.phys_val;
 
@@ -110,10 +105,7 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
 
     bound.conv_val.v = T * bound.conv_val.v;
     bound.phys_val.v = T * bound.phys_val.v;
-#else
-    bound.conv_val = cell.conv_val;
-    bound.phys_val = cell.phys_val;
-#endif
+
     break;
 
   default:

@@ -91,7 +91,7 @@ void rad_rhd::GetRadSource(const int cell, const grid_t &grid, Vector4 &G) {
 
   /*-- Compute some useful quantities --*/
   Type rhogamma = rho * gamma;
-  Type q = -abs_op * rho * B_Plank(GetTemperature(rho, prs));
+  Type q = -abs_op * rho * B_Plank(GetTemperature(rho, prs)) / kRadiation;
 
   /*-- Compute source function in the Eulerian frame --*/
   G[0] = q * gamma + rhogamma * (abs_op - scat_op * (u2 + uuD)) * Ur - rho * (abs_op - scat_op * (u2 + gamma2)) * uF;

@@ -33,7 +33,8 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
   double norm = 0; ///< норма ошибки
 
   do {
-    auto start_clock = tick::steady_clock::now();
+    Timer time;
+    time.start_timer();
     norm = -1;
 
     if (section_1.requests_send[0] != MPI_REQUEST_NULL) {
@@ -97,7 +98,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           const Type S = grid.scattering[num_cell * local_size + num_direction];
           // const Type S = grid.scattering[num_direction * count_cells + num_cell];
           Type k;
-          const Type rhs = GetRhs(x, S, *cell, k);
+          const Type rhs = GetRhsOpt(x, S, *cell, k);
           const face_loc_id_t id_in_faces = *(in_face);
           ++in_face;
           alignas(32) Type I0[4] =
@@ -138,8 +139,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
     MPI_Wait(&rq_norm, MPI_STATUS_IGNORE);
     norm = fabs(glob_norm);
 
-    WRITE_LOG("End iter number#: %d, norm=%.16lf, time= %lf\n", iter, norm,
-              (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
+    WRITE_LOG("End iter number#: %d, norm=%.16lf, time= %lf\n", iter, norm, time.get_delta_time_sec());
     iter++;
   } while (norm > _solve_mode.accuracy && iter < _solve_mode.max_number_of_iter);
 

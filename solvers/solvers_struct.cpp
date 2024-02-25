@@ -8,6 +8,9 @@ solve_mode_t _solve_mode;
 hllc_value_t _hllc_cfg;
 
 Type TableFunc::operator()(Type x, Type y) {
+
+  DIE_IF(data.size() == 0);
+
   if (x < min_x) {
     x = min_x;
   }
@@ -26,7 +29,12 @@ Type TableFunc::operator()(Type x, Type y) {
 
   int i = std::min((int)((round(x) - min_x) / step_x), Nx - 1);
   int j = std::min((int)((round(y) - min_y) / step_y), Ny - 1);
-  return data[Ny * i + j];
+  try {
+    return data[Ny * i + j];
+  } catch (...) {
+    WRITE_LOG_ERR("x=%lf, y=%lf, i=%d, j=%d, Nx=%d, Ny=%d\n", x, y, i, j, Nx, Ny);
+    D_LD;
+  }
 }
 
 flux_t flux_t::operator+(const flux_t &x) const {
@@ -177,8 +185,11 @@ grid_t::~grid_t() {
 
 #ifdef ILLUM
 void grid_t::InitFullPhysData() {
-  for (auto &el : cells) {
-    el.cell_data = new full_phys_data_t;
+  // for (auto &el : cells) {
+  //   el.cell_data = new full_phys_data_t;
+  // }
+  for (size_t i = 0; i < size; i++) {
+    cells[i].cell_data = new full_phys_data_t;
   }
 }
 #endif
@@ -207,7 +218,7 @@ void full_phys_data_t::Init(const flux_t *src) {
   lorenz = 1. / sqrt(1. - vel2);
 
   Type L = t_cooling_function(log(val->d) + LOG(kDensity), logT);
-  Type log_alpha = L - (LOG(kStefanBoltzmann4) + logT) + LOG(kDist);
+  Type log_alpha = L - (LOG(kStefanBoltzmann4) + 4 * logT) + LOG(kDist);
   alpha = exp(log_alpha);
   betta = (kSigma_thomson / kM_hydrogen * kDist) * val->d;
 }

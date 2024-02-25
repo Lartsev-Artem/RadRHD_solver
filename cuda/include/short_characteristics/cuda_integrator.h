@@ -29,6 +29,14 @@ namespace direction_integrator {
 __device__ Type Gamma(const Vector3 &direction, const Vector3 &direction2);
 
 /**
+ * @brief Индикатриса рассеяния Томсона
+ *
+ * @param[in] direction направление 1
+ * @param[in] direction2 направление 2
+ * @return  значение индикатрисы
+ */
+__device__ Type GammaT(const Vector3 &direction, const Vector3 &direction2);
+/**
  * @brief Функция интегрирования по направлениям, усреднённая по ячейке (плотность энергии излучения)
  *
  * @param[in] num_cell номер ячейки

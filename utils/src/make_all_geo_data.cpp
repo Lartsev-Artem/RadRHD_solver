@@ -21,11 +21,6 @@ int FUNC_NAME(MakeAllGeoData)(int argc, char **argv) {
   files.name_file_vtk = argv[2];
   files.Build();
 
-  fs::create_directory(files.base_address + "trace");
-  fs::create_directory(files.base_address + "graph");
-  fs::create_directory(files.base_address + "illum_geo");
-  fs::create_directory(files.base_address + "Solve");
-
   if (!fs::exists(files.base_address) || !fs::exists(files.name_file_vtk)) {
     RETURN_ERR("bad input address\n");
   }
@@ -42,7 +37,7 @@ int FUNC_NAME(MakeAllGeoData)(int argc, char **argv) {
     RETURN_ERR("don't build geo format\n");
   }
 
-  fs::copy_file(files.name_file_vtk, files.base_address);
+  // fs::copy_file(files.name_file_vtk, files.base_address);
 
   return e_completion_success;
 }

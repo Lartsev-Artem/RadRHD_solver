@@ -55,6 +55,7 @@ int rad_rhd::RunRadRHDModule() {
   }
 
   grid.InitMemory(grid.cells.size(), grid_direction);
+  grid.InitFullPhysData();
   WRITE_LOG("Init memory\n");
 
   // hllc init
@@ -103,6 +104,11 @@ int rad_rhd::RunRadRHDModule() {
     // send_all
     MPI_Bcast(grid.cells.data(), grid.cells.size(), MPI_phys_val_t, e_hllc_id, MPI_COMM_WORLD);
 
+#pragma omp parallel for
+    for (int i = 0; i < grid.size; i++) {
+      grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
+    }
+
     illum::separate_gpu::CalculateIllum(grid_direction, inner_bound_code, vec_x0, sorted_graph, sorted_id_bound_face, grid);
 
     cuda::interface::CudaSyncStream(cuda::e_cuda_params);
@@ -125,6 +131,9 @@ int rad_rhd::RunRadRHDModule() {
       }
     }
 
+    t += _hllc_cfg.tau;
+    cur_timer += _hllc_cfg.tau;
+
     if (cur_timer >= _hllc_cfg.save_timer) {
       DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 
@@ -132,8 +141,6 @@ int rad_rhd::RunRadRHDModule() {
       cur_timer = 0;
     }
 
-    t += _hllc_cfg.tau;
-    cur_timer += _hllc_cfg.tau;
     _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg, grid.cells);
 
     WRITE_LOG("it= %lf, time_step=%lf\n", t, timer.get_delta_time_sec());

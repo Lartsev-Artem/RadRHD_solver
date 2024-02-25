@@ -38,7 +38,7 @@ inline T GetTemperature(T rho, T prs) {
 template <typename T>
 inline T GetPressure(T rho, T tem) {
   constexpr T g_idealGasConst = (kM_hydrogen / k_boltzmann);
-  constexpr T g_idealGasConst_inv = 1. / g_idealGasConst;
+  constexpr T g_idealGasConst_inv = kDensity / g_idealGasConst;
   return (g_idealGasConst_inv / kPressure) * tem * rho;
 }
 

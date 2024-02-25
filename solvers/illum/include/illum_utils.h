@@ -156,6 +156,9 @@ Type ReCalcIllumOpt(const IdType num_dir, const std::vector<Type> &inter_coef, g
  */
 Type GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k);
 
+//! @brief Оптимизированная версия
+Type GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k);
+
 /**
  * @brief Расчет среднего значения на грани
  *

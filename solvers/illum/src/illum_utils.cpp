@@ -34,7 +34,11 @@ Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, co
 
   case e_bound_free:
   case e_bound_lock:
+    return 0;
   case e_bound_out_source:
+#if GEOMETRY_TYPE == Cone
+    return 1e52 / kRadiation / (kDist * kDist);
+#endif
     return 0;
 
 #ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
@@ -58,7 +62,10 @@ Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, co
   }
 #else
   case e_bound_inner_source:
+#if GEOMETRY_TYPE == Sphere
     return 1;
+#endif
+    return 0;
 #endif
   default:
     D_LD;
@@ -135,14 +142,6 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
     Type d = cell.phys_val.d;
     Type p = cell.phys_val.p;
     Type T = GetTemperature(d, p); // размерная
-
-#if GEOMETRY_TYPE == Cone
-    if (x[0] < 0.05) { //источник
-      d = 0.1;
-      p = 0.01;
-      T = coefT * (p / d); // размерная
-    }
-#endif
 
     Type T2 = T * T;
     Type T4 = T2 * T2;
@@ -476,14 +475,6 @@ Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Typ
     Type p = cell.phys_val.p;
     Type T = GetTemperature(p, d); // размерная
 
-#if GEOMETRY_TYPE == Cone
-    if (x[0] < 0.05) { //источник
-      d = 0.1;
-      p = 0.01;
-      T = coefT * (p / d); // размерная
-    }
-#endif
-
     Type T2 = T * T;
     Type T4 = T2 * T2;
 
@@ -506,6 +497,22 @@ Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Typ
   default:
     D_LD;
   }
+}
+
+Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k) {
+
+  // переход к размерным параметрам
+  const Type S = int_scattering;
+  const Type alpha = cell.cell_data->alpha;
+  const Type betta = cell.cell_data->betta;
+
+  cell.illum_val.absorp_coef = alpha;
+  cell.illum_val.scat_coef = betta;
+
+  Type Q = B_Plank(cell.cell_data->T) / kRadiation;
+
+  k = alpha + betta;
+  return (alpha * Q + betta * S) / k;
 }
 
 #endif //! defined ILLUM && defined SOLVERS
