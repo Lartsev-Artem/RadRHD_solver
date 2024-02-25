@@ -185,6 +185,7 @@ void grid_t::InitFullPhysData() {
 
 #include "gas_state.h"
 #include "global_value.h"
+#ifdef ILLUM
 #ifdef SPECTRUM
 void full_phys_data_t::InitDirection(const Vector3 &dir) {
   cosf = 0;
@@ -210,3 +211,4 @@ void full_phys_data_t::Init(const flux_t *src) {
   alpha = exp(log_alpha);
   betta = (kSigma_thomson / kM_hydrogen * kDist) * val->d;
 }
+#endif

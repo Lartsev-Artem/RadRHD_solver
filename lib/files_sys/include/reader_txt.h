@@ -98,12 +98,12 @@ template <typename Str_Type, typename T>
 int ReadData(const Str_Type name_file, std::vector<T> &data) {
 
   std::ifstream ifile;
-  OPEN_FSTREAM(ifile, input_file.c_str());
+  OPEN_FSTREAM(ifile, name_file.c_str());
   int n = std::count(std::istreambuf_iterator<char>(ifile), std::istreambuf_iterator<char>(), '\n');
   ifile.close();
 
   data.resize(n);
-  OPEN_FSTREAM(ifile, input_file.c_str());
+  OPEN_FSTREAM(ifile, name_file.c_str());
   for (size_t i = 0; i < data.size(); i++) {
     ifile >> data[i];
   }

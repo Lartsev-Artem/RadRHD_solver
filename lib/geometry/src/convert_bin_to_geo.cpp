@@ -19,14 +19,14 @@ void ConvertBinToGeo(std::vector<IntId> &neighbours_id_faces,
       f.geo.n = normals[i / CELL_SIZE].n[i % CELL_SIZE];
       f.geo.S = areas_faces[i];
 
-      cells[i / CELL_SIZE].geo.sign_n[i % CELL_SIZE] = true;
+      cells[i / CELL_SIZE].geo.sign_n.set_sign(i % CELL_SIZE, true);
       cells[i / CELL_SIZE].geo.id_faces[i % CELL_SIZE] = cc;
 
       neighbours_id_faces[i] = -10;
       if (idx >= 0) {
         f.geo.id_r = idx / CELL_SIZE; //сосед
 
-        cells[idx / CELL_SIZE].geo.sign_n[idx % CELL_SIZE] = false;
+        cells[idx / CELL_SIZE].geo.sign_n.set_sign(idx % CELL_SIZE, false);
         cells[idx / CELL_SIZE].geo.id_faces[idx % CELL_SIZE] = cc;
 
         neighbours_id_faces[idx] = -10;

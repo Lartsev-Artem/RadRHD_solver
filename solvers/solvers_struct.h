@@ -105,6 +105,7 @@ struct face_t {
   face_t(){};
 };
 
+#pragma pack(push, 1)
 /**
  * @brief Геометрия ячейки
  *
@@ -114,8 +115,15 @@ struct geo_cell_t {
   struct bits_flag {
     uint8_t bits;
     bits_flag(const uint8_t a = 0) : bits(a) {}
-    bool operator[](int i) {
+    const bool operator[](int i) const {
       return CHECK_BIT(bits, i);
+    }
+    void set_sign(int idx, bool sign) {
+      if (sign) {
+        bits = SET_BIT(bits, idx);
+      } else {
+        bits = CLEAR_BIT(bits, idx);
+      }
     }
   };
 
@@ -129,6 +137,7 @@ struct geo_cell_t {
                  sign_n(0x7), node(0),
                  center(Vector3(0, 0, 0)) {}
 };
+#pragma pack(pop)
 
 /**
  * @brief структура определяющей ячейки для трассировки МКХ
@@ -219,7 +228,7 @@ union graph_pair_t {
   };
   uint32_t bits;
 };
-
+#ifdef ILLUM
 struct full_phys_data_t {
   const flux_t *val;
   Type T;
@@ -237,6 +246,7 @@ struct full_phys_data_t {
   full_phys_data_t() {}
   void Init(const flux_t *src);
 };
+#endif
 
 struct elem_t {
   flux_t phys_val;
