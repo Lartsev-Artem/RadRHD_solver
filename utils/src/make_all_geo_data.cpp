@@ -42,6 +42,8 @@ int FUNC_NAME(MakeAllGeoData)(int argc, char **argv) {
     RETURN_ERR("don't build geo format\n");
   }
 
+  fs::copy_file(files.name_file_vtk, files.base_address);
+
   return e_completion_success;
 }
 #endif

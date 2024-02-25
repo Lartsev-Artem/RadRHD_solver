@@ -67,15 +67,14 @@ int cuda::interface::separate_device::CalculateIntScatteringAsync(const grid_dir
 
     CudaSyncStream(stream);
 
-    CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + dispN, device_host_ptrN[id_dev].int_scattering, size, cudaMemcpyDeviceToHost, cuda_streams[e_cuda_scattering_2]);
+    CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + M_loc * dispN, device_host_ptrN[id_dev].int_scattering, size, cudaMemcpyDeviceToHost, cuda_streams[e_cuda_scattering_2]);
 
     {
       CudaSyncStream(e_cuda_params);
       CudaSyncStream(e_cuda_scattering_2);
 
-      // if (grid_dir.loc_shift == 0) ///\note с учётом mpi_rhllc на каждом узле считаем эти данные
-      {
-
+      /// \todo: правильный признак
+      if (grid.energy != nullptr) {
         cuda::interface::separate_device::CalculateAllParamAsync(0, it, grid_dir, grid, e_cuda_params);
       }
       CudaSyncStream(e_cuda_params);
@@ -119,6 +118,7 @@ int cuda::interface::separate_device::CalculateAllParamAsync(const int id_dev, c
 #ifndef ONLY_CUDA_SCATTERING
   const IdType N_loc = gpu_config.size_params[im_dev];
   const IdType host_disp = gpu_config.disp_params[im_dev];
+  // WRITE_LOG("N_loc=%ld,host_disp=%ld\n", N_loc, host_disp);
 
   CUDA_TREADS_1D(threads);
   CUDA_BLOCKS_1D(blocks, N_loc);

@@ -125,9 +125,18 @@ static int SetRHllcValueDefault(std::vector<elem_t> &cells) {
     }
 
 #elif GEOMETRY_TYPE == Sphere
-    el.phys_val.d = 0.1;
-    el.phys_val.p = 0.1;
-    el.phys_val.v = Vector3(0, 0, 0);
+    Vector3 x = centers[i];
+    // if (x.norm() < 0.2) {
+    //   el.phys_val.d = 0.1;
+    //   el.phys_val.p = 1;
+    //   el.phys_val.v = Vector3(0, 0, 0);
+    // } else
+    {
+      el.phys_val.d = 0.1;
+      el.phys_val.p = 0.1;
+      el.phys_val.v = Vector3(0, 0, 0);
+    }
+
 #else
     el.phys_val.d = 0.1;
     el.phys_val.p = 1;

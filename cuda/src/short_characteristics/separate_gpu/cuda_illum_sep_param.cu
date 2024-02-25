@@ -80,8 +80,11 @@ __device__ void cuda_sep::device::MakeImpuls(const geo::grid_directions_device_t
 __global__ void cuda_sep::kernel::MakeIllumParam(const cuda::geo::grid_directions_device_t *dir, cuda::geo::grid_device_t *grid, IdType size_params, IdType shift_params) {
   // эти функции можно объденить в одну. Тогда будет одно общее обращение в память к illum
 
+#ifdef SINGLE_GPU
   grid->loc_size_params = size_params;
   grid->shift_params = shift_params;
+  grid->shift_gpu = shift_params;
+#endif
 
   cuda_sep::device::MakeEnergy(dir, grid);
   cuda_sep::device::MakeStream(dir, grid);

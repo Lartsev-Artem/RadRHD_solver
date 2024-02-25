@@ -419,6 +419,9 @@ Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Typ
       betta = 5;
     }
     k = alpha + betta;
+    cell.illum_val.absorp_coef = alpha;
+    cell.illum_val.scat_coef = betta;
+
     return (alpha * Q + betta * S) / k;
 #endif
 #if GEOMETRY_TYPE == Cone

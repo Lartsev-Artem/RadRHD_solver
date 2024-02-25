@@ -69,7 +69,6 @@ int rad_rhd::RunRadRHDModule() {
     WRITE_LOG("Init mpi device\n");
 
     illum::separate_gpu::InitSender(MPI_COMM_WORLD, grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
-    WRITE_LOG("Init mpi sender\n");
 
     //перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
     if (files_sys::bin::ReadRadiationFaceTrace(grid_direction.size, glb_files, vec_x0, sorted_graph, sorted_id_bound_face, inner_bound_code))
@@ -102,7 +101,7 @@ int rad_rhd::RunRadRHDModule() {
     }
 
     // send_all
-    MPI_Bcast(&grid.cells, grid.cells.size(), MPI_phys_val_t, e_hllc_id, MPI_COMM_WORLD);
+    MPI_Bcast(grid.cells.data(), grid.cells.size(), MPI_phys_val_t, e_hllc_id, MPI_COMM_WORLD);
 
     illum::separate_gpu::CalculateIllum(grid_direction, inner_bound_code, vec_x0, sorted_graph, sorted_id_bound_face, grid);
 
@@ -154,9 +153,7 @@ int rad_rhd::RunRadRHDModule() {
 
   MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
-  if (get_mpi_id() == 0) {
-    files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
-  }
+  DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 
   cuda_sep::ClearDevice();
   cuda_sep::ClearHost(grid);

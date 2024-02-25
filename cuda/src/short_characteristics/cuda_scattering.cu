@@ -100,7 +100,7 @@ __global__ void cuda::kernel::GetS_MPI_multi_device(const geo::grid_directions_d
   }
 
   grid->int_scattering[i * grid->local_scattering_size + k] = scatter / dir->full_area;
-  // grid->int_scattering[k * N + i] = scatter / dir->full_area;
+  // grid->int_scattering[k * size_loc + i] = scatter / dir->full_area;
 }
 
 #endif //! USE_CUDA

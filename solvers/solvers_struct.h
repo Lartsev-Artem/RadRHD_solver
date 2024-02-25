@@ -105,7 +105,7 @@ struct face_t {
   face_t(){};
 };
 
-#pragma pack(push, 1)
+// #pragma pack(push, 1)
 /**
  * @brief Геометрия ячейки
  *
@@ -137,7 +137,7 @@ struct geo_cell_t {
                  sign_n(0x7), node(0),
                  center(Vector3(0, 0, 0)) {}
 };
-#pragma pack(pop)
+// #pragma pack(pop)
 
 /**
  * @brief структура определяющей ячейки для трассировки МКХ
@@ -292,6 +292,8 @@ struct grid_t {
   std::vector<face_t> faces;
 #ifdef USE_MPI
   mpi_hllc_t *mpi_cfg;                              ///< конфиг mpi структуры
+#else
+  uint32_t *foo;                                              ///< заглушка под cuda
 #endif
 
 #ifndef TRANSFER_CELL_TO_FACE
@@ -307,12 +309,6 @@ struct grid_t {
 #ifdef SPECTRUM
   IdType size_frq;
   std::vector<Type> spectrum;
-#endif
-
-#ifdef SEPARATE_GPU
-  const int loc_illum_size = 10;
-  int loc_illum_wptr = 0;
-  int loc_illum_rptr = 0;
 #endif
 
   Type *Illum;

@@ -15,7 +15,12 @@ int main(int argc, char *argv[]) {
   if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
     return e_completion_fail;
 
-  rad_rhd::RadRHD_ConstRadStateTest();
+  // volatile int i = 0;
+  // while (i == 0)
+  //   sleep(1);
+
+  // rad_rhd::RadRHD_ConstRadStateTest();
+  rad_rhd::RunRadRHDModule();
 
   MPI_END;
 #else
