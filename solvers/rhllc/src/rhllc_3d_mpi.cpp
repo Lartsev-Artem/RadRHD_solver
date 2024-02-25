@@ -34,9 +34,12 @@ void rhllc_mpi::SyncAndCalcPhysCast(grid_t &grid) {
     int start = grid.mpi_cfg->disp_cells[idx];
     int end = start + grid.mpi_cfg->send_cells[idx];
 
-#pragma omp parallel default(none) firstprivate(start, end) shared(grid) for
-    for (int i = start; i < end; i++) {
-      grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
+#pragma omp parallel default(none) firstprivate(start, end) shared(grid)
+    {
+#pragma omp for
+      for (int i = start; i < end; i++) {
+        grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
+      }
     }
 
     MPI_Waitany(grid.mpi_cfg->requests_cast_phys.size(), grid.mpi_cfg->requests_cast_phys.data(), &idx, MPI_STATUSES_IGNORE);
@@ -131,6 +134,7 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
 }
 
 void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
+
   rhllc::max_signal_speed = 0;
   MPI_Request rq_max_speed = MPI_REQUEST_NULL;
   int myid = get_mpi_id();
@@ -173,14 +177,16 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
         rhllc::max_signal_speed = std::max(rhllc::max_signal_speed, max_speed);
       }
     }
+  }
+  // ищем максимум по всем узлам
+  //#pragma omp master
+  {
+    Type max_speed = rhllc::max_signal_speed;
+    MPI_Iallreduce(&max_speed, &rhllc::max_signal_speed, 1, MPI_DOUBLE, MPI_MAX, grid.mpi_cfg->comm, &rq_max_speed);
+  }
 
-// ищем максимум по всем узлам
-#pragma omp master
-    {
-      max_speed = rhllc::max_signal_speed;
-      MPI_Iallreduce(&max_speed, &rhllc::max_signal_speed, 1, MPI_DOUBLE, MPI_MAX, grid.mpi_cfg->comm, &rq_max_speed);
-    }
-
+#pragma omp parallel default(none) firstprivate(tau, myid) shared(grid, glb_files, rhllc::max_signal_speed, rq_max_speed)
+  {
     int start = grid.mpi_cfg->disp_cells[myid];
     int end = start + grid.mpi_cfg->send_cells[myid];
 
@@ -229,10 +235,10 @@ void rhllc_mpi::AddRadFlux(grid_t &grid) {
   int start = grid.mpi_cfg->disp_cells[myid];
   int end = start + grid.mpi_cfg->send_cells[myid];
 
-#pragma omp parallel default(none) firstprivate(start, end) shared(grid)
+  constexpr Type ds = 1.0;
+  Type tau = ds * _hllc_cfg.tau;
+#pragma omp parallel default(none) firstprivate(start, end, tau) shared(grid)
   {
-    constexpr Type ds = 1.0;
-    Type tau = ds * _hllc_cfg.tau;
 
 #pragma omp for
     for (int cell = start; cell < end; cell++) {

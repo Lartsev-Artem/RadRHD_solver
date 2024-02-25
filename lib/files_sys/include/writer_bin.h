@@ -171,7 +171,7 @@ int WriteSimpleMPI(const std::string &file, const Tidx n, const T *data, const T
     MPI_File_close(&fh);
     return e_completion_success;
   }
-  WRITE_LOG("no data for %s\n", std::string(name_file).c_str());
+  WRITE_LOG("no data for %s\n", std::string(file).c_str());
   return e_completion_fail;
 }
 

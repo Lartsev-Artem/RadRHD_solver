@@ -31,7 +31,7 @@
 
 namespace cuda_sep = cuda::interface::separate_device;
 
-int rad_rhd::RunRadRHDMpiModule() {
+int rad_rhd::RunRadRHDModule() {
 
   WRITE_LOG("Start RunRadRHDMpiModule()\n");
 

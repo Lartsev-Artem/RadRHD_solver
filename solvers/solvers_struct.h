@@ -115,7 +115,7 @@ struct geo_cell_t {
   struct bits_flag {
     uint8_t bits;
     bits_flag(const uint8_t a = 0) : bits(a) {}
-    const bool operator[](int i) const {
+    bool operator[](int i) const {
       return CHECK_BIT(bits, i);
     }
     void set_sign(int idx, bool sign) {

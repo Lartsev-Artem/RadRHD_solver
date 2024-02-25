@@ -42,8 +42,8 @@ void cuda::InitGridOnDevice(const grid_t &grid_host,
   mem::CpyToDevice(&grid_device->local_scattering_size, &loc_size_dir, sizeof(loc_size_dir)); // копируем локальное количество направлений
   mem::CpyToDevice(&grid_device->local_scattering_disp, &start_dir, sizeof(start_dir));       // копируем начальное направление
 
-  mem::CpyToDevice(&grid_device->loc_size, &num_cell_loc, sizeof(num_cell_loc));  // копируем локальный размер сетки
-  mem::CpyToDevice(&grid_device->shift, &cell_loc_shift, sizeof(cell_loc_shift)); // копируем начало локальной сетки
+  mem::CpyToDevice(&grid_device->loc_size_params, &num_cell_loc, sizeof(num_cell_loc));  // копируем локальный размер сетки
+  mem::CpyToDevice(&grid_device->shift_params, &cell_loc_shift, sizeof(cell_loc_shift)); // копируем начало локальной сетки
 
   //излучение
   mem::Malloc((CELL_SIZE * size_dir * size_grid * sizeof(Type)), &device_host_ptr.illum);       //память на массив излучения внутри структуры сетки

@@ -140,6 +140,9 @@ namespace separate_gpu {
  * @return возвращает норму ошибки на текущей итерации
  */
 Type ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp = 0);
+
+//! @brief Оптимизированная версия
+Type ReCalcIllumOpt(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp = 0);
 } // namespace separate_gpu
 
 /**

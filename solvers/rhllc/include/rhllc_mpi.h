@@ -8,7 +8,7 @@
 #if !defined RHLLC_MPI_H && defined SOLVERS && defined USE_MPI
 #define RHLLC_MPI_H
 
-#include "mpi-ext.h"
+#include "mpi_ext.h"
 #include "solvers_struct.h"
 
 /*! \addtogroup rhllc Модуль расчета газовой динамики в релятивистской постановке

@@ -20,6 +20,7 @@ namespace rad_rhd {
 
 int RadRHD_ConstRadStateTest();
 int RunRadRHDMpiModule();
+int RunRadRHDModule();
 } // namespace rad_rhd
 
 #endif //! RADRHD_MAIN_H

@@ -322,6 +322,55 @@ Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Ty
 
   return norm;
 }
+
+// 0-чтение, 0-сразу выкинуть из кэша
+#define PREFETCH_FACE_COEF(_cell_id)                                           \
+  __builtin_prefetch(&inter_coef[grid.cells[_cell_id].geo.id_faces[0]], 0, 0); \
+  __builtin_prefetch(&inter_coef[grid.cells[_cell_id].geo.id_faces[1]], 0, 0); \
+  __builtin_prefetch(&inter_coef[grid.cells[_cell_id].geo.id_faces[2]], 0, 0); \
+  __builtin_prefetch(&inter_coef[grid.cells[_cell_id].geo.id_faces[3]], 0, 0);
+
+Type illum::separate_gpu::ReCalcIllumOpt(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp) {
+  Type norm = -1;
+  const IdType shift_dir = num_dir + dir_disp;
+
+  PREFETCH_FACE_COEF(0);
+
+  for (size_t cell = 0; cell < grid.size - 1; cell++) {
+
+    PREFETCH_FACE_COEF(cell + 1);
+    const IdType id = cell * grid.size_dir + shift_dir;
+    __builtin_prefetch(&grid.Illum[id], 1, 0);
+
+    Type curI = 0;
+#pragma loop unroll(CELL_SIZE)
+    for (size_t j = 0; j < CELL_SIZE; j++) {
+      curI += inter_coef[grid.cells[cell].geo.id_faces[j]];
+    }
+    curI /= CELL_SIZE;
+
+    norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
+    grid.Illum[id] = curI;
+  }
+
+  //последняя итерация
+  {
+    const size_t cell = grid.size - 1;
+    const IdType id = cell * grid.size_dir + shift_dir;
+    __builtin_prefetch(&grid.Illum[id], 1, 0);
+    Type curI = 0;
+#pragma loop unroll(CELL_SIZE)
+    for (size_t j = 0; j < CELL_SIZE; j++) {
+      curI += inter_coef[grid.cells[cell].geo.id_faces[j]];
+    }
+    curI /= CELL_SIZE;
+
+    norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
+    grid.Illum[id] = curI;
+  }
+
+  return norm;
+}
 #endif
 
 #pragma GCC target("avx2")

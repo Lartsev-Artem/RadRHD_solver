@@ -110,7 +110,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
         }
         /*---------------------------------- конец FOR по ячейкам----------------------------------*/
 
-        loc_norm = separate_gpu::ReCalcIllum(num_direction, *inter_coef, grid, local_disp);
+        loc_norm = separate_gpu::ReCalcIllumOpt(num_direction, *inter_coef, grid, local_disp);
 
 #pragma omp critical
         {
