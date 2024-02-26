@@ -221,6 +221,25 @@ int RebuildImageBinToVtk(int argc, char *argv[]);
  * @return int ::e_type_completion
  */
 int GetSphereDirection(int argc, char **argv);
+
+/**
+ * @brief Записывает входной файл для metis
+ *
+ * @param[in] argc кол-во аргументов (требуется 3)
+ * @param[in] argv массив char** содержит {файл netgen, выходной файл, size}
+ * @return int ::e_type_completion
+ */
+int NetgenToMetis(int argc, char **argv);
+
+/**
+ * @brief Записывает входной файл для metis
+ *
+ * @param[in] argc кол-во аргументов (требуется 2)
+ * @param[in] argv массив char** содержит {файл netgen, выходной файл}
+ * @return int ::e_type_completion
+ */
+int NetgenMeshToMetis(int argc, char **argv);
+
 #endif
 
 } // namespace utils

@@ -16,7 +16,8 @@ int main(int argc, char *argv[]) {
     return e_completion_fail;
 
   // rad_rhd::RadRHD_ConstRadStateTest();
-  rad_rhd::RunRadRHDModule();
+  // rad_rhd::RunRadRHDModule();
+  rad_rhd::RunRadRHDMpiModule();
 
   MPI_END;
 #else

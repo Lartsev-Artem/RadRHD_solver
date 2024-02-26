@@ -135,7 +135,7 @@ int WriteSolution(const std::string &main_dir, const grid_t &grid);
  * @param[in] grid сетка
  * @return int  ::e_type_completion
  */
-int WriteFileSolutionMPI(const std::string &main_dir, const grid_t &grid);
+int WriteSolutionMPI(const std::string &main_dir, const grid_t &grid);
 
 /**
  * @brief Запись распределённого по узлам линейного массива размера n в файл

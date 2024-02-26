@@ -67,7 +67,10 @@ int rad_rhd::RunRadRHDMpiModule() {
     DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
 
     std::vector<int> metis;
-    files_sys::txt::ReadData(glb_files.base_address + F_SEPARATE_METIS(np), metis);
+    if (files_sys::txt::ReadData(glb_files.base_address + F_SEPARATE_METIS(np), metis)) {
+      RETURN_ERR("Error reading metis \n");
+    }
+
     grid.mpi_cfg = new mpi_hllc_t;
     rhllc_mpi::InitMpiConfig(metis, grid, grid.mpi_cfg);
     metis.clear();
@@ -90,7 +93,7 @@ int rad_rhd::RunRadRHDMpiModule() {
   Type t = 0.0;
   Type cur_timer = 0;
   int res_count = _solve_mode.start_point;
-  files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid); // начальное сохранение
+  files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid); // начальное сохранение
 
   Timer timer;
 
@@ -115,15 +118,16 @@ int rad_rhd::RunRadRHDMpiModule() {
 
     rhllc_mpi::HllcConvToPhys(grid);
 
+    t += _hllc_cfg.tau;
+    cur_timer += _hllc_cfg.tau;
+
     if (cur_timer >= _hllc_cfg.save_timer) {
-      DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
+      DIE_IF(files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 
       WRITE_LOG("t= %lf, time_step= %d\n", t, res_count);
       cur_timer = 0;
     }
 
-    t += _hllc_cfg.tau;
-    cur_timer += _hllc_cfg.tau;
     _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg, grid.cells);
 
     WRITE_LOG("it= %lf, time_step=%lf\n", t, timer.get_delta_time_sec());
@@ -144,9 +148,7 @@ int rad_rhd::RunRadRHDMpiModule() {
 
   MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
-  if (get_mpi_id() == 0) {
-    files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
-  }
+  DIE_IF(files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 
   cuda_sep::ClearDevice();
   cuda_sep::ClearHost(grid);

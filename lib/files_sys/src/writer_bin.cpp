@@ -82,7 +82,7 @@ int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &gri
 
 #ifdef USE_MPI
 
-int files_sys::bin::WriteFileSolutionMPI(const std::string &main_dir, const grid_t &grid) {
+int files_sys::bin::WriteSolutionMPI(const std::string &main_dir, const grid_t &grid) {
 
   int myid = get_mpi_id();
   IdType left = grid.mpi_cfg->disp_cells[myid];

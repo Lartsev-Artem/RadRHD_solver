@@ -110,5 +110,5 @@ constexpr double kInternalRadius = 0.12; ///< радиус внутренней 
 
 #define F_COOLING_FUNC "rcf_H.dat"
 
-#define F_SEPARATE_METIS(np) ((std::string("nodes_m_epart_") + std::to_string(np) + ".txt").c_str())
+#define F_SEPARATE_METIS(np) ((std::string("metis_") + std::to_string(np)).c_str())
 #endif //! GLOBAL_VALUE

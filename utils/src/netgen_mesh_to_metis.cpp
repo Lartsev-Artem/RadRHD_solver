@@ -3,11 +3,11 @@
 
 #include "geo_types.h"
 #include "read_netgen.h"
-#include "write_file_vtk.h"
+#include "write_metis.h"
 
 #include <vector>
 
-int FUNC_NAME(ReBuildNetgenMeshToVTK)(int argc, char *argv[]) {
+int FUNC_NAME(NetgenMeshToMetis)(int argc, char *argv[]) {
   std::string name_file_in = "";
   std::string name_file_out = "";
 
@@ -22,7 +22,7 @@ int FUNC_NAME(ReBuildNetgenMeshToVTK)(int argc, char *argv[]) {
   std::vector<Eigen::Vector4i> cell;
 
   utils::ReadNetgenMeshGrid(name_file_in, point, cell);
-  utils::WriteVtkFile(name_file_out, point, cell, 3);
+  utils::WriteMetis(name_file_out, cell, 3);
 
   return e_completion_success;
 }
