@@ -53,8 +53,8 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
     const IdType count_directions = grid_direction.size;
 
-    // #pragma omp parallel default(none) firstprivate(count_directions, myid, np, local_disp, local_size) \
-//     shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1)
+#pragma omp parallel default(none) firstprivate(count_directions, myid, np, local_disp, local_size) \
+    shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1)
     {
 
       const int count_th = omp_get_num_threads();
@@ -64,6 +64,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 
       Type loc_norm = -1;
       std::vector<Type> *inter_coef = &grid.inter_coef_all[omp_get_thread_num()]; ///< указатель на коэффициенты интерполяции по локальному для потока направлению
+      alignas(32) Type I0[4];
 
 #pragma omp single // nowait
       {
@@ -89,23 +90,39 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
         const Type *s = vec_x0[num_direction].s.data();
         const face_loc_id_t *in_face = vec_x0[num_direction].in_face_id.data();
         /*---------------------------------- далее FOR по неосвященным граням----------------------------------*/
-        for (auto fc_pair : sorted_graph[num_direction]) {
+        // for (auto fc_pair : sorted_graph[num_direction])
+        const graph_pair_t *fc_pair = sorted_graph[num_direction].data();
+        const IdType Ncells = sorted_graph[num_direction].size();
+        for (IdType i = 0; i < Ncells; i++) {
 
-          const IntId num_cell = fc_pair.cell;
-          const uint32_t num_loc_face = fc_pair.loc_face;
+          const IntId num_cell = fc_pair->cell;
+          const uint32_t num_loc_face = fc_pair->loc_face;
+
+          __builtin_prefetch(&(grid.scattering[num_cell * local_size + num_direction]), 0, 0);
+
           elem_t *cell = &grid.cells[num_cell];
           const Vector3 &x = cell->geo.center; // vec_x[num_cell].x[num_loc_face][num_node];
-          const Type S = grid.scattering[num_cell * local_size + num_direction];
-          // const Type S = grid.scattering[num_direction * count_cells + num_cell];
-          Type k;
-          const Type rhs = GetRhsOpt(x, S, *cell, k);
+
           const face_loc_id_t id_in_faces = *(in_face);
           ++in_face;
-          alignas(32) Type I0[4] =
-              {(*inter_coef)[cell->geo.id_faces[id_in_faces.a]],
-               (*inter_coef)[cell->geo.id_faces[id_in_faces.b]],
-               (*inter_coef)[cell->geo.id_faces[id_in_faces.c]],
-               0};
+
+          __builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[id_in_faces.a]]), 0, 0);
+          __builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[id_in_faces.b]]), 0, 0);
+          __builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[id_in_faces.c]]), 0, 0);
+          __builtin_prefetch(I0, 1, 1);
+          Type k;
+          const Type S = grid.scattering[num_cell * local_size + num_direction];
+          const Type rhs = GetRhsOpt(x, S, *cell, k);
+
+          I0[0] = (*inter_coef)[cell->geo.id_faces[id_in_faces.a]];
+          I0[1] = (*inter_coef)[cell->geo.id_faces[id_in_faces.b]];
+          I0[2] = (*inter_coef)[cell->geo.id_faces[id_in_faces.c]];
+
+          __builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[num_loc_face]]), 1, 0);
+
+          ++fc_pair;
+          __builtin_prefetch(&(grid.cells[fc_pair->cell]), 1, 2); //грузим следующую ячейку
+
           (*inter_coef)[cell->geo.id_faces[num_loc_face]] = GetIllum(I0, s, k, rhs);
           s += NODE_SIZE;
         }
