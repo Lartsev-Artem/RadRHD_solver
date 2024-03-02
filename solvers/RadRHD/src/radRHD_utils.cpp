@@ -149,7 +149,7 @@ void rad_rhd::GetRadSourceOpt(const int loc_cell_id, const elem_t &cell, const g
 
   /*-- Compute some useful quantities --*/
   Type rhogamma = rho * gamma;
-  Type q = -abs_op * rho * B_Plank(cell.cell_data->T);
+  Type q = -abs_op * rho * B_Plank(cell.cell_data->T) / kRadiation;
 
   /*-- Compute source function in the Eulerian frame --*/
   G[0] = q * gamma + rhogamma * (abs_op - scat_op * (u2 + uuD)) * Ur - rho * (abs_op - scat_op * (u2 + gamma2)) * uF;

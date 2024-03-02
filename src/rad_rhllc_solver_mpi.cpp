@@ -15,12 +15,11 @@ int main(int argc, char *argv[]) {
   if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
     return e_completion_fail;
 
-  // rad_rhd::RadRHD_ConstRadStateTest();
-  rad_rhd::RunRadRHDModule();
+  rad_rhd::RunRadRHDMpiModule();
 
   MPI_END;
 #else
-  WRITE_LOG_ERR("the rhllc solver is not included in the build. Use define RHLLC and SOLVER, SEPARATE_GPU\n");
+  WRITE_LOG_ERR("the rhllc solver is not included in the build. Use define RHLLC and SOLVER,SEPARATE_GPU\n");
   return 1;
 #endif
   return 0;

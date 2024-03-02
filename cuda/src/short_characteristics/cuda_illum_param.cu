@@ -16,8 +16,8 @@
   }
 
 __device__ void cuda::device::MakeEnergy(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
-  const IdType N = grid->loc_size;
-  const IdType shift = grid->shift;
+  const IdType N = grid->loc_size_params;
+  const IdType shift = grid->shift_params;
   const IdType i = blockIdx.x * blockDim.x + threadIdx.x;
 
   if (i >= N)
@@ -29,8 +29,8 @@ __device__ void cuda::device::MakeEnergy(const geo::grid_directions_device_t *di
 
 __device__ void cuda::device::MakeDivStream(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
   //  const int M = dir->size;
-  const IdType N = grid->loc_size;
-  const IdType shift = grid->shift;
+  const IdType N = grid->loc_size_params;
+  const IdType shift = grid->shift_params;
 
   IdType i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -61,8 +61,8 @@ __device__ void cuda::device::MakeDivStream(const geo::grid_directions_device_t 
 
 __device__ void cuda::device::MakeDivImpuls(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
   // const int M = dir->size;
-  const IdType N = grid->loc_size;
-  const IdType shift = grid->shift;
+  const IdType N = grid->loc_size_params;
+  const IdType shift = grid->shift_params;
 
   const IdType i = blockIdx.x * blockDim.x + threadIdx.x;
   if (i >= N)

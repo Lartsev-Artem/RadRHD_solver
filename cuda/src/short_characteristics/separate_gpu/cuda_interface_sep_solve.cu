@@ -112,21 +112,34 @@ int cuda::interface::separate_device::CalculateIntScatteringAsync(const grid_dir
 }
 #endif
 
+static inline IdType get_host_disp(const int id_dev, const grid_t &grid, const cuda::multi_gpu_config_t &cfg) {
+
+  if (cfg.disp[id_dev] > grid.loc_shift) {
+    return cfg.disp[id_dev] - grid.loc_shift;
+  }
+  return 0;
+}
 int cuda::interface::separate_device::CalculateAllParamAsync(const int id_dev, const int im_dev, const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
 
 #ifdef ON_FULL_ILLUM_ARRAYS
 #ifndef ONLY_CUDA_SCATTERING
+
   const IdType N_loc = gpu_config.size_params[im_dev];
-  const IdType host_disp = gpu_config.disp_params[im_dev];
-  // WRITE_LOG("N_loc=%ld,host_disp=%ld\n", N_loc, host_disp);
+  if (N_loc == 0) {
+    return e_completion_success; //это видеокарта ничего не считает
+  }
+
+  IdType gpu_disp = gpu_config.disp_params[im_dev];
 
   CUDA_TREADS_1D(threads);
   CUDA_BLOCKS_1D(blocks, N_loc);
 
-  cuda::separate_device::kernel::MakeIllumParam<<<blocks, threads, 0, cuda_streams[st]>>>(grid_dir_deviceN[id_dev], grid_deviceN[id_dev], N_loc, host_disp);
+  cuda::separate_device::kernel::MakeIllumParam<<<blocks, threads, 0, cuda_streams[st]>>>(grid_dir_deviceN[id_dev], grid_deviceN[id_dev], N_loc, gpu_disp);
 
   CUDA_CALL_FUNC(cudaGetLastError);
 
+  IdType host_disp = get_host_disp(im_dev, grid, gpu_config); // gpu_config.disp_params[im_dev];
+  log_sep_cuda("dev[%d]N_loc=%ld,gpu_disp=%ld,host_disp=%ld\n", im_dev, N_loc, gpu_disp, host_disp);
   CUDA_CALL_FUNC(cudaMemcpyAsync, grid.energy + host_disp, device_host_ptrN[id_dev].energy, N_loc * sizeof(grid.energy[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
   CUDA_CALL_FUNC(cudaMemcpyAsync, grid.stream + host_disp, device_host_ptrN[id_dev].stream, N_loc * sizeof(grid.stream[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);
   CUDA_CALL_FUNC(cudaMemcpyAsync, grid.impuls + host_disp, device_host_ptrN[id_dev].impuls, N_loc * sizeof(grid.impuls[0]), cudaMemcpyDeviceToHost, cuda_streams[st]);

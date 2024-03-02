@@ -10,6 +10,16 @@
 #include "geo_types.h"
 #include "solvers_struct.h"
 
+#ifdef DEBUG
+//#define LOG_SEP_CUDA
+#endif
+
+#ifdef LOG_SEP_CUDA
+#define log_sep_cuda(...) WRITE_LOG(__VA_ARGS__)
+#else
+#define log_sep_cuda(...)
+#endif
+
 /*! \addtogroup cuda Модуль расчёта излучения на видеокарте
     \details Модуль включает копию cpu геометрии и функции расчёта интегралов рассеяния на видеокарте.
     А также величин зависящих от излучения (потоки, импульсы)

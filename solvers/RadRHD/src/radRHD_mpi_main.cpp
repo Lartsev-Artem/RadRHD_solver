@@ -83,7 +83,6 @@ int rad_rhd::RunRadRHDMpiModule() {
     WRITE_LOG("Init mpi device\n");
 
     illum::separate_gpu::InitSender(MPI_COMM_WORLD, grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
-    WRITE_LOG("Init mpi sender\n");
 
     //перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
     if (files_sys::bin::ReadRadiationFaceTrace(grid_direction.size, glb_files, vec_x0, sorted_graph, sorted_id_bound_face, inner_bound_code))
@@ -113,11 +112,8 @@ int rad_rhd::RunRadRHDMpiModule() {
 
     cuda::interface::CudaSyncStream(cuda::e_cuda_params);
     cuda::interface::CudaWait();
-    D_L;
     rhllc_mpi::AddRadFlux(grid);
-    D_L;
     rhllc_mpi::HllcConvToPhys(grid);
-    D_L;
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
 

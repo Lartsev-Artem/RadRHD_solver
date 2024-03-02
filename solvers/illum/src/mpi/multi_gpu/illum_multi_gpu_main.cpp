@@ -40,6 +40,7 @@ int illum::RunIllumMultiGpuModule() {
   }
 
   grid.InitMemory(grid.cells.size(), grid_direction);
+  grid.InitFullPhysData();
 
   if (illum::InitRadiationState(glb_files.base_address, grid)) {
     DIE_IF(_solve_mode.class_vtk == e_grid_cfg_radiation); //в иных случаях допускает пропуск инициализации
@@ -56,6 +57,13 @@ int illum::RunIllumMultiGpuModule() {
   //перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
   if (files_sys::bin::ReadRadiationFaceTrace(grid_direction.size, glb_files, vec_x0, sorted_graph, sorted_id_bound_face, inner_bound_code))
     RETURN_ERR("Error reading trace part\n");
+
+#pragma omp parallel for
+  for (int i = 0; i < grid.size; i++) {
+    grid.cells[i].cell_data->alpha = 1;
+    grid.cells[i].cell_data->betta = 0.5;
+    grid.cells[i].cell_data->T = 1e7;
+  }
 
   MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
@@ -76,8 +84,10 @@ int illum::RunIllumMultiGpuModule() {
   MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
   if (get_mpi_id() == 0) {
+    // files_sys::bin::WriteSimple(glb_files.solve_address + "scat.bin", grid.size, grid.scattering);
     files_sys::bin::WriteSolution(glb_files.solve_address + "0", grid);
   }
+  // files_sys::bin::WriteSimple(glb_files.solve_address + "FullIllum" + std::to_string(get_mpi_id()) + "bin", grid.size * grid_direction.size, grid.Illum);
 
   cuda_sep::ClearDevice();
   cuda_sep::ClearHost(grid);

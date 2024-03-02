@@ -56,6 +56,7 @@ int illum::RunIllumFacesModule() {
   cpu::CalculateIllumFace(grid_direction, inner_bound_code,
                           vec_x0, sorted_graph, sorted_id_bound_face, grid);
 
+  // files_sys::bin::WriteSimple(glb_files.solve_address + "scat.bin", grid.size, grid.scattering);
   cpu::CalculateIllumParam(grid_direction, grid);
 
 #ifdef USE_CUDA

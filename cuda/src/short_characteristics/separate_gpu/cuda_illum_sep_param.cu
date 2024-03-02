@@ -14,10 +14,7 @@ __device__ void cuda_sep::device::MakeEnergy(const geo::grid_directions_device_t
   if (i >= N)
     return;
 
-  IdType Illum_shift = 0;
-  if (grid->shift_params > grid->shift_gpu) {
-    Illum_shift = grid->shift_params - grid->shift_gpu;
-  }
+  IdType Illum_shift = grid->shift_params; // откуда начинаются данные
 
   Type sum = 0;
   for (IdType k = 0; k < M; k++) {
@@ -35,10 +32,7 @@ __device__ void cuda_sep::device::MakeStream(const geo::grid_directions_device_t
   if (i >= N)
     return;
 
-  IdType Illum_shift = 0;
-  if (grid->shift_params > grid->shift_gpu) {
-    Illum_shift = grid->shift_params - grid->shift_gpu;
-  }
+  IdType Illum_shift = grid->shift_params; // откуда начинаются данные
 
   Vector3 stream = Vector3::Zero();
   const Type *I = grid->illum + M * (i + Illum_shift);
@@ -51,16 +45,13 @@ __device__ void cuda_sep::device::MakeStream(const geo::grid_directions_device_t
 
 __device__ void cuda_sep::device::MakeImpuls(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid) {
   const IdType cell = blockIdx.x * blockDim.x + threadIdx.x;
-  const IdType N = grid->loc_size_params;
+  const IdType N = grid->loc_size_params; //сколько хотим посчитать
   const IdType M = dir->size;
 
   if (cell >= N)
     return;
 
-  IdType Illum_shift = 0;
-  if (grid->shift_params > grid->shift_gpu) {
-    Illum_shift = grid->shift_params - grid->shift_gpu;
-  }
+  IdType Illum_shift = grid->shift_params; // откуда начинаются данные
 
   Matrix3 impuls = Matrix3::Zero();
   const Type *illum = grid->illum + M * (cell + Illum_shift);
@@ -83,7 +74,6 @@ __global__ void cuda_sep::kernel::MakeIllumParam(const cuda::geo::grid_direction
 #ifdef SINGLE_GPU
   grid->loc_size_params = size_params;
   grid->shift_params = shift_params;
-  grid->shift_gpu = shift_params;
 #endif
 
   cuda_sep::device::MakeEnergy(dir, grid);

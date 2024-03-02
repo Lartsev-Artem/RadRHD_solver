@@ -14,6 +14,8 @@
 namespace tick = std::chrono;
 namespace cuda_sep = cuda::interface::separate_device;
 
+#define builtin_prefetch(...) __builtin_prefetch(__VA_ARGS__)
+
 int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
                                         const std::vector<std::vector<IntId>> &inner_bound_code,
                                         const std::vector<align_cell_local> &vec_x0,
@@ -98,7 +100,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           const IntId num_cell = fc_pair->cell;
           const uint32_t num_loc_face = fc_pair->loc_face;
 
-          __builtin_prefetch(&(grid.scattering[num_cell * local_size + num_direction]), 0, 0);
+          builtin_prefetch(&(grid.scattering[num_cell * local_size + num_direction]), 0, 0);
 
           elem_t *cell = &grid.cells[num_cell];
           const Vector3 &x = cell->geo.center; // vec_x[num_cell].x[num_loc_face][num_node];
@@ -106,10 +108,10 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           const face_loc_id_t id_in_faces = *(in_face);
           ++in_face;
 
-          __builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[id_in_faces.a]]), 0, 0);
-          __builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[id_in_faces.b]]), 0, 0);
-          __builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[id_in_faces.c]]), 0, 0);
-          __builtin_prefetch(I0, 1, 1);
+          builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[id_in_faces.a]]), 0, 0);
+          builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[id_in_faces.b]]), 0, 0);
+          builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[id_in_faces.c]]), 0, 0);
+          builtin_prefetch(I0, 1, 1);
           Type k;
           const Type S = grid.scattering[num_cell * local_size + num_direction];
           const Type rhs = GetRhsOpt(x, S, *cell, k);
@@ -118,10 +120,10 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           I0[1] = (*inter_coef)[cell->geo.id_faces[id_in_faces.b]];
           I0[2] = (*inter_coef)[cell->geo.id_faces[id_in_faces.c]];
 
-          __builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[num_loc_face]]), 1, 0);
+          builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[num_loc_face]]), 1, 0);
 
           ++fc_pair;
-          __builtin_prefetch(&(grid.cells[fc_pair->cell]), 1, 2); //грузим следующую ячейку
+          builtin_prefetch(&(grid.cells[fc_pair->cell]), 1, 2); //грузим следующую ячейку
 
           (*inter_coef)[cell->geo.id_faces[num_loc_face]] = GetIllum(I0, s, k, rhs);
           s += NODE_SIZE;

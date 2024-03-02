@@ -81,6 +81,7 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
   SetShifts(metis_id, hllc_st);
 
   grid.loc_size = hllc_st->send_cells[myid]; //это приведет к правкам на видеокарте(возможно это уже учтено. Надо проверить)
+  grid.loc_shift = hllc_st->disp_cells[myid];
 
   hllc_st->id_irregular_faces.clear();
   hllc_st->requests_send_faces.clear();
@@ -89,13 +90,6 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
 
   for (int id_cell = 0; id_cell < grid.size; id_cell++) {
     grid.cells[id_cell].geo.node = metis_id[id_cell];
-
-    if (metis_id[id_cell] != myid) {
-      grid.cells[id_cell].phys_val.d = -1;
-      grid.cells[id_cell].phys_val.p = -1;
-      grid.cells[id_cell].conv_val.d = -1;
-      grid.cells[id_cell].conv_val.p = -1;
-    }
   }
 
   hllc_st->id_irregular_faces.reserve(N / np);
@@ -270,7 +264,7 @@ void rhllc_mpi::HllcConvToPhys(grid_t &grid) {
   {
 #pragma omp for
     for (int i = start; i < end; i++) {
-      rhllc::GetPhysValueStab(grid.cells[i].phys_val, grid.cells[i].conv_val);
+      rhllc::GetPhysValueStab(grid.cells[i].conv_val, grid.cells[i].phys_val);
     }
   }
 }

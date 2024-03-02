@@ -249,6 +249,15 @@ int NetgenMeshToMetis(int argc, char **argv);
  */
 int RenumNetgenByMetisToVtk(int argc, char **argv);
 
+/**
+ * @brief Определяет норму максимума между двумя решениями
+ *
+ * @param[in] argc кол-во аргументов (требуется 2)
+ * @param[in] argv массив char** содержит {файл 1, файл 2}
+ * @return int ::e_type_completion
+ */
+int CompareFiles(int argc, char **argv);
+
 #endif
 
 } // namespace utils

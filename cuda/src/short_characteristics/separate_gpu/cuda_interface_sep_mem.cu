@@ -17,31 +17,49 @@ static void init_params_config(cuda::multi_gpu_config_t &gpu_conf, const grid_t 
   gpu_conf.size_params.resize(gpu_conf.GPU_N, 0);
   gpu_conf.disp_params.resize(gpu_conf.GPU_N, 0);
 
-  const IdType loc_size_grid = grid_host.loc_size;
-  const IdType loc_shift_grid = grid_host.loc_shift;
+  const IdType cpu_size = grid_host.loc_size;
+  const IdType cpu_shift = grid_host.loc_shift;
 
   for (size_t id_dev = 0; id_dev < gpu_conf.GPU_N; id_dev++) {
 
-    const IdType cells_loc = gpu_conf.size[id_dev];
-    const IdType cells_shift = gpu_conf.disp[id_dev];
+    const IdType gpu_size = gpu_conf.size[id_dev];
+    const IdType gpu_disp = gpu_conf.disp[id_dev];
 
     //левая граница на узле больше правой на карте
-    if (loc_shift_grid > cells_shift + cells_loc) {
+    if (cpu_shift > gpu_disp + gpu_size) {
       continue;
     }
 
     //правая граница на узле меньше левой на карте
-    if (loc_shift_grid + loc_size_grid < cells_shift) {
+    if (cpu_shift + cpu_size < gpu_disp) {
       continue;
     }
 
     //здесь уже точно есть пересечение
-    int left = std::max(loc_shift_grid, cells_shift);
-    int right = std::min(loc_shift_grid + loc_size_grid, cells_shift + cells_loc);
+    if (cpu_shift < gpu_disp) {
+      int left = 0;
+      int right = std::min(cpu_shift + cpu_size, gpu_disp + gpu_size) - gpu_disp;
 
-    gpu_conf.disp_params[id_dev] = left;
-    gpu_conf.size_params[id_dev] = right - left;
+      gpu_conf.disp_params[id_dev] = left;
+      gpu_conf.size_params[id_dev] = right - left;
+    } else {
+      int left = cpu_shift - gpu_disp;
+      int right =
+          std::min(std::min(cpu_shift + cpu_size, gpu_disp + gpu_size), gpu_size);
+
+      gpu_conf.disp_params[id_dev] = left;
+      gpu_conf.size_params[id_dev] = right - left;
+    }
   }
+#ifdef LOG_SEP_CUDA
+  for (size_t id_dev = 0; id_dev < gpu_conf.GPU_N; id_dev++) {
+
+    const IdType gpu_size = gpu_conf.size[id_dev];
+    const IdType gpu_disp = gpu_conf.disp[id_dev];
+    log_sep_cuda("[%ld, %ld]gpu_cfg %ld %ld gpu_params %ld %ld\n", cpu_shift,
+                 cpu_size, gpu_disp, gpu_size, gpu_conf.disp_params[id_dev], gpu_conf.size_params[id_dev]);
+  }
+#endif
 }
 
 int cuda::interface::separate_device::InitDevice(const grid_directions_t &grid_dir_host, grid_t &grid_host) {
