@@ -18,6 +18,7 @@
  */
 namespace rhllc {
 int RunRhllcModule();
+int RunRhllcMpiModule();
 } // namespace rhllc
 
 #endif //! RHLLC_MAIN_H

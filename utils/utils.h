@@ -240,6 +240,15 @@ int NetgenToMetis(int argc, char **argv);
  */
 int NetgenMeshToMetis(int argc, char **argv);
 
+/**
+ * @brief Из файла netgen формирует файл в vtk в соответствии с порядком ячеек
+ *
+ * @param[in] argc кол-во аргументов (требуется 3)
+ * @param[in] argv массив char** содержит {файл netgen, файл порядка ячеек ,выходной файл}
+ * @return int ::e_type_completion
+ */
+int RenumNetgenByMetisToVtk(int argc, char **argv);
+
 #endif
 
 } // namespace utils

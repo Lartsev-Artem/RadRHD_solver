@@ -32,7 +32,7 @@ Type EddTensor(int i, int j, const Type U, const Vector3 &F);
  * @param[out] G radiation source
  */
 void GetRadSource(const int cell_id, const grid_t &grid, Vector4 &G);
-void GetRadSourceOpt(const int cell, const grid_t &grid, Vector4 &G);
+void GetRadSourceOpt(const int loc_cell_id, const elem_t &cell, const grid_t &grid, Vector4 &G);
 
 // #include "illum_rad_func.h"
 #if 0

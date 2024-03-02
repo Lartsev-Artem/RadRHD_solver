@@ -76,6 +76,33 @@ int WriteSimple(const Str_Type name_file, const stdT &x, const stdT &y) {
   ofile.close();
   return e_completion_success;
 }
+/**
+ * @brief Запись текстового файла в формате "чистые данные"
+ *
+ * @tparam Str_Type символьны тип
+ * @tparam stdT std контейнер
+ * @param[in] name_file полное имя файла с расширением
+ * @param[in] data массив std::vector
+ * @note  Файл содержит в первой строке число элементов. Далее последовательные
+ * данные
+ * @return int ::e_type_completion
+ */
+template <typename Str_Type, typename stdT>
+int WriteRaw(const Str_Type name_file, const stdT &data) {
+  std::ofstream ofile;
+  OPEN_FSTREAM(ofile, std::string(name_file).c_str());
+
+  if (typeid(*data.begin()) == typeid(double)) { //если размер данных double, то выводить
+    for (auto el : data)
+      ofile << std::setprecision(16) << el << '\n';
+  } else {
+    for (auto el : data)
+      ofile << el << '\n';
+  }
+
+  ofile.close();
+  return e_completion_success;
+}
 
 /**
  * @brief

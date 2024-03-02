@@ -2,17 +2,20 @@
 #if defined SOLVERS && defined RHLLC
 #include "rhllc_main.h"
 
-#include "rhllc_calc.h"
+#include "rhllc_mpi.h"
+//#include "rhllc_calc.h"
 #include "rhllc_init.h"
 #include "rhllc_utils.h"
 
+#include "global_value.h"
 #include "reader_bin.h"
+#include "reader_txt.h"
 #include "writer_bin.h"
 
 #include <chrono>
 namespace tick = std::chrono;
 
-int rhllc::RunRhllcModule() {
+int rhllc::RunRhllcMpiModule() {
   WRITE_LOG("Start RunRhllcModule()\n");
   grid_t grid;
 
@@ -25,7 +28,20 @@ int rhllc::RunRhllcModule() {
   }
   grid.InitMemory(grid.cells.size(), grid_directions_t(0));
 
-  DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
+  InitMPiStruct();
+
+  {
+    DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
+    int np = get_mpi_np();
+    std::vector<int> metis;
+    if (files_sys::txt::ReadSimple(glb_files.base_address + F_SEPARATE_METIS, metis)) {
+      RETURN_ERR("Error reading metis \n");
+    }
+
+    grid.mpi_cfg = new mpi_hllc_t;
+    rhllc_mpi::InitMpiConfig(metis, grid, grid.mpi_cfg);
+    metis.clear();
+  }
 
   Type t = 0.0;
   Type cur_timer = 0;
@@ -35,27 +51,30 @@ int rhllc::RunRhllcModule() {
 
   WRITE_LOG("tau = %lf\n", _hllc_cfg.tau);
 
-  files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid); // начальное сохранение
+  files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid); // начальное сохранение
+
+  MPI_BARRIER(MPI_COMM_WORLD);
 
   auto start_clock = tick::steady_clock::now();
 
   while (t < _hllc_cfg.T) {
-    Hllc3dStab(_hllc_cfg.tau, grid);
+    rhllc_mpi::Hllc3dStab(_hllc_cfg.tau, grid);
 
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
 
     if (cur_timer >= _hllc_cfg.save_timer) {
-      DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
+      DIE_IF(files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 
       WRITE_LOG("t= %lf, step= %d, time_step=%lf\n", t, res_count, (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
       cur_timer = 0;
     }
 
     _hllc_cfg.tau = GetTimeStep(_hllc_cfg, grid.cells);
+    MPI_BARRIER(MPI_COMM_WORLD);
   }
 
-  files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid);
+  files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid);
 
   WRITE_LOG("End RunRhllcModule()\n");
   return e_completion_success;

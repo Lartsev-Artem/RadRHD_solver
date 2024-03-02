@@ -100,9 +100,9 @@ void rad_rhd::GetRadSource(const int cell, const grid_t &grid, Vector4 &G) {
     G[i + 1] = q * u[i] - rho * (tot_op * uD[i] + scat_op * u[i] * (gamma2 + uuD)) * Ur + rhogamma * (tot_op * Fr[i] + scat_op * 2.0 * uF * u[i]);
 }
 
-void rad_rhd::GetRadSourceOpt(const int cell_id, const grid_t &grid, Vector4 &G) {
+void rad_rhd::GetRadSourceOpt(const int loc_cell_id, const elem_t &cell, const grid_t &grid, Vector4 &G) {
 
-  const elem_t &cell = grid.cells[cell_id];
+  // const elem_t &cell = grid.cells[cell_id];
   /*-- Set opacities --*/
   const Type abs_op = cell.cell_data->alpha;  // illum_val.absorp_coef;
   const Type scat_op = cell.cell_data->betta; // illum_val.scat_coef;
@@ -113,9 +113,9 @@ void rad_rhd::GetRadSourceOpt(const int cell_id, const grid_t &grid, Vector4 &G)
   const Vector3 &v = cell.phys_val.v;
 
 #ifdef USE_CUDA
-  const Type Ur = grid.energy[cell_id];
-  const Vector3 &Fr = grid.stream[cell_id];
-  const Matrix3 &Tr = grid.impuls[cell_id];
+  const Type Ur = grid.energy[loc_cell_id];
+  const Vector3 &Fr = grid.stream[loc_cell_id];
+  const Matrix3 &Tr = grid.impuls[loc_cell_id];
 #else
   const Type Ur = grid.cells[cell].illum_val.energy;
   const Vector3 &Fr = grid.cells[cell].illum_val.stream;

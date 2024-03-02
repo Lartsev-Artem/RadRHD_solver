@@ -52,5 +52,6 @@ void rhllc::Hllc3dStab(const Type tau, grid_t &grid) {
     }
 
   } // omp
+  WRITE_LOG("speed=%lf\n", rhllc::max_signal_speed)
 }
 #endif

@@ -53,7 +53,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
     const IdType count_directions = grid_direction.size;
 
-#pragma omp parallel default(none) firstprivate(count_directions, myid, np, local_disp, local_size) \
+#pragma omp parallel default(none) firstprivate(count_directions, np, local_disp, local_size) \
     shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1)
     {
 

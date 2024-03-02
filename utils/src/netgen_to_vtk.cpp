@@ -14,7 +14,7 @@ int FUNC_NAME(ReBuildNetgenToVTK)(int argc, char *argv[]) {
   int size = 0;
 
   if (argc <= 3) {
-    RETURN_ERR("Error input data!\n Input: path\\input_file, path\\output_file.vtk\n, size_task[2 or 3]");
+    RETURN_ERR("Error input data!\n Input: path\\input_file, path\\output_file.vtk\n, size_task[2 or 3]\n");
   } else {
     name_file_in = argv[1];
     name_file_out = argv[2];

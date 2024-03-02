@@ -67,7 +67,7 @@ int rad_rhd::RunRadRHDMpiModule() {
     DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
 
     std::vector<int> metis;
-    if (files_sys::txt::ReadData(glb_files.base_address + F_SEPARATE_METIS(np), metis)) {
+    if (files_sys::txt::ReadSimple(glb_files.base_address + F_SEPARATE_METIS, metis)) {
       RETURN_ERR("Error reading metis \n");
     }
 
@@ -113,11 +113,11 @@ int rad_rhd::RunRadRHDMpiModule() {
 
     cuda::interface::CudaSyncStream(cuda::e_cuda_params);
     cuda::interface::CudaWait();
-
+    D_L;
     rhllc_mpi::AddRadFlux(grid);
-
+    D_L;
     rhllc_mpi::HllcConvToPhys(grid);
-
+    D_L;
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
 

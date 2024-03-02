@@ -9,8 +9,9 @@
 #include "global_types.h"
 #include <vector>
 
+#include "mpi_ext.h"
 /**
- * @brief Вычисление числа компонент на узел
+ * @brief Вычисление число компонент на узел
  *
  * @param[in] np размер кластера
  * @param[in] n общее число элементов
@@ -27,4 +28,14 @@ void GetSend(const int np, const IdType n, std::vector<IdType> &send_count);
  */
 void GetDisp(const int np, const IdType n, std::vector<IdType> &disp);
 
+#ifdef USE_MPI
+/**
+ * @brief Устанавливает число компонент на узел и смещения компонент на узел
+ *
+ * @param[in] metis_id карта ячеек по узлам (важно кол-во вхождений на узел а не порядок(т.е. сетка может быть перенумерованной))
+ * @param[inout] cfg конфигурация кластера для hllc. Должен быть установлен comm
+ */
+void SetShifts(const std::vector<int> &metis_id, mpi_hllc_t *cfg);
+
+#endif
 #endif // MPI_SHIFTS
