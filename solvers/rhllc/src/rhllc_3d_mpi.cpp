@@ -89,6 +89,13 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
 
   for (int id_cell = 0; id_cell < grid.size; id_cell++) {
     grid.cells[id_cell].geo.node = metis_id[id_cell];
+
+    if (metis_id[id_cell] != myid) {
+      grid.cells[id_cell].phys_val.d = -1;
+      grid.cells[id_cell].phys_val.p = -1;
+      grid.cells[id_cell].conv_val.d = -1;
+      grid.cells[id_cell].conv_val.p = -1;
+    }
   }
 
   hllc_st->id_irregular_faces.reserve(N / np);
@@ -178,7 +185,7 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
 
   StartExchangeBoundaryCells(*grid.mpi_cfg);
 
-  //#pragma omp parallel default(none) firstprivate(tau, myid) shared(grid, glb_files, rhllc::max_signal_speed, rq_max_speed)
+#pragma omp parallel default(none) shared(grid, glb_files, rhllc::max_signal_speed)
   {
     const int size_grid = grid.size;
     Type max_speed = 0;
@@ -200,6 +207,8 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
       SyncExchangeBoundaryCells(*grid.mpi_cfg);
     }
 
+#pragma omp barrier
+
 // потоки на граничных ячейках узла
 #pragma omp for
     for (int i = 0; i < grid.mpi_cfg->id_irregular_faces.size(); i++) {
@@ -218,13 +227,10 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
     }
   }
   // ищем максимум по всем узлам
-  //#pragma omp master
-  {
-      // Type max_speed = rhllc::max_signal_speed;
-      // MPI_Iallreduce(&max_speed, &rhllc::max_signal_speed, 1, MPI_DOUBLE, MPI_MAX, grid.mpi_cfg->comm, &rq_max_speed);
-  }
+  Type max_speed = rhllc::max_signal_speed;
+  MPI_Iallreduce(&max_speed, &rhllc::max_signal_speed, 1, MPI_DOUBLE, MPI_MAX, grid.mpi_cfg->comm, &rq_max_speed);
 
-  //#pragma omp parallel default(none) firstprivate(tau, myid) shared(grid, glb_files, rhllc::max_signal_speed, rq_max_speed)
+#pragma omp parallel default(none) firstprivate(tau, myid) shared(grid, glb_files)
   {
     int start = grid.mpi_cfg->disp_cells[myid];
     int end = start + grid.mpi_cfg->send_cells[myid];
@@ -251,10 +257,8 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
 
   } // omp
 
-  Type max_speed = rhllc::max_signal_speed;
-  MPI_Allreduce(&max_speed, &rhllc::max_signal_speed, 1, MPI_DOUBLE, MPI_MAX, grid.mpi_cfg->comm);
+  MPI_Wait(&rq_max_speed, MPI_STATUS_IGNORE);
   rhllc_mpi_log("speed=%lf\n", rhllc::max_signal_speed)
-  // MPI_Wait(&rq_max_speed, MPI_STATUS_IGNORE);
 }
 
 void rhllc_mpi::HllcConvToPhys(grid_t &grid) {
