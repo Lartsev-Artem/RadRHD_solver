@@ -17,5 +17,6 @@ int RunIllumMpiModule();
 int RunIllumFacesModule();
 int RunIllumMultiGpuModule();
 
+int RunSpectrumModule(int count_states);
 } // namespace illum
 #endif //! ILLUM_MAIN_H

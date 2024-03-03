@@ -1,3 +1,5 @@
+#if 0 //запуск модуля с полными частотами
+// требует доработки в инициализации памяти и не только
 #if defined SOLVERS && defined ILLUM
 #include "illum_main.h"
 #if defined TRANSFER_CELL_TO_FACE && defined SEPARATE_GPU && defined SPECTRUM
@@ -78,3 +80,4 @@ int illum::spec::RunIllumSpectrumModule() {
 
 #endif
 #endif //! SOLVERS
+#endif

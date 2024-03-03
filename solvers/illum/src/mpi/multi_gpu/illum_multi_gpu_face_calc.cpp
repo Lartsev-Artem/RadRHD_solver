@@ -1,9 +1,11 @@
 #if defined ILLUM && defined SOLVERS && defined USE_MPI && defined USE_CUDA
 
 #include "illum_calc_gpu_async.h"
-#if defined TRANSFER_CELL_TO_FACE && defined SEPARATE_GPU && !defined SPECTRUM
+#if defined TRANSFER_CELL_TO_FACE && defined SEPARATE_GPU
+#include "global_consts.h"
 #include "illum_mpi_sender.h"
 #include "illum_utils.h"
+#include "plunk.h"
 
 #include "cuda_interface.h"
 #include "cuda_multi_interface.h"
@@ -31,6 +33,13 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
   const IdType local_size = grid_direction.loc_size;
   const IdType local_disp = grid_direction.loc_shift;
 
+#ifdef SPECTRUM
+  const Type frq0 = grid.frq_grid[grid.cur_frq_id];
+  const Type frq1 = grid.frq_grid[grid.cur_frq_id + 1];
+  WRITE_LOG("frq[%d]= %lf %lf\n", grid.cur_frq_id, frq0, frq1);
+  set_boundary_value((B_Plank(40000000, frq1, frq0)) / kRadiation);
+#endif
+
   int iter = 0;    ///< номер итерации
   double norm = 0; ///< норма ошибки
 
@@ -55,10 +64,14 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
     const IdType count_directions = grid_direction.size;
 
+#ifdef SPECTRUM
+#pragma omp parallel default(none) firstprivate(count_directions, np, local_disp, local_size, frq0, frq1) \
+    shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1, grid_direction)
+#else
 #pragma omp parallel default(none) firstprivate(count_directions, np, local_disp, local_size) \
     shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1)
+#endif
     {
-
       const int count_th = omp_get_num_threads();
       const int num_th = omp_get_thread_num();
 
@@ -77,7 +90,6 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 
 #pragma omp for
       for (IdType num_direction = 0; num_direction < local_size; num_direction++) {
-
         /*---------------------------------- FOR по граничным граням----------------------------------*/
 #ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
         const IntId *code_bound = inner_bound_code[num_direction].data();
@@ -104,7 +116,9 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 
           elem_t *cell = &grid.cells[num_cell];
           const Vector3 &x = cell->geo.center; // vec_x[num_cell].x[num_loc_face][num_node];
-
+#ifdef SPECTRUM
+          cell->cell_data->InitDirection(grid_direction.directions[num_direction].dir);
+#endif
           const face_loc_id_t id_in_faces = *(in_face);
           ++in_face;
 
@@ -114,7 +128,11 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           builtin_prefetch(I0, 1, 1);
           Type k;
           const Type S = grid.scattering[num_cell * local_size + num_direction];
+#ifdef SPECTRUM
+          const Type rhs = GetRhsOpt(x, S, *cell, k, frq0, frq1);
+#else
           const Type rhs = GetRhsOpt(x, S, *cell, k);
+#endif
 
           I0[0] = (*inter_coef)[cell->geo.id_faces[id_in_faces.a]];
           I0[1] = (*inter_coef)[cell->geo.id_faces[id_in_faces.b]];

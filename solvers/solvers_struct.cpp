@@ -110,39 +110,6 @@ grid_t::~grid_t() {
 #else // CUDA
 #include "cuda_interface.h"
 
-#ifdef SPECTRUM
-#include "plunk.h"
-void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_grid) {
-
-  DIE_IF(cells.size() != num_cells);
-
-  // loc_size = hllc_loc_size[myid].right - hllc_loc_size[id].left;
-
-  size_dir = dir_grid.size;
-  size = num_cells;
-  loc_size = size;
-  loc_shift = 0;
-  size_face = faces.size();
-
-  get_splitting_spectrum(spectrum);
-  size_frq = spectrum.size();
-
-  inter_coef_all.resize(omp_get_max_threads());
-  for (size_t i = 0; i < inter_coef_all.size(); i++) {
-#ifndef ILLUM_ON_CELL
-    inter_coef_all[i].resize(size * CELL_SIZE);
-#else
-    inter_coef_all[i].resize(size_face);
-#endif
-
-#ifdef SEPARATE_GPU
-    loc_illum_wptr = 0;
-    loc_illum_rptr = 0;
-    local_Illum.resize(loc_illum_size * size, 0);
-#endif
-  }
-}
-#else
 void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_grid) {
 
   DIE_IF(cells.size() != num_cells);
@@ -164,7 +131,7 @@ void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_gri
 #endif
   }
 }
-#endif
+
 grid_t::~grid_t() {
   inter_coef_all.clear();
 #ifdef USE_MPI
@@ -185,12 +152,18 @@ grid_t::~grid_t() {
 
 #ifdef ILLUM
 void grid_t::InitFullPhysData() {
-  // for (auto &el : cells) {
-  //   el.cell_data = new full_phys_data_t;
-  // }
   for (size_t i = 0; i < size; i++) {
     cells[i].cell_data = new full_phys_data_t;
   }
+}
+#endif
+
+#ifdef SPECTRUM
+#include "plunk.h"
+void grid_t::InitFrq() {
+  get_splitting_spectrum(frq_grid);
+  size_frq = frq_grid.size();
+  spectrum.resize(size_frq - 1, 0);
 }
 #endif
 

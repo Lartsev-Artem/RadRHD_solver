@@ -30,14 +30,14 @@ double get_scat_coef(double frq) {
 
 double get_scat_coef(double frq, double vel, double cosf) {
   constexpr double hmc = kH_plank / (kM_electron * kC_Light * kC_Light);
-  double velC = vel * (1. / kC_Light);
+  double velC = vel; // vel * (1. / kC_Light);
   double lorenz = 1. / sqrt(1. - (velC * velC));
   return sigma(hmc * frq * lorenz * (1. - velC * cosf)); //чтобы в пределе v=0 получить исходную постановку 2 не нужна
   // return sigma(2 * hmc * frq * lorenz * (1. - velC * cosf));
 }
 double get_scat_coef(double frq, double vel, double cosf, double lorenz) {
   constexpr double hmc = kH_plank / (kM_electron * kC_Light * kC_Light);
-  double velC = vel * (1. / kC_Light);
+  double velC = vel;                                     // vel * (1. / kC_Light);
   return sigma(hmc * frq * lorenz * (1. - velC * cosf)); //чтобы в пределе v=0 получить исходную постановку 2 не нужна
   // return sigma(2 * hmc * frq * lorenz * (1. - velC * cosf));
 }

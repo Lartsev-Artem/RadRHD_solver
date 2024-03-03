@@ -65,6 +65,7 @@ constexpr double kInternalRadius = 0.12; ///< радиус внутренней 
 #define F_INIT_BOUND "init_boundary.txt"
 #define F_FACE_ID "face_id.txt"
 #define F_GRAPH "graph"
+#define F_SEPARATE_METIS "metis"
 
 //--------------------------Файлы геометрии-----------------------------//
 #define F_GEO_FACES "geo_faces.bin"
@@ -108,7 +109,7 @@ constexpr double kInternalRadius = 0.12; ///< радиус внутренней 
 #define F_RADLOOSERATE "radEnLooseRate.bin"
 #endif
 
-#define F_COOLING_FUNC "rcf_H.dat"
+#define F_SPECTRUM "spectrum.txt"
 
-#define F_SEPARATE_METIS "metis"
+#define F_COOLING_FUNC "rcf_H.dat"
 #endif //! GLOBAL_VALUE

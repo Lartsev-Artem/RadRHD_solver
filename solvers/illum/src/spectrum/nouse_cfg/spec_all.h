@@ -1,4 +1,4 @@
-#ifndef SPEC_ALL_H
+#if 0 // ndef SPEC_ALL_H
 #define SPEC_ALL_H
 #include "geo_types.h"
 #include "solvers_struct.h"
@@ -8,6 +8,7 @@
 */
 
 namespace illum {
+
 
 /**
  * @brief Пространство имён расчёта излучения на cpu  без видеокарты

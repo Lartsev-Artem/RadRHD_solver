@@ -65,6 +65,12 @@ inline Matrix3 GetAverageByCell(const Matrix3 *array) {
 }
 
 /**
+ * @brief Функция устанавливает значение на границе
+ * @param[in] val
+ */
+void set_boundary_value(Type val);
+
+/**
  * @brief Функция возвращает значение на границе
  *
  * @param[in] type_bound тип граничных условий  ::e_boundary_types_t (связан с геометрией сетки)
@@ -158,6 +164,7 @@ Type GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k);
 
 //! @brief Оптимизированная версия
 Type GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k);
+Type GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k, Type frq0, Type frq1);
 
 /**
  * @brief Расчет среднего значения на грани

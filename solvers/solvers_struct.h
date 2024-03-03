@@ -293,22 +293,21 @@ struct grid_t {
 #ifdef USE_MPI
   mpi_hllc_t *mpi_cfg;                              ///< конфиг mpi структуры
 #else
-  uint32_t *foo;                                              ///< заглушка под cuda
+  uint32_t *foo;                                 ///< заглушка под cuda
 #endif
 
 #ifndef TRANSFER_CELL_TO_FACE
   std::vector<std::vector<Vector3>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
 #else
-#ifdef SPECTRUM
-  std::vector<std::vector<std::vector<Type>>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока[thread[frq{cell}]]
-#else
   std::vector<std::vector<Type>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
-#endif
 #endif
 
 #ifdef SPECTRUM
   IdType size_frq;
+  volatile int cur_frq_id;
+  std::vector<Type> frq_grid;
   std::vector<Type> spectrum;
+  void InitFrq();
 #endif
 
   Type *Illum;

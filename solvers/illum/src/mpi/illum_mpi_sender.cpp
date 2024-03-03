@@ -6,7 +6,7 @@
 MPI_Comm MPI_COMM_ILLUM = MPI_COMM_WORLD;
 illum::mpi_sender_t section_1;
 
-#if defined SEPARATE_GPU && !defined SPECTRUM
+#if defined SEPARATE_GPU
 void illum::separate_gpu::InitSender(const MPI_Comm &comm, const grid_directions_t &grid_dir, const grid_t &grid) {
 
   MpiInitStruct(grid_dir);
@@ -57,9 +57,7 @@ void illum::separate_gpu::InitSender(const MPI_Comm &comm, const grid_directions
   WRITE_LOG("Init mpi sender\n");
   return;
 }
-#endif
 
-#ifdef SPECTRUM
 void illum::spectrum_gpu::InitSender(const MPI_Comm &comm, const grid_directions_t &grid_dir, const grid_t &grid) {
 
   // MPI_Send(Illum_local.data(), N*F,MPI_DOUBLE,1,0,MPI_COMM_WORLD);

@@ -1,3 +1,8 @@
+#if 0 //здесь есть схема расчета полного излучения. С хранением всего спектра
+// => верного расчёта интеграла рассеяния и численных интегралов по частоте
+// однако реализация требует N*M*F памяти на узел, что допускает только 
+// грубые сетки + нет окончательного модуля к видеокарте. 
+// Схема запускалась только без рассеяния и требует отладки
 
 /// \todo: нужна проверка отправлений. Тестовый запуск без видеокарты. Все таки подумать над Illum_loc
 #include "solvers_config.h"
@@ -18,6 +23,30 @@
 const IntId *code_bound = inner_bound_code[num_direction].data();
 #pragma error "need recalc code bound from cell to face"
 #endif
+
+Type illum::spec::ReCalcIllum(const IdType num_dir, const std::vector<std::vector<Type>> &inter_coef, grid_t &grid, const IdType dir_disp) {
+  Type norm = -1;
+  const IdType shift_dir = (grid.size_frq * (num_dir + dir_disp));
+  const IdType shift_cell = grid.size_frq * grid.size_dir;
+
+  for (IdType cell = 0; cell < grid.size; cell++) {
+    IdType frq_id = cell * shift_cell + shift_dir;
+    for (IdType frq = 0; frq < grid.size_frq; frq++) {
+
+      Type curI = 0;
+      for (size_t j = 0; j < CELL_SIZE; j++) {
+        curI += inter_coef[grid.cells[cell].geo.id_faces[j]][frq]; //тут печаль с кэшами
+      }
+      curI /= CELL_SIZE;
+
+      IdType id = frq_id + frq;
+      norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
+      grid.Illum[id] = curI; //здесь по ячейкам
+    }
+  }
+
+  return norm;
+}
 
 #include "writer_txt.h"
 static void WriteRes(const std::string &name_file, std::vector<Type> &y) {
@@ -391,4 +420,6 @@ int illum::spec::CalculateIllumFaceMpi(const grid_directions_t &grid_direction,
   return e_completion_success;
 }
 #endif
+#endif
+
 #endif

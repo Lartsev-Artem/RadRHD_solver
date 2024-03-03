@@ -8,6 +8,18 @@
 
 TableFunc t_cooling_function;
 
+#if GEOMETRY_TYPE == Cone
+static Type boundary_value = 1e52 / kRadiation / (kDist * kDist);
+#elif GEOMETRY_TYPE == Sphere
+static Type boundary_value = 1;
+#else
+static Type boundary_value = 0;
+#endif
+
+void illum::set_boundary_value(Type val) {
+  boundary_value = val;
+}
+
 /**
  * @brief Точное решение уравнения переноса (вдоль луча) в ячейке
  *
@@ -37,7 +49,7 @@ Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, co
     return 0;
   case e_bound_out_source:
 #if GEOMETRY_TYPE == Cone
-    return 1e52 / kRadiation / (kDist * kDist);
+    return boundary_value;
 #endif
     return 0;
 
@@ -63,7 +75,7 @@ Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, co
 #else
   case e_bound_inner_source:
 #if GEOMETRY_TYPE == Sphere
-    return 1;
+    return boundary_value;
 #endif
     return 0;
 #endif
@@ -302,7 +314,7 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coe
   return norm;
 }
 
-#if defined SEPARATE_GPU && !defined SPECTRUM
+#if defined SEPARATE_GPU
 Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp) {
   Type norm = -1;
   const IdType shift_dir = num_dir + dir_disp;
@@ -510,6 +522,26 @@ Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, 
   cell.illum_val.scat_coef = betta;
 
   Type Q = B_Plank(cell.cell_data->T) / kRadiation;
+
+  k = alpha + betta;
+  return (alpha * Q + betta * S) / k;
+}
+
+#include "compton.h"
+Type illum::GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k,
+                      Type frq0, Type frq1) {
+
+  full_phys_data_t *phys = cell.cell_data;
+
+  Type betta;
+  if (LIKELY(phys->vel > kC_LightInv)) {
+    phys->betta = (get_scat_coef(0.5 * (frq1 + frq0), phys->vel, phys->cosf, phys->lorenz) / (kM_hydrogen * kDist)) * phys->val->d;
+  } else {
+    phys->betta = (get_scat_coef(0.5 * (frq1 + frq0)) / (kM_hydrogen * kDist)) * phys->val->d;
+  }
+
+  Type alpha = phys->alpha;
+  Type Q = B_Plank(phys->T, phys->logT, frq1, frq0) / kRadiation; // Q=alpha*Ie
 
   k = alpha + betta;
   return (alpha * Q + betta * S) / k;

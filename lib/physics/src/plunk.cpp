@@ -21,13 +21,16 @@ void get_splitting_spectrum(std::vector<Type> &spectrum) {
     spectrum[x] = ksplit::frq0 * exp(-x * x / ksplit::betta);
   }
   std::reverse(spectrum.begin(), spectrum.end()); //по возрастанию
+
+  // for (int x = 0; x < spectrum.size(); x++)
+  //   WRITE_LOG("frq[%d]=%lf\n", x, spectrum[x]);
 }
 
 int get_frq_idx(double frq) {
   if (frq > ksplit::frq0) {
     return 0; // ksplit::N - 1;
   }
-  return std::min((int)sqrt(-ksplit::betta * log(frq / ksplit::frq0)), 1000);
+  return std::min((int)sqrt(-ksplit::betta * log(frq / ksplit::frq0)), ksplit::N);
 }
 
 static inline double q1(double x) {
