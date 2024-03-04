@@ -64,6 +64,22 @@ namespace kernel {
  */
 __global__ void MakeIllumParam(const cuda::geo::grid_directions_device_t *dir, cuda::geo::grid_device_t *grid, IdType size_params, IdType shift_params);
 
+/**
+ * @brief Устанавливает локальные сдвиги видеокарт, в случае симуляции нескольких видеокарт на одной
+ *
+ * @param grid
+ * @param loc_size_gpu
+ * @param shift_gpu
+ * @param loc_size_params
+ * @param shift_params
+ * @return __global__
+ */
+__global__ void SetImDevice(geo::grid_device_t *grid,
+                            const IdType loc_size_gpu,
+                            const IdType shift_gpu,
+                            const IdType loc_size_params,
+                            const IdType shift_params);
+
 } // namespace kernel
 
 } // namespace separate_device

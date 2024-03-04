@@ -28,7 +28,7 @@ int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
 
   if (err) {
     for (int i = 0; i < grid.size; i++) {
-      grid.cells[i].phys_val = flux_t(1.0, Vector3::Zero(), GetPressure(1.0, 5000.0));
+      grid.cells[i].phys_val = flux_t(1e5 / kDensity, Vector3(0, 0.99, 0), GetPressure(1e5 / kDensity, 5000.0));
       grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
     }
     RETURN_ERR("Error reading phys state\n");

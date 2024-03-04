@@ -57,6 +57,12 @@ void sep::InitMultiDeviceGrid(int id_dev, const multi_gpu_config_t &gpu_conf, co
   mem::Malloc(loc_size_dir * num_cell_loc * sizeof(Type), &device_host_ptr.int_scattering);                                //память на массив рассеяния внутри структуры сетки
   mem::CpyToDevice(&grid_device->int_scattering, &device_host_ptr.int_scattering, sizeof(device_host_ptr.int_scattering)); //указатель со стороны хоста в указатель на стороне карты
 
+#ifdef SPECTRUM
+  //скорость
+  mem::Malloc(size_grid * sizeof(Vector3), &device_host_ptr.velocity); //память на массив потока внутри структуры сетки
+  mem::CpyToDevice(&grid_device->velocity, &device_host_ptr.velocity, sizeof(device_host_ptr.velocity));
+#endif
+
 #ifdef ON_FULL_ILLUM_ARRAYS
 
   int n = gpu_conf.size_params[id_dev];
@@ -102,6 +108,10 @@ void sep::ClearGridOnMultiDevice(multi_gpu_config_t &gpu_conf, std::vector<geo::
     mem::FreeMem(device_host_ptrs[i].energy);
     mem::FreeMem(device_host_ptrs[i].stream);
     mem::FreeMem(device_host_ptrs[i].impuls);
+#endif
+
+#ifdef SPECTRUM
+    mem::FreeMem(device_host_ptrs[i].velocity);
 #endif
 
     mem::FreeMem(grid_devices[i]);

@@ -1,5 +1,6 @@
 #ifdef USE_CUDA
 #include "cuda_illum_sep_param.h"
+#ifdef ON_FULL_ILLUM_ARRAYS
 
 #include "global_def.h"
 
@@ -81,4 +82,5 @@ __global__ void cuda_sep::kernel::MakeIllumParam(const cuda::geo::grid_direction
   cuda_sep::device::MakeImpuls(dir, grid);
 }
 
+#endif
 #endif //! USE_CUDA

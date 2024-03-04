@@ -1,4 +1,4 @@
-#ifdef USE_CUDA
+#if defined USE_CUDA //&& !defined SPECTRUM
 
 #include "cuda_def.h"
 #include "cuda_illum_sep_param.h"
@@ -70,6 +70,7 @@ int cuda::interface::separate_device::CalculateIntScatteringAsync(const grid_dir
     CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + M_loc * dispN, device_host_ptrN[id_dev].int_scattering, size, cudaMemcpyDeviceToHost, cuda_streams[e_cuda_scattering_2]);
 
     {
+#ifdef ON_FULL_ILLUM_ARRAYS
       CudaSyncStream(e_cuda_params);
       CudaSyncStream(e_cuda_scattering_2);
 
@@ -77,6 +78,7 @@ int cuda::interface::separate_device::CalculateIntScatteringAsync(const grid_dir
       if (grid.energy != nullptr) {
         cuda::interface::separate_device::CalculateAllParamAsync(0, it, grid_dir, grid, e_cuda_params);
       }
+#endif
       CudaSyncStream(e_cuda_params);
       CudaSyncStream(e_cuda_scattering_2);
     }

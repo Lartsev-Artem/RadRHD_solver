@@ -17,7 +17,7 @@ namespace tick = std::chrono;
 namespace cuda_sep = cuda::interface::separate_device;
 
 #define builtin_prefetch(...) __builtin_prefetch(__VA_ARGS__)
-
+#include "spectrum_utils.h"
 int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
                                         const std::vector<std::vector<IntId>> &inner_bound_code,
                                         const std::vector<align_cell_local> &vec_x0,
@@ -36,8 +36,6 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 #ifdef SPECTRUM
   const Type frq0 = grid.frq_grid[grid.cur_frq_id];
   const Type frq1 = grid.frq_grid[grid.cur_frq_id + 1];
-  WRITE_LOG("frq[%d]= %lf %lf\n", grid.cur_frq_id, frq0, frq1);
-  set_boundary_value((B_Plank(40000000, frq1, frq0)) / kRadiation);
 #endif
 
   int iter = 0;    ///< номер итерации
@@ -66,7 +64,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 
 #ifdef SPECTRUM
 #pragma omp parallel default(none) firstprivate(count_directions, np, local_disp, local_size, frq0, frq1) \
-    shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1, grid_direction)
+    shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1, grid_direction, glb_files, log_enable)
 #else
 #pragma omp parallel default(none) firstprivate(count_directions, np, local_disp, local_size) \
     shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1)
@@ -99,6 +97,10 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           const IdType neigh_id = grid.faces[num_face].geo.id_r;         //т.к. мы проходим границу здесь будет граничный признак
           (*inter_coef)[num_face] = illum::BoundaryConditions(neigh_id); //значение на грани ( или коэффициенты интерполяции)
         }
+#ifdef LOG_SPECTRUM
+        if (num_direction == 32 + local_disp)
+          log_enable = 1;
+#endif
 
         // индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
         const Type *s = vec_x0[num_direction].s.data();
@@ -143,7 +145,19 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           ++fc_pair;
           builtin_prefetch(&(grid.cells[fc_pair->cell]), 1, 2); //грузим следующую ячейку
 
-          (*inter_coef)[cell->geo.id_faces[num_loc_face]] = GetIllum(I0, s, k, rhs);
+          Type I;
+          if (k > numeric_limit_abs_coef) {
+            I = GetIllum(I0, s, k, rhs);
+          } else {
+            I = GetIllumLimit(I0, s, k, rhs);
+          }
+#ifdef DEBUG
+          if (std::isnan(fabs(I)) || std::isinf(fabs(I)) || I < 0) {
+            WRITE_LOG_ERR("nan[%d %d], k=%e, rhs=%e, I0:%e, %e, %e, %e\n", num_direction, num_cell, k, rhs, I0[0], I0[1], I0[2], S);
+            D_LD;
+          }
+#endif
+          (*inter_coef)[cell->geo.id_faces[num_loc_face]] = I;
           s += NODE_SIZE;
         }
         /*---------------------------------- конец FOR по ячейкам----------------------------------*/
@@ -170,13 +184,17 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 
     if (LIKELY(_solve_mode.max_number_of_iter >= 1)) // пропуск первой итерации
     {
+#ifdef SPECTRUM
+      cuda_sep::CalculateSpectrumIntScattering(grid_direction, grid, 0, local_size, cuda::e_cuda_scattering_1);
+#else
       cuda_sep::CalculateIntScatteringAsync(grid_direction, grid, 0, local_size, cuda::e_cuda_scattering_1);
+#endif
     }
 
     MPI_Wait(&rq_norm, MPI_STATUS_IGNORE);
     norm = fabs(glob_norm);
 
-    WRITE_LOG("End iter number#: %d, norm=%.16lf, time= %lf\n", iter, norm, time.get_delta_time_sec());
+    // WRITE_LOG("End iter number#: %d, norm=%.16lf, time= %lf\n", iter, norm, time.get_delta_time_sec());
     iter++;
   } while (norm > _solve_mode.accuracy && iter < _solve_mode.max_number_of_iter);
 

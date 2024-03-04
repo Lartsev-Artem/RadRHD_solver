@@ -43,6 +43,7 @@ int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &gri
   files_sys::bin::WriteSimple(main_dir + F_ILLUM, illum);
   // files_sys::txt::WriteSimple(main_dir + F_ILLUM + ".txt", illum);
 
+#ifdef ON_FULL_ILLUM_ARRAYS
 #if !defined USE_CUDA
   WRITE_FILE_ELEM((main_dir + F_ENERGY).c_str(), grid.cells, illum_val.energy);
 
@@ -60,11 +61,14 @@ int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &gri
 
   files_sys::bin::WriteSimple((main_dir + F_IMPULS).c_str(), grid.size, grid.impuls);
 
+#ifndef RAD_RHD
   files_sys::bin::WriteSimple((main_dir + F_DIVSTREAM).c_str(), grid.size, grid.divstream);
 
   files_sys::bin::WriteSimple((main_dir + F_DIVIMPULS).c_str(), grid.size, grid.divimpuls);
-#endif
-#endif
+#endif // RAD_RHD
+#endif // USE_CUDA
+#endif // ON_FULL_ILLUM_ARRAYS
+#endif // ILLUM
 
 #if (defined HLLC || defined RHLLC)
 
@@ -100,6 +104,7 @@ int files_sys::bin::WriteSolutionMPI(const std::string &main_dir, const grid_t &
     files_sys::bin::WriteSimple(main_dir + F_ILLUM, illum);
   }
 
+#ifdef ON_FULL_ILLUM_ARRAYS
 #if !defined USE_CUDA
 
   WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_ENERGY).c_str(), grid.cells, illum_val.energy, left, right);
@@ -112,8 +117,12 @@ int files_sys::bin::WriteSolutionMPI(const std::string &main_dir, const grid_t &
   WriteSimpleMPI(main_dir + F_ENERGY, grid.size, grid.energy, left, right);
   WriteSimpleMPI(main_dir + F_STREAM, grid.size, grid.stream, left, right);
   WriteSimpleMPI(main_dir + F_IMPULS, grid.size, grid.impuls, left, right);
+#ifndef RAD_RHD
   WriteSimpleMPI(main_dir + F_DIVSTREAM, grid.size, grid.divstream, left, right);
   WriteSimpleMPI(main_dir + F_DIVIMPULS, grid.size, grid.divimpuls, left, right);
+#endif
+#endif
+
 #endif
 #endif // ILLUM
 

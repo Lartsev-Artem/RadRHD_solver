@@ -80,6 +80,20 @@ int CalculateAllParamAsync(const int id_dev, const int im_dev, const grid_direct
  */
 int CalculateIntScatteringAsync(const grid_directions_t &grid_dir, grid_t &grid, const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream);
 
+#ifdef SPECTRUM
+/**
+ * @brief Расчёт интеграла рассеяния в спектральном приближении
+ *
+ * @param[in] grid_dir сфера направлений
+ * @param[in] grid сетка
+ * @param[in] start_dir начало направлений для данного потока
+ * @param[in] end_dir конец направлений для данного потока
+ * @param[in] stream id потока
+ * @return int ::e_type_completion
+ */
+int CalculateSpectrumIntScattering(const grid_directions_t &grid_dir, grid_t &grid, const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream);
+void SendVelocity(const grid_t &grid);
+#endif
 #ifdef MULTI_GPU
 /**
  * @brief Расчёт энергии, импульса и излучения на нескольких картах

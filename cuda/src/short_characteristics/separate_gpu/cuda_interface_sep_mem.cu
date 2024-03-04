@@ -93,19 +93,14 @@ int cuda::interface::separate_device::InitDevice(const grid_directions_t &grid_d
 
   WRITE_LOG("grid_host.loc_size =%lu %lu %lu %lu\n", grid_host.loc_size, grid_host.loc_shift, grid_host.size, grid_host.size_face);
 
+#ifdef ON_FULL_ILLUM_ARRAYS
   if (grid_dir_host.loc_shift == 0 || (grid_host.size != grid_host.loc_size)) // или нулевой узел, или данные разделены
   {
     mem_protected::MallocHost((grid_host.loc_size * sizeof(Type)), &grid_host.energy);
     mem_protected::MallocHost((grid_host.loc_size * sizeof(Vector3)), &grid_host.stream);
     mem_protected::MallocHost((grid_host.loc_size * sizeof(Matrix3)), &grid_host.impuls);
-
-    // //сопоставимо с хранением energy и stream и impuls
-    // const Type abs_op = grid.cells[cell].illum_val.absorp_coef;
-    // const Type scat_op = grid.cells[cell].illum_val.scat_coef;
-    // const Type rho = grid.cells[cell].phys_val.d;
-    // const Type prs = grid.cells[cell].phys_val.p;
-    // const Vector3 &v = grid.cells[cell].phys_val.v;
   }
+#endif
 
   return e_completion_success;
 }

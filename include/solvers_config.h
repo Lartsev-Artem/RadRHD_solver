@@ -25,7 +25,10 @@
 /// для экономии памяти и времени пересылок данных можно отключить их расчёт.
 /// но не для ускорения расчёта, т.к. дивергенции считаются  через эти величины
 #ifdef ILLUM
+
+#ifndef SPECTRUM
 #define ON_FULL_ILLUM_ARRAYS ///< расчитывать все параметры зависящие от излучения на каждом шаге
+#endif
 //#define INTERPOLATION_ON_FACES ///< расчитывать линейную 2d интерполяцию на гранях, вместо усреднения
 
 // #define USE_TRACE_THROUGH_INNER_BOUNDARY ///< использование трассировки сквозь внутреннюю границу (доп. память и эффект луча!)
@@ -82,6 +85,10 @@
 
 #if defined HLLC && defined RHLLC
 #error "Bad config. There can be only one task at a time (HLLC or RHLLC)"
+#endif
+
+#if defined RAD_RHD && defined SPECTRUM
+#error "Bad config. There can be only one task at a time (SPECTRUM or RAD_RHD)"
 #endif
 
 #if defined RAD_RHD && (!defined RHLLC || !defined ILLUM)

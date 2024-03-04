@@ -15,7 +15,6 @@
 #include "solvers_config.h"
 #include <string>
 
-
 /*! \addtogroup cuda Модуль расчёта излучения на видеокарте
     @{
 */
@@ -53,7 +52,12 @@ int inline CheckError(Err_t cudaStatus, const std::string my_text = "") {
 #define CUDA_CALL_FUNC(_func, ...) _func(__VA_ARGS__);
 #endif
 
+#ifdef SPECTRUM
+/// \note на nvidia gtx 1080 6gb почему не хватает ресурсов для запуска
+#define BS 16 ///< размер блока
+#else
 #define BS 32 ///< размер блока
+#endif
 
 #define CUDA_BLOCKS_2D(val, cells, dirs) dim3 val((cells + BS - 1) / BS, (dirs + BS - 1) / BS);
 #define CUDA_TREADS_2D(val) dim3 val(BS, BS);

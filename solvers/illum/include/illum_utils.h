@@ -178,6 +178,10 @@ Type GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k, Type frq0, 
  * @return Type излучение на грани
  */
 Type GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs);
+
+//!@brief предельный случай (k->0)
+Type GetIllumLimit(const Type *I0, const Type *s, const Type k, const Type rhs);
+constexpr Type numeric_limit_abs_coef = 1e-30;
 #endif
 
 } // namespace illum

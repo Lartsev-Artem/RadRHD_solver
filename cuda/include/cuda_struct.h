@@ -88,6 +88,10 @@ struct grid_device_t {
   Type *areas;      ///< площадь граней
   Type *volume;     ///< объемы ячеек
 
+#ifdef SPECTRUM
+  Vector3 *velocity; ///< скорость в ячейках
+#endif
+
 #ifdef ON_FULL_ILLUM_ARRAYS
   Type *energy;    ///< энергия излучения
   Vector3 *stream; ///< поток энергии излучения
@@ -98,9 +102,10 @@ struct grid_device_t {
                                         divimpuls(nullptr), normals(nullptr), areas(nullptr), volume(nullptr)
 #ifdef ON_FULL_ILLUM_ARRAYS
                                         ,
-                                        energy(nullptr), stream(nullptr), impuls(nullptr) {
-  }
+                                        energy(nullptr), stream(nullptr), impuls(nullptr)
 #endif
+  {
+  }
 };
 
 /**
@@ -120,6 +125,10 @@ struct device_host_ptr_t {
   Type *areas;      ///< площадь граней
   Type *volume;     ///< объемы ячеек
 
+#ifdef SPECTRUM
+  Vector3 *velocity; ///< скорость в ячейках
+#endif
+
 #ifdef ON_FULL_ILLUM_ARRAYS
   Type *energy;    ///< энергия излучения
   Vector3 *stream; ///< поток энергии излучения
@@ -130,9 +139,10 @@ struct device_host_ptr_t {
                         normals(nullptr), areas(nullptr), volume(nullptr), directions(nullptr)
 #ifdef ON_FULL_ILLUM_ARRAYS
                         ,
-                        energy(nullptr), stream(nullptr), impuls(nullptr) {
-  }
+                        energy(nullptr), stream(nullptr), impuls(nullptr)
 #endif
+  {
+  }
 };
 
 } // namespace geo

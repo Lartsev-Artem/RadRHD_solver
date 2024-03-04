@@ -269,6 +269,7 @@ void rhllc_mpi::HllcConvToPhys(grid_t &grid) {
   }
 }
 
+#ifdef RAD_RHD
 #include "radRHD_utils.h"
 void rhllc_mpi::AddRadFlux(grid_t &grid) {
 
@@ -296,5 +297,5 @@ void rhllc_mpi::AddRadFlux(grid_t &grid) {
     }
   }
 }
-
+#endif
 #endif //!  RHLLC &&  SOLVERS && USE_MPI

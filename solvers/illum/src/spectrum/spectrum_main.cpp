@@ -66,6 +66,7 @@ int illum::RunSpectrumModule(int count_states) {
       }
       count_states = 1; //не удалось считать данные. ВЫполнить дефолтный расчёт
     }
+    cuda_sep::SendVelocity(grid);
 
     MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 

@@ -407,7 +407,26 @@ Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs
 
   __m256d EXP = _mm256_exp_pd(_mm256_mul_pd(_mm256_set1_pd(-k), S));
   __m256d I = _mm256_add_pd(_mm256_mul_pd(_mm256_sub_pd(I_0, RHS), EXP), RHS);
-  _mm256_store_pd(Icur, _mm256_max_pd(_mm256_set1_pd(0), I));
+  _mm256_store_pd(Icur, _mm256_max_pd(_mm256_set1_pd(0.0), I));
+  return (Icur[0] + Icur[1] + Icur[2]) / 3.;
+}
+
+Type illum::GetIllumLimit(const Type *I0, const Type *s, const Type k, const Type rhs) {
+  // (1 - s * k) * (I_0 + s * (alpha * Q + S * betta));
+
+  alignas(32) Type Icur[4];
+  // for (size_t i = 0; i < 3; i++) {
+  //   Icur[i] = (1 - s[i] * k) * (I0[i] + s[i] * rhs);
+  // }
+
+  __m256d RHS = _mm256_set1_pd(rhs);
+  __m256d S = _mm256_load_pd(s);
+  __m256d I_0 = _mm256_load_pd(I0);
+  __m256d K = _mm256_set1_pd(k);
+
+  __m256d sk = _mm256_sub_pd(_mm256_set1_pd(1.0), _mm256_mul_pd(S, _mm256_set1_pd(k)));
+  __m256d I = _mm256_mul_pd(sk, _mm256_add_pd(I_0, _mm256_mul_pd(S, RHS)));
+  _mm256_store_pd(Icur, _mm256_max_pd(_mm256_set1_pd(0.0), I));
   return (Icur[0] + Icur[1] + Icur[2]) / 3.;
 }
 #pragma GCC pop("O3");
@@ -528,6 +547,7 @@ Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, 
 }
 
 #include "compton.h"
+#include "spectrum_utils.h"
 Type illum::GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k,
                       Type frq0, Type frq1) {
 
@@ -535,16 +555,32 @@ Type illum::GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k,
 
   Type betta;
   if (LIKELY(phys->vel > kC_LightInv)) {
-    phys->betta = (get_scat_coef(0.5 * (frq1 + frq0), phys->vel, phys->cosf, phys->lorenz) / (kM_hydrogen * kDist)) * phys->val->d;
+    betta = (get_scat_coef(0.5 * (frq1 + frq0), phys->vel, phys->cosf, phys->lorenz) / (kM_hydrogen * kDist)) * (phys->val->d * kDensity);
   } else {
-    phys->betta = (get_scat_coef(0.5 * (frq1 + frq0)) / (kM_hydrogen * kDist)) * phys->val->d;
+    betta = (get_scat_coef(0.5 * (frq1 + frq0)) / (kM_hydrogen * kDist)) * (phys->val->d * kDensity);
   }
 
-  Type alpha = phys->alpha;
-  Type Q = B_Plank(phys->T, phys->logT, frq1, frq0) / kRadiation; // Q=alpha*Ie
+  Type alpha = 0; // phys->alpha;
+  Type Q = B_Plank(phys->T, phys->logT, frq1, frq0) / kRadiation;
+  Type SS = (phys->val->d * kDensity / kM_hydrogen) * S / kDist;
 
   k = alpha + betta;
-  return (alpha * Q + betta * S) / k;
+  if (k < numeric_limit_abs_coef) {
+    return (alpha * Q + SS);
+  }
+
+#ifdef LOG_SPECTRUM
+  if (S != 0 && log_enable) {
+    log_spectrum("S=%e, SS=%e, b=%e\n", S, SS, betta);
+    log_enable = 0;
+  }
+  Type res = (alpha * Q + SS) / k;
+  if (res < 0 || std::isnan(res) || std::isinf(res)) {
+    EXIT_ERR("res=%e %e %e %e \n", res, alpha, Q, SS);
+  }
+#endif
+
+  return (alpha * Q + SS) / k;
 }
 
 #endif //! defined ILLUM && defined SOLVERS

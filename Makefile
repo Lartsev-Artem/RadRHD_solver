@@ -1,5 +1,5 @@
 # defining project config 
-DEFCONF 		= SOLVERS LINUX DEBUG BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA  USE_MPI RAD_RHD RHLLC SPECTRUM
+DEFCONF 		= SOLVERS LINUX DEBUG BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA  USE_MPI RHLLC SPECTRUM
 #DEFCONF 		= SOLVERS DEBUG RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI USE_CUDA
 
 # defining working directories
@@ -7,7 +7,7 @@ LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/
 LIB_SRC = lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometry/src lib/physics/src
 
 CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteristics cuda/include/ray_tracing cuda/include/short_characteristics/separate_gpu
-export CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/src/ray_tracing cuda/src/short_characteristics/separate_gpu
+export CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/src/ray_tracing cuda/src/short_characteristics/separate_gpu cuda/src/short_characteristics/separate_gpu/spectrum
 
 SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include solvers/ray_tracing/include solvers/illum/include/mpi solvers/illum/include/add_directions solvers/RadRHD/include solvers/illum/include/spectrum
 SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src solvers/ray_tracing/src solvers/illum/src/mpi solvers/illum/src/add_directions solvers/RadRHD/src solvers/illum/src/mpi/multi_gpu solvers/illum/src/spectrum
@@ -60,7 +60,7 @@ LINK_SRC		= $(filter-out $(EXE_OBJ),$(OBJS))
 # icpc:  -fast -O3 -xHost -ipo
 # gcc:  -Ofast march=cpu-type    -flto (-fwhole-program)
 export CXX      = mpic++
-CPPFLAGS        = $(DEF_SET) -fopenmp -fPIE -Ofast
+CPPFLAGS        = $(DEF_SET) -fopenmp -fPIE -O2#-Ofast
 CXXFLAGS        = -std=c++17 #-g #-Wall -Wextra -std=c++11
 
 export NVCC 		= nvcc
