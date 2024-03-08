@@ -1,3 +1,4 @@
+#if defined SPECTRUM
 #include "spectrum_utils.h"
 
 #include "gas_state.h"
@@ -59,3 +60,4 @@ int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
 
   return e_completion_success;
 }
+#endif //! SPECTRUM
