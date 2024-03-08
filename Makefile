@@ -1,5 +1,5 @@
 # defining project config 
-DEFCONF 		= SOLVERS LINUX DEBUG BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA  USE_MPI RHLLC SPECTRUM
+DEFCONF 		= SOLVERS DEBUG  BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA USE_MPI RHLLC SPECTRUM
 #DEFCONF 		= SOLVERS DEBUG RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI USE_CUDA
 
 # defining working directories
@@ -60,7 +60,7 @@ LINK_SRC		= $(filter-out $(EXE_OBJ),$(OBJS))
 # icpc:  -fast -O3 -xHost -ipo
 # gcc:  -Ofast march=cpu-type    -flto (-fwhole-program)
 export CXX      = mpic++
-CPPFLAGS        = $(DEF_SET) -fopenmp -fPIE -O2#-Ofast
+CPPFLAGS        = $(DEF_SET) -fopenmp -fPIE -Ofast
 CXXFLAGS        = -std=c++17 #-g #-Wall -Wextra -std=c++11
 
 export NVCC 		= nvcc

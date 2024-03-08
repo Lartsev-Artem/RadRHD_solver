@@ -162,7 +162,7 @@ int trace::RunTracesModule() {
       RETURN_ERR("Error graph_cell_faces");
 
 #ifndef DEBUG
-    std::remove(glb_files.graph_address + F_GRAPH + std::to_string(num_direction) + ".bin"); //удаляем граф по ячейкам
+    std::remove((glb_files.graph_address + F_GRAPH + std::to_string(num_direction) + ".bin").c_str()); //удаляем граф по ячейкам
 #endif
 
 #else
