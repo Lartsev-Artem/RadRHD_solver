@@ -3,14 +3,14 @@
 #include "solvers_struct.h"
 
 #ifdef DEBUG
-#define LOG_SPECTRUM
+//#define LOG_SPECTRUM
 #endif
 
 #ifdef LOG_SPECTRUM
 extern bool log_enable;
 #define log_spectrum(...) WRITE_LOG(__VA_ARGS__)
 #else
-log_spectrum(...)
+#define log_spectrum(...)
 #endif
 
 namespace illum {

@@ -6,6 +6,9 @@
 #ifndef GLOBAL_CONSTS_H
 #define GLOBAL_CONSTS_H
 
+#include "log_global_consts.h"
+#define LOG(val) log_##val
+
 constexpr double k_exp = 2.7182818284590452353602874713527; ///<число e
 constexpr double PI = 3.1415926535897932384626433832795;    ///<число пи
 constexpr double PI4 = 4 * PI;
@@ -54,14 +57,14 @@ constexpr double kDistSun = (149.6 * 10e9); ///< расстояние до Со�
 constexpr double kDistMoon = 400000000.;    ///<расстояние до Луны в м
 
 #if 1
-constexpr double kDist = 1e13;                                       ///< характерное расстояние
-constexpr double kVelocity = kC_Light;                               ///< характерная скорость
-constexpr double kMass = (kVelocity * kVelocity * kDist) / kGravity; ///< характерная масса
-// constexpr double kTemperature = 4000;         ///< характерная температура
+constexpr double kDist = 1e13;         ///< характерное расстояние
+constexpr double kVelocity = kC_Light; ///< характерная скорость
+// constexpr double kMass =(kVelocity * kVelocity * kDist) / kGravity; ///< характерная масса
+constexpr double kMass = 1e6;                 ///< характерная масса
 constexpr double kTime = (kDist / kVelocity); ///< характерное время
 
 constexpr double kDensity = (kMass / (kDist * kDist * kDist));   ///< характерная плотность
-constexpr double kPressure = (kDensity * kVelocity * kVelocity); ///< характерное давление
+constexpr double kPressure = kMass / (kDist * kTime * kTime);    ///< характерное давление
 constexpr double kRadiation = (kMass / (kTime * kTime * kTime)); ///< характерное излучение
 
 #else

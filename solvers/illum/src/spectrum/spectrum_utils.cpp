@@ -12,8 +12,12 @@ Type illum::spectrum::get_full_illum(const IdType num_dir, const grid_t &grid) {
   for (size_t cell = 0; cell < N; cell++) {
     sumI += grid.Illum[M * cell + num_dir];
   }
-  return sumI / kDist;
+  return sumI * kRadiation / kDist;
 }
+
+#include <array>
+static int vel_idx = 0;
+static std::array<Vector3, 3> VelArr = {Vector3(0, 0, 0), Vector3(0, 0.99, 0), Vector3(-0.99, 0, 0)};
 
 int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
 
@@ -27,18 +31,27 @@ int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
   err |= files_sys::bin::ReadSimple(glb_files.solve_address + std::to_string(num) + F_VELOCITY, velocity);
 
   if (err) {
+    WRITE_LOG_ERR("Error reading phys state\n");
+
+    if (vel_idx >= VelArr.size()) {
+      RETURN_ERR("No static state\n");
+    }
+
+#pragma omp parallel for
     for (int i = 0; i < grid.size; i++) {
-      grid.cells[i].phys_val = flux_t(1e5 / kDensity, Vector3(0, 0.99, 0), GetPressure(1e5 / kDensity, 5000.0));
+      grid.cells[i].phys_val = flux_t(1e-11 / kDensity, VelArr[vel_idx], GetPressure(1e-11 / kDensity, 5000.0));
       grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
     }
-    RETURN_ERR("Error reading phys state\n");
+    vel_idx++;
+    WRITE_LOG("Init static phys state\n");
+    return e_completion_success;
   }
 
   if (!((density.size() == pressure.size()) && (density.size() == velocity.size()) && (density.size() == grid.size))) {
     RETURN_ERR("Error data size in InitPhysState\n");
   }
 
-  //#pragma omp parallel for
+#pragma omp parallel for
   for (int i = 0; i < grid.size; i++) {
     grid.cells[i].phys_val = flux_t(density[i], velocity[i], pressure[i]);
     grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);

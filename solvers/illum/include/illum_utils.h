@@ -181,7 +181,7 @@ Type GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs);
 
 //!@brief предельный случай (k->0)
 Type GetIllumLimit(const Type *I0, const Type *s, const Type k, const Type rhs);
-constexpr Type numeric_limit_abs_coef = 1e-30;
+constexpr Type numeric_limit_abs_coef = 1e-20;
 #endif
 
 } // namespace illum

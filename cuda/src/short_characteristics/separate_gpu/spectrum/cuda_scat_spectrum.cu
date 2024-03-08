@@ -19,30 +19,12 @@ static inline __device__ Type get_compton_frq(Type frq, Type cosTh) {
   return frq / (1. + eps * (1.0 - cosTh));
 }
 
-static inline __device__ double sigma(double eps) {
-
-  if (eps < 1e-6) {
-    return kSigma_thomson;
-  }
-
-  if (eps > 1000) {
-    constexpr double coef = PI * kR_electron * kR_electron;
-    return coef / eps * (0.5 + log(2 * eps));
-  }
-
-  constexpr double coef = 2.0 * PI * kR_electron * kR_electron;
-  const double eps21 = 2 * eps + 1;
-  const double ln_eps21 = log(eps21) / eps;
-
-  return coef * (((1 + eps) / (eps * eps)) * (2 * (1 + eps) / (eps21)-ln_eps21) + 0.5 * ln_eps21 - (1 + 3 * eps) / (eps21 * eps21));
-}
-
 static inline __device__ Type GammaC(const Type cosf, const Type v, const Vector3 &vel, const Type frq, const Type lorenz,
                                      const Vector3 &main_dir, const Vector3 &scat_dir) {
 
   const Type cosTh = main_dir.dot(scat_dir);
   Type frq1;
-  if (v > 1e-10) {
+  if (v > (1. / kVelocity)) {
     const Type cosf1 = vel.dot(scat_dir) / v;
     frq1 = get_compton_frq(frq, v, cosf, cosf1, cosTh, lorenz);
   } else {
@@ -80,12 +62,12 @@ __global__ void cuda::kernel::Get_spectrum_multi_device(const geo::grid_directio
   Type v2 = vel.dot(vel);
 
   Type lorenz = 1.0;
-  Type v = 0;
-  const double cosf = 0;
+  Type v = 0.0;
+  Type cosf = 0.0;
   if (v2 > kC_LightInv) {
-    Type lorenz = 1. / sqrt(1. - (v2));
-    Type v = sqrt(v2);
-    const double cosf = vel.dot(cur_dir) / v;
+    lorenz = 1. / sqrt(1. - (v2));
+    v = sqrt(v2);
+    cosf = vel.dot(cur_dir) / v;
   }
 
   Type scatter = 0;
@@ -94,8 +76,11 @@ __global__ void cuda::kernel::Get_spectrum_multi_device(const geo::grid_directio
     scatter += GammaC(cosf, v, vel, frq, lorenz, cur_dir, all_dir[num_direction].dir) * I * all_dir[num_direction].area;
   }
 
-  ///\note в пределе малых здесь получим kSigma_thomson (размерную)
-  grid->int_scattering[i * grid->local_scattering_size + k] = scatter / dir->full_area;
+  ///\warning Без ослабления рассеяния нет сходимости в релятивистском режиме
+  constexpr Type cfl = 0.25;
+
+  ///\note в пределе малых частот здесь получим kSigma_thomson (размерную) (и cfl=1)
+  grid->int_scattering[i * grid->local_scattering_size + k] = cfl * scatter / dir->full_area;
 }
 
 #endif //! USE_CUDA

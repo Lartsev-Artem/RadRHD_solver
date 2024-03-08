@@ -62,12 +62,14 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
     /*---------------------------------- далее FOR по направлениям----------------------------------*/
     const IdType count_directions = grid_direction.size;
 
+#ifndef LOG_SPECTRUM
 #ifdef SPECTRUM
 #pragma omp parallel default(none) firstprivate(count_directions, np, local_disp, local_size, frq0, frq1) \
-    shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1, grid_direction, glb_files, log_enable)
+    shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1, grid_direction, glb_files)
 #else
 #pragma omp parallel default(none) firstprivate(count_directions, np, local_disp, local_size) \
     shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1)
+#endif
 #endif
     {
       const int count_th = omp_get_num_threads();
@@ -98,8 +100,9 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           (*inter_coef)[num_face] = illum::BoundaryConditions(neigh_id); //значение на грани ( или коэффициенты интерполяции)
         }
 #ifdef LOG_SPECTRUM
-        if (num_direction == 32 + local_disp)
+        if (num_direction + local_disp == 66) {
           log_enable = 1;
+        }
 #endif
 
         // индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
@@ -131,6 +134,11 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           Type k;
           const Type S = grid.scattering[num_cell * local_size + num_direction];
 #ifdef SPECTRUM
+#ifdef LOG_SPECTRUM
+          if (log_enable) {
+            log_spectrum("cell_log%d\n", num_cell);
+          }
+#endif
           const Type rhs = GetRhsOpt(x, S, *cell, k, frq0, frq1);
 #else
           const Type rhs = GetRhsOpt(x, S, *cell, k);
@@ -153,7 +161,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           }
 #ifdef DEBUG
           if (std::isnan(fabs(I)) || std::isinf(fabs(I)) || I < 0) {
-            WRITE_LOG_ERR("nan[%d %d], k=%e, rhs=%e, I0:%e, %e, %e, %e\n", num_direction, num_cell, k, rhs, I0[0], I0[1], I0[2], S);
+            WRITE_LOG_ERR("nan[%ld %d], k=%e, rhs=%e, I0:%e, %e, %e, %e\n", num_direction, num_cell, k, rhs, I0[0], I0[1], I0[2], S);
             D_LD;
           }
 #endif

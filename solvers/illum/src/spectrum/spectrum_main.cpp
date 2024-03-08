@@ -61,10 +61,7 @@ int illum::RunSpectrumModule(int count_states) {
   for (int st = 0; st < count_states; st++) {
 
     if (spectrum::InitPhysState(st, grid) != e_completion_success) {
-      if (st) {
-        break; //уже был расчёт, просто кончились новые данные
-      }
-      count_states = 1; //не удалось считать данные. ВЫполнить дефолтный расчёт
+      break; //не удалось инициализировать газовое состояние
     }
     cuda_sep::SendVelocity(grid);
 
@@ -95,3 +92,14 @@ int illum::RunSpectrumModule(int count_states) {
 
 #endif //! SEPARATE_GPU && SPECTRUM
 #endif //! SOLVERS
+
+//#include "plunk.h"
+// if (get_mpi_id() == 0) {
+//   std::vector<Type> frq(grid.spectrum.size());
+//   for (size_t i = 0; i < frq.size(); i++) {
+//     frq[i] = (grid.frq_grid[i] + grid.frq_grid[i + 1]) / 2;
+//     grid.spectrum[i] = exp(B_Plank_log(40000000, grid.frq_grid[i + 1], grid.frq_grid[i]));
+//   }
+//   files_sys::txt::WriteSimple(glb_files.solve_address + "init_spectrum.txt",
+//                               frq, grid.spectrum);
+// }

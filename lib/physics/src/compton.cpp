@@ -30,14 +30,14 @@ double get_scat_coef(double frq) {
 
 double get_scat_coef(double frq, double vel, double cosf) {
   constexpr double hmc = kH_plank / (kM_electron * kC_Light * kC_Light);
-  double velC = vel; // vel * (1. / kC_Light);
+  double velC = vel * (kVelocity / kC_Light);
   double lorenz = 1. / sqrt(1. - (velC * velC));
   return sigma(hmc * frq * lorenz * (1. - velC * cosf)); //чтобы в пределе v=0 получить исходную постановку 2 не нужна
   // return sigma(2 * hmc * frq * lorenz * (1. - velC * cosf));
 }
 double get_scat_coef(double frq, double vel, double cosf, double lorenz) {
   constexpr double hmc = kH_plank / (kM_electron * kC_Light * kC_Light);
-  double velC = vel;                                     // vel * (1. / kC_Light);
+  double velC = vel * (kVelocity / kC_Light);
   return sigma(hmc * frq * lorenz * (1. - velC * cosf)); //чтобы в пределе v=0 получить исходную постановку 2 не нужна
   // return sigma(2 * hmc * frq * lorenz * (1. - velC * cosf));
 }
@@ -45,7 +45,7 @@ double get_scat_coef(double frq, double vel, double cosf, double lorenz) {
 double get_compton_frq(double frq, double vel, double cosf, double cosf1, double cosTh) {
 
   constexpr double hmc = kH_plank / (kM_electron * kC_Light * kC_Light);
-  double velC = vel * (1. / kC_Light);
+  double velC = vel * (kVelocity / kC_Light);
   double lorenz = 1. / sqrt(1. - (velC * velC));
   double eps = hmc * frq;
 
@@ -61,7 +61,7 @@ double get_compton_frq(double frq, double cosTh) {
 double get_dif_scat_coef(double frq, double vel, double cosf, double cosf1, double cosTh) {
   constexpr double coef = 0.5 * kR_electron * kR_electron;
   double frq1;
-  if (vel > 1e-10) {
+  if (vel > 1.0 / kVelocity) {
     frq1 = get_compton_frq(frq, vel, cosf, cosf1, cosTh) / frq;
   } else {
     frq1 = get_compton_frq(frq, cosTh) / frq;

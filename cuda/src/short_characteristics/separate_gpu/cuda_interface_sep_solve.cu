@@ -114,6 +114,7 @@ int cuda::interface::separate_device::CalculateIntScatteringAsync(const grid_dir
 }
 #endif
 
+#ifdef ON_FULL_ILLUM_ARRAYS
 static inline IdType get_host_disp(const int id_dev, const grid_t &grid, const cuda::multi_gpu_config_t &cfg) {
 
   if (cfg.disp[id_dev] > grid.loc_shift) {
@@ -121,6 +122,8 @@ static inline IdType get_host_disp(const int id_dev, const grid_t &grid, const c
   }
   return 0;
 }
+#endif
+
 int cuda::interface::separate_device::CalculateAllParamAsync(const int id_dev, const int im_dev, const grid_directions_t &grid_dir, grid_t &grid, e_cuda_stream_id_t st) {
 
 #ifdef ON_FULL_ILLUM_ARRAYS

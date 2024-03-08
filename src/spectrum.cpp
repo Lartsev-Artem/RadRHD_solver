@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
 #ifdef SPECTRUM
   MPI_START(argc, argv);
 
-  int N = 1;
+  int N = 3;
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";
   if (argc > 1)
     file_config = argv[1];
