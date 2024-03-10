@@ -577,23 +577,4 @@ Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, 
   k = alpha + betta;
   return (alpha * Q + betta * S) / k;
 }
-
-// Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k) {
-
-//   // переход к размерным параметрам
-//   const Type S = int_scattering;
-//   Type alpha = cell.cell_data->alpha;
-//   const Type betta = cell.cell_data->betta;
-
-//   Type Q = alpha;
-//   alpha /= (4 * PI * kStefanBoltzmann * cell.cell_data->T * cell.cell_data->T * cell.cell_data->T * cell.cell_data->T);
-
-//   cell.illum_val.absorp_coef = alpha;
-//   cell.illum_val.scat_coef = betta;
-
-//   // Type Q = B_Plank(cell.cell_data->T) / kRadiation;
-
-//   k = alpha + betta;
-//   return (Q + betta * S) / k;
-// }
 #endif //! defined ILLUM && defined SOLVERS

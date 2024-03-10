@@ -106,7 +106,7 @@ int rad_rhd::RunRadRHDModule() {
 
 #pragma omp parallel for
     for (int i = 0; i < grid.size; i++) {
-      grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
+      grid.cells[i].cell_data->Init(&grid.cells[i].phys_val, &grid.cells[i]);
     }
 
     illum::separate_gpu::CalculateIllum(grid_direction, inner_bound_code, vec_x0, sorted_graph, sorted_id_bound_face, grid);

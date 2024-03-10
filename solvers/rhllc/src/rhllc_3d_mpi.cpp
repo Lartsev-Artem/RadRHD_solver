@@ -45,7 +45,7 @@ void rhllc_mpi::SyncAndCalcPhysCast(grid_t &grid) {
     {
 #pragma omp for
       for (int i = start; i < end; i++) {
-        grid.cells[i].cell_data->Init(&grid.cells[i].phys_val, &grid.cells[i]);
+        grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
       }
     }
 

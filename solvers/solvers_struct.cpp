@@ -196,7 +196,7 @@ void full_phys_data_t::Init(const flux_t *src, const elem_t *cell) {
   val = src;
   if (cell) {
     if (cell->geo.center[0] < 0.5) {
-      T = 1e11;
+      T = 1e17;
     } else {
       T = 1000;
     }
@@ -212,7 +212,6 @@ void full_phys_data_t::Init(const flux_t *src, const elem_t *cell) {
   lorenz = 1. / sqrt(1. - vel2);
 
   Type L = t_cooling_function(log(val->d) + LOG(kDensity), logT);
-  // alpha = exp(L) * kDist / kRadiation;
   Type log_alpha = L - (LOG(kStefanBoltzmann4) + 4 * logT) + LOG(kDist);
   alpha = exp(log_alpha);
   betta = (kSigma_thomson / kM_hydrogen * kDist) * val->d * kDensity;
