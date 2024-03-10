@@ -80,7 +80,7 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
 
     bound.phys_val.d = kM_hydrogen * 1e14 / kDensity; //  0.1;
     bound.phys_val.p = GetPressure(bound.phys_val.d, 1e7);
-    bound.phys_val.v = Vector3(1e3 / kC_Light, 0, 0);
+    bound.phys_val.v = Vector3(1e3 / kVelocity, 0, 0);
 
     GetConvValue(bound.phys_val, bound.conv_val);
 #else

@@ -34,14 +34,16 @@ int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &gri
   }
 
 #ifdef ILLUM
-  std::vector<Type> illum;
+  if (grid.Illum != nullptr) {
+    std::vector<Type> illum;
 #ifndef SEPARATE_GPU
-  GetDirectionDataFromFace(grid.size, 0, grid.Illum, 0.0, illum);
+    GetDirectionDataFromFace(grid.size, 0, grid.Illum, 0.0, illum);
 #else
-  GetCellDataBySelectedDirection(grid.size, grid.size_dir, 0, grid.Illum, illum);
+    GetCellDataBySelectedDirection(grid.size, grid.size_dir, 0, grid.Illum, illum);
 #endif
-  files_sys::bin::WriteSimple(main_dir + F_ILLUM, illum);
-  // files_sys::txt::WriteSimple(main_dir + F_ILLUM + ".txt", illum);
+    files_sys::bin::WriteSimple(main_dir + F_ILLUM, illum);
+    // files_sys::txt::WriteSimple(main_dir + F_ILLUM + ".txt", illum);
+  }
 
 #ifdef ON_FULL_ILLUM_ARRAYS
 #if !defined USE_CUDA

@@ -27,7 +27,7 @@ int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointe
       }
       if (sizeable) {
         for (auto &el : data) {
-          el *= *(sizes);
+          el *= (*sizes);
         }
       }
       SetDoubleVtkData(fs::path(str).replace_extension(), data, u_grid);
