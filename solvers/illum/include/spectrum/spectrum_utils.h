@@ -34,6 +34,19 @@ Type get_full_illum(const IdType num_dir, const grid_t &grid);
  */
 int InitPhysState(const int num, grid_t &grid);
 }; // namespace spectrum
+
+/**
+ * @brief
+ *
+ * @param[in] x точка на сетке в которой рассчитывается излучение(центр ячейки)
+ * @param[in] int_scattering интеграл рассеяния в ячейке
+ * @param[inout] cell ячейка с газодинамическими параметрами
+ * @param[out] k коэффициент ослабления (alpha+betta)
+ * @param[in] frq0 левая граница частоты
+ * @param[in] frq1 правая граница частоты
+ * @return правая часть : (alpha * Q +  S) / k;
+ */
+Type GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k, Type frq0, Type frq1);
 }; // namespace illum
 
 #endif //! SPECTRUM_UTILS_H

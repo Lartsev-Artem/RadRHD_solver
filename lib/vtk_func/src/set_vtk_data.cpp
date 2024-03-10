@@ -7,9 +7,10 @@
 
 namespace fs = std::filesystem;
 
-int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointer<vtkUnstructuredGrid> &u_grid) {
+int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointer<vtkUnstructuredGrid> &u_grid, const bool sizeable) {
 
   std::vector<Type> data;
+  std::vector<Type> size_data = {kRadiation, 1, 1, kDensity, kPressure};
   std::vector<std::string> name_data = {F_ILLUM, F_DIVSTREAM, F_ENERGY, F_DENSITY, F_PRESSURE};
 
   std::vector<Vector3> data3;
@@ -18,12 +19,19 @@ int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointe
   std::vector<Matrix3> data9;
   std::vector<std::string> name_data9 = {F_IMPULS};
 
+  const Type *sizes = size_data.data();
   for (auto &str : name_data) {
     if (fs::exists(address_solution + str)) {
       if (files_sys::bin::ReadSimple(address_solution + str, data)) {
         return e_completion_fail;
       }
+      if (sizeable) {
+        for (auto &el : data) {
+          el *= *(sizes);
+        }
+      }
       SetDoubleVtkData(fs::path(str).replace_extension(), data, u_grid);
+      sizes++;
     }
   }
 

@@ -47,7 +47,7 @@
 #define SINGLE_GPU ///< разделенной расчет, но с одной картой (система очереди)
 
 #ifdef SINGLE_GPU
-#define GPU_DIV_PARAM 2 ///< параметр дробления (число <<мнимых>> карт)
+#define GPU_DIV_PARAM 1 ///< параметр дробления (число <<мнимых>> карт)
 #endif
 #endif
 

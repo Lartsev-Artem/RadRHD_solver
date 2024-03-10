@@ -1,4 +1,4 @@
-#ifdef USE_CUDA
+#if defined USE_CUDA && defined SPECTRUM
 
 #include "cuda_integrator.h"
 #include "cuda_scattering.h"
@@ -38,7 +38,6 @@ static inline __device__ Type GammaC(const Type cosf, const Type v, const Vector
   return frq1_inv * ds;
 }
 
-#include "cuda_integrator.h"
 __global__ void cuda::kernel::Get_spectrum_multi_device(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid, const Type frq,
                                                         const IdType end_dir) {
 

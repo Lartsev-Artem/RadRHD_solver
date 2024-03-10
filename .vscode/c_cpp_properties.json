@@ -47,8 +47,7 @@
                 "HLLC",
                 "ILLUM",
                 "USE_CUDA",
-                "RAD_RHD",
-                "SPECTRUM"
+                "RAD_RHD"
             ],
             "compilerPath": "/usr/bin/mpic++",
             "cStandard": "c17",

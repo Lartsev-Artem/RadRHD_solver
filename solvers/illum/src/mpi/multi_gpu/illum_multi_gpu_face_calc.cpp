@@ -63,7 +63,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
     const IdType count_directions = grid_direction.size;
 
 #ifndef LOG_SPECTRUM
-#ifdef SPECTRUM
+#if defined SPECTRUM
 #pragma omp parallel default(none) firstprivate(count_directions, np, local_disp, local_size, frq0, frq1) \
     shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1, grid_direction, glb_files)
 #else

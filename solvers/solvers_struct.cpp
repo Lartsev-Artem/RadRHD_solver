@@ -24,7 +24,19 @@ Type TableFunc::operator()(Type x, Type y) {
   }
 
   if (y > max_y) {
-    y = max_y;
+    int i = std::min((int)((round(x) - min_x) / step_x), Nx - 1);
+
+    Type y1 = exp(data[Ny * i + (Ny - 1)]);
+    Type y0 = exp(data[Ny * i + (Ny - 2)]);
+
+    Type x1 = exp(max_y);
+    Type x0 = exp(max_y - step_y);
+
+    Type k = (y0 - y1) / (x0 - x1);
+    Type m = (-x1 * y0 + x0 * y1) / (x0 - x1);
+    // WRITE_LOG("(%lf %lf) (%lf %lf), %lf %lf: %e (def=%lf)\n", x0, y0, x1, y1, x, y, log(k * exp(y) + m), data[Ny * i + Ny - 1]);
+    return log(k * exp(y) + m);
+    // y > max_y
   }
 
   int i = std::min((int)((round(x) - min_x) / step_x), Nx - 1);
@@ -179,6 +191,32 @@ void full_phys_data_t::InitDirection(const Vector3 &dir) {
 }
 #endif
 
+void full_phys_data_t::Init(const flux_t *src, const elem_t *cell) {
+
+  val = src;
+  if (cell) {
+    if (cell->geo.center[0] < 0.5) {
+      T = 1e11;
+    } else {
+      T = 1000;
+    }
+  } else {
+    T = GetTemperature(src->d, src->p);
+  }
+
+  logT = log(T);
+
+  Type vel2 = val->v.dot(val->v);
+  vel = sqrt(vel2);
+
+  lorenz = 1. / sqrt(1. - vel2);
+
+  Type L = t_cooling_function(log(val->d) + LOG(kDensity), logT);
+  // alpha = exp(L) * kDist / kRadiation;
+  Type log_alpha = L - (LOG(kStefanBoltzmann4) + 4 * logT) + LOG(kDist);
+  alpha = exp(log_alpha);
+  betta = (kSigma_thomson / kM_hydrogen * kDist) * val->d * kDensity;
+}
 void full_phys_data_t::Init(const flux_t *src) {
 
   val = src;
@@ -193,6 +231,6 @@ void full_phys_data_t::Init(const flux_t *src) {
   Type L = t_cooling_function(log(val->d) + LOG(kDensity), logT);
   Type log_alpha = L - (LOG(kStefanBoltzmann4) + 4 * logT) + LOG(kDist);
   alpha = exp(log_alpha);
-  betta = (kSigma_thomson / kM_hydrogen * kDist) * val->d;
+  betta = (kSigma_thomson / kM_hydrogen * kDist) * val->d * kDensity;
 }
 #endif

@@ -8,12 +8,13 @@
 #include "set_vtk_data.h"
 
 int FUNC_NAME(RebuildSolve)(int argc, char *argv[]) {
-  if (argc != 4) {
+  if (argc < 4) {
     printf("Error input data!\n");
     printf("Input:\n");
     printf("name_file_vtk\n");
     printf("address_solve (like \"path\\file\")\n");
     printf("max_number_of_iter\n");
+    printf("Add params: sizeable exit [0/1]\n");
     return e_completion_fail;
   }
 
@@ -21,13 +22,18 @@ int FUNC_NAME(RebuildSolve)(int argc, char *argv[]) {
   const std::string address_solve = argv[2];
   const int max_number_of_iter = std::stoi(argv[3]);
 
+  bool sizeable = false;
+  if (argc == 5) {
+    sizeable = std::stoi(argv[4]);
+  }
+
   for (int i = 0; i < max_number_of_iter; i++) {
     {
       vtkSmartPointer<vtkUnstructuredGrid> grid = vtkSmartPointer<vtkUnstructuredGrid>::New();
       if (files_sys::vtk::Read(name_file_vtk, grid)) {
         return e_completion_fail;
       }
-      if (SetSolutionFromFileToVtk(address_solve + std::to_string(i), grid) == e_completion_success) {
+      if (SetSolutionFromFileToVtk(address_solve + std::to_string(i), grid, sizeable) == e_completion_success) {
         if (files_sys::vtk::WriteVtkGrid(address_solve + std::to_string(i) + ".vtk", grid, true) == e_completion_success) {
           printf("add grid %d\n", i);
         }

@@ -16,6 +16,7 @@ void illum::MpiInitStruct(const grid_directions_t &grid) {
   MPI_Type_commit(&MPI_RECV_ILLUM_T);
 }
 
+#ifdef SPECTRUM
 void illum::spectrum::MpiInitStruct(const grid_t &grid) {
 
   int array_size[] = {static_cast<int>(grid.size_frq * grid.size_dir)};
@@ -29,5 +30,5 @@ void illum::spectrum::MpiInitStruct(const grid_t &grid) {
   // MPI_Send(Illum_local.data(), N*F,MPI_DOUBLE,1,0,MPI_COMM_WORLD);
   // MPI_Recv(Illum.data(), N,subarray2,0,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 }
-
+#endif
 #endif

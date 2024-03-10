@@ -66,7 +66,8 @@ int SetDoubleVtkData(const std::string &name_data, const std::vector<Type> &data
  *
  * @param[in] address_solution адрес с файлами решения
  * @param[inout] u_grid сетка
+ * @param[in] sizeable признак вывода размерных переменных или безразмерных
  * @return int ::e_type_completion
  */
-int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointer<vtkUnstructuredGrid> &u_grid);
+int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointer<vtkUnstructuredGrid> &u_grid, const bool sizeable = false);
 #endif //! SET_DATA_H

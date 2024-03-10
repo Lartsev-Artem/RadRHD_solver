@@ -93,14 +93,23 @@ static int SetRHllcValueDefault(std::vector<elem_t> &cells) {
 #elif GEOMETRY_TYPE == Cube
     Type x = centers[i][0];
     if (x < 0.5) {
-      el.phys_val.d = 1;
-      el.phys_val.p = 1;
-      el.phys_val.v = Vector3(0.9, 0, 0);
+      el.phys_val.d = 1e-13 / kDensity;
+      el.phys_val.p = 0.01 / kPressure;
+      el.phys_val.v = Vector3(0, 0, 0);
     } else {
-      el.phys_val.d = 1;
-      el.phys_val.p = 10;
+      el.phys_val.d = 1e-13 / kDensity;
+      el.phys_val.p = 0.01 / kPressure;
       el.phys_val.v = Vector3(0, 0, 0);
     }
+    // if (x < 0.5) {
+    //   el.phys_val.d = 1;
+    //   el.phys_val.p = 1;
+    //   el.phys_val.v = Vector3(0.9, 0, 0);
+    // } else {
+    //   el.phys_val.d = 1;
+    //   el.phys_val.p = 10;
+    //   el.phys_val.v = Vector3(0, 0, 0);
+    // }
 #elif GEOMETRY_TYPE == Cone_JET
     Vector3 x = centers[i];
     if (Vector2(x[1], x[2]).norm() < 0.01 && x[0] < 0.05) {

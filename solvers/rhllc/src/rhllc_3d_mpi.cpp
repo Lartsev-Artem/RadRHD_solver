@@ -45,7 +45,7 @@ void rhllc_mpi::SyncAndCalcPhysCast(grid_t &grid) {
     {
 #pragma omp for
       for (int i = start; i < end; i++) {
-        grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
+        grid.cells[i].cell_data->Init(&grid.cells[i].phys_val, &grid.cells[i]);
       }
     }
 
@@ -260,11 +260,13 @@ void rhllc_mpi::HllcConvToPhys(grid_t &grid) {
   int start = grid.mpi_cfg->disp_cells[myid];
   int end = start + grid.mpi_cfg->send_cells[myid];
 
-#pragma omp parallel default(none) firstprivate(start, end) shared(grid)
+#pragma omp parallel default(none) firstprivate(start, end) shared(grid, glb_files)
   {
 #pragma omp for
     for (int i = start; i < end; i++) {
-      rhllc::GetPhysValueStab(grid.cells[i].conv_val, grid.cells[i].phys_val);
+      if (rhllc::GetPhysValueStab(grid.cells[i].conv_val, grid.cells[i].phys_val)) {
+        DIE_IF(rhllc::PhysPressureFix(grid.cells[i].conv_val, grid.cells[i].phys_val));
+      }
     }
   }
 }

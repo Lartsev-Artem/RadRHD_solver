@@ -60,4 +60,43 @@ int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
 
   return e_completion_success;
 }
+
+Type illum::GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k,
+                      Type frq0, Type frq1) {
+
+  full_phys_data_t *phys = cell.cell_data;
+
+  Type betta;
+  if (LIKELY(phys->vel > kC_LightInv)) {
+    betta = (get_scat_coef(0.5 * (frq1 + frq0), phys->vel, phys->cosf, phys->lorenz) / (kM_hydrogen)) * (phys->val->d * kDensity) * kDist;
+  } else {
+    betta = (get_scat_coef(0.5 * (frq1 + frq0))) * (phys->val->d * kDensity / kM_hydrogen) * kDist;
+  }
+
+  Type alpha = 0; // phys->alpha;
+  Type Q = B_Plank(phys->T, phys->logT, frq1, frq0) / kRadiation;
+  Type SS = (phys->val->d * kDensity / kM_hydrogen) * S * kDist;
+
+#ifdef LOG_SPECTRUM
+  if (log_enable) {
+    log_spectrum("S=%e, SS=%e, sig: %e %e %e\n",
+                 S, SS, 0.5 * (frq1 + frq0), phys->vel, phys->lorenz);
+  }
+
+#endif
+
+  k = alpha + betta;
+  if (k < numeric_limit_abs_coef) {
+    return (alpha * Q + SS);
+  }
+#ifdef DEBUG //
+  Type res = (alpha * Q + SS) / k;
+  if (res < 0 || std::isnan(res) || std::isinf(res)) {
+    EXIT_ERR("res=%e %e %e %e \n", res, alpha, Q, SS);
+  }
+#endif
+
+  return (alpha * Q + SS) / k;
+}
+
 #endif //! SPECTRUM

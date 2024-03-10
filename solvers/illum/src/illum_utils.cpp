@@ -578,42 +578,22 @@ Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, 
   return (alpha * Q + betta * S) / k;
 }
 
-Type illum::GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k,
-                      Type frq0, Type frq1) {
+// Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k) {
 
-  full_phys_data_t *phys = cell.cell_data;
+//   // переход к размерным параметрам
+//   const Type S = int_scattering;
+//   Type alpha = cell.cell_data->alpha;
+//   const Type betta = cell.cell_data->betta;
 
-  Type betta;
-  if (LIKELY(phys->vel > kC_LightInv)) {
-    betta = (get_scat_coef(0.5 * (frq1 + frq0), phys->vel, phys->cosf, phys->lorenz) / (kM_hydrogen)) * (phys->val->d * kDensity) * kDist;
-  } else {
-    betta = (get_scat_coef(0.5 * (frq1 + frq0))) * (phys->val->d * kDensity / kM_hydrogen) * kDist;
-  }
+//   Type Q = alpha;
+//   alpha /= (4 * PI * kStefanBoltzmann * cell.cell_data->T * cell.cell_data->T * cell.cell_data->T * cell.cell_data->T);
 
-  Type alpha = 0; // phys->alpha;
-  Type Q = B_Plank(phys->T, phys->logT, frq1, frq0) / kRadiation;
-  Type SS = (phys->val->d * kDensity / kM_hydrogen) * S * kDist;
+//   cell.illum_val.absorp_coef = alpha;
+//   cell.illum_val.scat_coef = betta;
 
-#ifdef LOG_SPECTRUM
-  if (log_enable) {
-    log_spectrum("S=%e, SS=%e, sig: %e %e %e\n",
-                 S, SS, 0.5 * (frq1 + frq0), phys->vel, phys->lorenz);
-  }
+//   // Type Q = B_Plank(cell.cell_data->T) / kRadiation;
 
-#endif
-
-  k = alpha + betta;
-  if (k < numeric_limit_abs_coef) {
-    return (alpha * Q + SS);
-  }
-#ifdef DEBUG //
-  Type res = (alpha * Q + SS) / k;
-  if (res < 0 || std::isnan(res) || std::isinf(res)) {
-    EXIT_ERR("res=%e %e %e %e \n", res, alpha, Q, SS);
-  }
-#endif
-
-  return (alpha * Q + SS) / k;
-}
-
+//   k = alpha + betta;
+//   return (Q + betta * S) / k;
+// }
 #endif //! defined ILLUM && defined SOLVERS

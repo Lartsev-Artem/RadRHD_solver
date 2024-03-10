@@ -229,6 +229,7 @@ union graph_pair_t {
   uint32_t bits;
 };
 #ifdef ILLUM
+struct elem_t;
 struct full_phys_data_t {
   const flux_t *val;
   Type T;
@@ -245,6 +246,7 @@ struct full_phys_data_t {
   full_phys_data_t(const flux_t *src) { Init(src); }
   full_phys_data_t() {}
   void Init(const flux_t *src);
+  void Init(const flux_t *src, const elem_t *cell);
 };
 #endif
 

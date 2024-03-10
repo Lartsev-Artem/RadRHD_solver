@@ -57,10 +57,10 @@ constexpr double kDistSun = (149.6 * 10e9); ///< расстояние до Со�
 constexpr double kDistMoon = 400000000.;    ///<расстояние до Луны в м
 
 #if 1
-constexpr double kDist = 1e13;         ///< характерное расстояние
-constexpr double kVelocity = kC_Light; ///< характерная скорость
-// constexpr double kMass =(kVelocity * kVelocity * kDist) / kGravity; ///< характерная масса
-constexpr double kMass = 1e6;                 ///< характерная масса
+constexpr double kDist = 1e13;                                       ///< характерное расстояние
+constexpr double kVelocity = kC_Light;                               ///< характерная скорость
+constexpr double kMass = (kVelocity * kVelocity * kDist) / kGravity; ///< характерная масса
+// constexpr double kMass = 1e6;                 ///< характерная масса
 constexpr double kTime = (kDist / kVelocity); ///< характерное время
 
 constexpr double kDensity = (kMass / (kDist * kDist * kDist));   ///< характерная плотность
