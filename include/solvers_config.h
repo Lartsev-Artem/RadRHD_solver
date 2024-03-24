@@ -35,6 +35,10 @@
 
 // #define ONLY_CUDA_SCATTERING ///< отключает весь расчет на видеокарте, кроме рассеяния
 
+#ifdef SPECTRUM
+#define SAVE_FULL_SPECTRUM ///< хранить все частоты в памяти
+#endif
+
 #ifdef USE_CUDA
 #define SEPARATE_GPU ///< разделение данных на видеокарте
 #endif

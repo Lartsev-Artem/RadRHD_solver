@@ -88,8 +88,14 @@ int cuda::interface::separate_device::InitDevice(const grid_directions_t &grid_d
   }
 
   /// \todo это отдельно, т.к. относится к инициализации хоста
-  mem_protected::MallocHost((grid_dir_host.size * grid_host.size * sizeof(Type)), &grid_host.Illum);
-  mem_protected::MallocHost(((grid_dir_host.loc_size) * grid_host.size * sizeof(Type)), &grid_host.scattering);
+
+  IdType frq_cnt = 1;
+#ifdef SAVE_FULL_SPECTRUM
+  frq_cnt = grid_host.size_frq;
+#endif
+
+  mem_protected::MallocHost((grid_dir_host.size * grid_host.size * frq_cnt * sizeof(Type)), &grid_host.Illum);
+  mem_protected::MallocHost(((grid_dir_host.loc_size) * grid_host.size * frq_cnt * sizeof(Type)), &grid_host.scattering);
 
   WRITE_LOG("grid_host.loc_size =%lu %lu %lu %lu\n", grid_host.loc_size, grid_host.loc_shift, grid_host.size, grid_host.size_face);
 

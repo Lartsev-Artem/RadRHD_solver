@@ -53,11 +53,17 @@ int inline CheckError(Err_t cudaStatus, const std::string my_text = "") {
 #endif
 
 #ifdef SPECTRUM
-/// \note на nvidia gtx 1080 6gb почему не хватает ресурсов для запуска
-#define BS 16 ///< размер блока
+#ifdef SAVE_FULL_SPECTRUM
+#define BS 4 ///< размер блока
+#else
+#define BS 16 /// \note на nvidia gtx 1080 6gb почему не хватает ресурсов для запуска
+#endif
 #else
 #define BS 32 ///< размер блока
 #endif
+
+#define CUDA_BLOCKS_3D(val, cells, dirs, frqs) dim3 val((cells + BS - 1) / BS, (dirs + BS - 1) / BS, (frqs + BS - 1) / BS);
+#define CUDA_TREADS_3D(val) dim3 val(BS, BS, BS);
 
 #define CUDA_BLOCKS_2D(val, cells, dirs) dim3 val((cells + BS - 1) / BS, (dirs + BS - 1) / BS);
 #define CUDA_TREADS_2D(val) dim3 val(BS, BS);

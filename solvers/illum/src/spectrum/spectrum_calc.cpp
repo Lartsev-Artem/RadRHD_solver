@@ -1,6 +1,6 @@
 #if defined SOLVERS && defined ILLUM && SPECTRUM
 #include "spectrum_calc.h"
-#if defined TRANSFER_CELL_TO_FACE && defined SEPARATE_GPU
+#if defined TRANSFER_CELL_TO_FACE && defined SEPARATE_GPU && !defined SAVE_FULL_SPECTRUM
 
 #include "illum_calc_gpu_async.h"
 #include "spectrum_utils.h"

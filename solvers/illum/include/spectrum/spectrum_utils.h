@@ -1,4 +1,5 @@
 #if !defined SPECTRUM_UTILS_H && defined SPECTRUM
+#define SPECTRUM_UTILS_H
 
 #include "solvers_struct.h"
 

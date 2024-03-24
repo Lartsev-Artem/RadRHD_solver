@@ -2,17 +2,17 @@
 
 #include "global_value.h"
 
-namespace ksplit {
+namespace ksplit2 {
 constexpr double betta = 35000;
 constexpr double frq0 = 1e24;
 constexpr int N = 1000;
-} // namespace ksplit
+} // namespace ksplit2
 
-namespace ksplit2 {
+namespace ksplit {
 constexpr double betta = 350;
 constexpr double frq0 = 1e24;
 constexpr int N = 100;
-} // namespace ksplit2
+} // namespace ksplit
 
 void get_splitting_spectrum(std::vector<Type> &spectrum) {
 

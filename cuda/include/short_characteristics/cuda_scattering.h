@@ -48,6 +48,9 @@ __global__ void Get_spectrum_multi_device(const geo::grid_directions_device_t *d
                                           const Type frq,
                                           const IdType end_dir);
 
+__global__ void Get_full_spectrum_multi_device(const geo::grid_directions_device_t *dir, geo::grid_device_t *grid,
+                                               const IdType end_dir);
+
 } // namespace kernel
 } // namespace cuda
 #endif //! CUDA_SCATTERING_H

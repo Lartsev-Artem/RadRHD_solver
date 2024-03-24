@@ -4,6 +4,10 @@
 #include "gas_state.h"
 #include "global_value.h"
 
+#include "compton.h"
+#include "illum_utils.h"
+#include "plunk.h"
+
 #include "reader_bin.h"
 
 Type illum::spectrum::get_full_illum(const IdType num_dir, const grid_t &grid) {
@@ -18,7 +22,7 @@ Type illum::spectrum::get_full_illum(const IdType num_dir, const grid_t &grid) {
 
 #include <array>
 static int vel_idx = 0;
-static std::array<Vector3, 3> VelArr = {Vector3(0, 0, 0), Vector3(0, 0.99, 0), Vector3(-0.99, 0, 0)};
+static std::array<Vector3, 3> VelArr = {Vector3(0, 0, 0), Vector3(0.99, 0, 0), Vector3(-0.99, 0, 0)};
 
 int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
 
@@ -86,9 +90,13 @@ Type illum::GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k,
 #endif
 
   k = alpha + betta;
+
+#ifndef SAVE_FULL_SPECTRUM
   if (k < numeric_limit_abs_coef) {
     return (alpha * Q + SS);
   }
+#endif
+
 #ifdef DEBUG //
   Type res = (alpha * Q + SS) / k;
   if (res < 0 || std::isnan(res) || std::isinf(res)) {

@@ -135,6 +135,8 @@ void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_gri
   size_face = faces.size();
 
   inter_coef_all.resize(omp_get_max_threads());
+
+#ifndef SAVE_FULL_SPECTRUM
   for (size_t i = 0; i < inter_coef_all.size(); i++) {
 #ifndef ILLUM_ON_CELL
     inter_coef_all[i].resize(size * CELL_SIZE);
@@ -142,6 +144,14 @@ void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_gri
     inter_coef_all[i].resize(size_face);
 #endif
   }
+#else
+  for (size_t i = 0; i < inter_coef_all.size(); i++) {
+    inter_coef_all[i].resize(size_face);
+    for (size_t j = 0; j < size_face; j++) {
+      inter_coef_all[i][j].resize(size_frq);
+    }
+  }
+#endif
 }
 
 grid_t::~grid_t() {
@@ -174,8 +184,8 @@ void grid_t::InitFullPhysData() {
 #include "plunk.h"
 void grid_t::InitFrq() {
   get_splitting_spectrum(frq_grid);
-  size_frq = frq_grid.size();
-  spectrum.resize(size_frq - 1, 0);
+  size_frq = frq_grid.size() - 1;
+  spectrum.resize(size_frq, 0);
 }
 #endif
 

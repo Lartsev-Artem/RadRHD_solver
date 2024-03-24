@@ -90,6 +90,54 @@ int cuda::interface::separate_device::CalculateSpectrumIntScattering(const grid_
 
   return e_completion_success;
 }
+
+int cuda::interface::separate_device::CalculateFullSpectrumIntScattering(const grid_directions_t &grid_dir, grid_t &grid,
+                                                                         const IdType start_dir, const IdType end_dir, const e_cuda_stream_id_t stream) {
+
+  const IdType M_loc = end_dir - start_dir;
+  const IdType M = grid_dir.size;
+  const IdType F = grid.size_frq;
+  constexpr int id_dev = 0;
+
+  for (int it = 0; it < GPU_DIV_PARAM; it++) {
+
+    cuda::separate_device::kernel::SetImDevice<<<1, 1>>>(grid_deviceN[id_dev],
+                                                         gpu_config.size[it],
+                                                         gpu_config.disp[it],
+                                                         gpu_config.size_params[it],
+                                                         gpu_config.disp_params[it]);
+
+    CUDA_CALL_FUNC(cudaDeviceSynchronize);
+
+    const IdType N = gpu_config.size[it];
+    const IdType dispN = gpu_config.disp[it];
+    CUDA_TREADS_3D(threads);
+    CUDA_BLOCKS_3D(blocks, N, M_loc, F);
+
+    cudaMemcpyAsync(device_host_ptrN[id_dev].illum, grid.Illum + M * dispN * F, M * N * F * sizeof(grid.Illum[0]),
+                    cudaMemcpyHostToDevice, cuda_streams[stream]);
+
+    CudaSyncStream(e_cuda_scattering_2);
+
+    kernel::Get_full_spectrum_multi_device<<<blocks, threads, 0, cuda_streams[stream]>>>(grid_dir_deviceN[id_dev], grid_deviceN[id_dev],
+                                                                                         end_dir);
+
+    // kernel::GetS_MPI_multi_device<<<blocks, threads, 0, cuda_streams[stream]>>>(grid_dir_deviceN[id_dev], grid_deviceN[id_dev], N, start_dir, end_dir);
+
+    CUDA_CALL_FUNC(cudaGetLastError);
+
+    IdType size = F * M_loc * N * sizeof(grid.scattering[0]);
+
+    CudaSyncStream(stream);
+
+    CUDA_CALL_FUNC(cudaMemcpyAsync, grid.scattering + M_loc * dispN * F, device_host_ptrN[id_dev].int_scattering, size, cudaMemcpyDeviceToHost, cuda_streams[e_cuda_scattering_2]);
+
+    CudaSyncStream(e_cuda_params);
+    CudaSyncStream(e_cuda_scattering_2);
+  }
+
+  return e_completion_success;
+}
 #endif
 #endif
 #endif

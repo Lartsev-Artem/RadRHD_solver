@@ -26,12 +26,13 @@ int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointe
         return e_completion_fail;
       }
       if (sizeable) {
+        Type val = *sizes;
         for (auto &el : data) {
-          el *= (*sizes);
+          el *= val;
         }
+        sizes++;
       }
       SetDoubleVtkData(fs::path(str).replace_extension(), data, u_grid);
-      sizes++;
     }
   }
 

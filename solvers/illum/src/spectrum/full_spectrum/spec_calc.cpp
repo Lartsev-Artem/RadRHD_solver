@@ -1,20 +1,17 @@
 #if 0 //здесь есть схема расчета полного излучения. С хранением всего спектра
 // => верного расчёта интеграла рассеяния и численных интегралов по частоте
-// однако реализация требует N*M*F памяти на узел, что допускает только 
-// грубые сетки + нет окончательного модуля к видеокарте. 
+// однако реализация требует N*M*F памяти на узел, что допускает только
+// грубые сетки + нет окончательного модуля к видеокарте.
 // Схема запускалась только без рассеяния и требует отладки
 
-/// \todo: нужна проверка отправлений. Тестовый запуск без видеокарты. Все таки подумать над Illum_loc
 #include "solvers_config.h"
-#if defined SPECTRUM && defined TRANSFER_CELL_TO_FACE
+#if defined SPECTRUM && defined TRANSFER_CELL_TO_FACE && defined SAVE_FULL_SPECTRUM
 #include "spec_all.h"
 
 #ifdef USE_CUDA
 #include "cuda_interface.h"
 #endif
 #include <omp.h>
-
-#define USE_ONE_DIRECTION
 
 #include "global_value.h"
 #include "plunk.h"

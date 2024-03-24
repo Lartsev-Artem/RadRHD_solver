@@ -1,5 +1,5 @@
 # defining project config 
-DEFCONF 		= SOLVERS DEBUG  BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA USE_MPI RHLLC RAD_RHD
+DEFCONF 		= SOLVERS DEBUG  BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA USE_MPI RHLLC SPECTRUM
 #DEFCONF 		= SOLVERS DEBUG RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI USE_CUDA
 
 # defining working directories
@@ -10,7 +10,7 @@ CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteris
 export CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/src/ray_tracing cuda/src/short_characteristics/separate_gpu cuda/src/short_characteristics/separate_gpu/spectrum
 
 SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include solvers/ray_tracing/include solvers/illum/include/mpi solvers/illum/include/add_directions solvers/RadRHD/include solvers/illum/include/spectrum
-SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src solvers/ray_tracing/src solvers/illum/src/mpi solvers/illum/src/add_directions solvers/RadRHD/src solvers/illum/src/mpi/multi_gpu solvers/illum/src/spectrum
+SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src solvers/ray_tracing/src solvers/illum/src/mpi solvers/illum/src/add_directions solvers/RadRHD/src solvers/illum/src/mpi/multi_gpu solvers/illum/src/spectrum solvers/illum/src/spectrum/full_spectrum
 
 RESOURCES_DIR = resources
 

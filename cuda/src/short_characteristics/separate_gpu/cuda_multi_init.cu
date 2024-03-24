@@ -49,12 +49,17 @@ void sep::InitMultiDeviceGrid(int id_dev, const multi_gpu_config_t &gpu_conf, co
   mem::CpyToDevice(&grid_device->loc_size_params, &loc_size_grid, sizeof(loc_size_grid)); // копируем локальный размер сетки
   mem::CpyToDevice(&grid_device->shift_params, &loc_shift_grid, sizeof(loc_shift_grid));  // копируем начало локальной сетки
 
+  IdType frq_cnt = 1;
+#ifdef SAVE_FULL_SPECTRUM
+  frq_cnt = grid_host.size_frq;
+#endif
+
   //излучение
-  mem::Malloc((grid_dir_host.size * num_cell_loc * sizeof(Type)), &device_host_ptr.illum);      //память на массив излучения внутри структуры сетки
-  mem::CpyToDevice(&grid_device->illum, &device_host_ptr.illum, sizeof(device_host_ptr.illum)); //указатель со стороны хоста в указатель на стороне карты
+  mem::Malloc((grid_dir_host.size * num_cell_loc * frq_cnt * sizeof(Type)), &device_host_ptr.illum); //память на массив излучения внутри структуры сетки
+  mem::CpyToDevice(&grid_device->illum, &device_host_ptr.illum, sizeof(device_host_ptr.illum));      //указатель со стороны хоста в указатель на стороне карты
 
   //интеграл рассеяния
-  mem::Malloc(loc_size_dir * num_cell_loc * sizeof(Type), &device_host_ptr.int_scattering);                                //память на массив рассеяния внутри структуры сетки
+  mem::Malloc(loc_size_dir * num_cell_loc * frq_cnt * sizeof(Type), &device_host_ptr.int_scattering);                      //память на массив рассеяния внутри структуры сетки
   mem::CpyToDevice(&grid_device->int_scattering, &device_host_ptr.int_scattering, sizeof(device_host_ptr.int_scattering)); //указатель со стороны хоста в указатель на стороне карты
 
 #ifdef SPECTRUM
