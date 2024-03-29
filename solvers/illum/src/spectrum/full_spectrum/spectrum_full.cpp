@@ -57,13 +57,7 @@ Type illum::full_spectrum::ReCalcIllum(const IdType num_dir, const std::vector<s
       curI /= CELL_SIZE;
 
       IdType id = frq_id + frq;
-      // norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
-      Type newN = fabs((grid.Illum[id] - curI) / curI);
-      if (newN > norm) {
-        norm = newN;
-        frq_idx = frq;
-        cell_idx = cell;
-      }
+      norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
       grid.Illum[id] = curI; //здесь по ячейкам
     }
   }

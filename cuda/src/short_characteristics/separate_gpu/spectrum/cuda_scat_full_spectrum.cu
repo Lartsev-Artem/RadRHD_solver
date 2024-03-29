@@ -97,6 +97,13 @@ __global__ void cuda::kernel::Get_full_spectrum_multi_device(const geo::grid_dir
     Type frq1;
     Type G = GammaC(cosf, v, vel, frq, lorenz, cur_dir, all_dir[num_direction].dir, frq1);
     Type I = Illum[(i * M + num_direction) * N_Frq + get_frq_idx(frq1)];
+    if (frq1 < 0.5 * (get_frq(0 + 1) + get_frq(0))) {
+      I = 0; // 1e-30; //низкие частоты обрезаем
+    }
+    if (frq1 > get_frq(N_Frq - 1)) {
+      I = 0; //высокие частоты обрезаем
+    }
+
     scatter += G * I * all_dir[num_direction].area;
   }
 
