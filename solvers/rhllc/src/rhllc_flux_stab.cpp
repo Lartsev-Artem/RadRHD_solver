@@ -9,7 +9,12 @@
 
 void rhllc::GetConvValueStab(flux_t &W, flux_t &U) {
 
+#if EOS == IDEAL
   const Type h = 1 + kGamma_g * W.p / W.d;
+#else
+  Type theta = W.p / W.d;
+  const Type h = 2.5 * theta + sqrt(2.25 * theta * theta + 1.0); // энтальпия
+#endif
 
   Type g = W.v.dot(W.v);
   if (g >= 1.0) {
@@ -45,7 +50,14 @@ int rhllc::PhysPressureFix(flux_t &U, flux_t &W) {
 
   Type lor = sqrt(1.0 + u0 * u0);
   Type plor = p * lor;
-  Type Dh = D + plor * kGamma_g;
+
+#if EOS == IDEAL
+  constexpr Type alpha = kGamma1 / (kGamma1 - 1.0);
+  Type Dh = D + plor * alpha;
+#else
+  constexpr Type alpha = 2.5;
+  Type Dh = 2.5 * plor + sqrt(2.25 * plor * plor + D * D);
+#endif
 
   Type f0 = m / Dh - u0;
 
@@ -56,7 +68,11 @@ int rhllc::PhysPressureFix(flux_t &U, flux_t &W) {
   for (int k = 1; k < MAX_ITER; k++) {
     lor = sqrt(1.0 + u1 * u1);
     plor = p * lor;
-    Dh = D + plor * kGamma_g;
+#if EOS == IDEAL
+    Dh = D + plor * alpha;
+#elif EOS == TAUB
+    Dh = 2.5 * plor + sqrt(2.25 * plor * plor + D * D);
+#endif
 
     f1 = m / Dh - u1;
 
@@ -83,7 +99,11 @@ int rhllc::PhysPressureFix(flux_t &U, flux_t &W) {
 
   lor = sqrt(1.0 + u1 * u1);
   plor = p * lor;
-  Dh = D + plor * kGamma_g;
+#if EOS == IDEAL
+  Dh = D + plor * alpha;
+#elif EOS == TAUB
+  Dh = 2.5 * plor + sqrt(2.25 * plor * plor + D * D);
+#endif
 
   W.d = U.d / lor;
   W.p = p;
@@ -117,7 +137,7 @@ int rhllc::GetPhysValueStab(const flux_t &U, flux_t &W) {
   double pmin = sqrt(m2 / (1.0 - eps2)) - E;
 
   double alpha, alpha2, lor2, lor, tau, theta;
-  double h, dh_dp, dh_dtau, yp, dp, dyp;
+  double h, dh_dp, dh_dtau, yp, dp, dyp, scrh;
 
   /* ----------------------------------------------
      1. Solve f(p) = 0 by Newton's method
@@ -137,10 +157,16 @@ int rhllc::GetPhysValueStab(const flux_t &U, flux_t &W) {
 
     tau = lor * D_1;
     theta = p * tau;
-
+#if EOS == IDEAL
     h = 1.0 + kGamma_g * theta;
     dh_dp = kGamma_g * tau;
     dh_dtau = kGamma_g * p;
+#else
+    h = 2.5 * theta + sqrt(2.25 * theta * theta + 1.0);
+    scrh = (5.0 * h - 8.0 * theta) / (2.0 * h - 5.0 * theta);
+    dh_dp = tau * scrh;
+    dh_dtau = p * scrh;
+#endif
 
     yp = D * h * lor - E - p;
     dyp = D * lor * dh_dp - m2 * lor2 * lor / (alpha2 * alpha) * (lor * dh_dtau + D * h) - 1.0;
@@ -238,11 +264,24 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
   const Type g_L = 1. / sqrt(1 - VV_L); // фактор Лоренца
   const Type g_R = 1. / sqrt(1 - VV_R);
 
+#if EOS == IDEAL
+
   const Type h_L = 1 + kGamma_g * p_L / d_L; // энтальпия
   const Type h_R = 1 + kGamma_g * p_R / d_R;
 
   const Type cs_L2 = ((kGamma1 * p_L) / (d_L * h_L)); //квадрат скорости звука
   const Type cs_R2 = ((kGamma1 * p_R) / (d_R * h_R));
+#else
+  Type theta_L = p_L / d_L;
+  Type theta_R = p_R / d_R;
+
+  const Type h_L = 2.5 * theta_L + sqrt(2.25 * theta_L * theta_L + 1.0); // энтальпия
+  const Type h_R = 2.5 * theta_R + sqrt(2.25 * theta_R * theta_R + 1.0);
+
+  const Type cs_L2 = theta_L / (3.0 * h_L) * (5.0 * h_L - 8.0 * theta_L) / (h_L - theta_L); //квадрат скорости звука
+  const Type cs_R2 = theta_R / (3.0 * h_R) * (5.0 * h_R - 8.0 * theta_R) / (h_R - theta_R);
+
+#endif
 
   Type cmax_L, cmax_R;
   Type cmin_L, cmin_R;

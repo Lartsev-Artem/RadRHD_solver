@@ -31,7 +31,8 @@ void ConvertBinToGeo(std::vector<IntId> &neighbours_id_faces,
 
         neighbours_id_faces[idx] = -10;
       } else {
-        f.geo.id_r = idx; // код границы
+        f.geo.id_r = idx;                    // код границы
+        cells[i / CELL_SIZE].geo.is_bound++; //сразу определяет число граничных граней (для углов)
       }
 
       faces.push_back(f); // как потом искать с ячейками?

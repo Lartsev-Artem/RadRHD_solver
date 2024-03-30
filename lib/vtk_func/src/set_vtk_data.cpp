@@ -13,6 +13,11 @@ int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointe
   std::vector<Type> size_data = {kRadiation, 1, 1, kDensity, kPressure};
   std::vector<std::string> name_data = {F_ILLUM, F_DIVSTREAM, F_ENERGY, F_DENSITY, F_PRESSURE};
 
+  if (sizeable) {
+    for (size_t i = 0; i < size_data.size(); i++)
+      std::cout << "Size: " << name_data[i] << ": " << size_data[i] << std::endl;
+  }
+
   std::vector<Vector3> data3;
   std::vector<std::string> name_data3 = {F_VELOCITY, F_STREAM, F_DIVIMPULS};
 
@@ -27,13 +32,12 @@ int SetSolutionFromFileToVtk(const std::string &address_solution, vtkSmartPointe
       }
       if (sizeable) {
         Type val = *sizes;
-        for (auto &el : data) {
-          el *= val;
-        }
-        sizes++;
+        for (size_t i = 0; i < data.size(); i++)
+          data[i] *= val;
       }
       SetDoubleVtkData(fs::path(str).replace_extension(), data, u_grid);
     }
+    sizes++;
   }
 
   for (auto &str : name_data3) {

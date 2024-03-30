@@ -14,6 +14,7 @@ static int SetTypeOfBound(const std::vector<Vector3> &centers,
   const size_t n = centers.size();
   for (size_t num_cell = 0; num_cell < n; num_cell++) {
     Vector3 P = centers[num_cell];
+    int bnd = -1;
     for (size_t num_face = 0; num_face < CELL_SIZE; num_face++) {
       const size_t id = num_cell * CELL_SIZE + num_face;
 
@@ -41,6 +42,13 @@ static int SetTypeOfBound(const std::vector<Vector3> &centers,
         } else {
           neighbors[id] = e_bound_free; // e_bound_lock; // боковая поверхность
         }
+        // if (bnd != -1) //ячейки имеющие две границы (углы) делаем без источника
+        // {
+        //   neighbors[id] = e_bound_free;
+        //   neighbors[bnd] = e_bound_free;
+        // }
+        bnd = id;
+
 #endif
 
 #if (GEOMETRY_TYPE == Sphere) || (GEOMETRY_TYPE == MAIN_ELLIPSE) || (GEOMETRY_TYPE == TEST_ELLIPSE)

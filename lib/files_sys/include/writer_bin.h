@@ -108,6 +108,16 @@ int WriteGridGeo(const std::string &name_file, const std::vector<geo_elem> &data
   return e_completion_success;
 }
 
+#ifdef ILLUM
+/**
+ * @brief Вывод всех направлений в серию бинарных файлов
+ *
+ * @param[in] main_dir путь к выходной директории
+ * @param[in] grid сетка
+ * @return int  ::e_type_completion
+ */
+int WriteAllIllumDirections(const std::string &main_dir, const grid_t &grid);
+#endif
 /**
  * @brief Запись структуры нормалей в файл
  *

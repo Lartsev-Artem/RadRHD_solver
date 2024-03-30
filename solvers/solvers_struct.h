@@ -131,10 +131,11 @@ struct geo_cell_t {
   Type V;                  ///< объем ячейки
   Vector3 center;          ///< центр ячейки
   bits_flag sign_n;        ///< знак нормали соответствующей грани
-  uint8_t node;
+  uint8_t node : 6;        ///< номер узла, на котором лежит ячейка
+  uint8_t is_bound : 2;    ///< ячейка граничная
 
   geo_cell_t() : id_faces{0, 0, 0, 0}, V(0),
-                 sign_n(0x7), node(0),
+                 sign_n(0x7), node(0), is_bound(0),
                  center(Vector3(0, 0, 0)) {}
 };
 // #pragma pack(pop)

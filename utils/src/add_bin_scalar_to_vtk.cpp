@@ -5,7 +5,7 @@
 int FUNC_NAME(AddScalarDataVtkFromBinFile)(int argc, char *argv[]) {
   if (argc < 4) {
     printf("Error input data!\n");
-    printf("Input Format: path\\file.vtk,  path\\data.bin");
+    printf("Input Format: path\\file.vtk,  path\\data.bin\n");
     printf("Input data: int, double\n");
     printf("Additional parameters: name_field_data\n");
     printf("Data format: size a b c ... \n");

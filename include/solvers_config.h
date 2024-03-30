@@ -63,12 +63,13 @@
 #define ILLUM_MPI ///< расчёт излучения с технологией MPI
 #endif
 
-#ifdef HLLC
-// #define HLLC_MPI ///< расчёт hllc с технологией MPI
-#endif
+#if (defined HLLC) || (defined RHLLC)
 
-#ifdef RHLLC
-// #define RHLLC_MPI ///< расчёт реляивиской постановки с технологией MPI
+#define IDEAL 1 ///< Eos: Г-law
+#define TAUB 2  ///< Eos: Taub-Mathews
+
+#define EOS TAUB
+
 #endif
 
 #endif //! USE_MPI

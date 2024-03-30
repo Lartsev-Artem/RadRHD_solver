@@ -15,8 +15,18 @@ constexpr double PI4 = 4 * PI;
 constexpr double kMinPressure = 1e-12;
 constexpr double kMinDensity = 1e-12;
 
-constexpr double kGamma1 = 4.0 / 3; ///< показатель адиабаты
+// 5/3-одноатомный идеальный газ, 4/3- многоатомный идеальный газ 7/5-  двуатомный
+constexpr double kGamma1 = 5.0 / 3; ///< показатель адиабаты
 constexpr double kGamma_g = kGamma1 / (kGamma1 - 1.0);
+
+//двуатомный водород
+// −181 °C	1,597
+// −76 °C	1,453
+// 20 °C	1,410
+// 100 °C	1,404
+// 400 °C	1,387
+// 1000 °C	1,358
+// 2000 °C	1,318
 
 #if 1 //СГС
 
@@ -63,6 +73,7 @@ constexpr double kMass = (kVelocity * kVelocity * kDist) / kGravity; ///< хар
 // constexpr double kMass = 1e6;                 ///< характерная масса
 constexpr double kTime = (kDist / kVelocity); ///< характерное время
 
+constexpr double kErg = kMass * kDist * kDist / (kTime * kTime);
 constexpr double kDensity = (kMass / (kDist * kDist * kDist));   ///< характерная плотность
 constexpr double kPressure = kMass / (kDist * kTime * kTime);    ///< характерное давление
 constexpr double kRadiation = (kMass / (kTime * kTime * kTime)); ///< характерное излучение

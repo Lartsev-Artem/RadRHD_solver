@@ -7,6 +7,27 @@
 #include "solvers_struct.h"
 #include "writer_bin.h"
 
+#ifdef ILLUM
+int files_sys::bin::WriteAllIllumDirections(const std::string &main_dir, const grid_t &grid) {
+
+  if (grid.Illum == nullptr)
+    return e_completion_fail;
+
+  std::vector<Type> illum;
+
+  for (size_t i = 0; i < grid.size_dir; i++) {
+#ifndef SEPARATE_GPU
+    GetDirectionDataFromFace(grid.size, i, grid.Illum, 0.0, illum);
+#else
+    GetCellDataBySelectedDirection(grid.size, grid.size_dir, i, grid.Illum, illum);
+#endif
+    files_sys::bin::WriteSimple(main_dir + "Illum" + std::to_string(i) + ".bin", illum);
+  }
+
+  return e_completion_success;
+}
+#endif
+
 int files_sys::bin::WriteNormals(const std::string &name_file_normals, std::vector<Normals> &normals) {
   FILE *f;
   OPEN_FILE(f, name_file_normals.c_str(), "wb");

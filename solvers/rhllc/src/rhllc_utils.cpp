@@ -78,8 +78,8 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
     GetConvValue(bound.phys_val, bound.conv_val);
 #elif GEOMETRY_TYPE == Cone
 
-    bound.phys_val.d = kM_hydrogen * 1e14 / kDensity; //  0.1;
-    bound.phys_val.p = GetPressure(bound.phys_val.d, 1e7);
+    bound.phys_val.d = kM_hydrogen * 1e15 / kDensity; //  0.1;
+    bound.phys_val.p = GetPressure(bound.phys_val.d, 1e8);
     bound.phys_val.v = Vector3(1e3 / kVelocity, 0, 0);
 
     GetConvValue(bound.phys_val, bound.conv_val);

@@ -12,7 +12,8 @@
 TableFunc t_cooling_function;
 
 #if GEOMETRY_TYPE == Cone
-static Type boundary_value = 1e52 / kRadiation / (kDist * kDist);
+// static Type boundary_value = 1e52 / (PI * 0.1 * kDist * 0.1 * kDist) / kRadiation;
+static Type boundary_value = 1e52 / (0.0001 * kDist * kDist) / kRadiation; // 0.0001 --- характерная площадь грани (зависит от сетки)
 #elif GEOMETRY_TYPE == Sphere
 static Type boundary_value = 1;
 #else
@@ -356,12 +357,24 @@ Type illum::separate_gpu::ReCalcIllumOpt(const IdType num_dir, const std::vector
     const IdType id = cell * grid.size_dir + shift_dir;
     __builtin_prefetch(&grid.Illum[id], 1, 0);
 
+#if 0 
     Type curI = 0;
 #pragma loop unroll(CELL_SIZE)
     for (size_t j = 0; j < CELL_SIZE; j++) {
       curI += inter_coef[grid.cells[cell].geo.id_faces[j]];
     }
     curI /= CELL_SIZE;
+#else
+    Type curI = 0;
+    Type S = 0;
+#pragma loop unroll(CELL_SIZE)
+    for (size_t j = 0; j < CELL_SIZE; j++) {
+      curI += inter_coef[grid.cells[cell].geo.id_faces[j]] *
+              grid.faces[grid.cells[cell].geo.id_faces[j]].geo.S;
+      S += grid.faces[grid.cells[cell].geo.id_faces[j]].geo.S;
+    }
+    curI /= S;
+#endif
 
     norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
     grid.Illum[id] = curI;
@@ -569,8 +582,8 @@ Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, 
   const Type alpha = cell.cell_data->alpha;
   const Type betta = cell.cell_data->betta;
 
-  cell.illum_val.absorp_coef = alpha;
-  cell.illum_val.scat_coef = betta;
+  // cell.illum_val.absorp_coef = alpha;
+  // cell.illum_val.scat_coef = betta;
 
   Type Q = B_Plank(cell.cell_data->T) / kRadiation;
 

@@ -2,9 +2,9 @@
 
 void GetRotationMatrix(const Vector3 &n, Matrix3 &T) {
   T = Matrix3::Zero();
-  constexpr Type eps = 1e-10;
+  constexpr Type eps = 1e-12;
 
-  if (fabs(n[2] * n[2] - 1) > eps) {
+  if (LIKELY(fabs(n[2] * n[2] - 1) > eps)) {
 
     T(0, 0) = n[0];
     T(0, 1) = n[1];
@@ -13,8 +13,10 @@ void GetRotationMatrix(const Vector3 &n, Matrix3 &T) {
     Type sqr = sqrt(1 - n[2] * n[2]);
     Type sqr_inv = 1. / sqr;
 
+#ifdef DEBUG
     if (sqr < eps * eps - eps / 10)
       D_L;
+#endif
 
     T(1, 0) = -n[1] * sqr_inv;
     T(1, 1) = n[0] * sqr_inv;

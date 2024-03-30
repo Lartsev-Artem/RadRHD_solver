@@ -153,12 +153,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           ++fc_pair;
           builtin_prefetch(&(grid.cells[fc_pair->cell]), 1, 2); //грузим следующую ячейку
 
-          Type I;
-          if (k > numeric_limit_abs_coef) {
-            I = GetIllum(I0, s, k, rhs);
-          } else {
-            I = GetIllumLimit(I0, s, k, rhs);
-          }
+          Type I = GetIllum(I0, s, k, rhs);
 #if 0 // def DEBUG
           if (std::isnan(fabs(I)) || std::isinf(fabs(I)) || I < 0) {
             WRITE_LOG_ERR("nan[%ld %d], k=%e, rhs=%e, I0:%e, %e, %e, %e\n", num_direction, num_cell, k, rhs, I0[0], I0[1], I0[2], S);

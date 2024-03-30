@@ -91,12 +91,6 @@ Type illum::GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k,
 
   k = alpha + betta;
 
-#ifndef SAVE_FULL_SPECTRUM
-  if (k < numeric_limit_abs_coef) {
-    return (alpha * Q + SS);
-  }
-#endif
-
 #ifdef DEBUG //
   Type res = (alpha * Q + SS) / k;
   if (res < 0 || std::isnan(res) || std::isinf(res)) {
