@@ -84,6 +84,13 @@ void ray_tracing::MakeRays(int num_frame, std::vector<Ray_t> &rays) {
 
   Ray_t center_ray(start_ray, (end_ray - start_ray).normalized()); ///< центр плоскости
 
+  MakeRays(center_ray, rays);
+
+  return;
+}
+
+void ray_tracing::MakeRays(const Ray_t &center_ray, std::vector<Ray_t> &rays) {
+
   Matrix3 basis; ///< локальный базис картинной плоскости
   intersection::SetBasis(center_ray.direction, basis);
 
@@ -99,6 +106,7 @@ void ray_tracing::MakeRays(int num_frame, std::vector<Ray_t> &rays) {
       Vector3 orig_2d(angle_of_plane(0) + i * step_x, angle_of_plane(1) + j * step_y, 0); ///< центр нового пикселя на плоскости
       Vector3 orig_3d = basis.transpose() * orig_2d + center_ray.orig;                    // переход к 3d
 
+      // WRITE_LOG("Ray[%d %d]: [%lf, %lf, %lf] -> [%lf %lf %lf]\n", i, j, orig_3d[0], orig_3d[1], orig_3d[2], center_ray.direction[0], center_ray.direction[1], center_ray.direction[2]);
       rays[i * k_pixels_height + j] = Ray_t(orig_3d, center_ray.direction);
     }
   }

@@ -27,5 +27,12 @@ namespace ray_tracing {
  * @return int ::e_type_completion
  */
 int RunRayTracing(const std::string &file_energy);
+
+/**
+ * @brief Функция находит номера ячеек которые участвуют в проецировании на картинную плоскость
+ * @note Параметры проекции задаются вручную до компиляции
+ * @return int ::e_type_completion
+ */
+int FindIntersections();
 } // namespace ray_tracing
 #endif //! RAY_TRACING_MAIN_H

@@ -23,6 +23,24 @@ int ray::interface::StartTracing(const std::vector<Ray_t> &rays_host, std::vecto
 
   mem::CpyToDevice(rays_device, rays_host.data(), M * sizeof(Ray_t));
 
+  cuda::ray_tracing::RayTracing_Phl1445<<<blocks, threads>>>(M, rays_device, size_surface, faces_device, intersection_device);
+
+  CUDA_CALL_FUNC(cudaGetLastError);
+
+  mem::CpyToHost(intersections.data(), intersection_device, M * sizeof(int));
+
+  return e_completion_success;
+}
+
+int ray::interface::StartTracingGrid(const std::vector<Ray_t> &rays_host, std::vector<int> &intersections) {
+
+  int M = rays_host.size();
+
+  CUDA_TREADS_1D(threads);
+  CUDA_BLOCKS_1D(blocks, M);
+
+  mem::CpyToDevice(rays_device, rays_host.data(), M * sizeof(Ray_t));
+
   cuda::ray_tracing::RayTracing<<<blocks, threads>>>(M, rays_device, size_surface, faces_device, intersection_device);
 
   CUDA_CALL_FUNC(cudaGetLastError);

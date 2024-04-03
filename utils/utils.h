@@ -258,6 +258,17 @@ int RenumNetgenByMetisToVtk(int argc, char **argv);
  */
 int CompareFiles(int argc, char **argv);
 
+/**
+ * @brief Строит проекцию всех данных из серии файлов решения vtk на картинную плоскость
+ *
+ * @param[in] argc кол-во аргументов (требуется 7)
+ * @param[in] argv массив char** содержит {адрес с файлами решения,
+ * файл с id проецируемых ячеек, число сеток, ширина плоскости в пикселях,высота плоскости в пикселях,
+ * адрес результата}
+ * @return int ::e_type_completion
+ */
+int PlaneFromVtk(int argc, char **argv);
+
 #endif
 
 } // namespace utils

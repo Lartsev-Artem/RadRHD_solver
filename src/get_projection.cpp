@@ -1,12 +1,13 @@
 #include "mpi_ext.h"
-#include "radRHD_main.h"
 #include "reader_json.h"
 #include "solvers_struct.h"
 
+#include "ray_tracing_main.h"
+
 int main(int argc, char *argv[]) {
 
+#ifdef USE_CUDA
   MPI_START(argc, argv);
-#if defined RAD_RHD && defined SEPARATE_GPU && !defined SPECTRUM
 
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";
   if (argc > 1)
@@ -15,11 +16,12 @@ int main(int argc, char *argv[]) {
   if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
     return e_completion_fail;
 
-  rad_rhd::RunRadRHDMpiModule();
+  ray_tracing::FindIntersections();
 
-#else
-  WRITE_LOG_ERR("the rhllc solver is not included in the build. Use define RHLLC and SOLVER,SEPARATE_GPU\n");
-#endif
   MPI_END;
+#else
+  WRITE_LOG_ERR("For building projections need USE_CUDA define \n");
+  return 1;
+#endif
   return 0;
 }

@@ -10,6 +10,9 @@
 
 #include "reader_bin.h"
 
+// похожий результат на поперечном направлении и скоростью потока (0.9,0,0)
+//температуре 10^8 на границе и 3 итерациями в интеграле
+
 Type illum::spectrum::get_full_illum(const IdType num_dir, const grid_t &grid) {
   const IdType N = grid.size;
   const IdType M = grid.size_dir;
@@ -30,10 +33,11 @@ int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
   std::vector<Type> pressure;
   std::vector<Vector3> velocity;
 
+  std::string adr = "/home/artem/projects/solver/build_rad/Solve/Solve";
   uint32_t err = 0;
-  err |= files_sys::bin::ReadSimple(glb_files.solve_address + std::to_string(num) + F_DENSITY, density);
-  err |= files_sys::bin::ReadSimple(glb_files.solve_address + std::to_string(num) + F_PRESSURE, pressure);
-  err |= files_sys::bin::ReadSimple(glb_files.solve_address + std::to_string(num) + F_VELOCITY, velocity);
+  err |= files_sys::bin::ReadSimple(adr + std::to_string(num) + F_DENSITY, density);
+  err |= files_sys::bin::ReadSimple(adr + std::to_string(num) + F_PRESSURE, pressure);
+  err |= files_sys::bin::ReadSimple(adr + std::to_string(num) + F_VELOCITY, velocity);
 
   if (err) {
     WRITE_LOG_ERR("Error reading phys state\n");
@@ -58,7 +62,7 @@ int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
 
 #pragma omp parallel for
   for (int i = 0; i < grid.size; i++) {
-    grid.cells[i].phys_val = flux_t(density[i], velocity[i], pressure[i]);
+    grid.cells[i].phys_val = flux_t(density[i] / kDensity, velocity[i], pressure[i] / kPressure);
     grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
   }
 

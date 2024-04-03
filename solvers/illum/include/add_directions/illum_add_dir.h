@@ -24,6 +24,8 @@ namespace additional_direction {
 int MakeDirectionReInterpolation(const std::string &base_address, const std::string &out_address, const int add_directions, const grid_directions_t &grid_dir);
 
 void SaveInterpolationScattering(const std::string &address_add_dir, const grid_directions_t &grid_dir, const grid_t &grid);
+
+void GetIdProjection(const std::string &base_address, const std::string &out_address, const int add_directions, const grid_directions_t &grid_dir);
 } // namespace additional_direction
 
 } // namespace illum

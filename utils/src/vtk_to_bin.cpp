@@ -34,8 +34,8 @@ int FUNC_NAME(WriteBinFromVtk)(int argc, char *argv[]) {
   std::vector<Vector3> v_data;
   std::vector<Matrix3> t_data;
 
-  for (size_t i = 0; i < unstructured_grid->GetCellData()->GetNumberOfArrays(); i++) {
-    std::string name_data(unstructured_grid->GetCellData()->GetArrayName(i));
+  for (size_t id_data = 0; id_data < unstructured_grid->GetCellData()->GetNumberOfArrays(); id_data++) {
+    std::string name_data(unstructured_grid->GetCellData()->GetArrayName(id_data));
     vtkDataArray *data = unstructured_grid->GetCellData()->GetScalars(name_data.c_str());
 
     int components = data->GetNumberOfComponents();

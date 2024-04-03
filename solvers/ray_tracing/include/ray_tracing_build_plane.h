@@ -26,6 +26,14 @@ namespace ray_tracing {
  */
 void MakeRays(int num_frame, std::vector<Ray_t> &rays);
 
+/**
+ * @brief Функция создает лучи для картинной плоскости на основе луча, выпущенного из центра плоскости
+ *
+ * @param[in] center_ray центральный луч
+ * @param[out] rays набор лучей на каждый пиксель
+ */
+void MakeRays(const Ray_t &center_ray, std::vector<Ray_t> &rays);
+
 #ifdef USE_VTK
 /**
  * @brief Функция создает пустую сетку для картинной плоскости

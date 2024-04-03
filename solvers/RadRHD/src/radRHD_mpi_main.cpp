@@ -127,7 +127,7 @@ int rad_rhd::RunRadRHDMpiModule() {
 
     _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg, grid.cells);
 
-    WRITE_LOG("it= %lf, time_step=%lf\n", t, timer.get_delta_time_sec());
+    // WRITE_LOG("it= %lf, time_step=%lf\n", t, timer.get_delta_time_sec());
 
     MPI_BARRIER(MPI_COMM_WORLD);
   }

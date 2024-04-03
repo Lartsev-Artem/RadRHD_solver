@@ -28,7 +28,7 @@ namespace ray_tracing {
 namespace interface {
 
 /**
- * @brief Поиск пересечений с заданными лучами.
+ * @brief Поиск пересечений с заданными лучами с учетом внешней геометрии.
  * @details Функция копирует rays_host на карту и intersections с карты.
  * Определяется ближайшее пересечение от источника
  * @param[in] rays_host лучи формирующие картинную плоскость
@@ -37,6 +37,17 @@ namespace interface {
  * @warning метод не оптимизирован для поиска по всей сетки. Применяется для пересечения с границей
  */
 int StartTracing(const std::vector<Ray_t> &rays_host, std::vector<IntId> &intersections);
+
+/**
+ * @brief Поиск пересечений сетки с заданными лучами.
+ * @details Функция копирует rays_host на карту и intersections с карты.
+ * Определяется ближайшее пересечение от источника
+ * @param[in] rays_host лучи формирующие картинную плоскость
+ * @param[out] intersections код пересечения ::e_ray_intersect_code (с номером грани)
+ * @return int ::e_type_completion
+ * @warning метод не оптимизирован для поиска по всей сетки. Применяется для пересечения с границей
+ */
+int StartTracingGrid(const std::vector<Ray_t> &rays_host, std::vector<int> &intersections);
 
 /**
  * @brief Поиск пересечений внутренней границы с заданными лучами

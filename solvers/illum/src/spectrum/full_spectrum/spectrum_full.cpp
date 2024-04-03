@@ -24,7 +24,8 @@ Type illum::full_spectrum::BoundaryConditions(const IdType type_bound, const Typ
     return 0;
   case e_bound_out_source:
 #if GEOMETRY_TYPE == Cone
-    return exp(B_Plank_log(1e12, frq, frq0) - LOG(kRadiation));
+    return exp(B_Plank_log(2 * 1e9, frq, frq0) - LOG(kRadiation));
+    // return exp(B_Plank_log(1e12, frq, frq0) - LOG(kRadiation));
 #endif
     return 0;
 

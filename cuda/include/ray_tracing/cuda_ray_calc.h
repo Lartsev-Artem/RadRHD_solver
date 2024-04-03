@@ -26,6 +26,18 @@ namespace cuda::ray_tracing {
 __device__ Type RayIntersectsTriangle(const Ray &ray, const Face &triangle, Vector3 &intersection);
 
 /**
+ * @brief Поиск всех пересечений с матрицей лучей c учетом внешней геометрии
+ *
+ * @param[in] M число лучей
+ * @param[in] rays лучи
+ * @param[in] N число треугольников
+ * @param[in] triangles треугольники
+ * @param[out] intersections коды пересечений для каждого луча
+ * @return __global__ use cudaGetLastError
+ */
+__global__ void RayTracing_Phl1445(const int M, const Ray *rays, const int N, const Face *triangles, int *intersections);
+
+/**
  * @brief Поиск всех пересечений с матрицей лучей
  *
  * @param[in] M число лучей

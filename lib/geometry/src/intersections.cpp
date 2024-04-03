@@ -18,7 +18,17 @@ void intersection::SetBasis(const Vector3 &normal, Matrix3 &basis) {
   if (normal[1] < 0)
     vec_1 = -vec_1;
 
-  // обычное векторное умножение.
+// обычное векторное умножение.
+#if 1 /// \note для проекции на плоскость, с центром в XoY это так
+  vec_2 = (normal.cross(vec_1));
+
+  vec_1.normalize();
+  vec_2.normalize();
+
+  basis.row(0) = vec_2;
+  basis.row(1) = vec_1;
+  basis.row(2) = normal;
+#else /// \todo: проверить для phl1445
   vec_2 = -(normal.cross(vec_1));
 
   vec_1.normalize();
@@ -27,6 +37,7 @@ void intersection::SetBasis(const Vector3 &normal, Matrix3 &basis) {
   basis.row(0) = vec_1;
   basis.row(1) = vec_2;
   basis.row(2) = normal;
+#endif
 }
 
 /**
