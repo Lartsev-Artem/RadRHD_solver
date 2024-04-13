@@ -152,9 +152,7 @@ int files_sys::bin::WriteSolutionMPI(const std::string &main_dir, const grid_t &
 #endif // ILLUM
 
 #if (defined HLLC || defined RHLLC)
-  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_DENSITY).c_str(), grid.cells, phys_val.d, left, right);
-  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_PRESSURE).c_str(), grid.cells, phys_val.p, left, right);
-  WRITE_FILE_ELEM_MPI(MPI_COMM_WORLD, (main_dir + F_VELOCITY).c_str(), grid.cells, phys_val.v, left, right);
+  WriteSimpleMPI(main_dir + F_FLUX, grid.size, grid.cells.data() + left, left, right, sizeof(flux_t), MPI_phys_val_t);
 #endif
 
   return 0;

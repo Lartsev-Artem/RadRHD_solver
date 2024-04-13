@@ -80,7 +80,7 @@ int WriteSimple(const Str_Type name_file, const int n, const T *data) {
     return e_completion_success;
   }
 
-  WRITE_LOG("no data for %s\n", std::string(name_file).c_str());
+  // WRITE_LOG("no data for %s\n", std::string(name_file).c_str());
   return e_completion_fail;
 }
 
@@ -181,7 +181,7 @@ int WriteSimpleMPI(const std::string &file, const Tidx n, const T *data, const T
     MPI_File_close(&fh);
     return e_completion_success;
   }
-  WRITE_LOG("no data for %s\n", std::string(file).c_str());
+  // WRITE_LOG("no data for %s\n", std::string(file).c_str());
   return e_completion_fail;
 }
 
@@ -222,6 +222,45 @@ void WriteFileVectorMPI(MPI_Comm comm, const std::string &file_name,
     MPI_File_write(fh, val, size_elem / sizeof(double), MPI_DOUBLE, MPI_STATUSES_IGNORE);
   }
   MPI_File_close(&fh);
+}
+
+/**
+ * @brief Запись данных распределённых по узлам
+ *
+ * @param[in] file имя файла
+ * @param[in] n размер полного массива
+ * @param[in] data указатель на начало данных на узле!
+ * @param[in] left_offset левая граница данных на узле
+ * @param[in] right_offset правая граница данных на узле
+ * @param[in] size_elem размер записываемой структуры в байтах
+ * @param[in] mpi_type тип данных MPI (позволяет записывать данные из структуры с пробелами)
+ * @warning Требует проверки
+ */
+template <typename T, typename Tidx>
+int WriteSimpleMPI(const std::string &file, const int n, const T *data, const Tidx left_offset,
+                   const Tidx right_offset, const size_t size_elem, MPI_Datatype mpi_type) {
+
+  if (data != nullptr) {
+    int myid = get_mpi_id();
+    MPI_Comm comm = MPI_COMM_WORLD;
+
+    MPI_File fh = MPI_FILE_NULL;
+    MPI_File_open(comm, file.c_str(), MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &fh);
+
+    DIE_IF(fh == MPI_FILE_NULL)
+
+    if (myid == 0) {
+      MPI_File_seek(fh, 0, MPI_SEEK_SET);
+      MPI_File_write(fh, &n, 1, MPI_INT, MPI_STATUSES_IGNORE);
+    } else {
+      MPI_File_seek(fh, sizeof(int) + left_offset * size_elem, MPI_SEEK_SET);
+    }
+    MPI_File_write(fh, data, (right_offset - left_offset), mpi_type, MPI_STATUSES_IGNORE);
+    MPI_File_close(&fh);
+    return e_completion_success;
+  }
+  // WRITE_LOG("no data for %s\n", std::string(file).c_str());
+  return e_completion_fail;
 }
 
 // поэлементная запись данных в файл с разных узлов

@@ -67,6 +67,7 @@ void InitMPiStruct() {
   }
 
   MPI_Type_create_resized(MPI_flux_t, 0, sizeof(elem_t), &MPI_phys_val_t); // структура физических переменных
+  MPI_Type_commit(&MPI_phys_val_t);
 
   // перессылка потоков из ячейки
   {
@@ -76,6 +77,7 @@ void InitMPiStruct() {
     MPI_Type_create_struct(2, len, pos, typ, &MPI_flux_elem_t);
     MPI_Type_commit(&MPI_flux_elem_t);
     MPI_Type_create_resized(MPI_flux_elem_t, 0, sizeof(elem_t), &MPI_flux_elem_t); // структура физических переменных
+    MPI_Type_commit(&MPI_flux_elem_t);
   }
 
   //настройки динамического расчета

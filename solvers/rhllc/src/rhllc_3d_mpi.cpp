@@ -127,14 +127,14 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
 
       if (send_list.count(idl) == 0) {
         send_list.emplace(idl);
-        MPI_Send_init(&grid.cells[idl], 1, MPI_flux_elem_t, metis_id[idr], idl, hllc_st->comm, &rq_send);
+        MPI_Send_init(&grid.cells[idl], 1, MPI_flux_elem_t, metis_id[idr], 0, hllc_st->comm, &rq_send);
         hllc_st->requests_send_faces.push_back(rq_send);
         rhllc_mpi_log("send0[%d]->%d\n", idl, metis_id[idr]);
       }
 
       if (rcv_list.count(idr) == 0) {
         rcv_list.emplace(idr);
-        MPI_Recv_init(&grid.cells[idr], 1, MPI_flux_elem_t, metis_id[idr], idr, hllc_st->comm, &rq_rcv);
+        MPI_Recv_init(&grid.cells[idr], 1, MPI_flux_elem_t, metis_id[idr], 1, hllc_st->comm, &rq_rcv);
         hllc_st->requests_rcv_faces.push_back(rq_rcv);
         rhllc_mpi_log("Rcv0[%d]\n", idr);
       }
@@ -148,13 +148,13 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
 
       if (send_list.count(idr) == 0) {
         send_list.emplace(idr);
-        MPI_Send_init(&grid.cells[idr], 1, MPI_flux_elem_t, metis_id[idl], idr, hllc_st->comm, &rq_send);
+        MPI_Send_init(&grid.cells[idr], 1, MPI_flux_elem_t, metis_id[idl], 1, hllc_st->comm, &rq_send);
         hllc_st->requests_send_faces.push_back(rq_send);
         rhllc_mpi_log("send1[%d]->%d\n", idr, metis_id[idl]);
       }
       if (rcv_list.count(idl) == 0) {
         rcv_list.emplace(idl);
-        MPI_Recv_init(&grid.cells[idl], 1, MPI_flux_elem_t, metis_id[idl], idl, hllc_st->comm, &rq_rcv);
+        MPI_Recv_init(&grid.cells[idl], 1, MPI_flux_elem_t, metis_id[idl], 0, hllc_st->comm, &rq_rcv);
         hllc_st->requests_rcv_faces.push_back(rq_rcv);
         rhllc_mpi_log("Rcv1[%d]\n", idl);
       }

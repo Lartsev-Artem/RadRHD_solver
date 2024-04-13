@@ -269,6 +269,15 @@ int CompareFiles(int argc, char **argv);
  */
 int PlaneFromVtk(int argc, char **argv);
 
+/**
+ * @brief Переводит структуру flux_t в набор бинарных файлов
+ *
+ * @param[in] argc кол-во аргументов (требуется 3)
+ * @param[in] argv массив char** содержит {адрес с файлами, кол-во файлов, (доп. флаг удаления исходных файлов)
+ * @return int ::e_type_completion
+ */
+int FluxToBin(int argc, char **argv);
+
 #endif
 
 } // namespace utils

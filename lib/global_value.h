@@ -88,6 +88,7 @@ constexpr double kInternalRadius = 0.12; ///< радиус внутренней 
 //--------------------------Файлы решение-------------------------------//
 #define F_SOLVE "Solve" // задается в настройках
 
+#define F_FLUX "flux.bin"
 #define F_DENSITY "density.bin"
 #define F_PRESSURE "pressure.bin"
 #define F_VELOCITY "velocity.bin"

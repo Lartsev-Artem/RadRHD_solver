@@ -30,7 +30,7 @@ static int SetTypeOfBound(const std::vector<Vector3> &centers,
         } else if ((normals[num_cell].n[num_face] - Vector3(1, 0, 0)).norm() < 1e-7) {
           neighbors[id] = e_bound_free; // свободная поверхность
         } else {
-          neighbors[id] = e_bound_lock; // боковая поверхность
+          neighbors[id] = e_bound_free; // боковая поверхность
         }
 #endif
 

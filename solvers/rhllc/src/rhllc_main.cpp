@@ -37,7 +37,7 @@ int rhllc::RunRhllcModule() {
 
   files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid); // начальное сохранение
 
-  auto start_clock = tick::steady_clock::now();
+  Timer timer;
 
   while (t < _hllc_cfg.T) {
     Hllc3dStab(_hllc_cfg.tau, grid);
@@ -46,9 +46,9 @@ int rhllc::RunRhllcModule() {
     cur_timer += _hllc_cfg.tau;
 
     if (cur_timer >= _hllc_cfg.save_timer) {
+      WRITE_LOG("t= %lf, step= %d, time_step=%lfs\n", t, res_count, timer.get_delta_time_sec());
       DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
-
-      WRITE_LOG("t= %lf, step= %d, time_step=%lf\n", t, res_count, (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
+      timer.start_timer();
       cur_timer = 0;
     }
 
