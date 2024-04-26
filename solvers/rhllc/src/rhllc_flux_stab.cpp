@@ -61,7 +61,7 @@ int rhllc::PhysPressureFix(flux_t &U, flux_t &W) {
 
   Type f0 = m / Dh - u0;
 
-  Type u1 = (-D + sqrt(D * D + 4.0 * m * kGamma_g * p)) / (2.0 * kGamma_g * p);
+  Type u1 = (-D + sqrt(D * D + 4.0 * m * alpha * p)) / (2.0 * alpha * p);
   int done = 0;
 
   Type f1, du;

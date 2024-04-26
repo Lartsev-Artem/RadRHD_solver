@@ -1,0 +1,46 @@
+#!/bin/bash
+#SBATCH --job-name=Lartsev
+#SBATCH --time=00:05:00
+#SBATCH --nodes=1 --cpus-per-task=1
+#SBATCH --partition release
+ulimit -l unlimited
+
+metis_exe=/nethome/student/FS18/FS2-x1/Lartsev/METIS/build/bin/mpmetis
+
+if [ -f "$metis_exe" ]; then
+
+    if [ -d utils/build/bin ]; then
+        echo "utils found!"     
+
+        val=""
+        if [ -f "$1".txt ]; then
+            echo "generate from empty format"
+            val="txt"     
+            ./utils/build/bin/netgen_to_metis $1.$val $1 3
+        else
+            if [ -f "$1".vol ]; then
+                echo "generate from mesh format"     
+                val="vol"
+                ./utils/build/bin/netgen_mesh_to_metis $1.$val $1
+            else
+                echo "No input file" 
+            fi
+        fi
+
+        if [ -f $1 ]; then            
+            $metis_exe $1 $2     
+            rm $1.npart.*
+            mv $1.epart.$2 build/metis     
+            rm $1
+            ./utils/build/bin/renum_grid_by_metis $1.$val build/metis build/grid.vtk
+            ./utils/build/bin/make_all_geo_data build/ build/grid.vtk
+            ./utils/build/bin/get_average_volume build/grid.vtk
+        else
+            echo "Fail netgen to metis convert"
+        fi
+    else
+        echo "utils not found!"     
+    fi
+else
+    echo "metis not found!"     
+fi

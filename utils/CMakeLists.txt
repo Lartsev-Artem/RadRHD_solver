@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(utils VERSION 1.0) 
 
 ############################### Запуск ########################################
-# cmake -B build -DINSTALL=ON   #OFF -  для сборки в библиотеку
+# cmake -B build -DINSTALL=ON   #OFF -  для сборки в библиотеку  -DCMAKE_PREFIX_PATH=/nethome/student/FS18/FS2-x1/Lartsev/VTK/VTK_build/  -DCMAKE_BUILD_TYPE=Release
 # cmake --build build -j4
 ###############################################################################
 
