@@ -5,6 +5,10 @@
 #SBATCH --partition release
 ulimit -l unlimited
 
+export PATH=$PATH:/nethome/student/FS18/FS2-x1/Lartsev/METIS/build/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/nethome/student/FS18/FS2-x1/Lartsev/METIS/build/lib
+
+
 metis_exe=/nethome/student/FS18/FS2-x1/Lartsev/METIS/build/bin/mpmetis
 
 if [ -f "$metis_exe" ]; then

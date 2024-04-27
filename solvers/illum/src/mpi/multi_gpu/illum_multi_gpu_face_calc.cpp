@@ -16,7 +16,7 @@
 namespace tick = std::chrono;
 namespace cuda_sep = cuda::interface::separate_device;
 
-#define builtin_prefetch(...) __builtin_prefetch(__VA_ARGS__)
+#define builtin_prefetch(...) //__builtin_prefetch(__VA_ARGS__)
 #include "spectrum_utils.h"
 int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
                                         const std::vector<std::vector<IntId>> &inner_bound_code,
@@ -167,12 +167,14 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 
         loc_norm = separate_gpu::ReCalcIllumOpt(num_direction, *inter_coef, grid, local_disp);
 
-#pragma omp critical
-        {
-          MPI_Startall(np - 1, section_1.requests_send.data() + ((num_direction - 0) * (np - 1)));
+        MPI_Startall(np - 1, section_1.requests_send.data() + ((num_direction - 0) * (np - 1)));
 
-          if (loc_norm > norm) {
-            norm = loc_norm;
+        if (loc_norm > norm) {
+#pragma omp critical
+          {
+            if (loc_norm > norm) {
+              norm = loc_norm;
+            }
           }
         }
       }
