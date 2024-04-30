@@ -34,7 +34,7 @@ int GetBoundaryCells(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_gr
       unstructured_grid->GetCellNeighbors(i, unstructured_grid->GetCell(i)->GetFace(j)->GetPointIds(), idc);
       if (idc->GetNumberOfIds() == 0) {
         boundary_cells.emplace((IntId)i);
-        break;
+        //break;
       } else if (idc->GetNumberOfIds() > 1)
         RETURN_ERR("More than 1 neighbor????\n");
     }
@@ -88,7 +88,7 @@ int GetBoundaryFacesId(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_
 
       if (idc->GetNumberOfIds() == 0) {
         boundary_faces.push_back(i * CELL_SIZE + j);
-        break;
+        //break;
       } else if (idc->GetNumberOfIds() > 1)
         RETURN_ERR("More than 1 neighbor????\n");
     }
