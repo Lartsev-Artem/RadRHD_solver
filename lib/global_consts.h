@@ -14,6 +14,7 @@ constexpr double PI = 3.1415926535897932384626433832795;    ///<число пи
 constexpr double PI4 = 4 * PI;
 constexpr double kMinPressure = 1e-12;
 constexpr double kMinDensity = 1e-12;
+constexpr double kReflectiveAbsorbCoef = 1.0;
 
 // 5/3-одноатомный идеальный газ, 4/3- многоатомный идеальный газ 7/5-  двуатомный
 constexpr double kGamma1 = 5.0 / 3; ///< показатель адиабаты

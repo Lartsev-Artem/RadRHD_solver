@@ -12,6 +12,7 @@ if [ -d utils/build/bin ]; then
             ./utils/build/bin/get_sphere_direction $1 build/
             mpirun -n 18 /nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/build/bin/graph_builder /nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/config/directories_cfg_claster.json
             mpirun -n 18 /nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/build/bin/trace_builder /nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/config/directories_cfg_claster.json             
+            mpirun -n 1 /nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/build/bin/get_reflection /nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/config/directories_cfg_claster.json             
         else
             echo "file sphere direction not found"
         fi

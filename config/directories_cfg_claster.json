@@ -1,14 +1,14 @@
 {
-    "base_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/build/",
-    "graph_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/build/graph/",
-    "trace_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/build/trace/",
-    "hllc_init_value": "/nethome/student/FS18/FS2-x1/Lartsev/solver/config/no.bin",
-    "illum_geo_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/build/illum_geo/",
-    "name_file_hllc_set": "/nethome/student/FS18/FS2-x1/Lartsev/solver/config/hllc_cfg.json",
-    "name_file_sphere_direction": "/nethome/student/FS18/FS2-x1/Lartsev/solver/build/grid_direction.txt",
+    "base_address": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/build/",
+    "graph_address": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/build/graph/",
+    "trace_address": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/build/trace/",
+    "hllc_init_value": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/config/no.bin",
+    "illum_geo_address": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/build/illum_geo/",
+    "name_file_hllc_set": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/config/hllc_cfg.json",
+    "name_file_sphere_direction": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/build/grid_direction.txt",
     "name_file_vtk": "/nethome/student/FS18/FS2-x1/Lartsev/tests/data/sphereR05.vtk",
-    "solve_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/build/Solve/Solve",
-    "solve_configuration": "/nethome/student/FS18/FS2-x1/Lartsev/solver/config/solve_cfg.json",
-    "add_dir_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/build/add_dir/",
-    "tab_func_address": "/nethome/student/FS18/FS2-x1/Lartsev/solver/tab_func/"
+    "solve_address": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/build/Solve/Solve",
+    "solve_configuration": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/config/solve_cfg.json",
+    "add_dir_address": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/build/add_dir/",
+    "tab_func_address": "/nethome/student/FS18/FS2-x1/Lartsev/RadRHD_solver/tab_func/"
 }

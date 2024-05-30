@@ -79,15 +79,14 @@ size_t ReadSimple(const std::string &name_file, T *data) {
     return e_completion_fail;
   }
   // data.resize(n);
-if (data != nullptr) 
-{
-  if (fread(data, sizeof(T), n, f) != n) {
-    return e_completion_fail;
-  }
+  if (data != nullptr) {
+    if (fread(data, sizeof(T), n, f) != n) {
+      return e_completion_fail;
+    }
 
-  fclose(f);
-  return e_completion_success;
-}
+    fclose(f);
+    return e_completion_success;
+  }
   WRITE_LOG("Read %s fail. No alloc memory\n", name_file.c_str());
   return e_completion_fail;
 }
@@ -192,6 +191,13 @@ int ReadRadiationFaceTrace(const int count_dir, const global_files_t &gbl_files,
                            std::vector<std::vector<graph_pair_t>> &sorted_graph,
                            std::vector<std::vector<IntId>> &sorted_id_bound_face,
                            std::vector<std::vector<IntId>> &inner_bound_code);
+
+int ReadRadiationFaceTrace(const int count_dir, const global_files_t &gbl_files,
+                           std::vector<align_cell_local> &vec_x0,
+                           std::vector<std::vector<graph_pair_t>> &sorted_graph,
+                           boundary_faces_by_directions_t &boundary_faces,
+                           std::vector<std::vector<IntId>> &inner_bound_code);
+
 #endif //! ILLUM
 
 #if defined RHLLC || defined HLLC

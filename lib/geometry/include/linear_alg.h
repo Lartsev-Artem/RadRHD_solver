@@ -18,4 +18,15 @@
  */
 void GetRotationMatrix(const Vector3 &n, Matrix3 &T);
 
+/**
+ * @brief Возвращает отражённое направление
+ *
+ * @param[in] dir исходное направление
+ * @param[in] n нормаль к поверхности (нормированная!)
+ * @return направление отражения
+ */
+static inline Vector3 reflection_dir(const Vector3 &dir, const Vector3 &n) {
+  return (dir - 2.0 * n * (dir.dot(n))).normalized();
+}
+
 #endif //! LINEAR_ALG_H

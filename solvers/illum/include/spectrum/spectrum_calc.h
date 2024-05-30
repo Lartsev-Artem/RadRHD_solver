@@ -19,7 +19,7 @@ int CalculateSpectrum(const grid_directions_t &grid_direction,
                       const std::vector<std::vector<IntId>> &inner_bound_code,
                       const std::vector<align_cell_local> &vec_x0,
                       const std::vector<std::vector<graph_pair_t>> &sorted_graph,
-                      const std::vector<std::vector<IntId>> &sorted_id_bound_face,
+                      const boundary_faces_by_directions_t &boundary_faces,
                       grid_t &grid);
 
 };

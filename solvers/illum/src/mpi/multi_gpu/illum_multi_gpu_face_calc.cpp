@@ -22,7 +22,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
                                         const std::vector<std::vector<IntId>> &inner_bound_code,
                                         const std::vector<align_cell_local> &vec_x0,
                                         const std::vector<std::vector<graph_pair_t>> &sorted_graph,
-                                        const std::vector<std::vector<IntId>> &sorted_id_bound_face,
+                                        const boundary_faces_by_directions_t &boundary_faces,
                                         grid_t &grid) {
 
   int np = get_mpi_np();
@@ -65,10 +65,10 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 #ifndef LOG_SPECTRUM
 #if defined SPECTRUM
 #pragma omp parallel default(none) firstprivate(count_directions, np, local_disp, local_size, frq0, frq1) \
-    shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1, grid_direction, glb_files)
+    shared(sorted_graph, boundary_faces, inner_bound_code, vec_x0, grid, norm, section_1, grid_direction, glb_files)
 #else
 #pragma omp parallel default(none) firstprivate(count_directions, np, local_disp, local_size) \
-    shared(sorted_graph, sorted_id_bound_face, inner_bound_code, vec_x0, grid, norm, section_1)
+    shared(sorted_graph, boundary_faces, inner_bound_code, vec_x0, grid, norm, section_1)
 #endif
 #endif
     {
@@ -95,10 +95,20 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
         const IntId *code_bound = inner_bound_code[num_direction].data();
 #pragma error "need recalc code bound from cell to face"
 #endif
-        for (auto num_face : sorted_id_bound_face[num_direction]) {
+        for (auto num_face : boundary_faces.sorted_id_bound_face[num_direction]) {
           const IdType neigh_id = grid.faces[num_face].geo.id_r;         //т.к. мы проходим границу здесь будет граничный признак
           (*inter_coef)[num_face] = illum::BoundaryConditions(neigh_id); //значение на грани ( или коэффициенты интерполяции)
         }
+#ifdef USE_REFLECTIVE_BOUNDARY
+        const size_t size_bound = boundary_faces.reflection_faces_id[num_direction].size();
+        for (size_t i = 0; i < size_bound; i++) {
+          int num_face = boundary_faces.reflection_faces_id[num_direction][i];
+          const IdType cell_id = grid.faces[num_face].geo.id_l; //ячейка однозначно определена по грани, т.к. это граница
+          const int dir_id = boundary_faces.reflection_dir_id[num_direction][i];
+          (*inter_coef)[num_face] += kReflectiveAbsorbCoef * grid.Illum[cell_id * count_directions + dir_id];
+        }
+#endif
+
 #ifdef LOG_SPECTRUM
         if (num_direction + local_disp == 66) {
           log_enable = 1;

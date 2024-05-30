@@ -34,5 +34,11 @@ int RunRayTracing(const std::string &file_energy);
  * @return int ::e_type_completion
  */
 int FindIntersections();
+
+/**
+ * @brief Функция находит номера направлений, отраженные от внутренних стенок
+ * @return int ::e_type_completion
+ */
+int FindReflectionDirections();
 } // namespace ray_tracing
 #endif //! RAY_TRACING_MAIN_H

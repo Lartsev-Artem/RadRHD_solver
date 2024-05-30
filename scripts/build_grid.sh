@@ -30,6 +30,7 @@ if [ -f "$metis_exe" ]; then
             ./utils/build/bin/renum_grid_by_metis $1.$val build/metis $1.vtk
             ./utils/build/bin/make_all_geo_data build/ $1.vtk
             ./utils/build/bin/get_average_volume $1.vtk
+            cp $1.vtk build/grid.vtk
         else
             echo "Fail netgen to metis convert"
         fi

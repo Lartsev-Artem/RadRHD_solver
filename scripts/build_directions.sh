@@ -8,6 +8,7 @@ if [ -d utils/build/bin ]; then
             ./utils/build/bin/get_sphere_direction $1 build/
             ./build/bin/graph_builder /home/artem/projects/RadRHD_solver/config/directories_cfg.json
             ./build/bin/trace_builder /home/artem/projects/RadRHD_solver/config/directories_cfg.json
+            ./build/bin/get_reflection /home/artem/projects/RadRHD_solver/config/directories_cfg.json
         else
             echo "file sphere direction not found"
         fi

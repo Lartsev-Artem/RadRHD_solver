@@ -18,7 +18,7 @@ int illum::spectrum::CalculateSpectrum(const grid_directions_t &grid_direction,
                                        const std::vector<std::vector<IntId>> &inner_bound_code,
                                        const std::vector<align_cell_local> &vec_x0,
                                        const std::vector<std::vector<graph_pair_t>> &sorted_graph,
-                                       const std::vector<std::vector<IntId>> &sorted_id_bound_face,
+                                       const boundary_faces_by_directions_t &boundary_faces,
                                        grid_t &grid) {
 
   const int count_frequencies = grid.frq_grid.size() - 1; ///< число разбиений по частоте
@@ -39,7 +39,7 @@ int illum::spectrum::CalculateSpectrum(const grid_directions_t &grid_direction,
     set_boundary_value(val);
 
     illum::separate_gpu::CalculateIllum(grid_direction, inner_bound_code,
-                                        vec_x0, sorted_graph, sorted_id_bound_face, grid);
+                                        vec_x0, sorted_graph, boundary_faces, grid);
 
     cuda::interface::CudaWait();
     cuda::interface::CudaSyncStream(cuda::e_cuda_scattering_1);

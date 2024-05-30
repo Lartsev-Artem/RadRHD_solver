@@ -6,6 +6,8 @@
 #include "reader_vtk.h"
 #include "writer_bin.h"
 
+///\note: Формат хранения номеров граничных ячеек: i * CELL_SIZE + j
+
 int FUNC_NAME(GetSurface)(int argc, char *argv[]) {
 
   if (argc != 3) {

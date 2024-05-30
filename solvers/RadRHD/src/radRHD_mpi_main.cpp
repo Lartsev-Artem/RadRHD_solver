@@ -43,7 +43,7 @@ int rad_rhd::RunRadRHDMpiModule() {
   std::vector<align_cell_local> vec_x0;
 
   std::vector<std::vector<graph_pair_t>> sorted_graph;
-  std::vector<std::vector<IntId>> sorted_id_bound_face;
+  boundary_faces_by_directions_t boundary_faces;
   std::vector<std::vector<IntId>> inner_bound_code;
 
   uint32_t err = 0;
@@ -86,7 +86,7 @@ int rad_rhd::RunRadRHDMpiModule() {
     illum::separate_gpu::InitSender(MPI_COMM_WORLD, grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
 
     //перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
-    if (files_sys::bin::ReadRadiationFaceTrace(grid_direction.size, glb_files, vec_x0, sorted_graph, sorted_id_bound_face, inner_bound_code))
+    if (files_sys::bin::ReadRadiationFaceTrace(grid_direction.size, glb_files, vec_x0, sorted_graph, boundary_faces, inner_bound_code))
       RETURN_ERR("Error reading trace part\n");
   }
 
@@ -109,7 +109,7 @@ int rad_rhd::RunRadRHDMpiModule() {
     rhllc_mpi::StartPhysCast(*grid.mpi_cfg, grid);
     rhllc_mpi::SyncAndCalcPhysCast(grid);
 
-    illum::separate_gpu::CalculateIllum(grid_direction, inner_bound_code, vec_x0, sorted_graph, sorted_id_bound_face, grid);
+    illum::separate_gpu::CalculateIllum(grid_direction, inner_bound_code, vec_x0, sorted_graph, boundary_faces, grid);
 
     cuda::interface::CudaSyncStream(cuda::e_cuda_params);
     cuda::interface::CudaWait();

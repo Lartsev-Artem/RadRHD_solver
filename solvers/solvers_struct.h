@@ -174,6 +174,12 @@ struct align_cell_local // для каждой ячейки и каждого н
   std::vector<face_loc_id_t> in_face_id; ///< id выходной грани
 };
 
+struct boundary_faces_by_directions_t {
+  std::vector<std::vector<IntId>> sorted_id_bound_face; ///< определенная граница
+  std::vector<std::vector<uint16_t>> reflection_dir_id; ///< интерполяция переотраженных направлений
+  std::vector<std::vector<IntId>> reflection_faces_id;  ///< номера ячеек внешней границы
+};
+
 /**
  * @brief  данные на сетке связанные с излучением
  *
