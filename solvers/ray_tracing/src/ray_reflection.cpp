@@ -74,8 +74,8 @@ static int MakeOrderedListReflections(const grid_directions_t &grid_dir,
       }
     }
 
-    files_sys::bin::WriteSimple(glb_files.illum_geo_address + F_DIRECTION_REFLECTION + std::to_string(dir) + ".bin", num_bound_faces);
-    files_sys::bin::WriteSimple(glb_files.illum_geo_address + F_FACES_REFLECTION + std::to_string(dir) + ".bin", id_direction);
+    files_sys::bin::WriteSimple(glb_files.illum_geo_address + F_DIRECTION_REFLECTION + std::to_string(dir) + ".bin", id_direction);
+    files_sys::bin::WriteSimple(glb_files.illum_geo_address + F_FACES_REFLECTION + std::to_string(dir) + ".bin", num_bound_faces);
   }
 
   return e_completion_success;

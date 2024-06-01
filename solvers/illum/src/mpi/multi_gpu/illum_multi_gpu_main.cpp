@@ -65,6 +65,7 @@ int illum::RunIllumMultiGpuModule() {
     grid.cells[i].cell_data->T = 1e7;
   }
 
+  WRITE_LOG("start calculate illum\n");
   MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
   separate_gpu::CalculateIllum(grid_direction, inner_bound_code,

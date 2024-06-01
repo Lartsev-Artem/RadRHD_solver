@@ -417,7 +417,7 @@ static inline __m256d _mm256_exp_pd(__m256d x) {
 Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs) {
 
   alignas(32) Type Icur[4];
-#ifndef LOG_SPECTRUM
+#if 0 // ndef LOG_SPECTRUM
   __m256d RHS = _mm256_set1_pd(rhs);
   __m256d S = _mm256_load_pd(s);
   __m256d I_0 = _mm256_load_pd(I0);
@@ -429,16 +429,16 @@ Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs
 #else
   for (size_t i = 0; i < 3; i++) {
     Icur[i] = exp(-k * s[i]) * (I0[i] - rhs) + rhs;
-    if (log_enable) {
-      log_spectrum("k=%e,s=%e, I0=%e, rhs %e, I=%e\n", k, s[i], I0[i], rhs, Icur[i]);
-    }
+    // if (log_enable) {
+    //   log_spectrum("k=%e,s=%e, I0=%e, rhs %e, I=%e\n", k, s[i], I0[i], rhs, Icur[i]);
+    // }
   }
 
-  if (log_enable) {
+  // if (log_enable) {
 
-    log_spectrum("Ires=%e\n", (Icur[0] + Icur[1] + Icur[2]) / 3.);
-    log_enable = 0;
-  }
+  //   log_spectrum("Ires=%e\n", (Icur[0] + Icur[1] + Icur[2]) / 3.);
+  //   log_enable = 0;
+  // }
 #endif
   return (Icur[0] + Icur[1] + Icur[2]) / 3.;
 }

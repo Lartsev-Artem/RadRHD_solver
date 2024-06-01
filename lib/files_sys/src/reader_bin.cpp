@@ -242,6 +242,7 @@ int files_sys::bin::ReadRadiationFaceTrace(const int count_dir, const global_fil
 
   boundary_faces.sorted_id_bound_face.resize(send[myid]);
   boundary_faces.reflection_dir_id.resize(send[myid]);
+  boundary_faces.reflection_faces_id.resize(send[myid]);
   sorted_graph.resize(send[myid]);
   inner_bound_code.resize(send[myid]);
 

@@ -115,7 +115,7 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
         }
 #endif
 
-        // индексация по массиву определяющих гранях (конвеерная т.к. заранее не известны позиции точек)
+        // индексация по массиву определяющих гранях (конвейерная т.к. заранее не известны позиции точек)
         const Type *s = vec_x0[num_direction].s.data();
         const face_loc_id_t *in_face = vec_x0[num_direction].in_face_id.data();
         /*---------------------------------- далее FOR по неосвященным граням----------------------------------*/

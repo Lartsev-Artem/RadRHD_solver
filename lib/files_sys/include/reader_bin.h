@@ -44,10 +44,12 @@ size_t ReadSimple(const std::string &name_file, std::vector<T> &data) {
 
   int n;
   if (fread(&n, sizeof(int), 1, f) != 1) {
+    WRITE_LOG("Reading %s failed\n", name_file.c_str());
     return e_completion_fail;
   }
   data.resize(n);
   if (fread(data.data(), sizeof(T), n, f) != n) {
+    WRITE_LOG("Reading %s failed\n", name_file.c_str());
     return e_completion_fail;
   }
 
