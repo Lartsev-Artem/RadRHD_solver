@@ -41,8 +41,14 @@ HOST_DEVICE constexpr Type k_internal_radius_disk = 0.01;                  ///< 
 HOST_DEVICE constexpr Type k_external_radius_disk = 0.06;                  ///< внешний радиус около аккреционного диска
 
 // параметры картинной плоскости
-constexpr Type k_width_plane = 2.4;         ///< безразмерная ширина картинной плоскости
-constexpr Type k_height_plane = 1.2;        ///< безразмерная высота картинной плоскости
+#ifdef GRB_TASK
+constexpr Type k_width_plane = 1.2;  ///< безразмерная ширина картинной плоскости
+constexpr Type k_height_plane = 0.6; ///< безразмерная высота картинной плоскости
+#else
+constexpr Type k_width_plane = 2.4;  ///< безразмерная ширина картинной плоскости
+constexpr Type k_height_plane = 1.2; ///< безразмерная высота картинной плоскости
+#endif
+
 constexpr int k_pixels_width = 600;         ///< число пикселей в ширину
 constexpr int k_pixels_height = 300;        ///< число пикселей в высоту
 constexpr Type k_height_above_center = 0.1; ///< высота над центром масс

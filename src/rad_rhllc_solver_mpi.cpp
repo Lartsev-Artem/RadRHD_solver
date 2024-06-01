@@ -5,7 +5,9 @@
 
 int main(int argc, char *argv[]) {
 
-  MPI_START(argc, argv);
+  // MPI_START(argc, argv);
+  int provided;
+  MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
 #if defined RAD_RHD && defined SEPARATE_GPU && !defined SPECTRUM
 
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";

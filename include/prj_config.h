@@ -39,6 +39,8 @@
 
 #define GEOMETRY_TYPE Cone // MAIN_ELLIPSE // Sphere
 
+#define GRB_TASK //переключает конфигурацию с phl1445 на grb
+
 #if !defined CLASTER
 #if !__NVCC__
 //#define USE_VTK ///< использование vtk для вывода результатов в виде

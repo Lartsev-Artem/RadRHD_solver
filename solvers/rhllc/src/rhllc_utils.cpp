@@ -73,9 +73,8 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
     bound.phys_val.p = 0.01;
     GetConvValue(bound.phys_val, bound.conv_val);
 #elif GEOMETRY_TYPE == Cone
-
-    bound.phys_val.d = kM_hydrogen * 1e15 / kDensity; //  0.1;
-    bound.phys_val.p = GetPressure(bound.phys_val.d, 1e8);
+    bound.phys_val.d = kM_hydrogen * 1e14 / kDensity; //  0.1;
+    bound.phys_val.p = GetPressure(bound.phys_val.d, 10 * kEv);
     bound.phys_val.v = Vector3(1e3 / kVelocity, 0, 0);
 
     GetConvValue(bound.phys_val, bound.conv_val);
@@ -88,7 +87,7 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
 
     bound.conv_val = cell.conv_val;
     bound.phys_val = cell.phys_val;
-
+#if GEOMETRY_TYPE != Cone
     GetRotationMatrix(f.geo.n, T);
 
     bound.conv_val.v = T * bound.conv_val.v;
@@ -101,7 +100,21 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
 
     bound.conv_val.v = T * bound.conv_val.v;
     bound.phys_val.v = T * bound.phys_val.v;
+#endif
+    break;
 
+  case e_bound_outer_surface:
+#if GEOMETRY_TYPE == Cone
+
+    bound.conv_val = cell.conv_val;
+    bound.phys_val = cell.phys_val;
+
+    // bound.phys_val = cell.phys_val;
+    // bound.phys_val.v = Vector3(0.999, 0, 0);
+    // GetConvValue(bound.phys_val, bound.conv_val);
+#else
+    D_LD;
+#endif
     break;
 
   default:

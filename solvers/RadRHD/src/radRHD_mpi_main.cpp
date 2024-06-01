@@ -100,10 +100,9 @@ int rad_rhd::RunRadRHDMpiModule() {
   MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
 
   const int myid = get_mpi_id();
+  timer.start_timer();
 
   while (t < _hllc_cfg.T) {
-
-    timer.start_timer();
 
     rhllc_mpi::Hllc3dStab(_hllc_cfg.tau, grid);
     rhllc_mpi::StartPhysCast(*grid.mpi_cfg, grid);
@@ -121,8 +120,9 @@ int rad_rhd::RunRadRHDMpiModule() {
     if (cur_timer >= _hllc_cfg.save_timer) {
       DIE_IF(files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 
-      WRITE_LOG("t= %lf, time_step= %d\n", t, res_count);
+      WRITE_LOG("t= %lf, step= %d, time=%lfs \n", t, res_count, timer.get_delta_time_sec());
       cur_timer = 0;
+      timer.start_timer();
     }
 
     _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg, grid.cells);

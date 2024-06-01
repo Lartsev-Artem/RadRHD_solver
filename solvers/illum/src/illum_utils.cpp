@@ -48,6 +48,7 @@ static inline Type GetI(Type s, Type Q, Type S, Type I_0, Type alpha, Type betta
 Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, const Vector3 &inter_coef) {
   switch (type_bound) {
 
+  case e_bound_outer_surface:
   case e_bound_free:
   case e_bound_lock:
     return 0;
@@ -339,7 +340,7 @@ Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Ty
 }
 
 // 0-чтение, 0-сразу выкинуть из кэша
-#define PREFETCH_FACE_COEF(_cell_id)                                           \
+#define PREFETCH_FACE_COEF(_cell_id) //                                         \
   __builtin_prefetch(&inter_coef[grid.cells[_cell_id].geo.id_faces[0]], 0, 0); \
   __builtin_prefetch(&inter_coef[grid.cells[_cell_id].geo.id_faces[1]], 0, 0); \
   __builtin_prefetch(&inter_coef[grid.cells[_cell_id].geo.id_faces[2]], 0, 0); \
@@ -355,7 +356,7 @@ Type illum::separate_gpu::ReCalcIllumOpt(const IdType num_dir, const std::vector
 
     PREFETCH_FACE_COEF(cell + 1);
     const IdType id = cell * grid.size_dir + shift_dir;
-    __builtin_prefetch(&grid.Illum[id], 1, 0);
+    //__builtin_prefetch(&grid.Illum[id], 1, 0);
 
 #if 0 
     Type curI = 0;
@@ -384,7 +385,7 @@ Type illum::separate_gpu::ReCalcIllumOpt(const IdType num_dir, const std::vector
   {
     const size_t cell = grid.size - 1;
     const IdType id = cell * grid.size_dir + shift_dir;
-    __builtin_prefetch(&grid.Illum[id], 1, 0);
+    //__builtin_prefetch(&grid.Illum[id], 1, 0);
     Type curI = 0;
 #pragma loop unroll(CELL_SIZE)
     for (size_t j = 0; j < CELL_SIZE; j++) {
@@ -416,7 +417,7 @@ static inline __m256d _mm256_exp_pd(__m256d x) {
 }
 Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs) {
 
-  alignas(32) Type Icur[4];
+  // alignas(32) Type Icur[4];
 #if 0 // ndef LOG_SPECTRUM
   __m256d RHS = _mm256_set1_pd(rhs);
   __m256d S = _mm256_load_pd(s);
@@ -426,21 +427,26 @@ Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs
   __m256d I = _mm256_add_pd(_mm256_mul_pd(_mm256_sub_pd(I_0, RHS), EXP), RHS);
   _mm256_store_pd(Icur, _mm256_max_pd(_mm256_set1_pd(0.0), I));
 
-#else
+#elif 0
   for (size_t i = 0; i < 3; i++) {
     Icur[i] = exp(-k * s[i]) * (I0[i] - rhs) + rhs;
-    // if (log_enable) {
-    //   log_spectrum("k=%e,s=%e, I0=%e, rhs %e, I=%e\n", k, s[i], I0[i], rhs, Icur[i]);
-    // }
+    if (log_enable) {
+      log_spectrum("k=%e,s=%e, I0=%e, rhs %e, I=%e\n", k, s[i], I0[i], rhs, Icur[i]);
+    }
   }
 
-  // if (log_enable) {
+  if (log_enable) {
 
-  //   log_spectrum("Ires=%e\n", (Icur[0] + Icur[1] + Icur[2]) / 3.);
-  //   log_enable = 0;
-  // }
+    log_spectrum("Ires=%e\n", (Icur[0] + Icur[1] + Icur[2]) / 3.);
+    log_enable = 0;
+  }
+#else
+  Type Icur = exp(-k * s[0]) * (I0[0] - rhs) + rhs;
+  Icur += (exp(-k * s[1]) * (I0[1] - rhs) + rhs);
+  Icur += (exp(-k * s[2]) * (I0[2] - rhs) + rhs);
+  return (Icur * 0.3333333333333333);
 #endif
-  return (Icur[0] + Icur[1] + Icur[2]) / 3.;
+  // return (Icur[0] + Icur[1] + Icur[2]) / 3.;
 }
 
 Type illum::GetIllumLimit(const Type *I0, const Type *s, const Type k, const Type rhs) {

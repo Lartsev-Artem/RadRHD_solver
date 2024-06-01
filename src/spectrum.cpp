@@ -8,7 +8,9 @@
 int main(int argc, char *argv[]) {
 
 #ifdef SPECTRUM
-  MPI_START(argc, argv);
+  // MPI_START(argc, argv);
+  int provided;
+  MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
 
   int N = 3;
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";

@@ -17,6 +17,9 @@ int main(int argc, char *argv[]) {
     return e_completion_fail;
 
   ray_tracing::FindIntersections();
+#ifdef GRB_TASK
+  ray_tracing::FindIntersections();
+#endif
 
   MPI_END;
 #else

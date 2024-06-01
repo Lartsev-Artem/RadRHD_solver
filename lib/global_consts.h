@@ -59,6 +59,8 @@ constexpr double kR_electron = 2.8179403 * 1e-15;        ///< радиус эл�
 constexpr double kGravity = 6.67430151515151515 * 1e-11; ///< гравитационная постоянная [м3*с-2*кг-1]
 #endif
 
+constexpr double kEv = 11604525.0061657; ///< 1 КэВ = К
+
 constexpr double kStefanBoltzmann4 = 4.0 * kStefanBoltzmann;
 
 constexpr double kEarthMass = (5.9722 * 1e25); ///< масса Земли в кг
