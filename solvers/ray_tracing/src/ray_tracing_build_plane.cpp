@@ -13,16 +13,24 @@
 #include <vtkPoints.h>
 #include <vtkQuad.h>
 
-void ray_tracing::MakeVtkPlane(const int x_cnt, const int y_cnt, vtkSmartPointer<vtkUnstructuredGrid> &image_plane) {
+void ray_tracing::MakeVtkPlane(const PlaneParams& plane, vtkSmartPointer<vtkUnstructuredGrid> &image_plane)                              
+{
+  MakeVtkPlane(plane._pixels_width,plane._pixels_height, image_plane,plane._width,plane._height);
+}
+
+
+void ray_tracing::MakeVtkPlane(const int x_cnt, const int y_cnt, vtkSmartPointer<vtkUnstructuredGrid> &image_plane, 
+                              Type width_plane, Type height_plane) 
+{
 
   // компоненты картинной плоскости
   vtkSmartPointer<vtkPoints> points_quad = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> quad_array = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkQuad> quad = vtkSmartPointer<vtkQuad>::New();
 
-  const Vector3 angle_of_plane(-(k_width_plane / 2), -(k_height_plane / 2), 0); // угол плоскости. От него начинается заполнение всей плоскости
-  const Type step_x = k_width_plane / x_cnt;                                    // ширина пикселя
-  const Type step_y = k_height_plane / y_cnt;                                   // высота пикселя
+  const Vector3 angle_of_plane(-(width_plane / 2), -(height_plane / 2), 0); // угол плоскости. От него начинается заполнение всей плоскости
+  const Type step_x = width_plane / x_cnt;                                    // ширина пикселя
+  const Type step_y = height_plane / y_cnt;                                   // высота пикселя
 
   size_t quad_number = 0;
   for (int i = 0; i < x_cnt; ++i) {
@@ -49,10 +57,10 @@ void ray_tracing::MakeVtkPlane(const int x_cnt, const int y_cnt, vtkSmartPointer
   return;
 }
 
-int ray_tracing::BuildVtkFromBin(const int x_cnt, const int y_cnt, const int number_of_planes, const std::string &files_plane) {
+int ray_tracing::BuildVtkFromBin(const PlaneParams& plane_cfg, const int number_of_planes, const std::string &files_plane) {
 
   vtkSmartPointer<vtkUnstructuredGrid> grid_plane = vtkSmartPointer<vtkUnstructuredGrid>::New();
-  MakeVtkPlane(x_cnt, y_cnt, grid_plane);
+  MakeVtkPlane(plane_cfg, grid_plane);
 
   vtkSmartPointer<vtkDoubleArray> Illum_array = vtkSmartPointer<vtkDoubleArray>::New();
   std::vector<Type> energy_plane;
@@ -98,6 +106,7 @@ void ray_tracing::MakeRays(const Ray_t &center_ray, std::vector<Ray_t> &rays) {
   constexpr Type step_x = k_width_plane / k_pixels_width;                       // ширина пикселя
   constexpr Type step_y = k_height_plane / k_pixels_height;                     // высота пикселя
 
+  /// \todo: (size+1)(size+1) and for <=
   rays.resize(k_pixels_width * k_pixels_height);
   //формируем всю плоскость
   for (int i = 0; i < k_pixels_width; ++i) {
@@ -108,6 +117,29 @@ void ray_tracing::MakeRays(const Ray_t &center_ray, std::vector<Ray_t> &rays) {
 
       // WRITE_LOG("Ray[%d %d]: [%lf, %lf, %lf] -> [%lf %lf %lf]\n", i, j, orig_3d[0], orig_3d[1], orig_3d[2], center_ray.direction[0], center_ray.direction[1], center_ray.direction[2]);
       rays[i * k_pixels_height + j] = Ray_t(orig_3d, center_ray.direction);
+    }
+  }
+
+  return;
+}
+
+void ray_tracing::MakeRays(const PlaneParams& plane_params, const Vector3 &plane_orig, const Vector3& observer,std::vector<Ray_t> &rays) 
+{
+  Vector3 center_dir= (plane_orig-observer).normalized();
+  Matrix3 basis; ///< локальный базис картинной плоскости
+  intersection::SetBasis(center_dir, basis);
+
+  /// \todo: (size+1)(size+1) and for <=
+  rays.resize(plane_params._pixels_width * plane_params._pixels_height);
+  //формируем всю плоскость
+  for (int i = 0; i < plane_params._pixels_width; ++i) {
+    for (int j = 0; j < plane_params._pixels_height; ++j) {
+
+      Vector3 orig_2d = plane_params.get_pixel_coord(i,j); ///< центр нового пикселя на плоскости
+      Vector3 orig_3d = basis.transpose() * orig_2d + plane_orig;                    // переход к 3d
+
+       //WRITE_LOG("Ray[%d %d]: [%lf, %lf, %lf] -> [%lf %lf %lf]\n", i, j, orig_3d[0], orig_3d[1], orig_3d[2], center_ray.direction[0], center_ray.direction[1], center_ray.direction[2]);
+      rays[i * plane_params._pixels_height + j] = Ray_t(orig_3d, (orig_3d-observer).normalized());
     }
   }
 

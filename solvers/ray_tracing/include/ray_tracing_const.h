@@ -60,5 +60,81 @@ constexpr Type k_accretion_energy = 10; ///< энергия на поверхн�
 constexpr Type k_disk_energy = 5;       ///< энергия аккреционного диска около аккретора
 constexpr Type k_rosh_energy = 0.00001; ///< энергия на поверхности потенциала Роша
 
+/**
+ * @brief Параметры картинной плоскости в 2d координатах
+ */
+struct PlaneParams
+{
+public:
+  Type _width; ///< безразмерная ширина плоскости
+  Type _height;///< безразмерная высота плоскости
+  int _pixels_width; ///< число пикселей в ширину
+  int _pixels_height; ///< число пикселей в высоту
+private:
+  Vector3 _angle_of_plane; ///< угол плоскости. От него начинается заполнение всей плоскости
+  Type _step_x;  ///< ширина пикселя
+  Type _step_y;  ///< высота пикселя
+public:
+  PlaneParams() = delete;
+  PlaneParams(const PlaneParams& prm)
+  {
+    *this = PlaneParams(prm._width, prm._height, prm._pixels_width, prm._pixels_height);
+  }
+  PlaneParams(Type width,Type height,int pixels_width, int pixels_height) :
+  _width(width),
+  _height(height),
+  _pixels_width(pixels_width),
+  _pixels_height(pixels_height) 
+  {
+    _angle_of_plane = Vector3(-(_width / 2), -(_height / 2), 0);
+    _step_x = _width / _pixels_width;
+    _step_y = _height / _pixels_height;
+  }
+  void operator=(const PlaneParams& prm)
+  {
+    _width = prm._width;
+   _height = prm._height;
+   _pixels_width=prm._pixels_width;
+   _pixels_height = prm._pixels_height;
+
+    _angle_of_plane = prm._angle_of_plane;
+    _step_x=prm._step_x;
+    _step_y=prm._step_y;
+  }
+
+  /**
+   * @brief Возвращает координаты центра [i,j] пикселя
+   * 
+   * @param[in] i номер пикселя по горизонтали
+   * @param[in] j номер пикселя по вертикали
+   * @return Vector3 
+   */
+  Vector3 get_pixel_coord(const int i, const int j) const
+  {
+      return Vector3(_angle_of_plane(0) + i * _step_x, _angle_of_plane(1) + j * _step_y, 0);
+  }
+};
+
+/**
+ * @brief Параметры сцены для проецирования
+ */
+struct ParamTraceProjection
+{
+  ParamTraceProjection() = delete;
+  ParamTraceProjection(const PlaneParams& prm2D, const Vector3& orig, const Vector3& observe_dir)
+                      :params2D(prm2D),plane_orig(orig),observer(observe_dir) {}
+  
+  PlaneParams params2D; ///< параметры плоскости
+  Vector3 plane_orig; ///< центр плоскости
+  
+  //для разных моделей направление лучей может быть параллельно одному
+  // направлению или проходить через одну точку
+  union 
+  {
+    Vector3 observer; ///< положение наблюдателя
+    Vector3 direction; ///< направление лучей
+  };
+};
+
 } // namespace ray_tracing
 #endif //! RAY_TRACING_CONST_H

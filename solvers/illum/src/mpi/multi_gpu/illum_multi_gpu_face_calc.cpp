@@ -215,5 +215,66 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 
   return e_completion_success;
 }
+
+
+int illum::separate_gpu::CalculateIllumByDirection(const Vector3 &direction,                                        
+                                        const align_cell_local &vec_x0,
+                                        const std::vector<graph_pair_t> &sorted_graph,
+                                        const std::vector<IntId>& sorted_id_bound_face,
+                                        grid_t &grid) 
+{
+                                                                                     
+            
+  //std::vector<Type>& inter_coef = grid.inter_coef_all[0]; // (grid.faces.size(),0);
+  std::vector<Type> inter_coef(grid.faces.size(),0);
+  alignas(32) Type I0[4];
+
+  for (IdType num_direction = 0; num_direction < 1; num_direction++) {
+    /*---------------------------------- FOR по граничным граням----------------------------------*/
+    for (auto num_face : sorted_id_bound_face) 
+    {
+      const IdType neigh_id = grid.faces[num_face].geo.id_r;         //т.к. мы проходим границу здесь будет граничный признак
+      inter_coef[num_face] = illum::BoundaryConditions(neigh_id); //значение на грани ( или коэффициенты интерполяции)
+    }
+
+    // индексация по массиву определяющих гранях (конвейерная т.к. заранее не известны позиции точек)
+    const Type *s = vec_x0.s.data();
+    const face_loc_id_t *in_face = vec_x0.in_face_id.data();
+    /*---------------------------------- далее FOR по неосвященным граням----------------------------------*/
+    // for (auto fc_pair : sorted_graph[num_direction])
+    const graph_pair_t *fc_pair = sorted_graph.data();
+    const IdType Ncells = sorted_graph.size();
+    for (IdType i = 0; i < Ncells; i++) {
+
+      const IntId num_cell = fc_pair->cell;
+      const uint32_t num_loc_face = fc_pair->loc_face;
+      
+      elem_t *cell = &grid.cells[num_cell];
+      const Vector3 &x = cell->geo.center; // vec_x[num_cell].x[num_loc_face][num_node];
+
+      const face_loc_id_t id_in_faces = *(in_face);
+      ++in_face;
+
+      Type k;
+      const Type S = 0;//grid.scattering[num_cell * local_size + num_direction];
+      const Type rhs = GetRhs(x, S, *cell, k);
+
+      I0[0] = inter_coef[cell->geo.id_faces[id_in_faces.a]];
+      I0[1] = inter_coef[cell->geo.id_faces[id_in_faces.b]];
+      I0[2] = inter_coef[cell->geo.id_faces[id_in_faces.c]];
+      
+      ++fc_pair;
+      Type I = GetIllum(I0, s, k, rhs);
+      inter_coef[cell->geo.id_faces[num_loc_face]] = I;
+      s += NODE_SIZE;
+    }
+    /*---------------------------------- конец FOR по ячейкам----------------------------------*/
+
+    Type loc_norm = separate_gpu::ReCalcIllumOpt(num_direction, inter_coef, grid, 0);       
+  }
+  /*---------------------------------- конец FOR по направлениям----------------------------------*/            
+  return e_completion_success;
+}
+
 #endif //! TRANSFER_CELL_TO_FACE
 #endif //! defined ILLUM && defined SOLVERS  && !defined USE_MPI

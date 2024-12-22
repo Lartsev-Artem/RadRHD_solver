@@ -86,7 +86,7 @@ constexpr double kInternalRadius = 0.12; ///< радиус внутренней 
 #define F_SURFACE_SPHERE_DIRECTION "surface_grid_direction.bin" ///< ячейки на поверхности сфер направлений
 #define F_DIRECTION_REFLECTION "reflection_id"                  ///<номера переотраженных направлений
 #define F_FACES_REFLECTION "reflection_face_id"                 ///<номера ячеек в которых происходит переотражение
-
+#define F_PLANE_CFG "plane_cfg.bin"                             ///< параметры картинной плоскости
 //--------------------------Файлы решение-------------------------------//
 #define F_SOLVE "Solve" // задается в настройках
 

@@ -153,7 +153,7 @@ int WriteSolutionMPI(const std::string &main_dir, const grid_t &grid);
  * @tparam Str_Type символьны тип
  * @tparam T тип записываемых данных
  * @param[in] file полное имя файла с расширением
- * @param[in] n размерность массива
+ * @param[in] n размерность массива(полного)
  * @param[in] data массив T*
  * @param[in] left_offset левая граница данных на узле
  * @param[in] right_offset правая граница данных на узле

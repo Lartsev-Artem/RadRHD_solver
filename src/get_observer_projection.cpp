@@ -1,27 +1,26 @@
 #include "mpi_ext.h"
 #include "reader_json.h"
-#include "rhllc_main.h"
 #include "solvers_struct.h"
+
+#include "ray_tracing_main.h"
 
 int main(int argc, char *argv[]) {
 
-#ifdef RHLLC
+#ifdef USE_CUDA
   MPI_START(argc, argv);
 
   std::string file_config = "/home/artem/projects/solver/config/directories_cfg.json";
   if (argc > 1)
     file_config = argv[1];
 
-  if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg)) {    
-    MPI_END;
+  if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
     return e_completion_fail;
-  }
 
-  rhllc::RunRhllcMpiModule();
-
+  ray_tracing::FindObserverIntersections(); 
+ 
   MPI_END;
 #else
-  WRITE_LOG_ERR("the rhllc solver is not included in the build. Use define RHLLC and SOLVER\n");
+  WRITE_LOG_ERR("For building projections need USE_CUDA define \n");
   return 1;
 #endif
   return 0;

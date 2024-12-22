@@ -12,7 +12,8 @@ void ConvertBinToGeo(std::vector<IntId> &neighbours_id_faces,
   for (int i = 0; i < N * CELL_SIZE; i++) {
     int idx = neighbours_id_faces[i];
 
-    if (idx != -10) {
+    if (idx != -10) //эта грань еще не обработана
+    {
       face_t f;
       f.geo.id_l = i / CELL_SIZE; //ячейка
 

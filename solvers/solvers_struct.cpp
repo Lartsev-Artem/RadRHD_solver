@@ -242,4 +242,42 @@ void full_phys_data_t::Init(const flux_t *src) {
   alpha = exp(log_alpha);
   betta = (kSigma_thomson / kM_hydrogen * kDist) * val->d * kDensity;
 }
+
+#include "reader_bin.h"
+#include "reader_txt.h"
+#include "trace_nodes.h"
+int TracerData::Init(const global_files_t& files)
+  {
+    uint32_t err = 0;
+    err |= files_sys::txt::ReadSimple(files.base_address + F_INTERNAL_BOUND, inter_boundary_face_id);
+    err |= files_sys::txt::ReadInitBoundarySetInFaces(files.base_address + F_FACE_ID, inter_faces);
+
+
+    err |= files_sys::bin::ReadSimple(files.base_address + F_NEIGHBOR, neighbours);
+    err |= files_sys::bin::ReadSimple(files.base_address + F_TRACE_GRID, grid);
+    err |= files_sys::bin::ReadSimple(files.base_address + F_TRACE_VERTEX, vertexs);
+    err |= files_sys::bin::ReadNormals(files.base_address + F_NORMALS, normals);    
+
+   { 
+    err |= files_sys::bin::ReadGridGeo(files.name_file_geometry_cells, geo_grid.cells);
+    err |= files_sys::bin::ReadGridGeo(files.name_file_geometry_faces, geo_grid.faces);
+
+    DIE_IF(err);
+
+    geo_grid.size_dir = 1;
+    geo_grid.size = geo_grid.cells.size();
+    geo_grid.loc_size = geo_grid.size;
+    geo_grid.loc_shift = 0;
+    geo_grid.size_face = geo_grid.faces.size();
+    geo_grid.inter_coef_all.resize(1);
+    geo_grid.inter_coef_all[0].resize(geo_grid.size_face);
+    geo_grid.Illum = new Type[geo_grid.size];
+  }
+  
+    vec_x.resize(vertexs.size());
+    DIE_IF(trace::GetInterpolationNodes(vertexs, vec_x));
+  
+    graph.resize(normals.size(), 0);
+    return e_completion_success;
+  }
 #endif

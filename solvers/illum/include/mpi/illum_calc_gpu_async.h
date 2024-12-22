@@ -41,6 +41,12 @@ int CalculateIllum(const grid_directions_t &grid_direction,
                    const std::vector<std::vector<graph_pair_t>> &sorted_graph,
                    const boundary_faces_by_directions_t &boundary_faces,
                    grid_t &grid);
+
+int CalculateIllumByDirection(const Vector3 &direction,
+                const align_cell_local &vec_x0,
+                const std::vector<graph_pair_t> &sorted_graph,
+                const std::vector<IntId>& sorted_id_bound_face,
+                grid_t &grid);
 #endif
 } // namespace separate_gpu
 

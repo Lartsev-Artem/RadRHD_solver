@@ -366,4 +366,36 @@ struct grid_t {
 #endif // USE_CUDA
 extern std::vector<bound_size_t> hllc_loc_size;
 
+
+#include <set>
+/**
+ * @brief Данные для маршевой трассировки с решением уравнения переноса
+ * (без кэширвоания)
+ */
+struct TracerData
+{
+  //Данные графа
+  std::vector<IntId> graph;          ///< упорядоченный набор ячеек
+  
+  std::set<IntId> inter_boundary_face_id; ///< id внутренних граней [i * CELL_SIZE + j]  
+  std::map<IntId, FaceCell> inter_faces;  ///< внутренние грани с ключом-номером ячейки
+
+  // обновляемые данные трассировки
+  std::vector<BasePointTetra> vec_x;
+  std::vector<cell_local> vec_x0;  
+  std::vector<IntId> graph_bound_faces;
+  std::vector<graph_pair_t> graph_cell_faces;  
+
+  align_cell_local X0;
+
+  //постоянные данные сетки
+  std::vector<Face> grid;
+  std::vector<Matrix4> vertexs;  
+  std::vector<Normals> normals;
+  std::vector<IntId> neighbours;
+  grid_t geo_grid;
+  
+  int Init(const global_files_t& files);  
+};
+
 #endif //! SOLVERS_STRUCT_H

@@ -68,12 +68,14 @@ static int get_data_projection(const std::vector<IntId> &projection, vtkDataArra
 }
 
 int FUNC_NAME(PlaneFromVtk)(int argc, char **argv) {
-  if (argc != 7) {
+  if (argc != 9) {
     printf("Error input data!\n");
     printf("Input:\n");
     printf("path\\Solve\n");
     printf("path\\projection_id_cell.bin\n");
     printf("number_of_data\n");
+    printf("plane width\n");
+    printf("plane height\n");
     printf("number_of_pixels_width\n");
     printf("number_of_pixels_height\n");
     printf("path\\Output\n");
@@ -83,9 +85,11 @@ int FUNC_NAME(PlaneFromVtk)(int argc, char **argv) {
   const std::string address_solve = argv[1];
   const std::string file_projection = argv[2];
   int number_of_data = std::stoi(argv[3]);
-  int X = std::stoi(argv[4]);
-  int Y = std::stoi(argv[5]);
-  const std::string output = argv[6];
+  Type weight = std::stod(argv[4]);
+  Type height = std::stod(argv[5]);
+  int X = std::stoi(argv[6]);
+  int Y = std::stoi(argv[7]);
+  const std::string output = argv[8];
 
   std::vector<IntId> projection;
   if (files_sys::bin::ReadSimple(file_projection, projection)) {
@@ -109,7 +113,7 @@ int FUNC_NAME(PlaneFromVtk)(int argc, char **argv) {
 
     // make plane
     vtkSmartPointer<vtkUnstructuredGrid> grid_plane = vtkSmartPointer<vtkUnstructuredGrid>::New();
-    ray_tracing::MakeVtkPlane(X, Y, grid_plane);
+    ray_tracing::MakeVtkPlane(X, Y, grid_plane,weight,height);
 
     for (size_t i = 0; i < grid->GetCellData()->GetNumberOfArrays(); i++) {
       std::string name_data(grid->GetCellData()->GetArrayName(i));

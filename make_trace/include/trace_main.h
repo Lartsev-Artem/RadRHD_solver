@@ -10,6 +10,8 @@
 #if !defined TRACE_MAIN_H && defined MAKE_TRACE
 #define TRACE_MAIN_H
 
+#include "solvers_struct.h"
+
 #ifdef DEBUG
 // #define ONLY_ONE_DIRECTION ///< позволяет выбрать фиксированное направление
 #endif
@@ -41,6 +43,8 @@ namespace trace {
  * @return int ::e_type_completion
  */
 int RunTracesModule();
+
+int RunTracesModule(TracerData& data, const Vector3& direction);
 
 } // namespace trace
 

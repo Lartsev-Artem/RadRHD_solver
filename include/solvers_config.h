@@ -35,7 +35,7 @@
 
 // #define ONLY_CUDA_SCATTERING ///< отключает весь расчет на видеокарте, кроме рассеяния
 
-#define USE_REFLECTIVE_BOUNDARY ///< включить отражающую границу
+//#define USE_REFLECTIVE_BOUNDARY ///< включить отражающую границу
 
 #ifdef SPECTRUM
 #define SAVE_FULL_SPECTRUM ///< хранить все частоты в памяти

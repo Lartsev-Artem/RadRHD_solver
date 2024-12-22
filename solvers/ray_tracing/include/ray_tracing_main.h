@@ -35,6 +35,16 @@ int RunRayTracing(const std::string &file_energy);
  */
 int FindIntersections();
 
+
+/**
+ * @brief Функция находит номера ячеек которые участвуют в проецировании на картинную плоскость
+ * @details В отличии от FindIntersections() используется модель распространения лучей
+ * не параллельных плоскости, а проходящих через точку наблюдателя
+ * @note Параметры проекции задаются вручную до компиляции
+ * @return int ::e_type_completion
+ */
+int FindObserverIntersections();
+
 /**
  * @brief Функция находит номера направлений, отраженные от внутренних стенок
  * @return int ::e_type_completion
