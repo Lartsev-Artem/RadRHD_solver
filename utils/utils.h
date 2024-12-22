@@ -184,6 +184,15 @@ int WriteBinFromVtk(int argc, char *argv[]);
  * @return int ::e_type_completion
  */
 int MakeTrace(int argc, char *argv[]);
+    
+/**
+ * @brief Формирует файл с проекцией (по лучу) решения на ПЛОСКОСТИ на заданную координатную ось 
+ *
+ * @param[in] argc кол-во аргументов (требуется 11)
+ * @param[in] argv массив char** содержит {файл vtk сетка, файл результат, размер плоскости{x,y}, колв-во пикселей{x,y}, основание {x,y},направление{x,y} }
+ * @return int ::e_type_completion
+ */
+int Make1DFromPlane(int argc, char *argv[]);
 
 /**
  * @brief Создает серию файлов с проекцией (по лучу) решения на заданную координатную ось
