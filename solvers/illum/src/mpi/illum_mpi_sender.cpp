@@ -133,7 +133,8 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
     disp_illum[i] = disp[i] * CELL_SIZE * grid.size;
   }
 
-  const IdType size_first_section = std::max(((1u << 31) / (CELL_SIZE * grid.size)) - 1, 1 * send_count[0] / 3); // первый узел будем потенциально разгружать(на всех узла должно хватать направлений)
+  /// \todo: было std::max. Понять почему
+  const IdType size_first_section = std::min(((1u << 31) / (CELL_SIZE * grid.size)) - 1, 1 * send_count[0] / 3); // первый узел будем потенциально разгружать(на всех узла должно хватать направлений)
   section_1.size = size_first_section;
   {
     //==================first rcv ==============================
@@ -168,8 +169,11 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
   const IdType local_size = send_count[myid];
   const IdType size_second_section = local_size - size_first_section;
   section_2.size = size_second_section;
+
   {
+
     const IdType N = grid_dir.size - (size_first_section * np) - size_second_section;
+    WRITE_LOG("N=%d\n", N);
     section_2.requests_rcv.resize(N, MPI_REQUEST_NULL);
     section_2.status_rcv.resize(N);
     section_2.flags_send_to_gpu.resize(N, 0);
@@ -179,10 +183,12 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
 
     int cc = 0;
     for (int src = 0; src < np; src++) {
+
       if (src == myid)
         continue;
       for (int j = size_first_section; j < send_count[src]; j++) {
         int tag = disp[src] + j;
+
         MPI_Recv_init(grid.Illum + size_msg * tag, (int)size_msg, MPI_DOUBLE, src, tag, MPI_COMM_ILLUM, &section_2.requests_rcv[cc++ /*tag - local_size*/]);
       }
     }

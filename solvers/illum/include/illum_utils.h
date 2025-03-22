@@ -107,18 +107,7 @@ Type GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scat
  */
 Type ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift = 0);
 
-#ifdef TRANSFER_CELL_TO_FACE
-
-/**
- * @brief Функция переводит данные расчёта излучения в структуру решателя
- *
- * @param[in] num_dir номер направления
- * @param[in] inter_coef значения на гранях  по данному направлению
- * @param[inout] grid сетка с излучением
- * @param[in] mpi_dir_shift - сдвиг в массиве излучения
- * @return возвращает норму ошибки на текущей итерации
- */
-Type ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, IdType mpi_dir_shift = 0);
+#ifndef TRANSFER_CELL_TO_FACE
 /**
  * @brief Функция возвращает значение на определяющей грани
  *
@@ -132,6 +121,20 @@ Type GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
                          const Vector2 &x0 = Vector2::Zero()
 #endif
 );
+#endif
+
+#ifdef TRANSFER_CELL_TO_FACE
+
+/**
+ * @brief Функция переводит данные расчёта излучения в структуру решателя
+ *
+ * @param[in] num_dir номер направления
+ * @param[in] inter_coef значения на гранях  по данному направлению
+ * @param[inout] grid сетка с излучением
+ * @param[in] mpi_dir_shift - сдвиг в массиве излучения
+ * @return возвращает норму ошибки на текущей итерации
+ */
+Type ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, IdType mpi_dir_shift = 0);
 
 namespace separate_gpu {
 /**

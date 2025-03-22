@@ -1,5 +1,7 @@
 #if defined BUILD_GRAPH
+#include "graph_config.h"
 #include "graph_main.h"
+
 
 #include "dbgdef.h"
 
@@ -8,18 +10,17 @@
 #include "graph_inner_bound.h"
 #include "graph_struct.h"
 
-int graph::RunGraphModule(TracerData& data,const Vector3& direction) 
-{
-  const std::vector<IntId>& neighbours = data.neighbours;
-  const std::set<IntId>& inter_boundary_face_id = data.inter_boundary_face_id;
-  const std::vector<Normals>& normals = data.normals;           
-  const std::map<IntId, FaceCell>& inter_faces = data.inter_faces;  
+int graph::RunGraphModule(TracerData &data, const Vector3 &direction) {
+  const std::vector<IntId> &neighbours = data.neighbours;
+  const std::set<IntId> &inter_boundary_face_id = data.inter_boundary_face_id;
+  const std::vector<Normals> &normals = data.normals;
+  const std::map<IntId, FaceCell> &inter_faces = data.inter_faces;
   std::vector<IntId> &graph = data.graph;
 
   const size_t num_cells = normals.size();
 
   std::vector<State> count_in_face(num_cells, 0);  ///< число входящих граней ячейки
-  std::vector<State> count_def_face(num_cells, 0); ///< число определённых граней ячейки  
+  std::vector<State> count_def_face(num_cells, 0); ///< число определённых граней ячейки
 
   std::set<IntId> inner_part; ///< часть граничных ячеек через которые луч покидай расчётную область
   std::set<IntId> outer_part; ///< часть граничных ячеек через которые луч возвращается в расчётную область
@@ -28,10 +29,9 @@ int graph::RunGraphModule(TracerData& data,const Vector3& direction)
 
   std::vector<IntId> cur_el;    ///<текущая границы
   std::set<IntId> next_step_el; ///< кандидаты на следующую границу
-  
-  for (int cur_direction = 0; cur_direction < 1; cur_direction++)
-  {   
-    InitFacesState(neighbours, inter_faces, faces_state);    
+
+  for (int cur_direction = 0; cur_direction < 1; cur_direction++) {
+    InitFacesState(neighbours, inter_faces, faces_state);
 
     DivideInnerBoundary(direction, normals, inter_boundary_face_id, inner_part, outer_part);
 
@@ -71,15 +71,15 @@ int graph::RunGraphModule(TracerData& data,const Vector3& direction)
 
     } // while
 
-    DIE_IF_ACTION(count_graph < graph.size(), WRITE_LOG_ERR("Error size graph[%d] %d\n", cur_direction, count_graph));    
+    DIE_IF_ACTION(count_graph < graph.size(), WRITE_LOG_ERR("Error size graph[%d] %d\n", cur_direction, count_graph));
   }
 
   bound_trace.clear();
 
 #if defined GRID_WITH_INNER_BOUNDARY && defined USE_CUDA && defined GRAPH_TRACING_INNER_BOUNDARY
   trace_through_boundary::ClearDevice();
-#endif  
-  
+#endif
+
   return e_completion_success;
 }
 

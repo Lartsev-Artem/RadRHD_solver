@@ -288,6 +288,7 @@ Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
   return I_x0;
 }
 
+#ifdef TRANSFER_CELL_TO_FACE
 Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
 
   Type norm = -1;
@@ -318,6 +319,7 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coe
 #endif
   return norm;
 }
+#endif
 
 #if defined SEPARATE_GPU
 Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp) {
@@ -415,6 +417,8 @@ static inline __m256d _mm256_exp_pd(__m256d x) {
       exp(X[2]),
       0);
 }
+
+#ifdef TRANSFER_CELL_TO_FACE
 Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs) {
 
   // alignas(32) Type Icur[4];
@@ -596,4 +600,7 @@ Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, 
   k = alpha + betta;
   return (alpha * Q + betta * S) / k;
 }
+
+#endif // TRANSFER_CELL_TO_FACE
+
 #endif //! defined ILLUM && defined SOLVERS
