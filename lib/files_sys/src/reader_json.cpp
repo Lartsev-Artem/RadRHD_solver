@@ -3,8 +3,8 @@
 #include <fstream>
 #include <string>
 
-#include "../json/json_struct.h"
 #include "global_def.h"
+#include "json_struct.h"
 
 static int ReadFileJson(nlohmann::json &j, const std::string &file) {
   std::ifstream ifile(file);

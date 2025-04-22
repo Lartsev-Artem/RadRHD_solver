@@ -250,6 +250,7 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_
   return norm;
 }
 
+#ifndef TRANSFER_CELL_TO_FACE
 Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
 #ifdef INTERPOLATION_ON_FACES
                                 ,
@@ -287,7 +288,7 @@ Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
   }
   return I_x0;
 }
-
+#endif
 #ifdef TRANSFER_CELL_TO_FACE
 Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
 

@@ -9,8 +9,8 @@
 
 #include <string>
 
-#include "../json/json_struct.h"
 #include "global_value.h"
+#include "json_struct.h"
 
 /*! \addtogroup file_sys Файловый модуль
     @{

@@ -12,9 +12,9 @@
 #include "geo_types.h"
 #include "global_consts.h"
 #include "global_def.h"
+#include "json_struct.h"
 #include "prj_config.h"
 #include "solvers_struct.h"
-#include "json/json_struct.h"
 
 #include "log_global_consts.h"
 #define LOG(val) log_##val

@@ -173,7 +173,6 @@ void illum::gpu_async::InitSender(const grid_directions_t &grid_dir, const grid_
   {
 
     const IdType N = grid_dir.size - (size_first_section * np) - size_second_section;
-    WRITE_LOG("N=%d\n", N);
     section_2.requests_rcv.resize(N, MPI_REQUEST_NULL);
     section_2.status_rcv.resize(N);
     section_2.flags_send_to_gpu.resize(N, 0);

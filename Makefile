@@ -1,139 +1,131 @@
-# defining project config 
-DEFCONF 		= SOLVERS DEBUG  BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA USE_MPI RHLLC RAD_RHD
-#DEFCONF 		= SOLVERS DEBUG RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM USE_MPI USE_CUDA
+## Флаги сборки
+KEYS 	= DEBUG SOLVERS BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA USE_MPI RHLLC RAD_RHD
+DEFINES = $(addprefix -D , $(KEYS))
+## Компиляторы и настройки
+CONFIG ?= release
+CXX 		:= mpic++
+NVCC 		:= nvcc
+CXXFLAGS 	:= $(DEFINES) -fopenmp -fPIE -std=c++17 
+NVCCFLAGS 	:= $(DEFINES) --expt-relaxed-constexpr -dc #-gencode arch=compute_70,code=sm_70 #-Xcompiler "-fopenmp"
 
-# defining working directories
-LIB_DIR = lib lib/json lib/files_sys/include lib/Eigen lib/geometry/include lib/mpi_extension lib/aligned_vec lib/physics/include lib/output_interface
-LIB_SRC = lib/files_sys/src lib/geometry lib/mpi_extension lib/json  lib/geometry/src lib/physics/src
+LDFLAGS 	:= -fopenmp -L/usr/local/cuda/lib64 -lcudart
 
-CUDA_INCDIR = cuda/include cuda/include/interface cuda/include/short_characteristics cuda/include/ray_tracing cuda/include/short_characteristics/separate_gpu
-export CUDA_SRCDIR = cuda/src cuda/src/interface cuda/src/short_characteristics cuda/src/ray_tracing cuda/src/short_characteristics/separate_gpu cuda/src/short_characteristics/separate_gpu/spectrum
-
-SOLVERS_DIR = solvers solvers/illum/include solvers/rhllc/include solvers/ray_tracing/include solvers/illum/include/mpi solvers/illum/include/add_directions solvers/RadRHD/include solvers/illum/include/spectrum
-SOLVERS_SRC = solvers solvers/illum/src solvers/rhllc/src solvers/ray_tracing/src solvers/illum/src/mpi solvers/illum/src/add_directions solvers/RadRHD/src solvers/illum/src/mpi/multi_gpu solvers/illum/src/spectrum solvers/illum/src/spectrum/full_spectrum
-
-RESOURCES_DIR = resources
-
-export SRCDIR          = src graph/src make_trace/src ${LIB_SRC} ${SOLVERS_SRC}
-INCLUDESDIR     = include graph/include make_trace/include  ${LIB_DIR}  ${CUDA_INCDIR} ${SOLVERS_DIR} build/resources
-
-export ROOT_DIR 	:= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-export BUILDDIR     = build
-export OBJDIR       = $(BUILDDIR)/objs
-export DEPDIR       = $(BUILDDIR)/dep
-EXEDIR          	= $(BUILDDIR)/bin
-
-SRCEXE 				= src
-
-# specify the list of directories in which the search should be performed.
-vpath %.cpp 		$(SRCDIR) 
-vpath %.h %.hpp 	$(INCLUDESDIR)
-vpath %.o 			$(OBJDIR)
-vpath %.d 			$(DEPDIR)
-vpath %.cu 			$(CUDA_SRCDIR) 
-
-.SUFFIXES:						# Delete the default suffixes
-.SUFFIXES: .cpp .h .o .d .hpp .cu	# Define our suffix list
-
-
-SRCS 			= $(foreach dir,$(SRCDIR),$(wildcard $(dir)/*.cpp))
-OBJS            = $(patsubst %.cpp, %.o, $(notdir $(SRCS)))
-DEP_FILES       = $(patsubst %.o, %.d, $(OBJS))
-
-CUDA_SRCS 		= $(foreach dir,$(CUDA_SRCDIR),$(wildcard $(dir)/*.cu))
-CUDA_OBJS       = $(patsubst %.cu, %.o, $(notdir $(CUDA_SRCS)))
-CUDA_DEP_FILES  = $(patsubst %.o, %.d, $(CUDA_OBJS))
-
-OBJS            += $(patsubst %.cu, %.o, $(notdir $(CUDA_SRCS))) # add cuda objs
-
-INCLUDE_DIRS    = $(addprefix -I ,$(INCLUDESDIR))
-DEF_SET 		= $(addprefix -D , $(DEFCONF))
-
-EXE_SRCS 		= $(foreach dir,$(SRCEXE),$(wildcard $(dir)/*.cpp))
-EXE_OBJ	 		= $(patsubst %.cpp, %.o, $(notdir $(EXE_SRCS)))
-EXE		 		= $(patsubst %.cpp, %.exe, $(notdir $(EXE_SRCS)))
-LINK_SRC		= $(filter-out $(EXE_OBJ),$(OBJS))
-#######################################################################
-################ CONFIGURING THE COMPILER #############################
-#######################################################################
-
-# icpc:  -fast -O3 -xHost -ipo
+# Настройки флагов для конфигураций
+ifeq ($(CONFIG),debug)
+	CXXFLAGS 	+= -g -O0 #-Wall -Wextra -std=c++11
+	NVCCFLAGS 	+= -G -g
+else
 # gcc:  -Ofast march=cpu-type    -flto (-fwhole-program)
-export CXX      = mpic++
-CPPFLAGS        = $(DEF_SET) -fopenmp -fPIE -Ofast
-CXXFLAGS        = -std=c++17 #-g #-Wall -Wextra -std=c++11
+	CXXFLAGS 	+= -Ofast #-xHost -ipo
+	NVCCFLAGS 	+= -O3
+	#LDFLAGS 	+= -ipo
+endif
 
-export NVCC 		= nvcc
-NVCC_OTHER_FLAGS 	= -Xcompiler "-fopenmp" --expt-relaxed-constexpr #-gencode arch=compute_70,code=sm_70 #совместимость с Eigen3
-NVCC_FLAGS 			= $(DEF_SET) -O2  -dc $(NVCC_OTHER_FLAGS)  #-gencode arch=compute_52,code=sm_52
+## Пути 
+export ROOT_DIR 	:= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+#export BUILD_DIR = build/$(CONFIG)
+export BUILD_DIR 	= build
+RESOURCES_DIR 		= resources
+BUILD_BIN          	= $(BUILD_DIR)/bin
+BUILD_OBJ          	= $(BUILD_DIR)/obj
+EXE_DIR 			= src
+TESTS_DIR 			= tests/src
+TESTS_BIN 			= $(BUILD_DIR)/tests
 
-PROGRAM         = run
-#TARGET_ARCH	=
+## Пути к исходным файлам
+LIB_SRC_DIR 	= lib/files_sys/src/ lib/geometry/src/ lib/json/src/ lib/mpi_extension/src/ lib/physics/src/ lib/grids/src/
+SOLVERS_SRC_DIR = solvers/illum/src/ solvers/hllc/src/ solvers/rhllc/src/ solvers/ray_tracing/src/  solvers/RadRHD/src/
 
-export COMPILE.cpp	= $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
-export COMPILE.cu	= $(NVCC) $(NVCC_FLAGS) $(NVCC_OTHER_FLAGS) $(INCLUDE_DIRS) $(TARGET_ARCH)
-export LINK.cpp 	= $(NVCC) -ccbin=$(CXX) $(NVCC_OTHER_FLAGS)
+CXX_SRC_DIRS 	= graph/src/ make_trace/src/ ${LIB_SRC_DIR} ${SOLVERS_SRC_DIR}
+CUDA_SRC_DIRS 	= cuda/src/
 
-all: $(PROGRAM)	
+## Пути к заголовочным файлам
+LIB_INC_DIR 	= lib lib/aligned_vec lib/files_sys/include lib/geometry/include lib/grids/include lib/json/include lib/mpi_extension/include lib/output_interface lib/physics/include
+SOLVERS_INC_DIR = solvers/illum/include/ solvers/hllc/include/ solvers/rhllc/include solvers/ray_tracing/include  solvers/RadRHD/include
+CUDALIB_INC_DIR = cuda/include
 
-#Make executable file. Early was $(addprefix $(OBJDIR)/, $^)
-$(PROGRAM): %: $(OBJS) $(EXE)
-#	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./, $^) $(LOADLIBES) $(LDLIBS) -o $@ 
-#	mv $(PROGRAM) $(BUILDDIR)
-	mkdir -p $(BUILDDIR)/graph
-	mkdir -p $(BUILDDIR)/illum_geo
-	mkdir -p $(BUILDDIR)/Solve
-	mkdir -p $(BUILDDIR)/trace
-	mkdir -p $(BUILDDIR)/add_dir
+CUDA_INC_DIRS 	= $(shell find $(CUDALIB_INC_DIR) -mindepth 0 -type d)
+CXX_INC_DIRS 	= $(shell find $(SOLVERS_INC_DIR) -mindepth 1 -type d)
+CXX_INC_DIRS 	+= include/ graph/include/ make_trace/include/  ${LIB_INC_DIR} ${CUDA_INC_DIRS} ${SOLVERS_INC_DIR} build/resources/
 
-# actions before the building process,
-prebuild:
-	mkdir -p $(OBJDIR)
-	mkdir -p $(DEPDIR)
-	mkdir -p $(EXEDIR)	
-	$(MAKE) -f $(RESOURCES_DIR)/makefile gen_header_value SRC_FILE=$(ROOT_DIR)/lib/global_consts.h		
-	$(MAKE) -f make_dependens	 
+CXXFLAGS	+=	$(addprefix -I ,$(CXX_INC_DIRS))
+NVCCFLAGS	+=	$(addprefix -I ,$(CXX_INC_DIRS))
 
-# Linking executable files files from all .o in combination with all .h
-%.exe: %.cpp
-	$(LINK.cpp) $(INCLUDE_DIRS) $(addprefix ./$(OBJDIR)/, $(LINK_SRC)) $(patsubst %.exe, ./$(OBJDIR)/%.o,$@) $(LOADLIBES) $(LDLIBS) -o $(patsubst %.exe, %,$@)
-	mv $(patsubst %.exe, %,$@) $(EXEDIR)
+# Рекурсивный поиск исходных файлов
+CXX_SRCS 	:= $(shell find $(CXX_SRC_DIRS) -type f -name '*.cpp')
+CUDA_SRCS	:= $(shell find $(CUDA_SRC_DIRS) -type f -name '*.cu')
+EXEC_SRCS 	:= $(shell find $(EXE_DIR)/ -type f -name '*.cpp')
+TEST_SRCS 	:= $(shell find $(TESTS_DIR)/ -type f -name '*.cpp' ! -name 'off_*.cpp')
 
-# Building rule for .o files and its .c/.cpp in combination with all .h
-%.o: %.cpp
-	$(COMPILE.cpp) -c $<
-	mv $@ $(OBJDIR)/$@
+# Генерация путей для объектных файлов
+CXX_OBJS   	:= $(patsubst %, $(BUILD_OBJ)/%.o, $(CXX_SRCS))
+CUDA_OBJS 	:= $(patsubst %, $(BUILD_OBJ)/%.o, $(CUDA_SRCS))
+EXECUTABLES := $(patsubst $(EXE_DIR)/%.cpp, $(BUILD_BIN)/%, $(EXEC_SRCS))
+TESTS 		:= $(patsubst $(TESTS_DIR)/%.cpp, $(TESTS_BIN)/%, $(TEST_SRCS))
 
-%.o: %.cu
-	$(COMPILE.cu) -c $<
-	mv $@ $(OBJDIR)/$@
+.PHONY: all debug release clean clean-all test
 
-# Creates the dependecy rules
-#%.d: %.cpp
-#	mkdir -p $(OBJDIR)
-#	mkdir -p $(DEPDIR)
-#	$(COMPILE.cpp) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@
+# Запрет автоматического удаления объектных файлов
+.PRECIOUS: $(BUILD_OBJ)/%.cpp.o $(BUILD_OBJ)/%.cu.o
+.SECONDARY: $(CXX_OBJS) $(CUDA_OBJS)
 
-#%.d: %.cu
-#	mkdir -p $(OBJDIR)
-#	mkdir -p $(DEPDIR)
-#	$(COMPILE.cu) $^ -MM -MT $(addprefix $(OBJDIR)/, $(@:.d=.o)) > $(DEPDIR)/$@	
+all: $(EXECUTABLES)
+	mkdir -p $(BUILD_DIR)/graph
+	mkdir -p $(BUILD_DIR)/illum_geo
+	mkdir -p $(BUILD_DIR)/Solve
+	mkdir -p $(BUILD_DIR)/trace
+	mkdir -p $(BUILD_DIR)/add_dir
 
-# Includes all .h files
-#include $(DEP_FILES)
-#include $(CUDA_DEP_FILES)
+test: $(TESTS)
+	mkdir -p $(BUILD_DIR)/graph
+	mkdir -p $(BUILD_DIR)/illum_geo
+	mkdir -p $(BUILD_DIR)/Solve
+
+debug:
+	@$(MAKE) CONFIG=debug
+
+release:
+	@$(MAKE) CONFIG=release
+
+prebuild:	
+	$(MAKE) -f $(RESOURCES_DIR)/makefile gen_header_value SRC_FILE=$(ROOT_DIR)/lib/global_consts.h
 
 
-# Cleans complete project
-.PHONY: clean
+# Линковка исполняемых файлов тестов
+$(TESTS_BIN)/%: $(BUILD_OBJ)/$(TESTS_DIR)/%.cpp.o $(CXX_OBJS) $(CUDA_OBJS)
+	@echo "Linking $@"
+	@mkdir -p $(@D)
+	$(NVCC) -dlink $(addprefix -I ,$(CXX_INC_DIRS)) $(CUDA_OBJS) -o $(notdir $@)_link.o
+	$(CXX) -o $@ $^ $(notdir $@)_link.o $(LDFLAGS)
+	rm $(notdir $@)_link.o
+
+# Линковка исполняемых файлов
+$(BUILD_BIN)/%: $(BUILD_OBJ)/$(EXE_DIR)/%.cpp.o $(CXX_OBJS) $(CUDA_OBJS)
+	@echo "Linking $@"
+	@mkdir -p $(@D)
+	$(NVCC) -dlink $(addprefix -I ,$(CXX_INC_DIRS)) $(CUDA_OBJS) -o $(notdir $@)_link.o
+	$(CXX) -o $@ $^ $(notdir $@)_link.o $(LDFLAGS)
+	rm $(notdir $@)_link.o
+
+# Компиляция C-файлов
+$(BUILD_OBJ)/%.cpp.o: %.cpp
+#	@echo "Compiling $<"
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Компиляция CUDA-файлов
+$(BUILD_OBJ)/%.cu.o: %.cu
+#	@echo "Compiling CUDA $<"
+	@mkdir -p $(dir $@)
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@
+
+# Удаление только объектных файлов
 clean:
-	@echo $(RM)
-	$(RM) $(BUILDDIR) -r
-	$(RM) *~ 
-	$(RM) $(PROGRAM)
-	$(RM) "File_Logs.txt"
+	@echo "Cleaning object files for all configurations"
+	@rm -rf $(BUILD_BIN)
+	@rm -rf $(BUILD_OBJ)
 
-.PHONY: clean_o
-clean_o:
-	$(RM) $(OBJDIR) -r
-	mkdir -p $(OBJDIR)
+# Полная очистка (включая исполняемые файлы)
+clean-all:
+	@echo "Full clean"
+	@rm -rf $(BUILD_DIR)

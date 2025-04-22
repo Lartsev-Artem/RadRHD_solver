@@ -14,9 +14,9 @@
 #include "global_types.h"
 #include "prj_config.h"
 
+#include "json_struct.h"
 #include "mpi_ext.h"
 #include "timer.h"
-#include "json/json_struct.h"
 extern global_files_t glb_files;
 #define Files_log std::string(glb_files.base_address + "File_Logs.txt").c_str()
 

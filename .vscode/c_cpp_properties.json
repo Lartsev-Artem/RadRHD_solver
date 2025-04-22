@@ -20,6 +20,7 @@
                 "/home/artem/projects/VTK9.3/VTK-build/Common/ExecutionModel",
                 "/home/artem/projects/VTK9.3/VTK-build/IO/Core",
                 "${workspaceFolder}/lib/geometry/include",
+                "${workspaceFolder}/lib/json/include",
                 "${workspaceFolder}/tests",
                 "${workspaceFolder}/graph/include",
                 "${workspaceFolder}/graph",
