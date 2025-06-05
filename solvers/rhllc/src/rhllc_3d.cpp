@@ -6,7 +6,8 @@
 
 #include <omp.h>
 
-void rhllc::Hllc3d(const Type tau, grid_t &grid) {
+void rhllc::Hllc3d(const Type tau, grid_t &grid)
+{
 
 #pragma omp parallel default(none) firstprivate(tau) shared(grid, glb_files)
   {
@@ -15,13 +16,17 @@ void rhllc::Hllc3d(const Type tau, grid_t &grid) {
 #ifdef ILLUM
     // востановление физических переменных
 #pragma omp for
-    for (int i = 0; i < size_grid; i++) {
+    for (int i = 0; i < size_grid; i++)
+    {
       int back = GetPhysValueSave(grid.cells[i].conv_val, grid.cells[i].phys_val);
-      if (back) {
+      if (back)
+      {
         D_LD;
-        if (back == 2) {
-
-        } else {
+        if (back == 2)
+        {
+        }
+        else
+        {
           // printf("try id= %d\n", i);
         }
         // если был персчёт
@@ -36,20 +41,26 @@ void rhllc::Hllc3d(const Type tau, grid_t &grid) {
 
     // потоки
 #pragma omp for
-    for (int i = 0; i < size_face; i++) {
+    for (int i = 0; i < size_face; i++)
+    {
       face_t &f = grid.faces[i];
       BoundConditions(f, grid.cells, bound_val);
       GetFlux(grid.cells[f.geo.id_l].conv_val, bound_val.conv_val, grid.cells[f.geo.id_l].phys_val, bound_val.phys_val, f);
     }
 
 #pragma omp for
-    for (int i = 0; i < size_grid; i++) {
+    for (int i = 0; i < size_grid; i++)
+    {
       elem_t &el = grid.cells[i];
       flux_t sumF;
-      for (int j = 0; j < CELL_SIZE; j++) {
-        if (el.geo.sign_n[j]) {
+      for (int j = 0; j < CELL_SIZE; j++)
+      {
+        if (el.geo.sign_n[j])
+        {
           sumF += grid.faces[el.geo.id_faces[j]].f;
-        } else {
+        }
+        else
+        {
           sumF -= grid.faces[el.geo.id_faces[j]].f;
         }
       }

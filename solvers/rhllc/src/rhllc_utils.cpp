@@ -12,7 +12,8 @@
 
 Type rhllc::max_signal_speed = 1;
 
-Type rhllc::GetTimeStep(const hllc_value_t &hllc_set, const std::vector<elem_t> &cells) {
+Type rhllc::GetTimeStep(const hllc_value_t &hllc_set, const std::vector<elem_t> &cells)
+{
 
   const Type t = hllc_set.CFL * hllc_set.h_min / max_signal_speed;
 
@@ -21,23 +22,28 @@ Type rhllc::GetTimeStep(const hllc_value_t &hllc_set, const std::vector<elem_t> 
   return t;
 }
 
-void rhllc::HllcPhysToConv(std::vector<elem_t> &cells) {
+void rhllc::HllcPhysToConv(std::vector<elem_t> &cells)
+{
 
 #pragma omp parallel for
-  for (int i = 0; i < cells.size(); i++) {
+  for (int i = 0; i < cells.size(); i++)
+  {
     GetConvValueStab(cells[i].phys_val, cells[i].conv_val);
   }
 }
 
-void rhllc::HllcConvToPhys(std::vector<elem_t> &cells) {
+void rhllc::HllcConvToPhys(std::vector<elem_t> &cells)
+{
 
 #pragma omp parallel for
-  for (int i = 0; i < cells.size(); i++) {
+  for (int i = 0; i < cells.size(); i++)
+  {
     GetPhysValueStab(cells[i].phys_val, cells[i].conv_val);
   }
 }
 
-void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, flux_all_t &bound) {
+void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, flux_all_t &bound)
+{
   const int id_l = f.geo.id_l;
   const int id_r = f.geo.id_r;
   const elem_t &cell = cells[id_l];
@@ -127,7 +133,8 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
 }
 
 #if NUMBER_OF_MEASUREMENTS == 2
-int ReBuildPhysicValue(const Vector4 &U, Vector4 &W) {
+int ReBuildPhysicValue(const Vector4 &U, Vector4 &W)
+{
   Vector2 v(W(1), W(2));
 
   const Type vv = v.dot(v);
@@ -148,7 +155,8 @@ int ReBuildPhysicValue(const Vector4 &U, Vector4 &W) {
   int cc = 0;
 
   Type err = 1;
-  do {
+  do
+  {
     err = W0;
 
     Type fW = W0 - p - E;
@@ -169,7 +177,8 @@ int ReBuildPhysicValue(const Vector4 &U, Vector4 &W) {
     cc++;
   } while (fabs(err / W0) > 1e-14);
 
-  if (p < 0 || D < 0 || std::isnan(p) || std::isnan(D)) {
+  if (p < 0 || D < 0 || std::isnan(p) || std::isnan(D))
+  {
     printf("Error (p = %lf, d= %lf)", p, D / Gamma0);
     return 1;
   }
@@ -182,7 +191,8 @@ int ReBuildPhysicValue(const Vector4 &U, Vector4 &W) {
   return 0;
 }
 
-int ReBuildPhysicValue(const std::vector<Vector4> &U, std::vector<Vector4> &W) {
+int ReBuildPhysicValue(const std::vector<Vector4> &U, std::vector<Vector4> &W)
+{
 
   bool flag = false;
 #pragma omp parallel default(none) shared(U, W, flag)
@@ -190,8 +200,10 @@ int ReBuildPhysicValue(const std::vector<Vector4> &U, std::vector<Vector4> &W) {
     const int size = U.size();
 
 #pragma omp for
-    for (int num_cell = 0; num_cell < size; num_cell++) {
-      if (!flag && ReBuildPhysicValue(U[num_cell], W[num_cell])) {
+    for (int num_cell = 0; num_cell < size; num_cell++)
+    {
+      if (!flag && ReBuildPhysicValue(U[num_cell], W[num_cell]))
+      {
 #pragma omp critical
         {
           flag = true;
@@ -205,12 +217,14 @@ int ReBuildPhysicValue(const std::vector<Vector4> &U, std::vector<Vector4> &W) {
   return flag;
 }
 
-int ReBuildConvValue(const std::vector<Vector4> &W, std::vector<Vector4> &U) {
+int ReBuildConvValue(const std::vector<Vector4> &W, std::vector<Vector4> &U)
+{
 
   U.resize(size_grid);
   Vector4 cell;
 
-  for (size_t i = 0; i < size_grid; i++) {
+  for (size_t i = 0; i < size_grid; i++)
+  {
     const Type v = (W[i](1) * W[i](1) + W[i](2) * W[i](2));
     const Type d = W[i](0);
     const Type Gamma = 1. / sqrt(1 - v);

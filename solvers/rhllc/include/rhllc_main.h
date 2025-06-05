@@ -16,9 +16,10 @@
  * @brief Пространство имён модуля газовой динамики в релятивистской постановке
  *
  */
-namespace rhllc {
-int RunRhllcModule();
-int RunRhllcMpiModule();
+namespace rhllc
+{
+    int RunRhllcModule();
+    int RunRhllcMpiModule();
 } // namespace rhllc
 
 #endif //! RHLLC_MAIN_H

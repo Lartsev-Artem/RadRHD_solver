@@ -3,7 +3,7 @@ KEYS 	= DEBUG SOLVERS BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA USE_MPI RHLLC RAD_RH
 DEFINES = $(addprefix -D , $(KEYS))
 ## Компиляторы и настройки
 CONFIG ?= release
-CXX 		:= mpic++
+CXX 		:= mpiicpx
 NVCC 		:= nvcc
 CXXFLAGS 	:= $(DEFINES) -fopenmp -fPIE -std=c++17 
 NVCCFLAGS 	:= $(DEFINES) --expt-relaxed-constexpr -dc #-gencode arch=compute_70,code=sm_70 #-Xcompiler "-fopenmp"
@@ -129,3 +129,7 @@ clean:
 clean-all:
 	@echo "Full clean"
 	@rm -rf $(BUILD_DIR)
+
+# Стереть логи
+log_clean:
+	@rm $(BUILD_DIR)/File_Logs*.txt

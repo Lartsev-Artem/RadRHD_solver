@@ -1,6 +1,6 @@
 #!/bin/bash
 
-metis_exe=/home/artem/projects/metis-5.1.0/build/Linux-x86_64/programs/mpmetis
+metis_exe=/home/artem/libraries/metis-5.1.0/build/Linux-x86_64/programs/mpmetis
 
 if [ -f "$metis_exe" ]; then
 

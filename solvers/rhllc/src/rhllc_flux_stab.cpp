@@ -7,7 +7,8 @@
 
 #define MAX_ITER 40
 
-void rhllc::GetConvValueStab(flux_t &W, flux_t &U) {
+void rhllc::GetConvValueStab(flux_t &W, flux_t &U)
+{
 
 #if EOS == IDEAL
   const Type h = 1 + kGamma_g * W.p / W.d;
@@ -17,7 +18,8 @@ void rhllc::GetConvValueStab(flux_t &W, flux_t &U) {
 #endif
 
   Type g = W.v.dot(W.v);
-  if (g >= 1.0) {
+  if (g >= 1.0)
+  {
     WRITE_LOG("Warning fix mod_vel=%lf\n", g);
     constexpr Type beta_fix = 0.9999;
     g = beta_fix / sqrt(g);
@@ -35,7 +37,8 @@ void rhllc::GetConvValueStab(flux_t &W, flux_t &U) {
   U.p = scrh - W.p;
 }
 
-int rhllc::PhysPressureFix(flux_t &U, flux_t &W) {
+int rhllc::PhysPressureFix(flux_t &U, flux_t &W)
+{
 
   /* ----------------------------------------------
      1. Solve f(u) = 0 with secant method
@@ -65,7 +68,8 @@ int rhllc::PhysPressureFix(flux_t &U, flux_t &W) {
   int done = 0;
 
   Type f1, du;
-  for (int k = 1; k < MAX_ITER; k++) {
+  for (int k = 1; k < MAX_ITER; k++)
+  {
     lor = sqrt(1.0 + u1 * u1);
     plor = p * lor;
 #if EOS == IDEAL
@@ -116,7 +120,8 @@ int rhllc::PhysPressureFix(flux_t &U, flux_t &W) {
   return e_completion_success;
 }
 
-int rhllc::GetPhysValueStab(const flux_t &U, flux_t &W) {
+int rhllc::GetPhysValueStab(const flux_t &U, flux_t &W)
+{
 
   constexpr double tol = 1.e-11;
   constexpr double eps2 = 1.e-12; /* Maximum 1/gamma^2 */
@@ -145,7 +150,8 @@ int rhllc::GetPhysValueStab(const flux_t &U, flux_t &W) {
 
   p = std::max(p, pmin);
   int iter;
-  for (iter = 0; iter < MAX_ITER; iter++) {
+  for (iter = 0; iter < MAX_ITER; iter++)
+  {
 
     alpha = E + p;
     alpha2 = alpha * alpha;
@@ -187,7 +193,8 @@ int rhllc::GetPhysValueStab(const flux_t &U, flux_t &W) {
     return 2;
   if (std::isnan(p))
     return 4;
-  if (iter >= MAX_ITER || fabs(yp / (E + p)) > 1.e-4 || p < (m - E)) {
+  if (iter >= MAX_ITER || fabs(yp / (E + p)) > 1.e-4 || p < (m - E))
+  {
     WRITE_LOG("GetPhysValueStab: solution may be inaccurate %d\n", iter);
     return 3;
   }
@@ -221,7 +228,8 @@ int rhllc::GetPhysValueStab(const flux_t &U, flux_t &W) {
  * @param cmin
  * @param cmax
  */
-static void inline GetSignalSpeed(Type cs2, Type Vn, Type V2_norm, Type &cmin, Type &cmax) {
+static void inline GetSignalSpeed(Type cs2, Type Vn, Type V2_norm, Type &cmin, Type &cmax)
+{
   const Type Vn2 = Vn * Vn;
   const Type Vt2 = V2_norm - Vn2;
   const Type sroot_L = sqrt(cs2 * (1 - Vn2 - Vt2 * cs2) * (1 - V2_norm));
@@ -230,7 +238,8 @@ static void inline GetSignalSpeed(Type cs2, Type Vn, Type V2_norm, Type &cmin, T
 }
 
 Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
-                        const flux_t &phys_val_l, const flux_t &phys_val_r, face_t &f) {
+                        const flux_t &phys_val_l, const flux_t &phys_val_r, face_t &f)
+{
   Matrix3 T;
   GetRotationMatrix(f.geo.n, T);
 
@@ -269,7 +278,7 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
   const Type h_L = 1 + kGamma_g * p_L / d_L; // энтальпия
   const Type h_R = 1 + kGamma_g * p_R / d_R;
 
-  const Type cs_L2 = ((kGamma1 * p_L) / (d_L * h_L)); //квадрат скорости звука
+  const Type cs_L2 = ((kGamma1 * p_L) / (d_L * h_L)); // квадрат скорости звука
   const Type cs_R2 = ((kGamma1 * p_R) / (d_R * h_R));
 #else
   Type theta_L = p_L / d_L;
@@ -278,7 +287,7 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
   const Type h_L = 2.5 * theta_L + sqrt(2.25 * theta_L * theta_L + 1.0); // энтальпия
   const Type h_R = 2.5 * theta_R + sqrt(2.25 * theta_R * theta_R + 1.0);
 
-  const Type cs_L2 = theta_L / (3.0 * h_L) * (5.0 * h_L - 8.0 * theta_L) / (h_L - theta_L); //квадрат скорости звука
+  const Type cs_L2 = theta_L / (3.0 * h_L) * (5.0 * h_L - 8.0 * theta_L) / (h_L - theta_L); // квадрат скорости звука
   const Type cs_R2 = theta_R / (3.0 * h_R) * (5.0 * h_R - 8.0 * theta_R) / (h_R - theta_R);
 
 #endif
@@ -295,22 +304,25 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
           compute HLLC  flux
      -------------------------------------------------- */
   flux_t F;
-  if (lambda_L >= 0.0) {
+  if (lambda_L >= 0.0)
+  {
     F.d = U_L.d * Vel_L[0]; // D*v_x
     F.v = U_L.v * Vel_L[0]; // mx*vx+p
     F.p = U_L.v[0];
 
     F.v[0] += p_L;
     //  sweep->press[i] = pL[i];
-
-  } else if (lambda_R <= 0.0) {
+  }
+  else if (lambda_R <= 0.0)
+  {
 
     F.d = U_R.d * Vel_R[0]; // D*v_x
     F.v = U_R.v * Vel_R[0]; // mx*vx+p
     F.p = U_R.v[0];
     F.v[0] += p_R;
-
-  } else {
+  }
+  else
+  {
 
 #if 0 // HLL
     flux_t F_L;               //(U_L.d * Vel_L[0], U_L.v * Vel_L[0], U_L.v[0]);
@@ -374,7 +386,8 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
 
     Type ps = (AL * us - BL) / (1.0 - us * lambda_L);
 
-    if (us >= 0.0) {
+    if (us >= 0.0)
+    {
       flux_t usl;
       Type dif = 1.0 / (lambda_L - us);
 
@@ -390,7 +403,9 @@ Type rhllc::GetFluxStab(const flux_t &conv_val_l, const flux_t &conv_val_r,
       F = F_L + usl;
 
       F.v[0] += p_L;
-    } else {
+    }
+    else
+    {
       flux_t usr;
       Type dif = 1.0 / (lambda_R - us);
       usr.d = U_R.d * (lambda_R - Vel_R[0]) * dif;

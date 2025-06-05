@@ -3,7 +3,8 @@
 #include "rhllc_main.h"
 #include "solvers_struct.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 
 #ifdef RHLLC
   MPI_START(argc, argv);
@@ -12,7 +13,8 @@ int main(int argc, char *argv[]) {
   if (argc > 1)
     file_config = argv[1];
 
-  if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg)) {    
+  if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
+  {
     MPI_END;
     return e_completion_fail;
   }

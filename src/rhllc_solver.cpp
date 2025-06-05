@@ -3,7 +3,8 @@
 #include "rhllc_main.h"
 #include "solvers_struct.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 
 #ifdef RHLLC
   MPI_START(argc, argv);

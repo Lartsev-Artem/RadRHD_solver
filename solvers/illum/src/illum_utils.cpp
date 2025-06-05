@@ -20,7 +20,8 @@ static Type boundary_value = 1;
 static Type boundary_value = 0;
 #endif
 
-void illum::set_boundary_value(Type val) {
+void illum::set_boundary_value(Type val)
+{
   boundary_value = val;
 }
 
@@ -36,17 +37,22 @@ void illum::set_boundary_value(Type val) {
  * @return значение луча в конце отрезка интегрирования
  * @note осуществляется предельный переход для среды без поглощения
  */
-static inline Type GetI(Type s, Type Q, Type S, Type I_0, Type alpha, Type betta) {
+static inline Type GetI(Type s, Type Q, Type S, Type I_0, Type alpha, Type betta)
+{
   Type k = alpha + betta;
-  if (s * k > 1e-10) {
+  if (s * k > 1e-10)
+  {
     Type src = (alpha * Q + betta * S) / k;
     return (exp(-k * s) * (I_0 - src) + src);
-  } else
+  }
+  else
     return (1 - s * k) * (I_0 + s * (alpha * Q + S * betta));
 }
 
-Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, const Vector3 &inter_coef) {
-  switch (type_bound) {
+Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, const Vector3 &inter_coef)
+{
+  switch (type_bound)
+  {
 
   case e_bound_outer_surface:
   case e_bound_free:
@@ -59,8 +65,10 @@ Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, co
     return 0;
 
 #ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
-  case e_bound_inner_source: {
-    switch (type_obj) {
+  case e_bound_inner_source:
+  {
+    switch (type_obj)
+    {
     case e_ray_intersect_none: // внутренняя граница не может быть не определённой
     case e_ray_intersect_rosh:
       D_LD;
@@ -74,7 +82,7 @@ Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, co
     default:
       return 0;
       Vector3 copy(inter_coef);
-      return GetIllumeFromInFace(0, copy); //значение на ячейке (код не не границы)
+      return GetIllumeFromInFace(0, copy); // значение на ячейке (код не не границы)
     }
   }
 #else
@@ -89,11 +97,14 @@ Type illum::BoundaryConditions(const IdType type_bound, const IntId type_obj, co
   }
 }
 
-Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, elem_t &cell) {
-  switch (_solve_mode.class_vtk) {
+Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type int_scattering, elem_t &cell)
+{
+  switch (_solve_mode.class_vtk)
+  {
 
   case e_grid_cfg_default:
-  case e_grid_cfg_static_illum: {
+  case e_grid_cfg_static_illum:
+  {
 
 #if GEOMETRY_TYPE == Sphere
     Type Q = 10;
@@ -221,14 +232,17 @@ Type illum::GetIllum(const Vector3 x, const Type s, const Type I_0, const Type i
 }
 #endif
 static const BaseTetra_t tetra;
-Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
+Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_coef, grid_t &grid, IdType mpi_dir_shift)
+{
 
   Type norm = -1;
   const IdType shift_dir = num_dir * grid.size;
 
-  for (IdType num_cell = 0; num_cell < grid.size; num_cell++) {
+  for (IdType num_cell = 0; num_cell < grid.size; num_cell++)
+  {
 
-    for (IdType i = 0; i < CELL_SIZE; i++) {
+    for (IdType i = 0; i < CELL_SIZE; i++)
+    {
 
       Vector3 Il = inter_coef[num_cell * CELL_SIZE + i];
 
@@ -242,7 +256,7 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Vector3> &inter_
       grid.Illum[id] = curI;
 
 #ifndef USE_CUDA
-      grid.cells[num_cell].illum_val.illum[num_dir * CELL_SIZE + i] = curI; //на каждой грани по направлениям
+      grid.cells[num_cell].illum_val.illum[num_dir * CELL_SIZE + i] = curI; // на каждой грани по направлениям
 #endif
     }
   }
@@ -256,13 +270,15 @@ Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
                                 ,
                                 const Vector2 &x0
 #endif
-) {
+)
+{
 
 #ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
-  if (neigh_id != e_bound_inner_source) //при использовании трассировки сквозь границу, внутренняя грань определена до этого
+  if (neigh_id != e_bound_inner_source) // при использовании трассировки сквозь границу, внутренняя грань определена до этого
 #endif
   {
-    if (neigh_id < 0) {
+    if (neigh_id < 0)
+    {
       Type I_x0 = illum::BoundaryConditions(neigh_id);
       inter_coef = Vector3(I_x0, I_x0, I_x0);
       return I_x0;
@@ -273,7 +289,7 @@ Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
 
 #ifdef INTERPOLATION_ON_FACES
 
-  //#pragma error("Unsupported config")
+  // #pragma error("Unsupported config")
 
   Type I_x0 = x0[0] * coef[0] + x0[1] * coef[1] + coef[2];
 
@@ -282,7 +298,8 @@ Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
   Type I_x0 = (coef[0] + coef[1] + coef[2]) / 3.;
 #endif
 
-  if (I_x0 < 0) {
+  if (I_x0 < 0)
+  {
     D_L;
     return 0;
   }
@@ -290,15 +307,18 @@ Type illum::GetIllumeFromInFace(const IdType neigh_id, Vector3 &inter_coef
 }
 #endif
 #ifdef TRANSFER_CELL_TO_FACE
-Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, IdType mpi_dir_shift) {
+Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, IdType mpi_dir_shift)
+{
 
   Type norm = -1;
   const IdType shift_dir = num_dir * grid.size;
 
-#ifdef ILLUM_ON_CELL //на ячейках
-  for (size_t cell = 0; cell < grid.size; cell++) {
+#ifdef ILLUM_ON_CELL // на ячейках
+  for (size_t cell = 0; cell < grid.size; cell++)
+  {
     Type curI = 0;
-    for (size_t j = 0; j < CELL_SIZE; j++) {
+    for (size_t j = 0; j < CELL_SIZE; j++)
+    {
       curI += inter_coef[grid.cells[cell].geo.id_faces[j]];
     }
     curI /= CELL_SIZE;
@@ -307,9 +327,11 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coe
     norm = std::max(norm, fabs((grid.Illum[id] - curI) / curI));
     grid.Illum[id] = curI;
   }
-#else //на гранях
-  for (size_t cell = 0; cell < grid.size; cell++) {
-    for (size_t j = 0; j < CELL_SIZE; j++) {
+#else // на гранях
+  for (size_t cell = 0; cell < grid.size; cell++)
+  {
+    for (size_t j = 0; j < CELL_SIZE; j++)
+    {
       Type curI = inter_coef[grid.cells[cell].geo.id_faces[j]];
 
       IdType id = mpi_dir_shift + CELL_SIZE * (shift_dir + cell) + j;
@@ -323,13 +345,16 @@ Type illum::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coe
 #endif
 
 #if defined SEPARATE_GPU
-Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp) {
+Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp)
+{
   Type norm = -1;
   const IdType shift_dir = num_dir + dir_disp;
 
-  for (size_t cell = 0; cell < grid.size; cell++) {
+  for (size_t cell = 0; cell < grid.size; cell++)
+  {
     Type curI = 0;
-    for (size_t j = 0; j < CELL_SIZE; j++) {
+    for (size_t j = 0; j < CELL_SIZE; j++)
+    {
       curI += inter_coef[grid.cells[cell].geo.id_faces[j]];
     }
     curI /= CELL_SIZE;
@@ -349,13 +374,15 @@ Type illum::separate_gpu::ReCalcIllum(const IdType num_dir, const std::vector<Ty
   __builtin_prefetch(&inter_coef[grid.cells[_cell_id].geo.id_faces[2]], 0, 0); \
   __builtin_prefetch(&inter_coef[grid.cells[_cell_id].geo.id_faces[3]], 0, 0);
 
-Type illum::separate_gpu::ReCalcIllumOpt(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp) {
+Type illum::separate_gpu::ReCalcIllumOpt(const IdType num_dir, const std::vector<Type> &inter_coef, grid_t &grid, const IdType dir_disp)
+{
   Type norm = -1;
   const IdType shift_dir = num_dir + dir_disp;
 
   PREFETCH_FACE_COEF(0);
 
-  for (size_t cell = 0; cell < grid.size - 1; cell++) {
+  for (size_t cell = 0; cell < grid.size - 1; cell++)
+  {
 
     PREFETCH_FACE_COEF(cell + 1);
     const IdType id = cell * grid.size_dir + shift_dir;
@@ -372,7 +399,8 @@ Type illum::separate_gpu::ReCalcIllumOpt(const IdType num_dir, const std::vector
     Type curI = 0;
     Type S = 0;
 #pragma loop unroll(CELL_SIZE)
-    for (size_t j = 0; j < CELL_SIZE; j++) {
+    for (size_t j = 0; j < CELL_SIZE; j++)
+    {
       curI += inter_coef[grid.cells[cell].geo.id_faces[j]] *
               grid.faces[grid.cells[cell].geo.id_faces[j]].geo.S;
       S += grid.faces[grid.cells[cell].geo.id_faces[j]].geo.S;
@@ -384,14 +412,15 @@ Type illum::separate_gpu::ReCalcIllumOpt(const IdType num_dir, const std::vector
     grid.Illum[id] = curI;
   }
 
-  //последняя итерация
+  // последняя итерация
   {
     const size_t cell = grid.size - 1;
     const IdType id = cell * grid.size_dir + shift_dir;
     //__builtin_prefetch(&grid.Illum[id], 1, 0);
     Type curI = 0;
 #pragma loop unroll(CELL_SIZE)
-    for (size_t j = 0; j < CELL_SIZE; j++) {
+    for (size_t j = 0; j < CELL_SIZE; j++)
+    {
       curI += inter_coef[grid.cells[cell].geo.id_faces[j]];
     }
     curI /= CELL_SIZE;
@@ -409,6 +438,7 @@ Type illum::separate_gpu::ReCalcIllumOpt(const IdType num_dir, const std::vector
 
 #include <bits/stdc++.h>
 #include <x86intrin.h>
+#if 0
 static inline __m256d _mm256_exp_pd(__m256d x) {
   alignas(32) Type X[4];
   _mm256_store_pd(X, x);
@@ -418,9 +448,11 @@ static inline __m256d _mm256_exp_pd(__m256d x) {
       exp(X[2]),
       0);
 }
+#endif
 
 #ifdef TRANSFER_CELL_TO_FACE
-Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs) {
+Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs)
+{
 
   // alignas(32) Type Icur[4];
 #if 0 // ndef LOG_SPECTRUM
@@ -433,14 +465,17 @@ Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs
   _mm256_store_pd(Icur, _mm256_max_pd(_mm256_set1_pd(0.0), I));
 
 #elif 0
-  for (size_t i = 0; i < 3; i++) {
+  for (size_t i = 0; i < 3; i++)
+  {
     Icur[i] = exp(-k * s[i]) * (I0[i] - rhs) + rhs;
-    if (log_enable) {
+    if (log_enable)
+    {
       log_spectrum("k=%e,s=%e, I0=%e, rhs %e, I=%e\n", k, s[i], I0[i], rhs, Icur[i]);
     }
   }
 
-  if (log_enable) {
+  if (log_enable)
+  {
 
     log_spectrum("Ires=%e\n", (Icur[0] + Icur[1] + Icur[2]) / 3.);
     log_enable = 0;
@@ -454,15 +489,18 @@ Type illum::GetIllum(const Type *I0, const Type *s, const Type k, const Type rhs
   // return (Icur[0] + Icur[1] + Icur[2]) / 3.;
 }
 
-Type illum::GetIllumLimit(const Type *I0, const Type *s, const Type k, const Type rhs) {
+Type illum::GetIllumLimit(const Type *I0, const Type *s, const Type k, const Type rhs)
+{
   // (1 - s * k) * (I_0 + s * (alpha * Q + S * betta));
 
   alignas(32) Type Icur[4];
-  for (size_t i = 0; i < 3; i++) {
+  for (size_t i = 0; i < 3; i++)
+  {
     Icur[i] = (1 - s[i] * k) * (I0[i] - rhs) + rhs;
 
 #ifdef LOG_SPECTRUM
-    if (log_enable) {
+    if (log_enable)
+    {
       log_spectrum("Lim k=%e s=%e, I0=%e, rhs %e, I=%e\n", k, s[i], I0[i], rhs, Icur[i]);
     }
 #endif
@@ -478,7 +516,8 @@ Type illum::GetIllumLimit(const Type *I0, const Type *s, const Type k, const Typ
   // _mm256_store_pd(Icur, _mm256_max_pd(_mm256_set1_pd(0.0), I));
 
 #ifdef LOG_SPECTRUM
-  if (log_enable) {
+  if (log_enable)
+  {
     log_spectrum("Lim Ires=%e\n", (Icur[0] + Icur[1] + Icur[2]) / 3.);
     log_enable = 0;
   }
@@ -487,11 +526,14 @@ Type illum::GetIllumLimit(const Type *I0, const Type *s, const Type k, const Typ
 }
 #pragma GCC pop("O3");
 
-Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k) {
-  switch (_solve_mode.class_vtk) {
+Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k)
+{
+  switch (_solve_mode.class_vtk)
+  {
 
   case e_grid_cfg_default:
-  case e_grid_cfg_static_illum: {
+  case e_grid_cfg_static_illum:
+  {
 
 #if GEOMETRY_TYPE == Sphere
     Type Q = 10;
@@ -586,7 +628,8 @@ Type illum::GetRhs(const Vector3 x, const Type int_scattering, elem_t &cell, Typ
   }
 }
 
-Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k) {
+Type illum::GetRhsOpt(const Vector3 x, const Type int_scattering, elem_t &cell, Type &k)
+{
 
   // переход к размерным параметрам
   const Type S = int_scattering;

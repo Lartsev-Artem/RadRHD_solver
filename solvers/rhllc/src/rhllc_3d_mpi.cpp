@@ -10,33 +10,38 @@
 #include "rhllc_utils.h"
 
 #ifdef DEBUG
-//#define rhllc_mpi_log(...) WRITE_LOG(__VA_ARGS__)
+// #define rhllc_mpi_log(...) WRITE_LOG(__VA_ARGS__)
 #define rhllc_mpi_log(...)
 #else
 #define rhllc_mpi_log(...)
 #endif
 
-void rhllc_mpi::StartPhysCast(mpi_hllc_t &hllc_st, grid_t &grid) {
+void rhllc_mpi::StartPhysCast(mpi_hllc_t &hllc_st, grid_t &grid)
+{
 
   int np = get_mpi_np(hllc_st.comm);
   hllc_st.requests_cast_phys.resize(np);
 
-  for (int id = 0; id < np; id++) {
+  for (int id = 0; id < np; id++)
+  {
     MPI_Ibcast(grid.cells.data() + hllc_st.disp_cells[id], hllc_st.send_cells[id],
                MPI_phys_val_t, id, hllc_st.comm, &hllc_st.requests_cast_phys[id]);
   }
 }
 
-void rhllc_mpi::SyncPhysCast(mpi_hllc_t &hllc_st) {
+void rhllc_mpi::SyncPhysCast(mpi_hllc_t &hllc_st)
+{
   MPI_Waitall(hllc_st.requests_cast_phys.size(), hllc_st.requests_cast_phys.data(), MPI_STATUSES_IGNORE);
 }
 
-void rhllc_mpi::SyncAndCalcPhysCast(grid_t &grid) {
+void rhllc_mpi::SyncAndCalcPhysCast(grid_t &grid)
+{
   int myid = get_mpi_id();
 
   int idx = myid;
 
-  do {
+  do
+  {
 
     int start = grid.mpi_cfg->disp_cells[idx];
     int end = start + grid.mpi_cfg->send_cells[idx];
@@ -44,7 +49,8 @@ void rhllc_mpi::SyncAndCalcPhysCast(grid_t &grid) {
 #pragma omp parallel default(none) firstprivate(start, end) shared(grid)
     {
 #pragma omp for
-      for (int i = start; i < end; i++) {
+      for (int i = start; i < end; i++)
+      {
         grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
       }
     }
@@ -53,9 +59,11 @@ void rhllc_mpi::SyncAndCalcPhysCast(grid_t &grid) {
   } while (idx != MPI_UNDEFINED);
 }
 
-void rhllc_mpi::StartExchangeBoundaryCells(mpi_hllc_t &hllc_st) {
+void rhllc_mpi::StartExchangeBoundaryCells(mpi_hllc_t &hllc_st)
+{
   static bool was_sended = false;
-  if (LIKELY(was_sended)) {
+  if (LIKELY(was_sended))
+  {
     MPI_Waitall(hllc_st.requests_send_faces.size(), hllc_st.requests_send_faces.data(), MPI_STATUSES_IGNORE);
   }
   MPI_Startall(hllc_st.requests_send_faces.size(), hllc_st.requests_send_faces.data());
@@ -63,11 +71,13 @@ void rhllc_mpi::StartExchangeBoundaryCells(mpi_hllc_t &hllc_st) {
   was_sended = true;
 }
 
-void rhllc_mpi::SyncExchangeBoundaryCells(mpi_hllc_t &hllc_st) {
+void rhllc_mpi::SyncExchangeBoundaryCells(mpi_hllc_t &hllc_st)
+{
   MPI_Waitall(hllc_st.requests_rcv_faces.size(), hllc_st.requests_rcv_faces.data(), MPI_STATUSES_IGNORE);
 }
 
-void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mpi_hllc_t *hllc_st) {
+void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mpi_hllc_t *hllc_st)
+{
 
   DIE_IF(!hllc_st)
 
@@ -80,7 +90,7 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
 
   SetShifts(metis_id, hllc_st);
 
-  grid.loc_size = hllc_st->send_cells[myid]; //это приведет к правкам на видеокарте(возможно это уже учтено. Надо проверить)
+  grid.loc_size = hllc_st->send_cells[myid]; // это приведет к правкам на видеокарте(возможно это уже учтено. Надо проверить)
   grid.loc_shift = hllc_st->disp_cells[myid];
 
   hllc_st->id_irregular_faces.clear();
@@ -88,7 +98,8 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
   hllc_st->requests_rcv_faces.clear();
   hllc_st->requests_cast_phys.clear();
 
-  for (int id_cell = 0; id_cell < grid.size; id_cell++) {
+  for (int id_cell = 0; id_cell < grid.size; id_cell++)
+  {
     grid.cells[id_cell].geo.node = metis_id[id_cell];
   }
 
@@ -98,7 +109,8 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
   std::set<int> rcv_list;
 
   int cnt = 0;
-  for (size_t id_faces = 0; id_faces < grid.faces.size(); id_faces++) {
+  for (size_t id_faces = 0; id_faces < grid.faces.size(); id_faces++)
+  {
     face_t *f = &grid.faces[id_faces];
     int idl = f->geo.id_l;
     int idr = f->geo.id_r;
@@ -106,7 +118,8 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
     f->geo.is_regular = 0;
     f->geo.id_l_node = metis_id[idl];
 
-    if (idr < 0) {
+    if (idr < 0)
+    {
       f->geo.id_r_node = idr;
       f->geo.is_regular = (metis_id[idl] == myid);
       cnt += (metis_id[idl] == myid);
@@ -115,24 +128,28 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
 
     f->geo.id_r_node = metis_id[idr];
 
-    if ((metis_id[idr] == metis_id[idl]) && (metis_id[idl] == myid)) {
-      f->geo.is_regular = 1; //полностью у нас
+    if ((metis_id[idr] == metis_id[idl]) && (metis_id[idl] == myid))
+    {
+      f->geo.is_regular = 1; // полностью у нас
       cnt++;
       continue;
     }
 
-    if (metis_id[idl] == myid) {
+    if (metis_id[idl] == myid)
+    {
       MPI_Request rq_send;
       MPI_Request rq_rcv;
 
-      if (send_list.count(idl) == 0) {
+      if (send_list.count(idl) == 0)
+      {
         send_list.emplace(idl);
         MPI_Send_init(&grid.cells[idl], 1, MPI_flux_elem_t, metis_id[idr], 0, hllc_st->comm, &rq_send);
         hllc_st->requests_send_faces.push_back(rq_send);
         rhllc_mpi_log("send0[%d]->%d\n", idl, metis_id[idr]);
       }
 
-      if (rcv_list.count(idr) == 0) {
+      if (rcv_list.count(idr) == 0)
+      {
         rcv_list.emplace(idr);
         MPI_Recv_init(&grid.cells[idr], 1, MPI_flux_elem_t, metis_id[idr], 1, hllc_st->comm, &rq_rcv);
         hllc_st->requests_rcv_faces.push_back(rq_rcv);
@@ -142,17 +159,20 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
       hllc_st->id_irregular_faces.push_back(id_faces); // только на нашем узле
     }
 
-    if (metis_id[idr] == myid) {
+    if (metis_id[idr] == myid)
+    {
       MPI_Request rq_send;
       MPI_Request rq_rcv;
 
-      if (send_list.count(idr) == 0) {
+      if (send_list.count(idr) == 0)
+      {
         send_list.emplace(idr);
         MPI_Send_init(&grid.cells[idr], 1, MPI_flux_elem_t, metis_id[idl], 1, hllc_st->comm, &rq_send);
         hllc_st->requests_send_faces.push_back(rq_send);
         rhllc_mpi_log("send1[%d]->%d\n", idr, metis_id[idl]);
       }
-      if (rcv_list.count(idl) == 0) {
+      if (rcv_list.count(idl) == 0)
+      {
         rcv_list.emplace(idl);
         MPI_Recv_init(&grid.cells[idl], 1, MPI_flux_elem_t, metis_id[idl], 0, hllc_st->comm, &rq_rcv);
         hllc_st->requests_rcv_faces.push_back(rq_rcv);
@@ -171,7 +191,8 @@ void rhllc_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, mp
   rhllc_mpi_log("cells=%u, vs %d+%u\n", grid.faces.size(), cnt, hllc_st->id_irregular_faces.size())
 }
 
-void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
+void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid)
+{
 
   rhllc::max_signal_speed = 0;
   MPI_Request rq_max_speed = MPI_REQUEST_NULL;
@@ -187,9 +208,11 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
     const int size_face = grid.faces.size();
 // потоки
 #pragma omp for
-    for (int i = 0; i < size_face; i++) {
+    for (int i = 0; i < size_face; i++)
+    {
       face_t &f = grid.faces[i];
-      if (f.geo.is_regular) {
+      if (f.geo.is_regular)
+      {
         rhllc::BoundConditions(f, grid.cells, bound_val);
         max_speed = std::max(max_speed, rhllc::GetFluxStab(grid.cells[f.geo.id_l].conv_val, bound_val.conv_val, grid.cells[f.geo.id_l].phys_val, bound_val.phys_val, f));
         rhllc_mpi_log("Reg[%d](%d %d)\n", i, f.geo.id_l, f.geo.id_r);
@@ -205,7 +228,8 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
 
 // потоки на граничных ячейках узла
 #pragma omp for
-    for (int i = 0; i < grid.mpi_cfg->id_irregular_faces.size(); i++) {
+    for (int i = 0; i < grid.mpi_cfg->id_irregular_faces.size(); i++)
+    {
       face_t &f = grid.faces[grid.mpi_cfg->id_irregular_faces[i]];
       rhllc::BoundConditions(f, grid.cells, bound_val);
       max_speed = std::max(max_speed, rhllc::GetFluxStab(grid.cells[f.geo.id_l].conv_val, bound_val.conv_val, grid.cells[f.geo.id_l].phys_val, bound_val.phys_val, f));
@@ -213,7 +237,8 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
     }
 
     // ищем максимум по потокам
-    if (max_speed > rhllc::max_signal_speed) {
+    if (max_speed > rhllc::max_signal_speed)
+    {
 #pragma omp critical
       {
         rhllc::max_signal_speed = std::max(rhllc::max_signal_speed, max_speed);
@@ -230,13 +255,18 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
     int end = start + grid.mpi_cfg->send_cells[myid];
 
 #pragma omp for
-    for (int i = start; i < end; i++) {
+    for (int i = start; i < end; i++)
+    {
       elem_t &el = grid.cells[i];
       flux_t sumF;
-      for (int j = 0; j < CELL_SIZE; j++) {
-        if (el.geo.sign_n[j]) {
+      for (int j = 0; j < CELL_SIZE; j++)
+      {
+        if (el.geo.sign_n[j])
+        {
           sumF += grid.faces[el.geo.id_faces[j]].f;
-        } else {
+        }
+        else
+        {
           sumF -= grid.faces[el.geo.id_faces[j]].f;
         }
         rhllc_mpi_log("Need[%d](%d)\n", el.geo.id_faces[j], i);
@@ -244,7 +274,8 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
       sumF *= (tau / el.geo.V);
       el.conv_val -= sumF;
 
-      if (rhllc::GetPhysValueStab(el.conv_val, el.phys_val)) {
+      if (rhllc::GetPhysValueStab(el.conv_val, el.phys_val))
+      {
         DIE_IF(rhllc::PhysPressureFix(el.conv_val, el.phys_val));
       }
     }
@@ -255,7 +286,8 @@ void rhllc_mpi::Hllc3dStab(const Type tau, grid_t &grid) {
   rhllc_mpi_log("speed=%lf\n", rhllc::max_signal_speed)
 }
 
-void rhllc_mpi::HllcConvToPhys(grid_t &grid) {
+void rhllc_mpi::HllcConvToPhys(grid_t &grid)
+{
   int myid = get_mpi_id();
   int start = grid.mpi_cfg->disp_cells[myid];
   int end = start + grid.mpi_cfg->send_cells[myid];
@@ -263,8 +295,10 @@ void rhllc_mpi::HllcConvToPhys(grid_t &grid) {
 #pragma omp parallel default(none) firstprivate(start, end) shared(grid, glb_files)
   {
 #pragma omp for
-    for (int i = start; i < end; i++) {
-      if (rhllc::GetPhysValueStab(grid.cells[i].conv_val, grid.cells[i].phys_val)) {
+    for (int i = start; i < end; i++)
+    {
+      if (rhllc::GetPhysValueStab(grid.cells[i].conv_val, grid.cells[i].phys_val))
+      {
         DIE_IF(rhllc::PhysPressureFix(grid.cells[i].conv_val, grid.cells[i].phys_val));
       }
     }
@@ -273,7 +307,8 @@ void rhllc_mpi::HllcConvToPhys(grid_t &grid) {
 
 #ifdef RAD_RHD
 #include "radRHD_utils.h"
-void rhllc_mpi::AddRadFlux(grid_t &grid) {
+void rhllc_mpi::AddRadFlux(grid_t &grid)
+{
 
   int myid = get_mpi_id();
   int start = grid.mpi_cfg->disp_cells[myid];
@@ -285,7 +320,8 @@ void rhllc_mpi::AddRadFlux(grid_t &grid) {
   {
 
 #pragma omp for
-    for (int cell = start; cell < end; cell++) {
+    for (int cell = start; cell < end; cell++)
+    {
 
       Vector4 G;
       rad_rhd::GetRadSourceOpt(cell - start, grid.cells[cell], grid, G);

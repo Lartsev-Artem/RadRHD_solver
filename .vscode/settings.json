@@ -210,6 +210,7 @@
     "syncstream": "cpp",
     "locale": "cpp"
   },
+  "cSpell.language": "en,ru",
   "cSpell.words": [
     "ifile",
     "ofile",

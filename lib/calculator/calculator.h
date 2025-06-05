@@ -11,7 +11,7 @@
 
 #include <cstring>
 #include <map>
-
+#include <cstdint>
 #define MAX_LENGTH_VAR_NAME 80
 
 static const char *err_msgs[] = {
@@ -23,27 +23,36 @@ static const char *err_msgs[] = {
     "Unknown symbol"};
 
 template <typename T>
-class Calculator {
+class Calculator
+{
 public:
-  enum ERRORS { ERR_BAL,
-                ERR_END,
-                ERR_OP,
-                ERR_OVER,
-                ERR_UNKNOWN_VAR,
-                ERR_UNKNOWN };
+  enum ERRORS
+  {
+    ERR_BAL,
+    ERR_END,
+    ERR_OP,
+    ERR_OVER,
+    ERR_UNKNOWN_VAR,
+    ERR_UNKNOWN
+  };
 
-  class compcl {
+  class compcl
+  {
   public:
-    bool operator()(const char *a, const char *b) const {
+    bool operator()(const char *a, const char *b) const
+    {
       return strcmp(a, b) < 0;
     }
   };
 
 private:
-  enum { NONE = 0,
-         NUM,
-         OP,
-         VAR };
+  enum
+  {
+    NONE = 0,
+    NUM,
+    OP,
+    VAR
+  };
 
   char token[MAX_LENGTH_VAR_NAME];
   char tok_type;
@@ -75,19 +84,22 @@ public:
   inline bool was_error() { return _was_error; }
   inline const char *error_message() { return err_msgs[_error_code]; }
 
-  struct itr_range {
+  struct itr_range
+  {
     typename std::map<const char *, T, compcl>::iterator begin;
     typename std::map<const char *, T, compcl>::iterator end;
   };
 
-  inline itr_range list_vars() {
+  inline itr_range list_vars()
+  {
     return {
         vars.begin(),
         vars.end()};
   }
 
 private:
-  inline uint64_t fact(int64_t a) {
+  inline uint64_t fact(int64_t a)
+  {
     if (a < 0)
       throw ERR_OVER;
     return a > 1 ? fact(a - 1) * a : 1;
@@ -99,7 +111,8 @@ private:
 #include <cstdlib>
 
 template <typename T>
-Calculator<T>::Calculator() {
+Calculator<T>::Calculator()
+{
   tok_type = NONE;
   exp = nullptr;
   memset(lastVar, 0, sizeof(lastVar));
@@ -109,74 +122,89 @@ Calculator<T>::Calculator() {
 }
 
 template <typename T>
-Calculator<T>::~Calculator() {
+Calculator<T>::~Calculator()
+{
 }
 
 template <typename T>
-void Calculator<T>::next_token() {
-  auto isoperator{[](int ch) {
-    return (bool)strchr("()!^*/%+-=", ch);
-  }};
+void Calculator<T>::next_token()
+{
+  auto isoperator{[](int ch)
+                  {
+                    return (bool)strchr("()!^*/%+-=", ch);
+                  }};
 
-  auto skipSpaces{[](const char *&str) {
-    while (isspace(*str))
-      str++;
-  }};
+  auto skipSpaces{[](const char *&str)
+                  {
+                    while (isspace(*str))
+                      str++;
+                  }};
 
   skipSpaces(exp);
-  //Проверка на конец выражения
-  if (exp[0] == 0) {
+  // Проверка на конец выражения
+  if (exp[0] == 0)
+  {
     tok_type = NONE;
     return;
   }
 
-  //Проверка типа
-  if (isdigit(exp[0])) //Число
+  // Проверка типа
+  if (isdigit(exp[0])) // Число
   {
     tok_type = NUM;
 
     int i = 0;
-    //Копирование числа
-    while (isdigit(exp[0]) || exp[0] == '.') {
+    // Копирование числа
+    while (isdigit(exp[0]) || exp[0] == '.')
+    {
       token[i++] = *exp++;
-      if (exp[0] == 'e') //обработка экпоненциальной записи
+      if (exp[0] == 'e') // обработка экпоненциальной записи
       {
         token[i++] = *exp++;
-        if (exp[0] == '-' || exp[0] == '+') {
+        if (exp[0] == '-' || exp[0] == '+')
+        {
           token[i++] = *exp++;
         }
       }
     }
     token[i] = 0;
-  } else if (isalpha(exp[0])) //Переменная
+  }
+  else if (isalpha(exp[0])) // Переменная
   {
     tok_type = VAR;
 
     int i = 0;
-    //Копирование переменной (начинается не с цифры но может в себе содержать)
-    while (isalpha(exp[0]) || exp[0] == '_' || isdigit(exp[0])) {
+    // Копирование переменной (начинается не с цифры но может в себе содержать)
+    while (isalpha(exp[0]) || exp[0] == '_' || isdigit(exp[0]))
+    {
       token[i] = *exp++;
       i++;
     }
     token[i] = 0;
-  } else if (isoperator(exp[0])) //Оператор
+  }
+  else if (isoperator(exp[0])) // Оператор
   {
     *token = *exp++;
     tok_type = OP;
-  } else
+  }
+  else
     throw ERR_UNKNOWN;
 }
 
 template <typename T>
-T Calculator<T>::operator()(const char *exp) {
+T Calculator<T>::operator()(const char *exp)
+{
   this->exp = exp;
   T result = 0;
   this->_was_error = false;
   curVar = nullptr;
 
-  try {
+  try
+  {
     eval_exp5(result);
-  } catch (ERRORS ec) {
+  }
+  catch (ERRORS ec)
+  {
     _was_error = true;
     _error_code = ec;
     result = 0;
@@ -192,7 +220,8 @@ void Calculator<T>::eval_exp5(T &result) // =
   eval_exp4(result);
 
   if (tok_type == OP &&
-      token[0] == '=') {
+      token[0] == '=')
+  {
     char *tmp = new char[strlen(lastVar) + 1];
     strcpy(tmp, lastVar);
     curVar = tmp;
@@ -214,11 +243,13 @@ void Calculator<T>::eval_exp4(T &result) // + -
   char op = token[0];
   while (tok_type == OP &&
          (op == '+' ||
-          op == '-')) {
+          op == '-'))
+  {
     next_token();
     T tmp = 0;
     eval_exp3(tmp);
-    switch (op) {
+    switch (op)
+    {
     case '+':
       result += tmp;
       break;
@@ -239,11 +270,13 @@ void Calculator<T>::eval_exp3(T &result) // * / %
   while (tok_type == OP &&
          (op == '*' ||
           op == '/' ||
-          op == '%')) {
+          op == '%'))
+  {
     next_token();
     T tmp = 0;
     eval_exp2(tmp);
-    switch (op) {
+    switch (op)
+    {
     case '*':
       result *= tmp;
       break;
@@ -263,7 +296,7 @@ void Calculator<T>::eval_exp2(T &result) // + - Унарные
 {
   char op = '+';
 
-  if (tok_type == OP && (token[0] == '+' || token[0] == '-')) //Есть подходящий оператор
+  if (tok_type == OP && (token[0] == '+' || token[0] == '-')) // Есть подходящий оператор
   {
     op = token[0];
     next_token();
@@ -271,7 +304,8 @@ void Calculator<T>::eval_exp2(T &result) // + - Унарные
 
   eval_exp1(result);
 
-  switch (op) {
+  switch (op)
+  {
   case '+':
     break;
   case '-':
@@ -287,18 +321,23 @@ void Calculator<T>::eval_exp1(T &result) // ^ !
 
   char op = token[0];
   while (tok_type == OP &&
-         (op == '^' || op == '!')) {
+         (op == '^' || op == '!'))
+  {
     next_token();
     T tmp = 0;
-    switch (op) {
+    switch (op)
+    {
     case '^':
       eval_exp1(tmp);
       result = static_cast<T>(pow(result, tmp));
       break;
     case '!':
-      try {
+      try
+      {
         result = static_cast<T>(fact((uint64_t)abs(floor(result)))); // = |_result_|!
-      } catch (...) {
+      }
+      catch (...)
+      {
         throw ERR_OVER;
       }
       break;
@@ -310,37 +349,46 @@ void Calculator<T>::eval_exp1(T &result) // ^ !
 template <typename T>
 void Calculator<T>::eval_exp0(T &result) // ( )
 {
-  if (tok_type == OP && *token == '(') {
+  if (tok_type == OP && *token == '(')
+  {
     eval_exp5(result);
     if (!(tok_type == OP &&
           token[0] == ')'))
       throw ERR_BAL;
     else
       next_token();
-  } else
+  }
+  else
     atom(result);
 }
 
 template <typename T>
-void Calculator<T>::atom(T &result) {
+void Calculator<T>::atom(T &result)
+{
   if (tok_type == OP)
     throw ERR_OP;
   if (tok_type == NONE)
     throw ERR_END;
 
-  if (tok_type == VAR) {
+  if (tok_type == VAR)
+  {
     strcpy(lastVar, token);
 
-    try {
+    try
+    {
       result = vars.at(token);
-    } catch (...) {
-      if (curVar && strcmp(curVar, token)) {
+    }
+    catch (...)
+    {
+      if (curVar && strcmp(curVar, token))
+      {
         throw ERR_UNKNOWN_VAR;
       }
       result = 0;
     }
-
-  } else {
+  }
+  else
+  {
     result = static_cast<T>(atof(token));
   }
   next_token();

@@ -21,7 +21,8 @@ extern hllc_value_t _hllc_cfg;
  * @brief Структура хранящая и организующая доступ к табулированной функция двух переменных
  *
  */
-struct TableFunc {
+struct TableFunc
+{
   int Nx; ///< число узлов по первой переменной x
   int Ny; ///< число узлов по второй переменной y
 
@@ -34,7 +35,8 @@ struct TableFunc {
 
   std::vector<Type> data; ///< значения табулированной функции в формате (x*Ny + y)
 
-  TableFunc(int nx = 0, int ny = 0) : Nx(nx), Ny(ny) {
+  TableFunc(int nx = 0, int ny = 0) : Nx(nx), Ny(ny)
+  {
     data.resize(nx * ny, 0);
   }
 
@@ -46,7 +48,8 @@ struct TableFunc {
  * @brief Структура потоков
  * @warning операторы написаны строго под hllc в той реализации, в которой есть
  */
-struct flux_t {
+struct flux_t
+{
   Type d;    ///< плотность
   Vector3 v; ///< скорость
   Type p;    ///< давление
@@ -66,11 +69,13 @@ struct flux_t {
   Type &operator[](const int i);
 };
 
-struct flux_all_t {
+struct flux_all_t
+{
   flux_t phys_val;
   flux_t conv_val;
 };
-struct bound_size_t {
+struct bound_size_t
+{
   int left;
   int right;
 };
@@ -79,7 +84,8 @@ struct bound_size_t {
  * @brief Геометрия грани
  *
  */
-struct geo_face_t {
+struct geo_face_t
+{
 
   uint32_t id_l : 25; ///< номер "левой" ячейки. всегда определена
   uint32_t id_l_node : 6;
@@ -99,10 +105,11 @@ struct geo_face_t {
  * @brief структура грани
  *
  */
-struct face_t {
+struct face_t
+{
   flux_t f;       ///< поток определенный на грани
   geo_face_t geo; ///< геометрия ячейки
-  face_t(){};
+  face_t() {};
 };
 
 // #pragma pack(push, 1)
@@ -110,18 +117,25 @@ struct face_t {
  * @brief Геометрия ячейки
  *
  */
-struct geo_cell_t {
+struct geo_cell_t
+{
 
-  struct bits_flag {
+  struct bits_flag
+  {
     uint8_t bits;
     bits_flag(const uint8_t a = 0) : bits(a) {}
-    bool operator[](int i) const {
+    bool operator[](int i) const
+    {
       return CHECK_BIT(bits, i);
     }
-    void set_sign(int idx, bool sign) {
-      if (sign) {
+    void set_sign(int idx, bool sign)
+    {
+      if (sign)
+      {
         bits = SET_BIT(bits, idx);
-      } else {
+      }
+      else
+      {
         bits = CLEAR_BIT(bits, idx);
       }
     }
@@ -154,7 +168,8 @@ struct cell_local // для каждой ячейки и каждого напр
 };
 
 /// \brief сжатая битовая структура для хранения локальных номеров граней
-union face_loc_id_t {
+union face_loc_id_t
+{
   struct
   {
     uint8_t a : 2;
@@ -174,7 +189,8 @@ struct align_cell_local // для каждой ячейки и каждого н
   std::vector<face_loc_id_t> in_face_id; ///< id выходной грани
 };
 
-struct boundary_faces_by_directions_t {
+struct boundary_faces_by_directions_t
+{
   std::vector<std::vector<IntId>> sorted_id_bound_face; ///< определенная граница
   std::vector<std::vector<uint16_t>> reflection_dir_id; ///< интерполяция переотраженных направлений
   std::vector<std::vector<IntId>> reflection_faces_id;  ///< номера ячеек внешней границы
@@ -184,12 +200,13 @@ struct boundary_faces_by_directions_t {
  * @brief  данные на сетке связанные с излучением
  *
  */
-struct illum_value_t {
+struct illum_value_t
+{
   Type absorp_coef;       ///< коэффициент поглощения (не ослабления!)
   Type scat_coef;         ///< коэффициент рассеяния
   Type rad_en_loose_rate; ///< источник равновесного излучения
 
-//в противном случае эти структуры вынесены как указатели в сетку и не привязаны к ячейкам
+// в противном случае эти структуры вынесены как указатели в сетку и не привязаны к ячейкам
 #if !defined USE_CUDA
   std::vector<Type> illum; // num_dir*CELL_SIZE
 
@@ -214,7 +231,8 @@ struct illum_value_t {
                                          stream(Vector3::Zero()),
                                          impuls(Matrix3::Zero()),
                                          div_stream(0),
-                                         div_impuls(Vector3::Zero()) {
+                                         div_impuls(Vector3::Zero())
+  {
     illum.resize(num_dir * CELL_SIZE, 0);
   }
 #else
@@ -227,7 +245,8 @@ struct illum_value_t {
  * @brief связанная пара ячейка-грань в графе обхода ячеек
  *
  */
-union graph_pair_t {
+union graph_pair_t
+{
   struct
   {
     uint32_t loc_face : 2; ///< локальный номер грани на которой проходит расчёт излучения
@@ -237,7 +256,8 @@ union graph_pair_t {
 };
 #ifdef ILLUM
 struct elem_t;
-struct full_phys_data_t {
+struct full_phys_data_t
+{
   const flux_t *val;
   Type T;
   Type logT;
@@ -257,7 +277,8 @@ struct full_phys_data_t {
 };
 #endif
 
-struct elem_t {
+struct elem_t
+{
   flux_t phys_val;
   flux_t conv_val;
 
@@ -266,14 +287,15 @@ struct elem_t {
   illum_value_t illum_val;
 #endif
 
-  geo_cell_t geo; //геометрия элемента
+  geo_cell_t geo; // геометрия элемента
 
   // private:
   //	elem_t(const elem_t& el) {};
 };
 
 #ifndef USE_CUDA
-struct grid_t {
+struct grid_t
+{
   IdType size;
   std::vector<elem_t> cells;
   std::vector<face_t> faces;
@@ -292,7 +314,8 @@ struct grid_t {
   void InitMemory(const IdType num_cells, const IdType num_directions);
 };
 #else
-struct grid_t {
+struct grid_t
+{
   IdType size;      ///< размер сетки (число ячеек)
   IdType size_face; ///< число граней
   IdType size_dir;  ///< число направлений
@@ -300,9 +323,9 @@ struct grid_t {
   std::vector<elem_t> cells;
   std::vector<face_t> faces;
 #ifdef USE_MPI
-  mpi_hllc_t *mpi_cfg;                              ///< конфиг mpi структуры
+  mpi_hllc_t *mpi_cfg; ///< конфиг mpi структуры
 #else
-  uint32_t *foo;                                              ///< заглушка под cuda
+  uint32_t *foo; ///< заглушка под cuda
 #endif
 
 #if !defined TRANSFER_CELL_TO_FACE
@@ -366,7 +389,6 @@ struct grid_t {
 #endif // USE_CUDA
 extern std::vector<bound_size_t> hllc_loc_size;
 
-
 #include <set>
 /**
  * @brief Данные для маршевой трассировки с решением уравнения переноса
@@ -374,28 +396,28 @@ extern std::vector<bound_size_t> hllc_loc_size;
  */
 struct TracerData
 {
-  //Данные графа
-  std::vector<IntId> graph;          ///< упорядоченный набор ячеек
-  
-  std::set<IntId> inter_boundary_face_id; ///< id внутренних граней [i * CELL_SIZE + j]  
+  // Данные графа
+  std::vector<IntId> graph; ///< упорядоченный набор ячеек
+
+  std::set<IntId> inter_boundary_face_id; ///< id внутренних граней [i * CELL_SIZE + j]
   std::map<IntId, FaceCell> inter_faces;  ///< внутренние грани с ключом-номером ячейки
 
   // обновляемые данные трассировки
   std::vector<BasePointTetra> vec_x;
-  std::vector<cell_local> vec_x0;  
+  std::vector<cell_local> vec_x0;
   std::vector<IntId> graph_bound_faces;
-  std::vector<graph_pair_t> graph_cell_faces;  
+  std::vector<graph_pair_t> graph_cell_faces;
 
   align_cell_local X0;
 
-  //постоянные данные сетки
+  // постоянные данные сетки
   std::vector<Face> grid;
-  std::vector<Matrix4> vertexs;  
+  std::vector<Matrix4> vertexs;
   std::vector<Normals> normals;
   std::vector<IntId> neighbours;
   grid_t geo_grid;
-  
-  int Init(const global_files_t& files);  
+
+  int Init(const global_files_t &files);
 };
 
 #endif //! SOLVERS_STRUCT_H
