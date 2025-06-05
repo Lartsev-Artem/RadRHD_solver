@@ -33,7 +33,8 @@
 
 namespace cuda_sep = cuda::interface::separate_device;
 
-int rad_rhd::RunRadRHDMpiModule() {
+int rad_rhd::RunRadRHDMpiModule()
+{
 
   WRITE_LOG("Start RunRadRHDMpiModule()\n");
 
@@ -52,7 +53,8 @@ int rad_rhd::RunRadRHDMpiModule() {
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
   err |= files_sys::txt::ReadTableFunc(glb_files.tab_func_address + F_COOLING_FUNC, t_cooling_function);
 
-  if (err) {
+  if (err)
+  {
     RETURN_ERR("Error reading \n");
   }
 
@@ -68,12 +70,12 @@ int rad_rhd::RunRadRHDMpiModule() {
     DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
 
     std::vector<int> metis;
-    if (files_sys::txt::ReadSimple(glb_files.base_address + F_SEPARATE_METIS, metis)) {
+    if (files_sys::txt::ReadSimple(glb_files.base_address + F_SEPARATE_METIS, metis))
+    {
       RETURN_ERR("Error reading metis \n");
     }
 
-    grid.mpi_cfg = new mpi_hllc_t;
-    rhllc_mpi::InitMpiConfig(metis, grid, grid.mpi_cfg);
+    rhllc_mpi::InitMpiConfig(metis, grid);
     metis.clear();
   }
 
@@ -83,9 +85,9 @@ int rad_rhd::RunRadRHDMpiModule() {
     cuda::interface::SetStreams();
     WRITE_LOG("Init mpi device\n");
 
-    illum::separate_gpu::InitSender(MPI_COMM_WORLD, grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
+    illum::separate_gpu::InitSender(MPI_COMM_WORLD, grid_direction, grid); // после инициализации видеокарты, т.к. структура сетки инициализируется и там
 
-    //перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
+    // перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
     if (files_sys::bin::ReadRadiationFaceTrace(grid_direction.size, glb_files, vec_x0, sorted_graph, boundary_faces, inner_bound_code))
       RETURN_ERR("Error reading trace part\n");
   }
@@ -97,15 +99,16 @@ int rad_rhd::RunRadRHDMpiModule() {
 
   Timer timer;
 
-  MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
+  MPI_BARRIER(MPI_COMM_WORLD); // ждём пока все процессы проинициализируют память
 
   const int myid = get_mpi_id();
   timer.start_timer();
 
-  while (t < _hllc_cfg.T) {
+  while (t < _hllc_cfg.T)
+  {
 
     rhllc_mpi::Hllc3dStab(_hllc_cfg.tau, grid);
-    rhllc_mpi::StartPhysCast(*grid.mpi_cfg, grid);
+    rhllc_mpi::StartPhysCast(grid.mpi_cfg, grid);
     rhllc_mpi::SyncAndCalcPhysCast(grid);
 
     illum::separate_gpu::CalculateIllum(grid_direction, inner_bound_code, vec_x0, sorted_graph, boundary_faces, grid);
@@ -117,7 +120,8 @@ int rad_rhd::RunRadRHDMpiModule() {
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
 
-    if (cur_timer >= _hllc_cfg.save_timer) {
+    if (cur_timer >= _hllc_cfg.save_timer)
+    {
       DIE_IF(files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 
       WRITE_LOG("t= %lf, step= %d, time=%lfs \n", t, res_count, timer.get_delta_time_sec());
@@ -138,7 +142,7 @@ int rad_rhd::RunRadRHDMpiModule() {
   cuda::interface::CudaSyncStream(cuda::e_cuda_scattering_1);
   cuda::interface::CudaSyncStream(cuda::e_cuda_params);
 
-  MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
+  MPI_BARRIER(MPI_COMM_WORLD); // ждём пока все процессы проинициализируют память
 
   DIE_IF(files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 

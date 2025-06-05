@@ -3,7 +3,7 @@
 #include "rhllc_main.h"
 
 #include "rhllc_mpi.h"
-//#include "rhllc_calc.h"
+// #include "rhllc_calc.h"
 #include "rhllc_init.h"
 #include "rhllc_utils.h"
 
@@ -15,7 +15,8 @@
 #include <chrono>
 namespace tick = std::chrono;
 
-int rhllc::RunRhllcMpiModule() {
+int rhllc::RunRhllcMpiModule()
+{
   WRITE_LOG("Start RunRhllcModule()\n");
   grid_t grid;
 
@@ -23,7 +24,8 @@ int rhllc::RunRhllcMpiModule() {
 
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, grid.faces);
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
-  if (err) {
+  if (err)
+  {
     RETURN_ERR("Error reading \n");
   }
   grid.InitMemory(grid.cells.size(), grid_directions_t(0));
@@ -34,12 +36,12 @@ int rhllc::RunRhllcMpiModule() {
     DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
     int np = get_mpi_np();
     std::vector<int> metis;
-    if (files_sys::txt::ReadSimple(glb_files.base_address + F_SEPARATE_METIS, metis)) {
+    if (files_sys::txt::ReadSimple(glb_files.base_address + F_SEPARATE_METIS, metis))
+    {
       RETURN_ERR("Error reading metis \n");
     }
 
-    grid.mpi_cfg = new mpi_hllc_t;
-    rhllc_mpi::InitMpiConfig(metis, grid, grid.mpi_cfg);
+    rhllc_mpi::InitMpiConfig(metis, grid);
     metis.clear();
   }
 
@@ -57,13 +59,15 @@ int rhllc::RunRhllcMpiModule() {
 
   Timer timer;
 
-  while (t < _hllc_cfg.T) {
+  while (t < _hllc_cfg.T)
+  {
     rhllc_mpi::Hllc3dStab(_hllc_cfg.tau, grid);
 
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
 
-    if (cur_timer >= _hllc_cfg.save_timer) {
+    if (cur_timer >= _hllc_cfg.save_timer)
+    {
       WRITE_LOG("t= %lf, step= %d, time_step=%lfs\n", t, res_count, timer.get_delta_time_sec());
       DIE_IF(files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
       timer.start_timer();

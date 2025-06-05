@@ -208,7 +208,12 @@
     "scoped_allocator": "cpp",
     "span": "cpp",
     "syncstream": "cpp",
-    "locale": "cpp"
+    "locale": "cpp",
+    "expected": "cpp",
+    "spanstream": "cpp",
+    "stacktrace": "cpp",
+    "format": "cpp",
+    "stdfloat": "cpp"
   },
   "cSpell.language": "en,ru",
   "cSpell.words": [

@@ -8,14 +8,16 @@
 #include "writer_bin.h"
 
 #ifdef ILLUM
-int files_sys::bin::WriteAllIllumDirections(const std::string &main_dir, const grid_t &grid) {
+int files_sys::bin::WriteAllIllumDirections(const std::string &main_dir, const grid_t &grid)
+{
 
   if (grid.Illum == nullptr)
     return e_completion_fail;
 
   std::vector<Type> illum;
 
-  for (size_t i = 0; i < grid.size_dir; i++) {
+  for (size_t i = 0; i < grid.size_dir; i++)
+  {
 #ifndef SEPARATE_GPU
     GetDirectionDataFromFace(grid.size, i, grid.Illum, 0.0, illum);
 #else
@@ -28,14 +30,17 @@ int files_sys::bin::WriteAllIllumDirections(const std::string &main_dir, const g
 }
 #endif
 
-int files_sys::bin::WriteNormals(const std::string &name_file_normals, std::vector<Normals> &normals) {
+int files_sys::bin::WriteNormals(const std::string &name_file_normals, std::vector<Normals> &normals)
+{
   FILE *f;
   OPEN_FILE(f, name_file_normals.c_str(), "wb");
 
   int n = (int)normals.size();
   fwrite(&n, sizeof(int), 1, f);
-  for (int i = 0; i < n; i++) {
-    for (int j = 0; j < CELL_SIZE; j++) {
+  for (int i = 0; i < n; i++)
+  {
+    for (int j = 0; j < CELL_SIZE; j++)
+    {
       fwrite(&normals[i].n[j], sizeof(Vector3), 1, f);
     }
   }
@@ -48,14 +53,17 @@ int files_sys::bin::WriteNormals(const std::string &name_file_normals, std::vect
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &grid) {
+int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &grid)
+{
 
-  if (get_mpi_id() != 0) {
+  if (get_mpi_id() != 0)
+  {
     return e_completion_success;
   }
 
 #ifdef ILLUM
-  if (grid.Illum != nullptr) {
+  if (grid.Illum != nullptr)
+  {
     std::vector<Type> illum;
 #ifndef SEPARATE_GPU
     GetDirectionDataFromFace(grid.size, 0, grid.Illum, 0.0, illum);
@@ -109,17 +117,20 @@ int files_sys::bin::WriteSolution(const std::string &main_dir, const grid_t &gri
 
 #ifdef USE_MPI
 
-int files_sys::bin::WriteSolutionMPI(const std::string &main_dir, const grid_t &grid) {
+int files_sys::bin::WriteSolutionMPI(const std::string &main_dir, const grid_t &grid)
+{
 
   int myid = get_mpi_id();
-  IdType left = grid.mpi_cfg->disp_cells[myid];
-  IdType right = left + grid.mpi_cfg->send_cells[myid];
+  IdType left = grid.loc_shift;
+  IdType right = left + grid.loc_size;
 
 #ifdef ILLUM
 
-  if (grid.Illum != nullptr) {
+  if (grid.Illum != nullptr)
+  {
     std::vector<Type> illum;
-    if (myid == 0) {
+    if (myid == 0)
+    {
 #ifndef SEPARATE_GPU
       GetDirectionDataFromFace(grid.size, 0, grid.Illum, 0.0, illum);
 #else

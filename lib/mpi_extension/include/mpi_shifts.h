@@ -33,9 +33,12 @@ void GetDisp(const int np, const IdType n, std::vector<IdType> &disp);
  * @brief Устанавливает число компонент на узел и смещения компонент на узел
  *
  * @param[in] metis_id карта ячеек по узлам (важно кол-во вхождений на узел а не порядок(т.е. сетка может быть перенумерованной))
- * @param[inout] cfg конфигурация кластера для hllc. Должен быть установлен comm
+ * @param[in] np число процессов
+ * @param[inout] send размер кластеров
+ * @param[inout] disp смешение на каждам из узлов
  */
-void SetShifts(const std::vector<int> &metis_id, mpi_hllc_t *cfg);
+void SetShifts(const std::vector<int> &metis_id, int np,
+               std::vector<int> &send, std::vector<int> &disp);
 
 #endif
 #endif // MPI_SHIFTS

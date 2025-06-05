@@ -66,30 +66,39 @@
  *
  */
 #define CREATE_STRUCT(name, type, ...) \
-  struct name {                        \
+  struct name                          \
+  {                                    \
     type __VA_ARGS__;                  \
   }
+
+/**
+ * @brief Размер статического массива в элементах
+ *
+ */
+#define SIZEOF_ARRAY(a) (sizeof(a) / sizeof(a[0]));
 
 /**
  * @brief Быстрая печать структуры с элементами одного типа
  *
  */
-#define PRINT_STRUCT(st, type)                            \
-  type *str = (type *)&st;                                \
-  while (str < (type *)&st + sizeof(st) / sizeof(type)) { \
-    std::cout << *str++ << '\n';                          \
+#define PRINT_STRUCT(st, type)                          \
+  type *str = (type *)&st;                              \
+  while (str < (type *)&st + sizeof(st) / sizeof(type)) \
+  {                                                     \
+    std::cout << *str++ << '\n';                        \
   }
 
 /**
  * @brief Быстрое заполнение структуры с элементами одного типа
  *
  */
-#define FILL_STRUCT(st, type, val)                          \
-  {                                                         \
-    type *str = (type *)&st;                                \
-    while (str < (type *)&st + sizeof(st) / sizeof(type)) { \
-      *str++ = val;                                         \
-    }                                                       \
+#define FILL_STRUCT(st, type, val)                        \
+  {                                                       \
+    type *str = (type *)&st;                              \
+    while (str < (type *)&st + sizeof(st) / sizeof(type)) \
+    {                                                     \
+      *str++ = val;                                       \
+    }                                                     \
   }
 
 #endif

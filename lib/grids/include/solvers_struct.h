@@ -323,7 +323,7 @@ struct grid_t
   std::vector<elem_t> cells;
   std::vector<face_t> faces;
 #ifdef USE_MPI
-  mpi_hllc_t *mpi_cfg; ///< конфиг mpi структуры
+  mpi_hd_t *mpi_cfg; ///< конфиг mpi структуры
 #else
   uint32_t *foo; ///< заглушка под cuda
 #endif

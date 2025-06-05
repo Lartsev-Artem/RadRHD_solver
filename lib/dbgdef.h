@@ -57,13 +57,16 @@ extern global_files_t glb_files;
  * @brief Условное прерывание работы программы с указанием места
  *
  */
-#define DIE_IF(_cond)    \
-  if (UNLIKELY(_cond)) { \
-    D_LD;                \
+#define DIE_IF(_cond)             \
+  if (UNLIKELY(_cond))            \
+  {                               \
+    WRITE_POS(Files_log, #_cond); \
+    D_LD;                         \
   }
 
 #define DIE_IF_ACTION(_cond, _act) \
-  if (UNLIKELY(_cond)) {           \
+  if (UNLIKELY(_cond))             \
+  {                                \
     _act;                          \
     D_LD;                          \
   }
@@ -144,8 +147,10 @@ extern global_files_t glb_files;
 
 #else
 #define CONVERT_TO_STRING(s, ...) #s #__VA_ARGS__
-#define WRITE_LOG(...) \
-  { CONVERT_TO_STRING(__VA_ARGS__); }
+#define WRITE_LOG(...)              \
+  {                                 \
+    CONVERT_TO_STRING(__VA_ARGS__); \
+  }
 #endif // WRITE_GLOBAL_LOG
 
 #ifdef DEBUG
@@ -174,6 +179,6 @@ extern global_files_t glb_files;
 
 #endif
 
-//#undef Files_log
+// #undef Files_log
 // #undef WRITE_POS
 #endif // DBG_DEF

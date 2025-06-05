@@ -1,6 +1,7 @@
 #include "mpi_shifts.h"
 
-void GetSend(const int np, const IdType n, std::vector<IdType> &send_count) {
+void GetSend(const int np, const IdType n, std::vector<IdType> &send_count)
+{
 
   send_count.assign(np, n / np);
 
@@ -11,7 +12,8 @@ void GetSend(const int np, const IdType n, std::vector<IdType> &send_count) {
   }
 }
 
-void GetDisp(const int np, const IdType n, std::vector<IdType> &disp) {
+void GetDisp(const int np, const IdType n, std::vector<IdType> &disp)
+{
 
   disp.assign(np, 0);
   int a = n % np;
@@ -28,20 +30,22 @@ void GetDisp(const int np, const IdType n, std::vector<IdType> &disp) {
 #include "dbgdef.h"
 #include <algorithm>
 
-void SetShifts(const std::vector<int> &metis_id, mpi_hllc_t *cfg) {
-  int np = get_mpi_np(cfg->comm);
-
+void SetShifts(const std::vector<int> &metis_id, int np,
+               std::vector<int> &send, std::vector<int> &disp)
+{
   int np_count = *std::max_element(metis_id.begin(), metis_id.end());
   DIE_IF(((np_count + 1) != np));
 
-  cfg->send_cells.resize(np, 0);
-  cfg->disp_cells.resize(np, 0);
-  for (int i = 0; i < np; i++) {
-    cfg->send_cells[i] = std::count(metis_id.begin(), metis_id.end(), i);
+  send.resize(np, 0);
+  disp.resize(np, 0);
+  for (int i = 0; i < np; i++)
+  {
+    send[i] = std::count(metis_id.begin(), metis_id.end(), i);
 
-    cfg->disp_cells[i] = 0;
-    for (int j = 0; j < i; j++) {
-      cfg->disp_cells[i] += cfg->send_cells[j];
+    disp[i] = 0;
+    for (int j = 0; j < i; j++)
+    {
+      disp[i] += send[j];
     }
   }
 }

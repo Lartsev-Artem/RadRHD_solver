@@ -8,40 +8,48 @@
 static int8_t id = -1;
 static int8_t np = -1;
 
-namespace mpi_private {
-static void init_value(const MPI_Comm &comm) {
-  int rank, size;
-  MPI_Comm_rank(comm, &rank);
-  MPI_Comm_size(comm, &size);
+namespace mpi_private
+{
+  static void init_value(const MPI_Comm &comm)
+  {
+    int rank, size;
+    MPI_Comm_rank(comm, &rank);
+    MPI_Comm_size(comm, &size);
 
-  id = (int8_t)rank;
-  np = (int8_t)size;
+    id = (int8_t)rank;
+    np = (int8_t)size;
 
-  WRITE_LOG("MPI Claster config: %d %d\n", id, np);
-}
+    WRITE_LOG("MPI Claster config: %d %d\n", id, np);
+  }
 }; // namespace mpi_private
 
-int8_t get_mpi_id() {
-  if (id < 0) {
+int8_t get_mpi_id()
+{
+  if (id < 0)
+  {
     mpi_private::init_value(MPI_COMM_WORLD);
   }
   return id;
 }
 
-int8_t get_mpi_np() {
-  if (np < 0) {
+int8_t get_mpi_np()
+{
+  if (np < 0)
+  {
     mpi_private::init_value(MPI_COMM_WORLD);
   }
   return np;
 }
 
-int8_t get_mpi_id(const MPI_Comm &comm) {
+int8_t get_mpi_id(const MPI_Comm &comm)
+{
   int rank;
   MPI_Comm_rank(comm, &rank);
   return (int8_t)rank;
 }
 
-int8_t get_mpi_np(const MPI_Comm &comm) {
+int8_t get_mpi_np(const MPI_Comm &comm)
+{
   int size;
   MPI_Comm_size(comm, &size);
   return (int8_t)size;
@@ -51,11 +59,24 @@ int8_t get_mpi_np(const MPI_Comm &comm) {
 MPI_Datatype MPI_flux_t;
 MPI_Datatype MPI_phys_val_t;
 MPI_Datatype MPI_flux_elem_t;
+MPI_Datatype MPI_hllc_map_t;
 
 MPI_Datatype MPI_hllc_value_t;
 
 #if 1
-void InitMPiStruct() {
+void InitMPiStruct()
+{
+
+  // структура кластера для газовой динамики
+  {
+    typedef mpi_hd_t::mpi_map_t mp_t;
+    int len[4] = {1, 1, 4, 4};
+    MPI_Aint pos[4] = {offsetof(mp_t, np_l), offsetof(mp_t, np_r),
+                       offsetof(mp_t, cell), offsetof(mp_t, face)};
+    MPI_Datatype typ[4] = {MPI_INT64_T, MPI_INT64_T, MPI_INT64_T, MPI_INT64_T};
+    MPI_Type_create_struct(4, len, pos, typ, &MPI_hllc_map_t);
+    MPI_Type_commit(&MPI_hllc_map_t);
+  }
 
   // структура потоков
   {
@@ -80,7 +101,7 @@ void InitMPiStruct() {
     MPI_Type_commit(&MPI_flux_elem_t);
   }
 
-  //настройки динамического расчета
+  // настройки динамического расчета
   {
     int len[5] = {1, 1, 1, 1, 1};
     MPI_Aint pos[5] = {offsetof(hllc_value_t, T), offsetof(hllc_value_t, CFL), offsetof(hllc_value_t, h_min), offsetof(hllc_value_t, save_timer), offsetof(hllc_value_t, tau)};
@@ -93,8 +114,9 @@ void InitMPiStruct() {
 
   return;
 }
-#else //устаревший формат?
-void InitMPiStruct() {
+#else // устаревший формат?
+void InitMPiStruct()
+{
 
   // структура потоков
   {
@@ -123,7 +145,7 @@ void InitMPiStruct() {
     MPI_Type_commit(&MPI_flux_elem_t);
   }
 
-  //настройки динамического расчета
+  // настройки динамического расчета
   {
     int len[5 + 1] = {1, 1, 1, 1, 1, 1};
     MPI_Aint pos[6] = {offsetof(hllc_value_t, T), offsetof(hllc_value_t, CFL), offsetof(hllc_value_t, h_min), offsetof(hllc_value_t, save_timer), offsetof(hllc_value_t, tau), sizeof(hllc_value_t)};
