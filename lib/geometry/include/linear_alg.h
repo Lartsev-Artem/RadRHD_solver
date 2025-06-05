@@ -25,8 +25,12 @@ void GetRotationMatrix(const Vector3 &n, Matrix3 &T);
  * @param[in] n нормаль к поверхности (нормированная!)
  * @return направление отражения
  */
-static inline Vector3 reflection_dir(const Vector3 &dir, const Vector3 &n) {
+static inline Vector3 reflection_dir(const Vector3 &dir, const Vector3 &n)
+{
   return (dir - 2.0 * n * (dir.dot(n))).normalized();
 }
+
+Vector3 Spherical2Cartesian(const Vector3 &rpt);
+Vector3 Cartesian2Spherical(const Vector3 &xyz);
 
 #endif //! LINEAR_ALG_H

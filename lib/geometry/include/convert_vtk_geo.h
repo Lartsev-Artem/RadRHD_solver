@@ -38,19 +38,22 @@ int GetFacesPoints(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid
  * @return int ::e_type_completion
  */
 template <typename stdT>
-int GetFacesById(const stdT &id_faces, const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::map<IntId, FaceCell> &faces) {
+int GetFacesById(const stdT &id_faces, const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::map<IntId, FaceCell> &faces)
+{
 
   faces.clear();
 
   FaceCell face_buf;
   vtkPoints *points_face;
 
-  for (auto id : id_faces) {
+  for (auto id : id_faces)
+  {
 
     points_face = unstructured_grid->GetCell(id / CELL_SIZE)->GetFace(id % CELL_SIZE)->GetPoints();
 
     face_buf.face_id = id;
-    for (int i = 0; i < CELL_SIZE - 1; i++) {
+    for (int i = 0; i < CELL_SIZE - 1; i++)
+    {
       face_buf.face[i] = Vector3(points_face->GetPoint(i));
     }
 
@@ -196,6 +199,24 @@ int GetCentersOfCells2D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured
  * @return int ::e_type_completion
  */
 int GetCellsPointsSurface(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<Face> &faces);
+
+/**
+ * @brief Функция возвращает номера узлов для ячеек сетки - поверхности
+ *
+ * @param[in] unstructured_grid сетка поверхности в формате vtk
+ * @param[out] nodes_id номера узлов ячейки на поверхности
+ * @return int ::e_type_completion
+ */
+int GetCellsPointsIdSurface(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<int> &nodes_id);
+
+/**
+ * @brief Функция возвращает связь узлов и ячеек на поверхности
+ *
+ * @param[in] unstructured_grid сетка поверхности в формате vtk
+ * @param[out] cell_connections связная структура геометрии ячеек на поверхности
+ * @return int ::e_type_completion
+ */
+int GetGridStructSurface(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, DirectionsGrid_t &cell_connections);
 // #endif // NUMBER_OF_MEASUREMENTS
 
 #endif // USE_VTK

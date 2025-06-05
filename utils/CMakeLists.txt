@@ -66,8 +66,6 @@ include_directories(${EIGEN_DIR}) # библиотека Eigen
 # endif()
 #     include_directories(${lib_INCLUDE_DIR}) # добавляем пути из подпроекта
 
-SET(VTK_DIR "/home/artem/libraries/VTK-9.3-build" CACHE PATH "VTK directory override" FORCE)
-
 find_package(VTK REQUIRED)
 
 if(VTK_FOUND)
