@@ -18,6 +18,7 @@
 
 const Vector3 k_bound_face_norm = Vector3(0, 0, 1); ///< внешняя нормаль пространственной грани
 
+/// \brief Прямое отражение
 static void direct_reflection(
     const grid_directions_t &grid_direction,
     const std::vector<Face> &surface,
@@ -52,6 +53,7 @@ static void direct_reflection(
     return;
 }
 
+/// \brief Обратное отражение
 static void inverse_reflection(
     const grid_directions_t &grid_direction,
     const std::vector<Face> &surface,
@@ -89,7 +91,7 @@ static void inverse_reflection(
     return;
 }
 
-int read_mesh_direction(const std::string &base_address, interpolation_mesh_direction_t &grid_st)
+static int read_mesh_direction(const std::string &base_address, interpolation_mesh_direction_t &grid_st)
 {
     if (files_sys::bin::ReadSimple(base_address + F_NUM_NEIGHS_SURFACE, grid_st.num_of_neighs))
         return e_completion_fail;
@@ -149,6 +151,16 @@ static int init_reflection(
     return e_completion_success;
 }
 
+/**
+ * @brief Обратное отражение + интерполяция
+ *
+ * @param grid_direction
+ * @param new_grid_direction
+ * @param illum_src
+ * @param reflection_id
+ * @param mode - режим интерполяции (0- cellTopoint, 1-cellTopoint + linear_interpolation)
+ * @param reflection_val
+ */
 static void inverse_inter_reflection(
     const grid_directions_t &grid_direction,
     const grid_directions_t &new_grid_direction,
@@ -230,6 +242,7 @@ static void inverse_inter_reflection(
     }
 }
 
+/// @brief Обратное отражение + расширение шаблона (ячейка + 3 соседа)
 static void inverse_avg_cells_reflection(
     const grid_directions_t &grid_direction,
     const std::vector<int> &reflection_id,
