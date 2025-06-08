@@ -1,5 +1,6 @@
 ## Флаги сборки
-KEYS 	= DEBUG SOLVERS BUILD_GRAPH MAKE_TRACE ILLUM USE_CUDA USE_MPI RHLLC RAD_RHD
+KEYS	:= SOLVERS BUILD_GRAPH MAKE_TRACE ILLUM RHLLC RadRHD
+KEYS 	+= DEBUG USE_CUDA USE_MPI
 DEFINES = $(addprefix -D , $(KEYS))
 ## Компиляторы и настройки
 CONFIG ?= release
@@ -74,12 +75,12 @@ all: $(EXECUTABLES)
 	mkdir -p $(BUILD_DIR)/illum_geo
 	mkdir -p $(BUILD_DIR)/Solve
 	mkdir -p $(BUILD_DIR)/trace
-	mkdir -p $(BUILD_DIR)/add_dir
+	mkdir -p $(BUILD_DIR)/add_dir	
 
 test: $(TESTS)
 	mkdir -p $(BUILD_DIR)/graph
 	mkdir -p $(BUILD_DIR)/illum_geo
-	mkdir -p $(BUILD_DIR)/Solve
+	mkdir -p $(BUILD_DIR)/Solve	
 
 debug:
 	@$(MAKE) CONFIG=debug

@@ -75,13 +75,24 @@ else()
 endif()
 
 if(INSTALL) # формеруем набор подпрограмм
+    # 1. Создаем статическую библиотеку из общих исходников
+    add_library(common_lib STATIC ${SRC_CXX} ${SRC_H})
+
+    # 2. Применяем зависимости ко всей библиотеке
+    if(VTK_FOUND)
+        target_link_libraries(common_lib PRIVATE ${VTK_LIBRARIES})
+    endif()
+
+    # 3. Создаем исполняемые файлы, линкуя с общей библиотекой
     foreach(sub_prog ${${PROJECT_NAME}_SRC_CXX})
-        get_filename_component(name ${sub_prog}  NAME_WLE) #имя файла без пути и без разширения
-        add_executable(${name} ${sub_prog} ${SRC_CXX} ${SRC_H})
-        # target_link_libraries(${name} PRIVATE lib)
+        get_filename_component(name ${sub_prog} NAME_WLE)
+        add_executable(${name} ${sub_prog})
+        target_link_libraries(${name} PRIVATE common_lib)
+        
+        # Дополнительные зависимости для конкретной цели
         if(VTK_FOUND)
-            target_link_libraries(${name} PRIVATE  ${VTK_LIBRARIES})
-        endif()        
+            target_link_libraries(${name} PRIVATE ${VTK_LIBRARIES})
+        endif()
     endforeach()
 else() # создаем библиотеку
     add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}_SRC_CXX} ${SRC_CXX} ${SRC_H})

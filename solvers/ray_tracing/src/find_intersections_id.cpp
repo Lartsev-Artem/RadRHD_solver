@@ -11,17 +11,21 @@
 
 static uint8_t it = 0;
 
-int ray_tracing::FindIntersections() {
+int ray_tracing::FindIntersections()
+{
 
   ///\note Этот луч задает центр проекции
 
-#ifdef GRB_TASK
+#if TASK_TYPE == GRB_TASK
   Vector3 start_ray;
   Vector3 end_ray;
-  if (it == 0) {
+  if (it == 0)
+  {
     start_ray = Vector3(1.1, 0, 0);
     end_ray = Vector3(0.95, 0, 0);
-  } else {
+  }
+  else
+  {
     start_ray = Vector3(0.5, 0, 1);
     end_ray = Vector3(0.5, 0, 0);
   }
@@ -33,7 +37,8 @@ int ray_tracing::FindIntersections() {
   int myid = get_mpi_id();
   int np = get_mpi_np();
 
-  if (get_mpi_id() != 0) {
+  if (get_mpi_id() != 0)
+  {
     return e_completion_success;
   }
 
@@ -62,28 +67,29 @@ int ray_tracing::FindIntersections() {
   return e_completion_success;
 }
 
-int ray_tracing::FindObserverIntersections() 
+int ray_tracing::FindObserverIntersections()
 {
 
   int myid = get_mpi_id();
   int np = get_mpi_np();
 
-  if (get_mpi_id() != 0) {
+  if (get_mpi_id() != 0)
+  {
     return e_completion_success;
   }
 
   std::vector<FaceCell> faces; ///< поверхность сетки
   if (files_sys::bin::ReadSimple(glb_files.base_address + F_SURFACE, faces))
     return e_completion_fail;
-  
-  ParamTraceProjection plane_cfg(PlaneParams(1,1,1,1),Vector3::Zero(),Vector3::Zero());
-  if (files_sys::bin::ReadSimple(glb_files.base_address + F_PLANE_CFG, (uint8_t*)(&plane_cfg)))
+
+  ParamTraceProjection plane_cfg(PlaneParams(1, 1, 1, 1), Vector3::Zero(), Vector3::Zero());
+  if (files_sys::bin::ReadSimple(glb_files.base_address + F_PLANE_CFG, (uint8_t *)(&plane_cfg)))
     return e_completion_fail;
 
   std::vector<Ray_t> rays;
-  PlaneParams& plane_params = plane_cfg.params2D;
-  Vector3& plane_orig = plane_cfg.plane_orig;
-  Vector3& observer =plane_cfg.observer;
+  PlaneParams &plane_params = plane_cfg.params2D;
+  Vector3 &plane_orig = plane_cfg.plane_orig;
+  Vector3 &observer = plane_cfg.observer;
   MakeRays(plane_params, plane_orig, observer, rays);
 
   std::vector<IntId> intersections(rays.size(), -1);
@@ -93,15 +99,15 @@ int ray_tracing::FindObserverIntersections()
             PixX= %d,PixY= %d, width= %lf, height= %lf,
             plane_orig: %lf %lf %lf,
             observer: %lf %lf %lf
-            )",\
-            plane_params._pixels_width,\
-            plane_params._pixels_height,\
-            plane_params._width,\
-            plane_params._height,\
-            plane_orig[0],plane_orig[1],plane_orig[2],\
-            observer[0],observer[1],observer[2]);
-              
-  Timer time;  
+            )",
+            plane_params._pixels_width,
+            plane_params._pixels_height,
+            plane_params._width,
+            plane_params._height,
+            plane_orig[0], plane_orig[1], plane_orig[2],
+            observer[0], observer[1], observer[2]);
+
+  Timer time;
   cuda::ray_tracing::interface::StartTracingGrid(rays, intersections);
 
   WRITE_LOG("Tracing end %lf\n", time.get_delta_time_sec());
