@@ -419,12 +419,18 @@ int GetVertexMatrix(const size_t number_cell, const vtkSmartPointer<vtkUnstructu
 int GetNeighborFace2D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, std::vector<int> &neighbors)
 {
 
+#if NUMBER_OF_MEASUREMENTS == 3
+  constexpr int kCELL_SIZE = CELL_SIZE - 1;
+#else
+  constexpr int kCELL_SIZE = CELL_SIZE;
+#endif
+
   auto GetNumberNeighborFace{[](const int a, const int b, vtkCell *neighbor_cell)
                              {
                                vtkIdList *idc;
 
                                int x, y;
-                               for (int i = 0; i < CELL_SIZE; i++)
+                               for (int i = 0; i < kCELL_SIZE; i++)
                                {
                                  idc = neighbor_cell->GetEdge(i)->GetPointIds();
                                  x = idc->GetId(0);
@@ -440,7 +446,7 @@ int GetNeighborFace2D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_g
 
   int count_unique_face = 0;
   const int N = unstructured_grid->GetNumberOfCells();
-  neighbors.resize(N * CELL_SIZE, e_neigh_code_undef);
+  neighbors.resize(N * kCELL_SIZE, e_neigh_code_undef);
 
   vtkSmartPointer<vtkIdList> idp = vtkSmartPointer<vtkIdList>::New();
   vtkSmartPointer<vtkIdList> idc = vtkSmartPointer<vtkIdList>::New();
@@ -449,9 +455,9 @@ int GetNeighborFace2D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_g
   for (vtkIdType num_cell = 0; num_cell < N; ++num_cell)
   {
 
-    for (int num_face = 0; num_face < CELL_SIZE; ++num_face)
+    for (int num_face = 0; num_face < kCELL_SIZE; ++num_face)
     {
-      if (neighbors[num_cell * CELL_SIZE + num_face] != e_neigh_code_undef)
+      if (neighbors[num_cell * kCELL_SIZE + num_face] != e_neigh_code_undef)
         continue;
       ++count_unique_face;
 
@@ -461,7 +467,7 @@ int GetNeighborFace2D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_g
 
       /*Может быть проблема с указателями на списки!*/
       unstructured_grid->GetCellNeighbors(num_cell, idp, idc);
-      int face = num_cell * CELL_SIZE + num_face;
+      int face = num_cell * kCELL_SIZE + num_face;
 
       if (idc->GetNumberOfIds() == 1)
       {
@@ -473,8 +479,8 @@ int GetNeighborFace2D(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_g
           RETURN_ERR("neighbor %lld not found\n", num_cell);
         }
 
-        neighbors[face] = id_neighbor_cell * CELL_SIZE + id_neighbor_face;
-        neighbors[id_neighbor_cell * CELL_SIZE + id_neighbor_face] = face;
+        neighbors[face] = id_neighbor_cell * kCELL_SIZE + id_neighbor_face;
+        neighbors[id_neighbor_cell * kCELL_SIZE + id_neighbor_face] = face;
       }
       else if (idc->GetNumberOfIds() == 0)
         neighbors[face] = e_neigh_code_out_bound; // граничная ячейка
@@ -644,54 +650,55 @@ int GetCellsPointsIdSurface(const vtkSmartPointer<vtkUnstructuredGrid> &unstruct
 {
 
   const vtkIdType n = unstructured_grid->GetNumberOfCells();
-  nodes_id.resize(n * (CELL_SIZE - 1));
+  const vtkIdType nVertex = CELL_SIZE - 1;
+
+  nodes_id.resize(n * nVertex);
 
   for (vtkIdType i = 0; i < n; i++)
   {
     vtkSmartPointer<vtkIdList> idp = unstructured_grid->GetCell(i)->GetPointIds();
-    for (vtkIdType k = 0; k < CELL_SIZE - 1; k++)
+    for (vtkIdType k = 0; k < nVertex; k++)
     {
-      nodes_id[(CELL_SIZE - 1) * i + k] = idp->GetId(k);
+      nodes_id[nVertex * i + k] = idp->GetId(k);
     }
   }
 
   return e_completion_success;
 }
 
-int GetGridStructSurface(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, DirectionsGrid_t &cell_connections)
+int GetGridStructSurface(const vtkSmartPointer<vtkUnstructuredGrid> &ugrid,
+                         interpolation_mesh_direction_t &mesh)
 {
 
-  const vtkIdType nCells = unstructured_grid->GetNumberOfCells();
-  const vtkIdType nNodes = unstructured_grid->GetNumberOfPoints();
+  const vtkIdType nCells = ugrid->GetNumberOfCells();
+  const vtkIdType nNodes = ugrid->GetNumberOfPoints();
+  const vtkIdType nVertex = CELL_SIZE - 1;
 
-  cell_connections.neigh_count.resize(3 * nCells);
-  cell_connections.nodes.resize(3 * nCells);
-  cell_connections.node_cells.reserve(3 * nCells * 5);
+  mesh.num_of_neighs.resize(nVertex * nCells);
+  mesh.nodes_coord.resize(nVertex * nCells);
+  mesh.node_cells_id.reserve(nVertex * nCells * 5);
 
   for (vtkIdType i = 0; i < nCells; i++)
   {
-    vtkSmartPointer<vtkIdList> idp = unstructured_grid->GetCell(i)->GetPointIds();
-    for (vtkIdType k = 0; k < CELL_SIZE - 1; k++)
+    vtkSmartPointer<vtkIdList> idp = ugrid->GetCell(i)->GetPointIds();
+    for (vtkIdType k = 0; k < nVertex; k++)
     {
       vtkSmartPointer<vtkIdList> cellIds = vtkSmartPointer<vtkIdList>::New();
-      unstructured_grid->GetPointCells(idp->GetId(k), cellIds);
+      ugrid->GetPointCells(idp->GetId(k), cellIds);
 
-      if (i == 0 && k == 0)
+      int num_of_neighs = cellIds->GetNumberOfIds();
+      if (!(i == 0 && k == 0))
       {
-        cell_connections.neigh_count[3 * i + k] = cellIds->GetNumberOfIds();
+        num_of_neighs += mesh.num_of_neighs[nVertex * i + k - 1];
       }
-      else
-      {
-        cell_connections.neigh_count[3 * i + k] = cell_connections.neigh_count[3 * i + k - 1] + cellIds->GetNumberOfIds();
-      }
-      // cell_connections.neigh_count[3*i +k] = cellIds->GetNumberOfIds();
+      mesh.num_of_neighs[nVertex * i + k] = num_of_neighs;
 
-      cell_connections.nodes[3 * i + k] = Vector3(unstructured_grid->GetPoint(idp->GetId(k)));
+      mesh.nodes_coord[nVertex * i + k] = Vector3(ugrid->GetPoint(idp->GetId(k)));
 
       // Выводим номера ячеек
       for (vtkIdType cell = 0; cell < cellIds->GetNumberOfIds(); cell++)
       {
-        cell_connections.node_cells.push_back(cellIds->GetId(cell));
+        mesh.node_cells_id.push_back(cellIds->GetId(cell));
       }
     }
   }

@@ -29,7 +29,8 @@ typedef Eigen::Vector4d Vector4;
 typedef Eigen::Matrix4d Matrix4;
 typedef Eigen::MatrixXd MatrixX;
 
-struct Ray_t {
+struct Ray_t
+{
   Vector3 orig;
   Vector3 direction;
 
@@ -37,7 +38,8 @@ struct Ray_t {
   Ray_t(const Vector3 o, const Vector3 dir) : direction(dir), orig(o) {}
 };
 
-struct Intersection_t {
+struct Intersection_t
+{
   int id;
   Type dist;
   Vector3 point;
@@ -45,22 +47,26 @@ struct Intersection_t {
 };
 
 ///\todo: d в новый файл  с классами.
-struct Normals {
+struct Normals
+{
   std::array<Vector3, CELL_SIZE> n;
 };
 
-struct Face {
+struct Face
+{
   Vector3 A;
   Vector3 B;
   Vector3 C;
-  Face &operator=(const Face &face) {
+  Face &operator=(const Face &face)
+  {
     A = face.A;
     B = face.B;
     C = face.C;
     return *this;
   }
 
-  Vector3 &operator[](const int i) {
+  Vector3 &operator[](const int i)
+  {
     return *((Vector3 *)((uint8_t *)&A + sizeof(Vector3) * i));
   }
 
@@ -68,7 +74,8 @@ struct Face {
   Face(const Face &f) : A(f.A), B(f.B), C(f.C) {}
 };
 
-struct FaceCell {
+struct FaceCell
+{
   int face_id;
   Face face;
   FaceCell(const int id = 0, const Face &face_init = Face())
@@ -78,22 +85,49 @@ std::ostream &operator<<(std::ostream &os, const std::pair<const int, FaceCell> 
 std::ostream &operator<<(std::ostream &os, const FaceCell &f);
 std::istream &operator>>(std::istream &is, FaceCell &f);
 
-struct direction_s {
+struct direction_s
+{
   Vector3 dir;
   Type area;
 };
 
-struct grid_directions_t {
+/**
+ * @brief Структура для интерполяции на сфере
+ * хранит связи узлов и ячеек
+ *
+ */
+struct interpolation_mesh_direction_t
+{
+  // формат cell0[n1,n2,n3,...],cell1[.. где число ni - не фиксированы
+  std::vector<IntId> node_cells_id; // соседи узла (т.к. кол-во не фиксировано,
+  // доступ может быть получен только с головы, последовательными сдвигами на num_of_neighs[i])
+
+  // формат cell_id*3+node_id
+  std::vector<IntId> num_of_neighs; // число соседей для каждого узла.
+  std::vector<Vector3> nodes_coord; // координаты узлов (пачками по три)
+};
+
+struct grid_directions_t
+{
   IdType size;
   IdType loc_size;
   IdType loc_shift;
   std::vector<direction_s> directions;
   Type full_area;
-  grid_directions_t(const IdType N = 0) : size(N), loc_size(N), loc_shift(0), directions(N) {}
+  interpolation_mesh_direction_t *mesh;
+  grid_directions_t(const IdType N = 0) : size(N), loc_size(N), loc_shift(0), directions(N),
+                                          mesh(nullptr) {}
+  ~grid_directions_t()
+  {
+    if (mesh)
+    {
+      delete mesh;
+    }
+  }
 };
 
-//это узлы интерполяции на гранях
-struct BasePointTetra //узлы интерполяции всех тетраэдров // В перспективе можно уйти к граням
+// это узлы интерполяции на гранях
+struct BasePointTetra // узлы интерполяции всех тетраэдров // В перспективе можно уйти к граням
 {
   Vector3 x[CELL_SIZE][NUMBER_OF_MEASUREMENTS];
 
@@ -104,7 +138,8 @@ struct BasePointTetra //узлы интерполяции всех тетраэ�
  * @note величины от 0 до N обозначают номер соседнего элемента
  *
  */
-enum e_neighbor_code_t {
+enum e_neighbor_code_t
+{
   e_neigh_code_undef = -5,     ///< сосед не определён
   e_neigh_code_in_bound = -2,  ///< внутрення граница области
   e_neigh_code_out_bound = -1, ///< внешняя граница
@@ -114,7 +149,8 @@ enum e_neighbor_code_t {
  * @brief тип грани ячейки по отношению к направлению
  *
  */
-enum e_face_in_out_type_t {
+enum e_face_in_out_type_t
+{
   e_face_type_out = 0, /// <выходящая грань
   e_face_type_in = 1   ///< входящая грань
 };
@@ -124,7 +160,8 @@ enum e_face_in_out_type_t {
  * единичными размерами и прямыми углами и началом в точке {0,0,0}
  *
  */
-struct BaseTetra_t {
+struct BaseTetra_t
+{
   Vector3 start_point_plane_coord;  ///< начало координат плоскости
   Matrix3 transform_matrix;         ///< матрица перехода из базового тетраэдра в плоскость
   Matrix3 inverse_transform_matrix; ///< матрица перехода из плоскости в базовый тетраэдр
@@ -137,7 +174,8 @@ struct BaseTetra_t {
 
   //	Vector3 center_local_sphere;  // центр описанной сферы около стандартного тетраэдра
 
-  BaseTetra_t() {
+  BaseTetra_t()
+  {
     // 3 узла интерполяции
     {
       straight_face << 1. / 6, 1. / 6, 1,
@@ -152,14 +190,14 @@ struct BaseTetra_t {
           -sqrt(2) / 4, 1. / (2 * sqrt(6)), 1;
     }
 
-    //Матрицы перехода из стандартного тетраэдра в координаты наклонной плоскости
+    // Матрицы перехода из стандартного тетраэдра в координаты наклонной плоскости
     {
       transform_matrix << -1. / sqrt(2), 1. / sqrt(2), 0,
           -1. / sqrt(6), -1. / sqrt(6), sqrt(2. / 3),
           1. / sqrt(3), 1. / sqrt(3), 1. / sqrt(3);
     }
 
-    //Матрицы перехода из наклонной плоскости в  координаты стандартного тетраэдра
+    // Матрицы перехода из наклонной плоскости в  координаты стандартного тетраэдра
     {
       inverse_transform_matrix << -1. / sqrt(2), -1. / sqrt(6), 1. / sqrt(3),
           1. / sqrt(2), -1. / sqrt(6), 1. / sqrt(3),

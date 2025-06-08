@@ -212,11 +212,11 @@ int GetCellsPointsIdSurface(const vtkSmartPointer<vtkUnstructuredGrid> &unstruct
 /**
  * @brief Функция возвращает связь узлов и ячеек на поверхности
  *
- * @param[in] unstructured_grid сетка поверхности в формате vtk
- * @param[out] cell_connections связная структура геометрии ячеек на поверхности
+ * @param[in] ugrid сетка поверхности в формате vtk
+ * @param[out] mesh связная структура геометрии ячеек на поверхности
  * @return int ::e_type_completion
  */
-int GetGridStructSurface(const vtkSmartPointer<vtkUnstructuredGrid> &unstructured_grid, DirectionsGrid_t &cell_connections);
+int GetGridStructSurface(const vtkSmartPointer<vtkUnstructuredGrid> &ugrid, interpolation_mesh_direction_t &mesh);
 // #endif // NUMBER_OF_MEASUREMENTS
 
 #endif // USE_VTK
