@@ -1,15 +1,15 @@
 ## Флаги сборки
-KEYS	:= SOLVERS BUILD_GRAPH MAKE_TRACE ILLUM RHLLC RadRHD
-KEYS 	+= DEBUG USE_CUDA USE_MPI
+KEYS	:= SOLVERS RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM
+KEYS 	+= DEBUG USE_MPI #USE_CUDA
 DEFINES = $(addprefix -D , $(KEYS))
 ## Компиляторы и настройки
 CONFIG ?= release
 CXX 		:= mpiicpx
 NVCC 		:= nvcc
-CXXFLAGS 	:= $(DEFINES) -fopenmp -fPIE -std=c++17 
+CXXFLAGS 	:= $(DEFINES) -qopenmp -fPIE -std=c++17 
 NVCCFLAGS 	:= $(DEFINES) --expt-relaxed-constexpr -dc #-gencode arch=compute_70,code=sm_70 #-Xcompiler "-fopenmp"
 
-LDFLAGS 	:= -fopenmp -L/usr/local/cuda/lib64 -lcudart
+LDFLAGS 	:= -qopenmp -L/usr/local/cuda/lib64 -lcudart
 
 # Настройки флагов для конфигураций
 ifeq ($(CONFIG),debug)
@@ -24,7 +24,6 @@ endif
 
 ## Пути 
 export ROOT_DIR 	:= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-#export BUILD_DIR = build/$(CONFIG)
 export BUILD_DIR 	= build
 RESOURCES_DIR 		= resources
 BUILD_BIN          	= $(BUILD_DIR)/bin
@@ -55,7 +54,32 @@ NVCCFLAGS	+=	$(addprefix -I ,$(CXX_INC_DIRS))
 # Рекурсивный поиск исходных файлов
 CXX_SRCS 	:= $(shell find $(CXX_SRC_DIRS) -type f -name '*.cpp')
 CUDA_SRCS	:= $(shell find $(CUDA_SRC_DIRS) -type f -name '*.cu')
-EXEC_SRCS 	:= $(shell find $(EXE_DIR)/ -type f -name '*.cpp')
+EXEC_SRCS 	:= $(shell find $(EXE_DIR)/ -maxdepth 1 -type f -name '*.cpp')
+ifneq ($(filter HLLC,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/HD/ -type f -name '*.cpp')
+endif
+ifneq ($(filter RHLLC,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/RHD/ -type f -name '*.cpp')
+endif
+ifneq ($(filter RadRHD,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/radRHD/ -type f -name '*.cpp')
+endif
+ifneq ($(filter BUILD_GRAPH,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/graph/ -type f -name '*.cpp')
+endif
+ifneq ($(filter MAKE_TRACE,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/trace/ -type f -name '*.cpp')
+endif
+ifneq ($(filter ILLUM,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/illum/ -type f -name '*.cpp')
+endif
+ifneq ($(filter SPECTRUM,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/spectrum/ -type f -name '*.cpp')
+endif
+ifneq ($(filter UTILS,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/utils/ -type f -name '*.cpp')
+endif
+
 TEST_SRCS 	:= $(shell find $(TESTS_DIR)/ -type f -name '*.cpp' ! -name 'off_*.cpp')
 
 # Генерация путей для объектных файлов
