@@ -207,7 +207,7 @@ int main(int argc, char **argv)
       sum[2] += fabs(grid.cells[i].phys_val.p - default_grid.cells[i].phys_val.p);
     }
 
-    WRITE_LOG("Result Sum_error (mpi vs single): %lf\n", sum.norm());
+    WRITE_LOG("Result Sum_error (mpi vs single): %.16lf\n", sum.norm());
   }
 
   DEINIT_ENVIRONMENT(argc, argv);

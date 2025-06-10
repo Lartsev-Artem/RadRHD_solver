@@ -6,7 +6,7 @@ DEFINES = $(addprefix -D , $(KEYS))
 CONFIG ?= release
 CXX 		:= mpiicpx
 NVCC 		:= nvcc
-CXXFLAGS 	:= $(DEFINES) -qopenmp -fPIE -std=c++17
+CXXFLAGS 	:= $(DEFINES) -qopenmp -fPIE -std=c++20
 NVCCFLAGS 	:= $(DEFINES) --expt-relaxed-constexpr -dc #-gencode arch=compute_70,code=sm_70 #-Xcompiler "-fopenmp"
 
 LDFLAGS 	:= -qopenmp
@@ -20,9 +20,9 @@ ifeq ($(CONFIG),debug)
 	NVCCFLAGS 	+= -G -g
 else
 # gcc:  -Ofast march=cpu-type    -flto (-fwhole-program)
-	CXXFLAGS 	+= -Ofast #-xHost -ipo
+	CXXFLAGS 	+= -Ofast -ipo #-xHost
 	NVCCFLAGS 	+= -O3
-	#LDFLAGS 	+= -ipo
+	LDFLAGS 	+= -ipo
 endif
 
 ## Пути 
@@ -167,6 +167,7 @@ clean:
 	@echo "Cleaning object files for all configurations"
 	@rm -rf $(BUILD_BIN)
 	@rm -rf $(BUILD_OBJ)
+	@rm -rf $(TESTS_BIN)
 
 # Полная очистка (включая исполняемые файлы)
 clean-all:
