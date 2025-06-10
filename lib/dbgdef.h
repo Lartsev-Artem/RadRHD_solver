@@ -64,15 +64,10 @@ extern global_files_t glb_files;
     D_LD;                         \
   }
 
-#ifdef DEBUG
-#define STOP_IF(_cond)            \
-  if (UNLIKELY(_cond))            \
-  {                               \
-    WRITE_POS(Files_log, #_cond); \
-    D_LD;                         \
-  }
+#ifdef RRHD_DEBUG
+#define RRHD_ASSERT(_cond) DIE_IF(!_cond)
 #else
-#define STOP_IF(_cond)
+#define RRHD_ASSERT(_cond)
 #endif
 
 #define DIE_IF_ACTION(_cond, _act) \
@@ -164,7 +159,7 @@ extern global_files_t glb_files;
   }
 #endif // WRITE_GLOBAL_LOG
 
-#ifdef DEBUG
+#ifdef RRHD_DEBUG
 #include <unistd.h>
 #define GDB_ATTACH      \
   {                     \

@@ -85,7 +85,7 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
     break;
 
     default:
-        STOP_IF(id_r < 0); // Err bound in RHLLC_3d
+        RRHD_ASSERT(id_r < 0); // Err bound in RHLLC_3d
 
         bound.conv_val = cells[id_r].conv_val;
         bound.phys_val = cells[id_r].phys_val;

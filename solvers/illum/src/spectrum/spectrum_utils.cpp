@@ -11,13 +11,15 @@
 #include "reader_bin.h"
 
 // похожий результат на поперечном направлении и скоростью потока (0.9,0,0)
-//температуре 10^8 на границе и 3 итерациями в интеграле
+// температуре 10^8 на границе и 3 итерациями в интеграле
 
-Type illum::spectrum::get_full_illum(const IdType num_dir, const grid_t &grid) {
+Type illum::spectrum::get_full_illum(const IdType num_dir, const grid_t &grid)
+{
   const IdType N = grid.size;
   const IdType M = grid.size_dir;
   Type sumI = 0;
-  for (size_t cell = 0; cell < N; cell++) {
+  for (size_t cell = 0; cell < N; cell++)
+  {
     sumI += grid.Illum[M * cell + num_dir];
   }
   return sumI * kRadiation / kDist;
@@ -27,7 +29,8 @@ Type illum::spectrum::get_full_illum(const IdType num_dir, const grid_t &grid) {
 static int vel_idx = 0;
 static std::array<Vector3, 3> VelArr = {Vector3(0, 0, 0), Vector3(0.99, 0, 0), Vector3(-0.99, 0, 0)};
 
-int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
+int illum::spectrum::InitPhysState(const int num, grid_t &grid)
+{
 
   std::vector<Type> density;
   std::vector<Type> pressure;
@@ -39,15 +42,18 @@ int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
   err |= files_sys::bin::ReadSimple(adr + std::to_string(num) + F_PRESSURE, pressure);
   err |= files_sys::bin::ReadSimple(adr + std::to_string(num) + F_VELOCITY, velocity);
 
-  if (err) {
+  if (err)
+  {
     WRITE_LOG_ERR("Error reading phys state\n");
 
-    if (vel_idx >= VelArr.size()) {
+    if (vel_idx >= VelArr.size())
+    {
       RETURN_ERR("No static state\n");
     }
 
 #pragma omp parallel for
-    for (int i = 0; i < grid.size; i++) {
+    for (int i = 0; i < grid.size; i++)
+    {
       grid.cells[i].phys_val = flux_t(1e-11 / kDensity, VelArr[vel_idx], GetPressure(1e-11 / kDensity, 5000.0));
       grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
     }
@@ -56,12 +62,14 @@ int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
     return e_completion_success;
   }
 
-  if (!((density.size() == pressure.size()) && (density.size() == velocity.size()) && (density.size() == grid.size))) {
+  if (!((density.size() == pressure.size()) && (density.size() == velocity.size()) && (density.size() == grid.size)))
+  {
     RETURN_ERR("Error data size in InitPhysState\n");
   }
 
 #pragma omp parallel for
-  for (int i = 0; i < grid.size; i++) {
+  for (int i = 0; i < grid.size; i++)
+  {
     grid.cells[i].phys_val = flux_t(density[i] / kDensity, velocity[i], pressure[i] / kPressure);
     grid.cells[i].cell_data->Init(&grid.cells[i].phys_val);
   }
@@ -70,14 +78,18 @@ int illum::spectrum::InitPhysState(const int num, grid_t &grid) {
 }
 
 Type illum::GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k,
-                      Type frq0, Type frq1) {
+                      Type frq0, Type frq1)
+{
 
   full_phys_data_t *phys = cell.cell_data;
 
   Type betta;
-  if (LIKELY(phys->vel > kC_LightInv)) {
+  if (LIKELY(phys->vel > kC_LightInv))
+  {
     betta = (get_scat_coef(0.5 * (frq1 + frq0), phys->vel, phys->cosf, phys->lorenz) / (kM_hydrogen)) * (phys->val->d * kDensity) * kDist;
-  } else {
+  }
+  else
+  {
     betta = (get_scat_coef(0.5 * (frq1 + frq0))) * (phys->val->d * kDensity / kM_hydrogen) * kDist;
   }
 
@@ -86,7 +98,8 @@ Type illum::GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k,
   Type SS = (phys->val->d * kDensity / kM_hydrogen) * S * kDist;
 
 #ifdef LOG_SPECTRUM
-  if (log_enable) {
+  if (log_enable)
+  {
     log_spectrum("S=%e, SS=%e, sig: %e %e %e\n",
                  S, SS, 0.5 * (frq1 + frq0), phys->vel, phys->lorenz);
   }
@@ -95,9 +108,10 @@ Type illum::GetRhsOpt(const Vector3 x, const Type S, elem_t &cell, Type &k,
 
   k = alpha + betta;
 
-#ifdef DEBUG //
+#ifdef RRHD_DEBUG //
   Type res = (alpha * Q + SS) / k;
-  if (res < 0 || std::isnan(res) || std::isinf(res)) {
+  if (res < 0 || std::isnan(res) || std::isinf(res))
+  {
     EXIT_ERR("res=%e %e %e %e \n", res, alpha, Q, SS);
   }
 #endif

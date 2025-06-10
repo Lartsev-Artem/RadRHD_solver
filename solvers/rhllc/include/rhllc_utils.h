@@ -26,7 +26,7 @@ namespace rhllc
   inline Type GetTimeStep(const hllc_value_t &hllc_set)
   {
     const Type t = hllc_set.CFL * hllc_set.h_min / max_signal_speed;
-    STOP_IF(t < 0);
+    RRHD_ASSERT(t < 0);
     return t;
   }
 
@@ -46,7 +46,7 @@ namespace rhllc
    */
   void HllcConvToPhys(grid_t &grid);
 
-#ifdef DEBUG
+#ifdef RRHD_DEBUG
   /**
    * @brief Проверка условия физичности консервативных переменных
    *

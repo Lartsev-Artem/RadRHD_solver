@@ -22,7 +22,7 @@ namespace illum {
 template <typename T>
 inline T f_plank(T x) {
 
-#ifdef DEBUG
+#ifdef RRHD_DEBUG
   if (x > 700) {
     WRITE_LOG_ERR("loss of accuracy exp(%lf)\n", x);
   }

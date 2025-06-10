@@ -1,6 +1,6 @@
 ## Флаги сборки
 KEYS	:= SOLVERS RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM
-KEYS 	+= DEBUG USE_MPI #USE_CUDA
+KEYS 	+= RRHD_DEBUG USE_MPI USE_EIGEN #USE_CUDA
 DEFINES = $(addprefix -D , $(KEYS))
 ## Компиляторы и настройки
 CONFIG ?= release

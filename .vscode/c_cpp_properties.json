@@ -40,7 +40,7 @@
             ],
             "defines": [
                 "USE_VTK",
-                "DEBUG",
+                "RRHD_DEBUG",
                 "SOLVERS",
                 //"BUILD_GRAPH",
                 //"MAKE_TRACE",

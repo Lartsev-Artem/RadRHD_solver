@@ -19,28 +19,31 @@
     @{
 */
 
-namespace cuda {
+namespace cuda
+{
 
 #define CONVERT_TO_STRING(s, ...) #s #__VA_ARGS__
 
-/**
- * @brief Функция проверки работы функций cuda с расшифровкой кода ошибки
- *
- * @tparam Err_t
- * @param cudaStatus код ошибки
- * @param my_text доп. текст сообщения
- * @return ::e_type_completion
- */
-template <typename Err_t>
-int inline CheckError(Err_t cudaStatus, const std::string my_text = "") {
-  if (cudaStatus != cudaSuccess) {
-    WRITE_LOG_ERR("Error cuda code: %d \n%s \n%s\n", cudaStatus, cudaGetErrorString(cudaStatus), my_text.c_str());
-    return e_completion_fail;
+  /**
+   * @brief Функция проверки работы функций cuda с расшифровкой кода ошибки
+   *
+   * @tparam Err_t
+   * @param cudaStatus код ошибки
+   * @param my_text доп. текст сообщения
+   * @return ::e_type_completion
+   */
+  template <typename Err_t>
+  int inline CheckError(Err_t cudaStatus, const std::string my_text = "")
+  {
+    if (cudaStatus != cudaSuccess)
+    {
+      WRITE_LOG_ERR("Error cuda code: %d \n%s \n%s\n", cudaStatus, cudaGetErrorString(cudaStatus), my_text.c_str());
+      return e_completion_fail;
+    }
+    return e_completion_success;
   }
-  return e_completion_success;
-}
 
-#ifdef DEBUG
+#ifdef RRHD_DEBUG
 /**
  * @brief Безопасный вызов cuda функции c проверкой возвращаемого значения
  *

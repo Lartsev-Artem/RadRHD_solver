@@ -12,7 +12,7 @@
 
 #include "solvers_struct.h"
 
-#ifdef DEBUG
+#ifdef RRHD_DEBUG
 // #define ONLY_ONE_DIRECTION ///< позволяет выбрать фиксированное направление
 #endif
 
@@ -33,18 +33,19 @@
  * @brief Пространство имён модуля трассировки
  *
  */
-namespace trace {
+namespace trace
+{
 
-/**
- * @brief Функция вызывает модуль трассировки по всем направлениям
- * \note  Перед вызовом должна быть проинициализирована глобальная структура ::global_files_t
- * построена внутренняя геометрия с помощью ::BuildDataFromVTK, и построены графы обхода с помощью ::RunGraphModule
- *
- * @return int ::e_type_completion
- */
-int RunTracesModule();
+    /**
+     * @brief Функция вызывает модуль трассировки по всем направлениям
+     * \note  Перед вызовом должна быть проинициализирована глобальная структура ::global_files_t
+     * построена внутренняя геометрия с помощью ::BuildDataFromVTK, и построены графы обхода с помощью ::RunGraphModule
+     *
+     * @return int ::e_type_completion
+     */
+    int RunTracesModule();
 
-int RunTracesModule(TracerData& data, const Vector3& direction);
+    int RunTracesModule(TracerData &data, const Vector3 &direction);
 
 } // namespace trace
 

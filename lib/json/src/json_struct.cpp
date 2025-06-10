@@ -9,7 +9,8 @@
 
 global_files_t glb_files; ///< глобальная структура с путями к данным
 
-global_files_t::global_files_t(const std::string &BASE_ADDRESS, const std::string &address_illum_geo_file) {
+global_files_t::global_files_t(const std::string &BASE_ADDRESS, const std::string &address_illum_geo_file)
+{
 
   base_address = BASE_ADDRESS;
   illum_geo_address = address_illum_geo_file;
@@ -19,7 +20,8 @@ global_files_t::global_files_t(const std::string &BASE_ADDRESS, const std::strin
   Build();
 }
 
-void global_files_t::Build() {
+void global_files_t::Build()
+{
   // name_file_hllc_set = base_address + F_HLLC_SET;
 
   //---------Файлы расчётных данных(отдельные файлы по направлениям)---------//
@@ -46,10 +48,12 @@ void global_files_t::Build() {
   name_file_geometry_cells = base_address + F_GEO_CELLS;
 }
 
-#ifdef DEBUG
-void global_files_t::print() {
+#ifdef RRHD_DEBUG
+void global_files_t::print()
+{
   std::string *str = (std::string *)this;
-  while (str < (std::string *)this + sizeof(global_files_t) / sizeof(std::string)) {
+  while (str < (std::string *)this + sizeof(global_files_t) / sizeof(std::string))
+  {
     std::cout << *str++ << '\n';
   }
 }

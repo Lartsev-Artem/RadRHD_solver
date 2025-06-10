@@ -11,7 +11,7 @@
  * @arg USE_MPI               --- подключение технологии mpi
  * @arg RAD_RHD               --- радиационная релятивистская газовая динамика
  * @arg SPECTRUM              --- построение спектра путем решения уравнения переноса излучения
- * @arg DEBUG                 --- сборка с логами
+ * @arg RRHD_DEBUG                 --- сборка с логами
  *===============================================================* /
  * @version 0.1
  * @date 2023-09-21
@@ -33,7 +33,7 @@
 #undef USE_MPI //! компилятор nvcc не поддерживает mpi
 #endif
 
-#ifdef DEBUG
+#ifdef RRHD_DEBUG
 
 // #define LOG_OUT_TO_SCREEN ///<выводить лог не в файл, а на экран
 
@@ -43,6 +43,6 @@
 #define WRITE_MPI_LOG // писать mpi лог файл
 #endif
 
-#endif // DEBUG
+#endif // RRHD_DEBUG
 
 #endif // PRJ_CONFIG

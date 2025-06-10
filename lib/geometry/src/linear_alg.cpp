@@ -15,7 +15,7 @@ void GetRotationMatrix(const Vector3 &n, Matrix3 &T)
     Type sqr = sqrt(1 - n[2] * n[2]);
     Type sqr_inv = 1. / sqr;
 
-#ifdef DEBUG
+#ifdef RRHD_DEBUG
     if (sqr < eps * eps - eps / 10)
       D_L;
 #endif

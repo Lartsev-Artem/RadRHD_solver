@@ -23,12 +23,13 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
                                         const std::vector<align_cell_local> &vec_x0,
                                         const std::vector<std::vector<graph_pair_t>> &sorted_graph,
                                         const boundary_faces_by_directions_t &boundary_faces,
-                                        grid_t &grid) {
+                                        grid_t &grid)
+{
 
   int np = get_mpi_np();
   int myid = get_mpi_id();
 
-  DIE_IF(np <= 1); //на одном узле не работает. Тогда надо закрывать пересылки mpi
+  DIE_IF(np <= 1); // на одном узле не работает. Тогда надо закрывать пересылки mpi
 
   const IdType local_size = grid_direction.loc_size;
   const IdType local_disp = grid_direction.loc_shift;
@@ -41,21 +42,24 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
   int iter = 0;    ///< номер итерации
   double norm = 0; ///< норма ошибки
 
-  do {
+  do
+  {
     Timer time;
     time.start_timer();
     norm = -1;
 
-    if (section_1.requests_send[0] != MPI_REQUEST_NULL) {
+    if (section_1.requests_send[0] != MPI_REQUEST_NULL)
+    {
       MPI_Waitall(section_1.requests_send.size(), section_1.requests_send.data(), MPI_STATUSES_IGNORE);
     }
     cuda::interface::CudaSyncStream(cuda::e_cuda_scattering_1);
 
-#ifdef MULTI_GPU //если разделение в порядке очереди надо запускать расчёт до пересылки новых данных
-    if (myid == 0) {
-      //самый высоких приоритет, т.к. надо расчитать, до конфликта с асинхронной отправкой
-      cuda::interface::CalculateAllParamAsync(grid_direction, grid, cuda::e_cuda_params); //запустим расчёт параметров здесь
-                                                                                          // на выходе получим ответ за 1 шаг до сходимости, но зато без ожидания на выходе
+#ifdef MULTI_GPU // если разделение в порядке очереди надо запускать расчёт до пересылки новых данных
+    if (myid == 0)
+    {
+      // самый высоких приоритет, т.к. надо расчитать, до конфликта с асинхронной отправкой
+      cuda::interface::CalculateAllParamAsync(grid_direction, grid, cuda::e_cuda_params); // запустим расчёт параметров здесь
+                                                                                          //  на выходе получим ответ за 1 шаг до сходимости, но зато без ожидания на выходе
     }
 #endif
 
@@ -89,28 +93,32 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
       }
 
 #pragma omp for
-      for (IdType num_direction = 0; num_direction < local_size; num_direction++) {
+      for (IdType num_direction = 0; num_direction < local_size; num_direction++)
+      {
         /*---------------------------------- FOR по граничным граням----------------------------------*/
 #ifdef USE_TRACE_THROUGH_INNER_BOUNDARY
         const IntId *code_bound = inner_bound_code[num_direction].data();
 #pragma error "need recalc code bound from cell to face"
 #endif
-        for (auto num_face : boundary_faces.sorted_id_bound_face[num_direction]) {
-          const IdType neigh_id = grid.faces[num_face].geo.id_r;         //т.к. мы проходим границу здесь будет граничный признак
-          (*inter_coef)[num_face] = illum::BoundaryConditions(neigh_id); //значение на грани ( или коэффициенты интерполяции)
+        for (auto num_face : boundary_faces.sorted_id_bound_face[num_direction])
+        {
+          const IdType neigh_id = grid.faces[num_face].geo.id_r;         // т.к. мы проходим границу здесь будет граничный признак
+          (*inter_coef)[num_face] = illum::BoundaryConditions(neigh_id); // значение на грани ( или коэффициенты интерполяции)
         }
 #ifdef USE_REFLECTIVE_BOUNDARY
         const size_t size_bound = boundary_faces.reflection_faces_id[num_direction].size();
-        for (size_t i = 0; i < size_bound; i++) {
+        for (size_t i = 0; i < size_bound; i++)
+        {
           int num_face = boundary_faces.reflection_faces_id[num_direction][i];
-          const IdType cell_id = grid.faces[num_face].geo.id_l; //ячейка однозначно определена по грани, т.к. это граница
+          const IdType cell_id = grid.faces[num_face].geo.id_l; // ячейка однозначно определена по грани, т.к. это граница
           const int dir_id = boundary_faces.reflection_dir_id[num_direction][i];
           (*inter_coef)[num_face] += kReflectiveAbsorbCoef * grid.Illum[cell_id * count_directions + dir_id];
         }
 #endif
 
 #ifdef LOG_SPECTRUM
-        if (num_direction + local_disp == 66) {
+        if (num_direction + local_disp == 66)
+        {
           log_enable = 1;
         }
 #endif
@@ -122,7 +130,8 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
         // for (auto fc_pair : sorted_graph[num_direction])
         const graph_pair_t *fc_pair = sorted_graph[num_direction].data();
         const IdType Ncells = sorted_graph[num_direction].size();
-        for (IdType i = 0; i < Ncells; i++) {
+        for (IdType i = 0; i < Ncells; i++)
+        {
 
           const IntId num_cell = fc_pair->cell;
           const uint32_t num_loc_face = fc_pair->loc_face;
@@ -145,7 +154,8 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           const Type S = grid.scattering[num_cell * local_size + num_direction];
 #ifdef SPECTRUM
 #ifdef LOG_SPECTRUM
-          if (log_enable) {
+          if (log_enable)
+          {
             log_spectrum("cell_log%d\n", num_cell);
           }
 #endif
@@ -161,10 +171,10 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
           builtin_prefetch(&((*inter_coef)[cell->geo.id_faces[num_loc_face]]), 1, 0);
 
           ++fc_pair;
-          builtin_prefetch(&(grid.cells[fc_pair->cell]), 1, 2); //грузим следующую ячейку
+          builtin_prefetch(&(grid.cells[fc_pair->cell]), 1, 2); // грузим следующую ячейку
 
           Type I = GetIllum(I0, s, k, rhs);
-#if 0 // def DEBUG
+#if 0 // def RRHD_DEBUG
           if (std::isnan(fabs(I)) || std::isinf(fabs(I)) || I < 0) {
             WRITE_LOG_ERR("nan[%ld %d], k=%e, rhs=%e, I0:%e, %e, %e, %e\n", num_direction, num_cell, k, rhs, I0[0], I0[1], I0[2], S);
             D_LD;
@@ -179,10 +189,12 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
 
         MPI_Startall(np - 1, section_1.requests_send.data() + ((num_direction - 0) * (np - 1)));
 
-        if (loc_norm > norm) {
+        if (loc_norm > norm)
+        {
 #pragma omp critical
           {
-            if (loc_norm > norm) {
+            if (loc_norm > norm)
+            {
               norm = loc_norm;
             }
           }
@@ -216,25 +228,24 @@ int illum::separate_gpu::CalculateIllum(const grid_directions_t &grid_direction,
   return e_completion_success;
 }
 
-
-int illum::separate_gpu::CalculateIllumByDirection(const Vector3 &direction,                                        
-                                        const align_cell_local &vec_x0,
-                                        const std::vector<graph_pair_t> &sorted_graph,
-                                        const std::vector<IntId>& sorted_id_bound_face,
-                                        grid_t &grid) 
+int illum::separate_gpu::CalculateIllumByDirection(const Vector3 &direction,
+                                                   const align_cell_local &vec_x0,
+                                                   const std::vector<graph_pair_t> &sorted_graph,
+                                                   const std::vector<IntId> &sorted_id_bound_face,
+                                                   grid_t &grid)
 {
-                                                                                     
-            
-  //std::vector<Type>& inter_coef = grid.inter_coef_all[0]; // (grid.faces.size(),0);
-  std::vector<Type> inter_coef(grid.faces.size(),0);
+
+  // std::vector<Type>& inter_coef = grid.inter_coef_all[0]; // (grid.faces.size(),0);
+  std::vector<Type> inter_coef(grid.faces.size(), 0);
   alignas(32) Type I0[4];
 
-  for (IdType num_direction = 0; num_direction < 1; num_direction++) {
+  for (IdType num_direction = 0; num_direction < 1; num_direction++)
+  {
     /*---------------------------------- FOR по граничным граням----------------------------------*/
-    for (auto num_face : sorted_id_bound_face) 
+    for (auto num_face : sorted_id_bound_face)
     {
-      const IdType neigh_id = grid.faces[num_face].geo.id_r;         //т.к. мы проходим границу здесь будет граничный признак
-      inter_coef[num_face] = illum::BoundaryConditions(neigh_id); //значение на грани ( или коэффициенты интерполяции)
+      const IdType neigh_id = grid.faces[num_face].geo.id_r;      // т.к. мы проходим границу здесь будет граничный признак
+      inter_coef[num_face] = illum::BoundaryConditions(neigh_id); // значение на грани ( или коэффициенты интерполяции)
     }
 
     // индексация по массиву определяющих гранях (конвейерная т.к. заранее не известны позиции точек)
@@ -244,11 +255,12 @@ int illum::separate_gpu::CalculateIllumByDirection(const Vector3 &direction,
     // for (auto fc_pair : sorted_graph[num_direction])
     const graph_pair_t *fc_pair = sorted_graph.data();
     const IdType Ncells = sorted_graph.size();
-    for (IdType i = 0; i < Ncells; i++) {
+    for (IdType i = 0; i < Ncells; i++)
+    {
 
       const IntId num_cell = fc_pair->cell;
       const uint32_t num_loc_face = fc_pair->loc_face;
-      
+
       elem_t *cell = &grid.cells[num_cell];
       const Vector3 &x = cell->geo.center; // vec_x[num_cell].x[num_loc_face][num_node];
 
@@ -256,13 +268,13 @@ int illum::separate_gpu::CalculateIllumByDirection(const Vector3 &direction,
       ++in_face;
 
       Type k;
-      const Type S = 0;//grid.scattering[num_cell * local_size + num_direction];
+      const Type S = 0; // grid.scattering[num_cell * local_size + num_direction];
       const Type rhs = GetRhs(x, S, *cell, k);
 
       I0[0] = inter_coef[cell->geo.id_faces[id_in_faces.a]];
       I0[1] = inter_coef[cell->geo.id_faces[id_in_faces.b]];
       I0[2] = inter_coef[cell->geo.id_faces[id_in_faces.c]];
-      
+
       ++fc_pair;
       Type I = GetIllum(I0, s, k, rhs);
       inter_coef[cell->geo.id_faces[num_loc_face]] = I;
@@ -270,9 +282,9 @@ int illum::separate_gpu::CalculateIllumByDirection(const Vector3 &direction,
     }
     /*---------------------------------- конец FOR по ячейкам----------------------------------*/
 
-    Type loc_norm = separate_gpu::ReCalcIllumOpt(num_direction, inter_coef, grid, 0);       
+    Type loc_norm = separate_gpu::ReCalcIllumOpt(num_direction, inter_coef, grid, 0);
   }
-  /*---------------------------------- конец FOR по направлениям----------------------------------*/            
+  /*---------------------------------- конец FOR по направлениям----------------------------------*/
   return e_completion_success;
 }
 

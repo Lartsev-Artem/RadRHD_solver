@@ -16,7 +16,8 @@
 #include <chrono>
 namespace tick = std::chrono;
 
-int trace::RunTracesModule() {
+int trace::RunTracesModule()
+{
 
   WRITE_LOG("Start RunTracesModule\n");
 
@@ -68,12 +69,15 @@ int trace::RunTracesModule() {
 
   const int count_cells = vertexs.size();
   std::vector<BasePointTetra> vec_x(count_cells);
-  if (GetInterpolationNodes(vertexs, vec_x)) {
+  if (GetInterpolationNodes(vertexs, vec_x))
+  {
     D_LD;
   }
 
-  if (myid == 0) {
-    if (files_sys::bin::WriteSimple(name_file_x, vec_x)) {
+  if (myid == 0)
+  {
+    if (files_sys::bin::WriteSimple(name_file_x, vec_x))
+    {
       RETURN_ERR("Error writing %s\n", name_file_x.c_str());
     }
   }
@@ -90,7 +94,7 @@ int trace::RunTracesModule() {
   std::vector<IntId> graph_bound_faces;
   std::vector<graph_pair_t> graph_cell_faces;
 #else
-  std::vector<bits_flag_t> face_states(count_cells, 0); //битовое поле: 0=> выходящая грань,  1=> входящая
+  std::vector<bits_flag_t> face_states(count_cells, 0); // битовое поле: 0=> выходящая грань,  1=> входящая
 #endif
 
   /*---------------------------------- далее FOR по направлениям----------------------------------*/
@@ -119,7 +123,8 @@ int trace::RunTracesModule() {
 #endif
 
     /*---------------------------------- далее FOR по ячейкам----------------------------------*/
-    for (int h = 0; h < count_cells; ++h) {
+    for (int h = 0; h < count_cells; ++h)
+    {
       num_cell = sorted_graph[h];
 
       bits_flag_t face_state = 0;
@@ -128,7 +133,8 @@ int trace::RunTracesModule() {
       face_states[num_cell] = face_state;
 #endif
 
-      for (ShortId num_out_face = 0; num_out_face < CELL_SIZE; ++num_out_face) {
+      for (ShortId num_out_face = 0; num_out_face < CELL_SIZE; ++num_out_face)
+      {
         if (CHECK_BIT(face_state, num_out_face) == e_face_type_out) // выходящие грани
         {
           GetLocNodes(num_cell, num_out_face, grid, vertexs[num_cell],
@@ -139,14 +145,14 @@ int trace::RunTracesModule() {
           graph_pair_t buf;
           buf.cell = num_cell;
           buf.loc_face = num_out_face;
-          graph_cell_faces.push_back(buf); //это вместо graph
+          graph_cell_faces.push_back(buf); // это вместо graph
 #endif
         }
 #ifdef TRANSFER_CELL_TO_FACE
         //==e_face_type_in
         else if (neighbours[num_cell * CELL_SIZE + num_out_face] < 0) ///< сосед к текущей грани
         {
-          graph_bound_faces.push_back(geo_grid.cells[num_cell].geo.id_faces[num_out_face]); //номера граней на сетке
+          graph_bound_faces.push_back(geo_grid.cells[num_cell].geo.id_faces[num_out_face]); // номера граней на сетке
         }
 #endif
       }
@@ -161,8 +167,8 @@ int trace::RunTracesModule() {
     if (files_sys::bin::WriteSimple(name_file_graph_body + std::to_string(num_direction) + ".bin", graph_cell_faces))
       RETURN_ERR("Error graph_cell_faces");
 
-#ifndef DEBUG
-    std::remove((glb_files.graph_address + F_GRAPH + std::to_string(num_direction) + ".bin").c_str()); //удаляем граф по ячейкам
+#ifndef RRHD_DEBUG
+    std::remove((glb_files.graph_address + F_GRAPH + std::to_string(num_direction) + ".bin").c_str()); // удаляем граф по ячейкам
 #endif
 
 #else
@@ -173,7 +179,8 @@ int trace::RunTracesModule() {
     WRITE_FILE_ELEM((name_file_x0_loc + "_s" + std::to_string(num_direction) + ".bin").c_str(), vec_x0, s);
     std::vector<face_loc_id_t> compress_id(vec_x0.size() / NODE_SIZE);
     face_loc_id_t val;
-    for (size_t i = 0; i < compress_id.size(); i++) {
+    for (size_t i = 0; i < compress_id.size(); i++)
+    {
       val.a = vec_x0[i * NODE_SIZE + 0].in_face_id;
       val.b = vec_x0[i * NODE_SIZE + 1].in_face_id;
       val.c = vec_x0[i * NODE_SIZE + 2].in_face_id;
