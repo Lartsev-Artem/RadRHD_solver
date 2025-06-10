@@ -16,5 +16,3 @@ gen_header_value:
 	$(CXX) -std=c++11 -o $(EXE) $(CUR_DIR)/parser_header.cpp -I $(ROOT_DIR)/lib/calculator/ -I $(ROOT_DIR)/lib/output_interface/
 	$(EXE) $(SRC_FILE) $(RESDIR)/
 	rm $(EXE)
-
-		

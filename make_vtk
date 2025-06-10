@@ -1,0 +1,29 @@
+#export BUILDDIR
+RESDIR  = $(ROOT_DIR)/$(BUILD_DIR)/obj
+
+##VTK
+VTK_LIB_DIR := /home/artem/libraries/VTK-9.3.1
+VTK_BUILD_DIR := /home/artem/libraries/VTK-9.3-build
+VTK_INCS := Common/Core Common/DataModel Utilities/KWIML IO/Legacy Common/ExecutionModel  IO/Core Utilities/KWSys
+
+VTK_LIBS = /home/artem/libraries/VTK-9.3-build/lib
+
+export LD_LIBRARY_PATH=/home/artem/libraries/VTK-9.3-build/lib/:$LD_LIBRARY_PATH
+VTK_SRC0 := vtkCommonCore vtkCommonDataModel vtksys
+# Команда поиска с обработкой шаблонов
+FOUND_SO := $(shell  find $(VTK_LIBS) -type f -maxdepth 1 \( -false $(foreach pat,$(VTK_SRC0), -o -name "*$(pat)*") \))
+
+LDFLAGS += -dynamic -L$(VTK_LIBS) -lvtkCommonCore-9.3 -lvtkCommonDataModel-9.3 -lvtksys-9.3
+
+LIB_INC_DIR   	+= $(patsubst %, $(VTK_LIB_DIR)/%, $(VTK_INCS))
+LIB_INC_DIR   	+= $(patsubst %, $(VTK_BUILD_DIR)/%, $(VTK_INCS))
+
+all: copy_vtk_libs	
+#grep -oP 'lvtk\w+' Makefile
+
+copy_vtk_libs:
+	@echo "Копирование VTK .so файлов..."	
+	@mkdir -p $(BUILD_DIR)/lib
+	@echo $(FOUND_SO)
+
+#export LD_LIBRARY_PATH=/home/artem/libraries/VTK-9.3-build/lib/:$LD_LIBRARY_PATH

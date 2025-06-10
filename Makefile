@@ -48,6 +48,7 @@ LIB_INC_DIR 	= lib $(LIB_EXTERNAL_DIR) lib/files_sys/include lib/geometry/includ
 SOLVERS_INC_DIR = solvers/illum/include/ solvers/hydro solvers/hydro/hllc/include/ solvers/hydro/rhllc/include solvers/ray_tracing/include  solvers/RadRHD/include
 CUDALIB_INC_DIR = cuda/include
 
+##Рекурсивный поиск путей
 CXX_INC_DIRS 	= $(shell find $(SOLVERS_INC_DIR) -mindepth 1 -type d)
 CXX_INC_DIRS 	+= include/ graph/include/ make_trace/include/  ${LIB_INC_DIR} ${SOLVERS_INC_DIR} build/resources/
 ifneq ($(filter USE_CUDA,$(KEYS)),)
@@ -109,7 +110,7 @@ all: $(EXECUTABLES)
 	mkdir -p $(BUILD_DIR)/illum_geo
 	mkdir -p $(BUILD_DIR)/Solve
 	mkdir -p $(BUILD_DIR)/trace
-	mkdir -p $(BUILD_DIR)/add_dir	
+	mkdir -p $(BUILD_DIR)/add_dir
 
 test: $(TESTS)
 	mkdir -p $(BUILD_DIR)/graph
@@ -125,6 +126,8 @@ release:
 prebuild:	
 	$(MAKE) -f $(RESOURCES_DIR)/makefile gen_header_value SRC_FILE=$(ROOT_DIR)/lib/global_consts.h
 
+vtkbuild:
+	$(MAKE) -f make_vtk all
 
 # Линковка исполняемых файлов тестов
 $(TESTS_BIN)/%: $(BUILD_OBJ)/$(TESTS_DIR)/%.cpp.o $(CXX_OBJS) $(CUDA_OBJS)
