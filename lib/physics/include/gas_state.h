@@ -20,7 +20,8 @@
  * @return gas temperature
  */
 template <typename T>
-inline T GetTemperature(T rho, T prs) {
+constexpr inline T GetTemperature(T rho, T prs)
+{
   // constexpr T g_idealGasConst = 1; //PLUTO
   constexpr T g_idealGasConst = (kM_hydrogen / k_boltzmann) * kPressure / kDensity; // * (kDist * kDist) / (kTime * kTime);
   return g_idealGasConst * prs / rho;
@@ -36,7 +37,8 @@ inline T GetTemperature(T rho, T prs) {
  * @return gas pressure
  */
 template <typename T>
-inline T GetPressure(T rho, T tem) {
+constexpr inline T GetPressure(T rho, T tem)
+{
   constexpr T g_idealGasConst = (kM_hydrogen / k_boltzmann);
   constexpr T g_idealGasConst_inv = kDensity / g_idealGasConst;
   return (g_idealGasConst_inv / kPressure) * tem * rho;
@@ -52,7 +54,8 @@ inline T GetPressure(T rho, T tem) {
  * @return gas density
  */
 template <typename T>
-inline T GetDensity(T prs, T tem) {
+constexpr inline T GetDensity(T prs, T tem)
+{
   constexpr T g_idealGasConst = (kM_hydrogen / k_boltzmann);
   return (((g_idealGasConst * kPressure / kDensity) * prs) / tem);
 }

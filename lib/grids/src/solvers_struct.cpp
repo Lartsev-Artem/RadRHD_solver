@@ -103,59 +103,24 @@ Type &flux_t::operator[](const int i)
   return *((Type *)((uint8_t *)&(*this) + sizeof(Type) * i));
 }
 
-#ifndef USE_CUDA
-void grid_t::InitMemory(const IdType num_cells, const IdType num_directions)
-{
-
-  DIE_IF(cells.size() != num_cells);
-
-  size = cells.size();
-
-#if defined ILLUM
-  Illum = new Type[num_directions * size * CELL_SIZE];
-  scattering = new Type[num_directions * size];
-  memset(Illum, 0.0, sizeof(Type) * num_directions * size * CELL_SIZE);
-  memset(scattering, 0.0, sizeof(Type) * num_directions * size);
-
-  inter_coef_all.resize(omp_get_max_threads());
-  for (size_t i = 0; i < inter_coef_all.size(); i++)
-  {
-    inter_coef_all[i].resize(size * CELL_SIZE);
-  }
-
-  if (get_mpi_id() == 0)
-  {
-    for (IdType i = 0; i < size; i++)
-    {
-      cells[i].illum_val.illum.resize(num_directions * CELL_SIZE, 0);
-    }
-  }
-#endif
-}
-#ifdef ILLUM
-grid_t::~grid_t()
-{
-  delete[] Illum;
-  delete[] scattering;
-  inter_coef_all.clear();
-}
-#endif
-#else // CUDA
+#ifdef USE_CUDA
 #include "cuda_interface.h"
+#endif // CUDA
 
 void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_grid)
 {
-
   DIE_IF(cells.size() != num_cells);
 
-  // loc_size = hllc_loc_size[myid].right - hllc_loc_size[id].left;
-
-  size_dir = dir_grid.size;
   size = num_cells;
-  loc_size = size;
-  loc_shift = 0;
   size_face = faces.size();
 
+#ifdef USE_MPI
+  loc_size = size;
+  loc_shift = 0;
+#endif
+
+#ifdef ILLUM
+  size_dir = dir_grid.size;
   inter_coef_all.resize(omp_get_max_threads());
 
 #ifndef SAVE_FULL_SPECTRUM
@@ -177,11 +142,12 @@ void grid_t::InitMemory(const IdType num_cells, const grid_directions_t &dir_gri
     }
   }
 #endif
+#endif
 }
 
 grid_t::~grid_t()
 {
-  inter_coef_all.clear();
+
 #ifdef USE_MPI
   if (mpi_cfg)
   {
@@ -190,6 +156,7 @@ grid_t::~grid_t()
 #endif
 
 #ifdef ILLUM
+  inter_coef_all.clear();
   for (auto &el : cells)
   {
     if (el.cell_data)
@@ -199,7 +166,6 @@ grid_t::~grid_t()
   }
 #endif
 }
-#endif // NOT USE_CUDA
 
 #ifdef ILLUM
 void grid_t::InitFullPhysData()

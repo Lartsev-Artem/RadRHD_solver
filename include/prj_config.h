@@ -20,6 +20,8 @@
  *
  */
 
+/** namespace Rrhd - Relativistic radiation hydrodynamic  */
+
 #ifndef PRJ_CONFIG
 #define PRJ_CONFIG
 

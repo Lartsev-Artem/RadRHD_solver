@@ -29,6 +29,8 @@
                 "${workspaceFolder}/solvers/illum",
                 "${workspaceFolder}/solvers/illum/include",
                 "${workspaceFolder}/lib",
+                "${workspaceFolder}/lib/external",
+                "${workspaceFolder}/lib/external/aligned_vec",
                 "${workspaceFolder}/lib/mpi_extension",
                 "${workspaceFolder}/cuda/include",
                 "${workspaceFolder}/cuda/src",
@@ -40,17 +42,17 @@
                 "USE_VTK",
                 "DEBUG",
                 "SOLVERS",
-                "BUILD_GRAPH",
-                "MAKE_TRACE",
-                "ILLUM",
-                "USE_CUDA",
+                //"BUILD_GRAPH",
+                //"MAKE_TRACE",
+                //"ILLUM",
+                //"USE_CUDA",
                 "USE_MPI",
-                "RHLLC",
-                "RAD_RHD"
+                "RHLLC"
+                //"RAD_RHD"
             ],
             "compilerPath": "/usr/bin/mpic++",
             "cStandard": "c17",
-            "cppStandard": "gnu++17",
+            "cppStandard": "gnu++23",
             "intelliSenseMode": "linux-clang-x64",
             "configurationProvider": "ms-vscode.makefile-tools"
         }

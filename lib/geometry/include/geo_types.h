@@ -14,6 +14,8 @@
 #undef _GLIBCXX_ATOMIC_BUILTINS
 #undef _GLIBCXX_USE_INT128
 #endif
+
+// #define EIGEN_HAS_CONSTEXPR 1
 #include <Eigen/Dense>
 
 #include "global_def.h"

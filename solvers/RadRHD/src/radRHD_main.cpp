@@ -31,7 +31,8 @@
 
 namespace cuda_sep = cuda::interface::separate_device;
 
-int rad_rhd::RunRadRHDModule() {
+int rad_rhd::RunRadRHDModule()
+{
 
   WRITE_LOG("Start RunRadRHDMpiModule()\n");
 
@@ -50,7 +51,8 @@ int rad_rhd::RunRadRHDModule() {
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
   err |= files_sys::txt::ReadTableFunc(glb_files.tab_func_address + F_COOLING_FUNC, t_cooling_function);
 
-  if (err) {
+  if (err)
+  {
     RETURN_ERR("Error reading \n");
   }
 
@@ -69,9 +71,9 @@ int rad_rhd::RunRadRHDModule() {
     cuda::interface::SetStreams();
     WRITE_LOG("Init mpi device\n");
 
-    illum::separate_gpu::InitSender(MPI_COMM_WORLD, grid_direction, grid); //после инициализации видеокарты, т.к. структура сетки инициализируется и там
+    illum::separate_gpu::InitSender(MPI_COMM_WORLD, grid_direction, grid); // после инициализации видеокарты, т.к. структура сетки инициализируется и там
 
-    //перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
+    // перенесено ниже,т.к. читается долго, а потенциальных ошибок быть не должно
     if (files_sys::bin::ReadRadiationFaceTrace(grid_direction.size, glb_files, vec_x0, sorted_graph, boundary_faces, inner_bound_code))
       RETURN_ERR("Error reading trace part\n");
   }
@@ -85,18 +87,21 @@ int rad_rhd::RunRadRHDModule() {
 
   Timer timer;
 
-  MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
+  MPI_BARRIER(MPI_COMM_WORLD); // ждём пока все процессы проинициализируют память
 
   const int myid = get_mpi_id();
-  enum {
+  enum
+  {
     e_hllc_id = 0
   };
 
-  while (t < _hllc_cfg.T) {
+  while (t < _hllc_cfg.T)
+  {
 
     timer.start_timer();
 
-    if (LIKELY(myid == e_hllc_id)) {
+    if (LIKELY(myid == e_hllc_id))
+    {
       rhllc::Hllc3dStab(_hllc_cfg.tau, grid);
       // rhllc::HllcConvToPhys(grid.cells);
     }
@@ -105,7 +110,8 @@ int rad_rhd::RunRadRHDModule() {
     MPI_Bcast(grid.cells.data(), grid.cells.size(), MPI_phys_val_t, e_hllc_id, MPI_COMM_WORLD);
 
 #pragma omp parallel for
-    for (int i = 0; i < grid.size; i++) {
+    for (int i = 0; i < grid.size; i++)
+    {
       grid.cells[i].cell_data->Init(&grid.cells[i].phys_val, &grid.cells[i]);
     }
 
@@ -114,9 +120,11 @@ int rad_rhd::RunRadRHDModule() {
     cuda::interface::CudaSyncStream(cuda::e_cuda_params);
     cuda::interface::CudaWait();
 
-    if (LIKELY(myid == e_hllc_id)) {
+    if (LIKELY(myid == e_hllc_id))
+    {
 #pragma omp parallel for
-      for (int cell = 0; cell < grid.size; cell++) {
+      for (int cell = 0; cell < grid.size; cell++)
+      {
 
         Vector4 G;
         rad_rhd::GetRadSource(cell, grid, G);
@@ -127,14 +135,15 @@ int rad_rhd::RunRadRHDModule() {
         grid.cells[cell].conv_val.v[1] += ds * _hllc_cfg.tau * G[2];
         grid.cells[cell].conv_val.v[2] += ds * _hllc_cfg.tau * G[3];
 
-        rhllc::GetPhysValueStab(grid.cells[cell].conv_val, grid.cells[cell].phys_val);
+        rhllc::GetPhysValue(grid.cells[cell].conv_val, grid.cells[cell].phys_val);
       }
     }
 
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
 
-    if (cur_timer >= _hllc_cfg.save_timer) {
+    if (cur_timer >= _hllc_cfg.save_timer)
+    {
       DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 
       WRITE_LOG("t= %lf, time_step= %d\n", t, res_count);
@@ -158,7 +167,7 @@ int rad_rhd::RunRadRHDModule() {
 
   cuda::interface::CudaSyncStream(cuda::e_cuda_params);
 
-  MPI_BARRIER(MPI_COMM_WORLD); //ждём пока все процессы проинициализируют память
+  MPI_BARRIER(MPI_COMM_WORLD); // ждём пока все процессы проинициализируют память
 
   DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 

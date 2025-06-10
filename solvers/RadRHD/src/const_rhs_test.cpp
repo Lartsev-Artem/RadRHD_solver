@@ -17,7 +17,8 @@
 #include <chrono>
 namespace tick = std::chrono;
 
-int rad_rhd::RadRHD_ConstRadStateTest() {
+int rad_rhd::RadRHD_ConstRadStateTest()
+{
   WRITE_LOG("Start RadRHDTest()\n");
   grid_t grid;
 
@@ -25,7 +26,8 @@ int rad_rhd::RadRHD_ConstRadStateTest() {
 
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, grid.faces);
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
-  if (err) {
+  if (err)
+  {
     RETURN_ERR("Error reading \n");
   }
   grid.InitMemory(grid.cells.size(), grid_directions_t(0));
@@ -37,13 +39,17 @@ int rad_rhd::RadRHD_ConstRadStateTest() {
   cuda::interface::InitDevice(glb_files.base_address, grid_direction, grid);
 
 #pragma omp parallel for
-  for (int i = 0; i < grid.size; i++) {
-    if (grid.cells[i].geo.center[0] < 0.5) {
+  for (int i = 0; i < grid.size; i++)
+  {
+    if (grid.cells[i].geo.center[0] < 0.5)
+    {
       grid.energy[i] = 10;
       grid.stream[i] = Vector3(5, 0, 0);
       grid.impuls[i] = Matrix3::Zero();
       grid.impuls[i](0, 0) = grid.impuls[i](1, 1) = grid.impuls[i](2, 2) = grid.energy[i];
-    } else {
+    }
+    else
+    {
       grid.energy[i] = 0;
       grid.stream[i] = Vector3(0, 0, 0);
       grid.impuls[i] = Matrix3::Zero();
@@ -70,10 +76,12 @@ int rad_rhd::RadRHD_ConstRadStateTest() {
 
   auto start_clock = tick::steady_clock::now();
 
-  while (t < _hllc_cfg.T) {
+  while (t < _hllc_cfg.T)
+  {
     rhllc::Hllc3dStab(_hllc_cfg.tau, grid);
 
-    if (cur_timer >= _hllc_cfg.save_timer) {
+    if (cur_timer >= _hllc_cfg.save_timer)
+    {
       DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 
       WRITE_LOG("t= %lf, step= %d, time_step=%lf\n", t, res_count, (double)tick::duration_cast<tick::milliseconds>(tick::steady_clock::now() - start_clock).count() / 1000.);
@@ -81,7 +89,8 @@ int rad_rhd::RadRHD_ConstRadStateTest() {
     }
 
 #pragma omp parallel for
-    for (int cell = 0; cell < grid.size; cell++) {
+    for (int cell = 0; cell < grid.size; cell++)
+    {
 
       Vector4 G;
       GetRadSource(cell, grid, G);
@@ -92,7 +101,7 @@ int rad_rhd::RadRHD_ConstRadStateTest() {
       grid.cells[cell].conv_val.v[1] += ds * _hllc_cfg.tau * G[2];
       grid.cells[cell].conv_val.v[2] += ds * _hllc_cfg.tau * G[3];
 
-      rhllc::GetPhysValueStab(grid.cells[cell].conv_val, grid.cells[cell].phys_val);
+      rhllc::GetPhysValue(grid.cells[cell].conv_val, grid.cells[cell].phys_val);
     }
 
     t += _hllc_cfg.tau;

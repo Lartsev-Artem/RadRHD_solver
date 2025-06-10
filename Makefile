@@ -1,19 +1,22 @@
 ## Флаги сборки
-KEYS	:= SOLVERS BUILD_GRAPH MAKE_TRACE ILLUM RHLLC RadRHD
-KEYS 	+= DEBUG USE_CUDA USE_MPI
+KEYS	:= SOLVERS RHLLC #BUILD_GRAPH MAKE_TRACE ILLUM
+KEYS 	+= DEBUG USE_MPI #USE_CUDA
 DEFINES = $(addprefix -D , $(KEYS))
 ## Компиляторы и настройки
 CONFIG ?= release
 CXX 		:= mpiicpx
 NVCC 		:= nvcc
-CXXFLAGS 	:= $(DEFINES) -fopenmp -fPIE -std=c++17 
+CXXFLAGS 	:= $(DEFINES) -qopenmp -fPIE -std=c++17
 NVCCFLAGS 	:= $(DEFINES) --expt-relaxed-constexpr -dc #-gencode arch=compute_70,code=sm_70 #-Xcompiler "-fopenmp"
 
-LDFLAGS 	:= -fopenmp -L/usr/local/cuda/lib64 -lcudart
+LDFLAGS 	:= -qopenmp
+ifneq ($(filter USE_CUDA,$(KEYS)),)
+	LDFLAGS	+= -L/usr/local/cuda/lib64 -lcudart
+endif
 
 # Настройки флагов для конфигураций
 ifeq ($(CONFIG),debug)
-	CXXFLAGS 	+= -g -O0 #-Wall -Wextra -std=c++11
+	CXXFLAGS 	+= -g -O0 #-Wall -Wextra 
 	NVCCFLAGS 	+= -G -g
 else
 # gcc:  -Ofast march=cpu-type    -flto (-fwhole-program)
@@ -24,7 +27,6 @@ endif
 
 ## Пути 
 export ROOT_DIR 	:= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-#export BUILD_DIR = build/$(CONFIG)
 export BUILD_DIR 	= build
 RESOURCES_DIR 		= resources
 BUILD_BIN          	= $(BUILD_DIR)/bin
@@ -41,21 +43,53 @@ CXX_SRC_DIRS 	= graph/src/ make_trace/src/ ${LIB_SRC_DIR} ${SOLVERS_SRC_DIR}
 CUDA_SRC_DIRS 	= cuda/src/
 
 ## Пути к заголовочным файлам
-LIB_INC_DIR 	= lib lib/aligned_vec lib/files_sys/include lib/geometry/include lib/grids/include lib/json/include lib/mpi_extension/include lib/output_interface lib/physics/include
+LIB_EXTERNAL_DIR = lib/external lib/external/aligned_vec lib/external/gcem lib/external/vexpr
+LIB_INC_DIR 	= lib $(LIB_EXTERNAL_DIR) lib/files_sys/include lib/geometry/include lib/grids/include lib/json/include lib/mpi_extension/include lib/output_interface lib/physics/include
 SOLVERS_INC_DIR = solvers/illum/include/ solvers/hllc/include/ solvers/rhllc/include solvers/ray_tracing/include  solvers/RadRHD/include
 CUDALIB_INC_DIR = cuda/include
 
-CUDA_INC_DIRS 	= $(shell find $(CUDALIB_INC_DIR) -mindepth 0 -type d)
 CXX_INC_DIRS 	= $(shell find $(SOLVERS_INC_DIR) -mindepth 1 -type d)
-CXX_INC_DIRS 	+= include/ graph/include/ make_trace/include/  ${LIB_INC_DIR} ${CUDA_INC_DIRS} ${SOLVERS_INC_DIR} build/resources/
+CXX_INC_DIRS 	+= include/ graph/include/ make_trace/include/  ${LIB_INC_DIR} ${SOLVERS_INC_DIR} build/resources/
+ifneq ($(filter USE_CUDA,$(KEYS)),)
+	CUDA_INC_DIRS 	= $(shell find $(CUDALIB_INC_DIR) -mindepth 0 -type d)
+	CXX_INC_DIRS	+=${CUDA_INC_DIRS} 	
+endif
 
 CXXFLAGS	+=	$(addprefix -I ,$(CXX_INC_DIRS))
 NVCCFLAGS	+=	$(addprefix -I ,$(CXX_INC_DIRS))
 
 # Рекурсивный поиск исходных файлов
 CXX_SRCS 	:= $(shell find $(CXX_SRC_DIRS) -type f -name '*.cpp')
-CUDA_SRCS	:= $(shell find $(CUDA_SRC_DIRS) -type f -name '*.cu')
-EXEC_SRCS 	:= $(shell find $(EXE_DIR)/ -type f -name '*.cpp')
+ifneq ($(filter USE_CUDA,$(KEYS)),)
+	CUDA_SRCS	:= $(shell find $(CUDA_SRC_DIRS) -type f -name '*.cu')
+endif
+
+EXEC_SRCS 	:= $(shell find $(EXE_DIR)/ -maxdepth 1 -type f -name '*.cpp')
+ifneq ($(filter HLLC,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/HD/ -type f -name '*.cpp')
+endif
+ifneq ($(filter RHLLC,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/RHD/ -type f -name '*.cpp')
+endif
+ifneq ($(filter RadRHD,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/radRHD/ -type f -name '*.cpp')
+endif
+ifneq ($(filter BUILD_GRAPH,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/graph/ -type f -name '*.cpp')
+endif
+ifneq ($(filter MAKE_TRACE,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/trace/ -type f -name '*.cpp')
+endif
+ifneq ($(filter ILLUM,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/illum/ -type f -name '*.cpp')
+endif
+ifneq ($(filter SPECTRUM,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/spectrum/ -type f -name '*.cpp')
+endif
+ifneq ($(filter UTILS,$(KEYS)),)
+	EXEC_SRCS += $(shell find $(EXE_DIR)/utils/ -type f -name '*.cpp')
+endif
+
 TEST_SRCS 	:= $(shell find $(TESTS_DIR)/ -type f -name '*.cpp' ! -name 'off_*.cpp')
 
 # Генерация путей для объектных файлов
@@ -104,9 +138,13 @@ $(TESTS_BIN)/%: $(BUILD_OBJ)/$(TESTS_DIR)/%.cpp.o $(CXX_OBJS) $(CUDA_OBJS)
 $(BUILD_BIN)/%: $(BUILD_OBJ)/$(EXE_DIR)/%.cpp.o $(CXX_OBJS) $(CUDA_OBJS)
 	@echo "Linking $@"
 	@mkdir -p $(@D)
+ifneq ($(filter USE_CUDA,$(KEYS)),)
 	$(NVCC) -dlink $(addprefix -I ,$(CXX_INC_DIRS)) $(CUDA_OBJS) -o $(notdir $@)_link.o
 	$(CXX) -o $@ $^ $(notdir $@)_link.o $(LDFLAGS)
 	rm $(notdir $@)_link.o
+else
+	$(CXX) -o $@ $^ $(LDFLAGS)
+endif	
 
 # Компиляция C-файлов
 $(BUILD_OBJ)/%.cpp.o: %.cpp

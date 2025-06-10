@@ -24,13 +24,15 @@
 
 #include <omp.h>
 
-static int Rhllc_test() {
+static int Rhllc_test()
+{
   grid_t grid;
 
   uint32_t err = 0;
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, grid.faces);
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
-  if (err) {
+  if (err)
+  {
     RETURN_ERR("Error reading \n");
   }
   grid.InitMemory(grid.cells.size(), grid_directions_t(0));
@@ -43,14 +45,16 @@ static int Rhllc_test() {
 
   Timer timer_all;
   Timer timer;
-  struct {
+  struct
+  {
     Type flux;
     Type godunov;
     Type all;
   } times;
   times.all = times.flux = times.godunov = 0;
 
-  while (t < _hllc_cfg.T) {
+  while (t < _hllc_cfg.T)
+  {
     // rhllc::Hllc3dStab(_hllc_cfg.tau, grid);
     {
 #pragma omp parallel default(none) shared(grid, _hllc_cfg, glb_files, timer, times)
@@ -66,10 +70,11 @@ static int Rhllc_test() {
         }
 // потоки
 #pragma omp for
-        for (int i = 0; i < size_face; i++) {
+        for (int i = 0; i < size_face; i++)
+        {
           face_t &f = grid.faces[i];
           rhllc::BoundConditions(f, grid.cells, bound_val);
-          max_speed = std::max(max_speed, rhllc::GetFluxStab(grid.cells[f.geo.id_l].conv_val, bound_val.conv_val, grid.cells[f.geo.id_l].phys_val, bound_val.phys_val, f));
+          max_speed = std::max(max_speed, rhllc::GetFlux(grid.cells[f.geo.id_l].conv_val, bound_val.conv_val, grid.cells[f.geo.id_l].phys_val, bound_val.phys_val, f));
         }
 
 #pragma omp master
@@ -79,20 +84,26 @@ static int Rhllc_test() {
         }
 
 #pragma omp for
-        for (int i = 0; i < size_grid; i++) {
+        for (int i = 0; i < size_grid; i++)
+        {
           elem_t &el = grid.cells[i];
           flux_t sumF;
-          for (int j = 0; j < CELL_SIZE; j++) {
-            if (el.geo.sign_n[j]) {
+          for (int j = 0; j < CELL_SIZE; j++)
+          {
+            if (el.geo.sign_n[j])
+            {
               sumF += grid.faces[el.geo.id_faces[j]].f;
-            } else {
+            }
+            else
+            {
               sumF -= grid.faces[el.geo.id_faces[j]].f;
             }
           }
           sumF *= (tau / el.geo.V);
           el.conv_val -= sumF;
 
-          if (rhllc::GetPhysValueStab(el.conv_val, el.phys_val)) {
+          if (rhllc::GetPhysValue(el.conv_val, el.phys_val))
+          {
             DIE_IF(rhllc::PhysPressureFix(el.conv_val, el.phys_val));
           }
         }
@@ -103,7 +114,7 @@ static int Rhllc_test() {
         }
 
       } // omp
-    }   //! Hllc3dStab
+    } //! Hllc3dStab
 
     t += _hllc_cfg.tau;
   } // while
@@ -115,7 +126,8 @@ static int Rhllc_test() {
   return e_completion_success;
 } //! RunRhllcModule
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 
   MPI_START(argc, argv);
 

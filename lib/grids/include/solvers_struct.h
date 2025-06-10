@@ -54,7 +54,7 @@ struct flux_t
   Vector3 v; ///< скорость
   Type p;    ///< давление
 
-  flux_t() : d(0), v(Vector3(0, 0, 0)), p(0) {}
+  flux_t() : d(0), v{0, 0, 0}, p(0) {}
   flux_t(const Type a, const Vector3 b, const Type c) : d(a), v(b), p(c) {}
   flux_t(const flux_t &f) : d(f.d), v(f.v), p(f.p) {}
 
@@ -293,41 +293,25 @@ struct elem_t
   //	elem_t(const elem_t& el) {};
 };
 
-#ifndef USE_CUDA
-struct grid_t
-{
-  IdType size;
-  std::vector<elem_t> cells;
-  std::vector<face_t> faces;
-
-#if defined ILLUM
-  Type *Illum;
-  Type *scattering;
-  std::vector<std::vector<Vector3>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
-
-  grid_t() : size(0), Illum(nullptr), scattering(nullptr) {}
-  ~grid_t();
-
-#else
-  grid_t() : size(0) {}
-#endif
-  void InitMemory(const IdType num_cells, const IdType num_directions);
-};
-#else
 struct grid_t
 {
   IdType size;      ///< размер сетки (число ячеек)
   IdType size_face; ///< число граней
-  IdType size_dir;  ///< число направлений
+
+  IdType loc_size;  ///<
+  IdType loc_shift; ///<
 
   std::vector<elem_t> cells;
   std::vector<face_t> faces;
+
 #ifdef USE_MPI
   mpi_hd_t *mpi_cfg; ///< конфиг mpi структуры
 #else
   uint32_t *foo; ///< заглушка под cuda
 #endif
 
+#ifdef ILLUM
+  IdType size_dir; ///< число направлений
 #if !defined TRANSFER_CELL_TO_FACE
   std::vector<std::vector<Vector3>> inter_coef_all; ///< коэффициенты интерполяции локальные для каждого потока
 #elif defined SAVE_FULL_SPECTRUM
@@ -347,9 +331,6 @@ struct grid_t
   Type *Illum;
   Type *scattering;
 
-  IdType loc_size;
-  IdType loc_shift;
-
   Type *divstream;
   Vector3 *divimpuls;
 
@@ -359,14 +340,22 @@ struct grid_t
   Matrix3 *impuls;
 #endif
 
-#ifdef ILLUM
   //! \brief Инициализация памяти под структуру физических данных
   void InitFullPhysData();
-#endif
+#endif // ILLUM
 
   void InitMemory(const IdType num_cells, const grid_directions_t &dir_grid);
 
-  grid_t() : size(0), size_face(0), size_dir(0), loc_size(0), loc_shift(0), Illum(nullptr), scattering(nullptr),
+  grid_t() : size(0), size_face(0)
+#ifdef USE_MPI
+             ,
+             loc_size(0), loc_shift(0),
+             mpi_cfg(nullptr)
+#endif
+#ifdef ILLUM
+             ,
+             size_dir(0),
+             Illum(nullptr), scattering(nullptr),
              divstream(nullptr), divimpuls(nullptr)
 #ifdef ON_FULL_ILLUM_ARRAYS
              ,
@@ -376,17 +365,12 @@ struct grid_t
              ,
              size_frq(0)
 #endif
-#ifdef USE_MPI
-             ,
-             mpi_cfg(nullptr)
 #endif
-
   {
   }
   ~grid_t();
 };
 
-#endif // USE_CUDA
 extern std::vector<bound_size_t> hllc_loc_size;
 
 #include <set>

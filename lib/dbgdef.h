@@ -64,6 +64,17 @@ extern global_files_t glb_files;
     D_LD;                         \
   }
 
+#ifdef DEBUG
+#define STOP_IF(_cond)            \
+  if (UNLIKELY(_cond))            \
+  {                               \
+    WRITE_POS(Files_log, #_cond); \
+    D_LD;                         \
+  }
+#else
+#define STOP_IF(_cond)
+#endif
+
 #define DIE_IF_ACTION(_cond, _act) \
   if (UNLIKELY(_cond))             \
   {                                \
@@ -162,19 +173,19 @@ extern global_files_t glb_files;
       sleep(1);         \
   }
 
-#define WRITE_CELL_INFO(id, _grid)                                                                                       \
-  {                                                                                                                      \
-    geo_cell_t *cell = &_grid.cells[id].geo;                                                                             \
-    geo_face_t *f1 = &_grid.faces[cell->id_faces[0]].geo;                                                                \
-    geo_face_t *f2 = &_grid.faces[cell->id_faces[1]].geo;                                                                \
-    geo_face_t *f3 = &_grid.faces[cell->id_faces[2]].geo;                                                                \
-    geo_face_t *f4 = &_grid.faces[cell->id_faces[3]].geo;                                                                \
-    WRITE_LOG("N_bits=%u, V=%lf, id_faces: %d %d %d %d\n", cell->sign_n.bits, cell->V, cell->id_faces[0],                \
-              cell->id_faces[1], cell->id_faces[2], cell->id_faces[3]);                                                  \
-    WRITE_LOG("f1: n=[%lf, %lf, %lf], S=%lf, neigh: %d, %d\n", f1->n[0], f1->n[1], f1->n[2], f1->S, f1->id_l, f1->id_r); \
-    WRITE_LOG("f2: n=[%lf, %lf, %lf], S=%lf, neigh: %d, %d\n", f2->n[0], f2->n[1], f2->n[2], f2->S, f2->id_l, f2->id_r); \
-    WRITE_LOG("f3: n=[%lf, %lf, %lf], S=%lf, neigh: %d, %d\n", f3->n[0], f3->n[1], f3->n[2], f3->S, f3->id_l, f3->id_r); \
-    WRITE_LOG("f4: n=[%lf, %lf, %lf], S=%lf, neigh: %d, %d\n", f4->n[0], f4->n[1], f4->n[2], f4->S, f4->id_l, f4->id_r); \
+#define WRITE_CELL_INFO(id, _grid)                                                                                                                 \
+  {                                                                                                                                                \
+    geo_cell_t *cell = &_grid.cells[id].geo;                                                                                                       \
+    geo_face_t *f1 = &_grid.faces[cell->id_faces[0]].geo;                                                                                          \
+    geo_face_t *f2 = &_grid.faces[cell->id_faces[1]].geo;                                                                                          \
+    geo_face_t *f3 = &_grid.faces[cell->id_faces[2]].geo;                                                                                          \
+    geo_face_t *f4 = &_grid.faces[cell->id_faces[3]].geo;                                                                                          \
+    WRITE_LOG("N_bits=%u, V=%lf, id_faces: %d %d %d %d\n", cell->sign_n.bits, cell->V, cell->id_faces[0],                                          \
+              cell->id_faces[1], cell->id_faces[2], cell->id_faces[3]);                                                                            \
+    WRITE_LOG("f1: n=[%lf, %lf, %lf], S=%lf, neigh: %d, %d is_reg=%d\n", f1->n[0], f1->n[1], f1->n[2], f1->S, f1->id_l, f1->id_r, f1->is_regular); \
+    WRITE_LOG("f2: n=[%lf, %lf, %lf], S=%lf, neigh: %d, %d is_reg=%d\n", f2->n[0], f2->n[1], f2->n[2], f2->S, f2->id_l, f2->id_r, f2->is_regular); \
+    WRITE_LOG("f3: n=[%lf, %lf, %lf], S=%lf, neigh: %d, %d is_reg=%d\n", f3->n[0], f3->n[1], f3->n[2], f3->S, f3->id_l, f3->id_r, f3->is_regular); \
+    WRITE_LOG("f4: n=[%lf, %lf, %lf], S=%lf, neigh: %d, %d is_reg=%d\n", f4->n[0], f4->n[1], f4->n[2], f4->S, f4->id_l, f4->id_r, f4->is_regular); \
   }
 
 #endif

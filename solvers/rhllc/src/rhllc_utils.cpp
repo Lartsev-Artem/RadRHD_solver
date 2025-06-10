@@ -1,134 +1,31 @@
-#if defined RHLLC && defined SOLVERS
+#if defined RHLLC
 #include "rhllc_utils.h"
+
 #include "rhllc_flux.h"
-#include "rhllc_flux_stab.h"
-
-#include "gas_state.h"
-
-#include "global_value.h"
 #include "linear_alg.h"
+#include "gas_state.h"
 
 #include <omp.h>
 
 Type rhllc::max_signal_speed = 1;
 
-Type rhllc::GetTimeStep(const hllc_value_t &hllc_set, const std::vector<elem_t> &cells)
-{
-
-  const Type t = hllc_set.CFL * hllc_set.h_min / max_signal_speed;
-
-  DIE_IF(t < 0);
-
-  return t;
-}
-
-void rhllc::HllcPhysToConv(std::vector<elem_t> &cells)
+void rhllc::HllcPhysToConv(grid_t &grid)
 {
 
 #pragma omp parallel for
-  for (int i = 0; i < cells.size(); i++)
+  for (int i = 0; i < grid.size; i++)
   {
-    GetConvValueStab(cells[i].phys_val, cells[i].conv_val);
+    GetConvValue(grid.cells[i].phys_val, grid.cells[i].conv_val);
   }
 }
 
-void rhllc::HllcConvToPhys(std::vector<elem_t> &cells)
+void rhllc::HllcConvToPhys(grid_t &grid)
 {
 
 #pragma omp parallel for
-  for (int i = 0; i < cells.size(); i++)
+  for (int i = 0; i < grid.size; i++)
   {
-    GetPhysValueStab(cells[i].phys_val, cells[i].conv_val);
-  }
-}
-
-void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, flux_all_t &bound)
-{
-  const int id_l = f.geo.id_l;
-  const int id_r = f.geo.id_r;
-  const elem_t &cell = cells[id_l];
-  Matrix3 T;
-
-  switch (id_r) // id соседа она же признак ГУ
-  {
-  case e_bound_free:
-    bound.conv_val = cell.conv_val;
-    bound.phys_val = cell.phys_val;
-    break;
-  case e_bound_inner_source:
-#if GEOMETRY_TYPE == Sphere
-    bound.phys_val.d = 0.1;
-    bound.phys_val.v << 0, 0, 0;
-    bound.phys_val.p = 1;
-
-    GetConvValue(bound.phys_val, bound.conv_val);
-#elif GEOMETRY_TYPE == Cone_JET
-    bound.phys_val.d = 0.1;
-    bound.phys_val.v << 0.99, 0, 0;
-    bound.phys_val.p = 0.01;
-    GetConvValue(bound.phys_val, bound.conv_val);
-#else
-    bound.conv_val = cell.conv_val;
-    bound.phys_val = cell.phys_val;
-#endif
-    break;
-  case e_bound_out_source:
-#if GEOMETRY_TYPE == Cylinder
-    bound.phys_val.d = 0.1;
-    bound.phys_val.v << 0.99, 0, 0;
-    bound.phys_val.p = 0.01;
-    GetConvValue(bound.phys_val, bound.conv_val);
-#elif GEOMETRY_TYPE == Cone
-    bound.phys_val.d = kM_hydrogen * 1e14 / kDensity; //  0.1;
-    bound.phys_val.p = GetPressure(bound.phys_val.d, 10 * kEv);
-    bound.phys_val.v = Vector3(1e3 / kVelocity, 0, 0);
-
-    GetConvValue(bound.phys_val, bound.conv_val);
-#else
-    bound.conv_val = cell.conv_val;
-    bound.phys_val = cell.phys_val;
-#endif
-    break;
-  case e_bound_lock:
-
-    bound.conv_val = cell.conv_val;
-    bound.phys_val = cell.phys_val;
-#if GEOMETRY_TYPE != Cone
-    GetRotationMatrix(f.geo.n, T);
-
-    bound.conv_val.v = T * bound.conv_val.v;
-    bound.phys_val.v = T * bound.phys_val.v;
-
-    bound.conv_val.v[0] = -bound.conv_val.v[0];
-    bound.phys_val.v[0] = -bound.phys_val.v[0];
-
-    T = T.transpose();
-
-    bound.conv_val.v = T * bound.conv_val.v;
-    bound.phys_val.v = T * bound.phys_val.v;
-#endif
-    break;
-
-  case e_bound_outer_surface:
-#if GEOMETRY_TYPE == Cone
-
-    bound.conv_val = cell.conv_val;
-    bound.phys_val = cell.phys_val;
-
-    // bound.phys_val = cell.phys_val;
-    // bound.phys_val.v = Vector3(0.999, 0, 0);
-    // GetConvValue(bound.phys_val, bound.conv_val);
-#else
-    D_LD;
-#endif
-    break;
-
-  default:
-    DIE_IF(id_r < 0); // Err bound in RHLLC_3d
-
-    bound.conv_val = cells[id_r].conv_val;
-    bound.phys_val = cells[id_r].phys_val;
-    break;
+    GetPhysValue(grid.cells[i].phys_val, grid.cells[i].conv_val);
   }
 }
 
