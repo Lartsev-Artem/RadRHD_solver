@@ -2,19 +2,19 @@
 #include "mpi_ext.h"
 #include "solvers_struct.h"
 
-#include "rhllc_utils.h"
-#include "rhllc_ini_states.h"
+#include "hydro_mpi_cfg.h"
 #include "rhllc_3d_mpi.h"
+#include "rhllc_ini_states.h"
+#include "rhllc_utils.h"
 
-#include "reader_json.h"
 #include "reader_bin.h"
+#include "reader_json.h"
 #include "reader_txt.h"
 #include "writer_bin.h"
 
 using namespace rrhd;
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   MPI_START(argc, argv);
   INIT_ENVIRONMENT(argc, argv);
 
@@ -23,8 +23,7 @@ int main(int argc, char *argv[])
 
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, grid.faces);
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
-  if (err)
-  {
+  if (err) {
     RETURN_ERR("Error geo reading \n");
   }
   grid.InitMemory(grid.cells.size(), grid_directions_t(0));
@@ -34,12 +33,11 @@ int main(int argc, char *argv[])
   {
     InitMPiStruct();
     std::vector<int> metis;
-    if (files_sys::txt::ReadSimple(glb_files.base_address + F_SEPARATE_METIS, metis))
-    {
+    if (files_sys::txt::ReadSimple(glb_files.base_address + F_SEPARATE_METIS, metis)) {
       RETURN_ERR("Error reading metis \n");
     }
 
-    rhllc_mpi::InitMpiConfig(metis, grid);
+    hydro_mpi::InitMpiConfig(metis, grid);
     metis.clear();
   }
 
@@ -58,15 +56,13 @@ int main(int argc, char *argv[])
 
   Timer timer;
 
-  while (t < _hllc_cfg.T)
-  {
+  while (t < _hllc_cfg.T) {
     rhllc_mpi::Hllc3d(_hllc_cfg.tau, grid);
 
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
 
-    if (cur_timer >= _hllc_cfg.save_timer)
-    {
+    if (cur_timer >= _hllc_cfg.save_timer) {
       WRITE_LOG("t= %lf, step= %d, time_step=%ld ms\n", t, res_count, timer.get_delta_time_ms());
       DIE_IF(files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
       timer.start_timer();

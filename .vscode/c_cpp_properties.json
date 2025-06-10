@@ -26,6 +26,7 @@
                 "${workspaceFolder}/graph",
                 "${workspaceFolder}/make_trace",
                 "${workspaceFolder}/solvers",
+                "${workspaceFolder}/solvers/hydro",
                 "${workspaceFolder}/solvers/illum",
                 "${workspaceFolder}/solvers/illum/include",
                 "${workspaceFolder}/lib",
@@ -36,19 +37,16 @@
                 "${workspaceFolder}/cuda/src",
                 "${workspaceFolder}/solvers/RadRHD/include",
                 "${workspaceFolder}/lib/calculator",
-                "${workspaceFolder}/build/resources"
+                "${workspaceFolder}/build/resources",
+                "${workspaceFolder}/solvers/hydro/rhllc/include",
+                "${workspaceFolder}/solvers/hydro/hllc/include"
             ],
             "defines": [
                 "USE_VTK",
                 "RRHD_DEBUG",
                 "SOLVERS",
-                //"BUILD_GRAPH",
-                //"MAKE_TRACE",
-                //"ILLUM",
-                //"USE_CUDA",
                 "USE_MPI",
                 "RHLLC"
-                //"RAD_RHD"
             ],
             "compilerPath": "/usr/bin/mpic++",
             "cStandard": "c17",

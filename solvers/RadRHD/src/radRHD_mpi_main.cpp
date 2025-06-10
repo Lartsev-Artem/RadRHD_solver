@@ -33,8 +33,7 @@
 
 namespace cuda_sep = cuda::interface::separate_device;
 
-int rad_rhd::RunRadRHDMpiModule()
-{
+int rad_rhd::RunRadRHDMpiModule() {
 
   WRITE_LOG("Start RunRadRHDMpiModule()\n");
 
@@ -53,8 +52,7 @@ int rad_rhd::RunRadRHDMpiModule()
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
   err |= files_sys::txt::ReadTableFunc(glb_files.tab_func_address + F_COOLING_FUNC, t_cooling_function);
 
-  if (err)
-  {
+  if (err) {
     RETURN_ERR("Error reading \n");
   }
 
@@ -70,8 +68,7 @@ int rad_rhd::RunRadRHDMpiModule()
     DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
 
     std::vector<int> metis;
-    if (files_sys::txt::ReadSimple(glb_files.base_address + F_SEPARATE_METIS, metis))
-    {
+    if (files_sys::txt::ReadSimple(glb_files.base_address + F_SEPARATE_METIS, metis)) {
       RETURN_ERR("Error reading metis \n");
     }
 
@@ -104,8 +101,7 @@ int rad_rhd::RunRadRHDMpiModule()
   const int myid = get_mpi_id();
   timer.start_timer();
 
-  while (t < _hllc_cfg.T)
-  {
+  while (t < _hllc_cfg.T) {
 
     rhllc_mpi::Hllc3dStab(_hllc_cfg.tau, grid);
     rhllc_mpi::StartPhysCast(grid.mpi_cfg, grid);
@@ -116,12 +112,11 @@ int rad_rhd::RunRadRHDMpiModule()
     cuda::interface::CudaSyncStream(cuda::e_cuda_params);
     cuda::interface::CudaWait();
     rhllc_mpi::AddRadFlux(grid);
-    rhllc_mpi::HllcConvToPhys(grid);
+    rhllc::HllcConvToPhys(grid);
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
 
-    if (cur_timer >= _hllc_cfg.save_timer)
-    {
+    if (cur_timer >= _hllc_cfg.save_timer) {
       DIE_IF(files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
 
       WRITE_LOG("t= %lf, step= %d, time=%lfs \n", t, res_count, timer.get_delta_time_sec());

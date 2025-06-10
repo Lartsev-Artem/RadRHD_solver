@@ -1,9 +1,9 @@
 #if defined RHLLC
 #include "rhllc_utils.h"
 
-#include "rhllc_flux.h"
-#include "linear_alg.h"
 #include "gas_state.h"
+#include "linear_alg.h"
+#include "rhllc_flux.h"
 
 #include <omp.h>
 
@@ -11,29 +11,63 @@ Type rrhd::rhllc::max_signal_speed = 1;
 
 using namespace rrhd;
 
-void rhllc::HllcPhysToConv(grid_t &grid)
-{
+void rhllc::HllcPhysToConv(grid_t &grid) {
 
 #pragma omp parallel for
-  for (int i = 0; i < grid.size; i++)
-  {
+  for (int i = 0; i < grid.size; i++) {
     GetConvValue(grid.cells[i].phys_val, grid.cells[i].conv_val);
   }
 }
 
-void rhllc::HllcConvToPhys(grid_t &grid)
-{
+void rhllc::HllcConvToPhys(grid_t &grid) {
 
-#pragma omp parallel for
-  for (int i = 0; i < grid.size; i++)
+  int myid = get_mpi_id();
+  int start = grid.loc_shift;
+  int end = start + grid.loc_size;
+
+#pragma omp parallel default(none) firstprivate(start, end) shared(grid, glb_files)
   {
-    GetPhysValue(grid.cells[i].phys_val, grid.cells[i].conv_val);
+#pragma omp for
+    for (int i = start; i < end; i++) {
+      if (UNLIKELY(GetPhysValue(grid.cells[i].conv_val, grid.cells[i].phys_val))) {
+        DIE_IF(PhysPressureFix(grid.cells[i].conv_val, grid.cells[i].phys_val));
+      }
+    }
   }
 }
 
+#ifdef RAD_RHD
+#include "radRHD_utils.h"
+void rhllc::AddRadFlux(grid_t &grid) {
+
+  int myid = get_mpi_id();
+  int start = grid.loc_shift;
+  int end = start + grid.loc_size;
+
+  constexpr Type ds = 1.0;
+  Type tau = ds * _hllc_cfg.tau;
+#pragma omp parallel default(none) firstprivate(start, end, tau) shared(grid)
+  {
+
+#pragma omp for
+    for (int cell = start; cell < end; cell++) {
+
+      Vector4 G;
+      rad_rhd::GetRadSourceOpt(cell - start, grid.cells[cell], grid, G);
+      G *= tau;
+
+      flux_t &conv_val = grid.cells[cell].conv_val;
+      conv_val.p += G[0];
+      conv_val.v[0] += G[1];
+      conv_val.v[1] += G[2];
+      conv_val.v[2] += G[3];
+    }
+  }
+}
+#endif
+
 #if NUMBER_OF_MEASUREMENTS == 2
-int ReBuildPhysicValue(const Vector4 &U, Vector4 &W)
-{
+int ReBuildPhysicValue(const Vector4 &U, Vector4 &W) {
   Vector2 v(W(1), W(2));
 
   const Type vv = v.dot(v);
@@ -54,8 +88,7 @@ int ReBuildPhysicValue(const Vector4 &U, Vector4 &W)
   int cc = 0;
 
   Type err = 1;
-  do
-  {
+  do {
     err = W0;
 
     Type fW = W0 - p - E;
@@ -76,8 +109,7 @@ int ReBuildPhysicValue(const Vector4 &U, Vector4 &W)
     cc++;
   } while (fabs(err / W0) > 1e-14);
 
-  if (p < 0 || D < 0 || std::isnan(p) || std::isnan(D))
-  {
+  if (p < 0 || D < 0 || std::isnan(p) || std::isnan(D)) {
     printf("Error (p = %lf, d= %lf)", p, D / Gamma0);
     return 1;
   }
@@ -90,8 +122,7 @@ int ReBuildPhysicValue(const Vector4 &U, Vector4 &W)
   return 0;
 }
 
-int ReBuildPhysicValue(const std::vector<Vector4> &U, std::vector<Vector4> &W)
-{
+int ReBuildPhysicValue(const std::vector<Vector4> &U, std::vector<Vector4> &W) {
 
   bool flag = false;
 #pragma omp parallel default(none) shared(U, W, flag)
@@ -99,10 +130,8 @@ int ReBuildPhysicValue(const std::vector<Vector4> &U, std::vector<Vector4> &W)
     const int size = U.size();
 
 #pragma omp for
-    for (int num_cell = 0; num_cell < size; num_cell++)
-    {
-      if (!flag && ReBuildPhysicValue(U[num_cell], W[num_cell]))
-      {
+    for (int num_cell = 0; num_cell < size; num_cell++) {
+      if (!flag && ReBuildPhysicValue(U[num_cell], W[num_cell])) {
 #pragma omp critical
         {
           flag = true;
@@ -116,14 +145,12 @@ int ReBuildPhysicValue(const std::vector<Vector4> &U, std::vector<Vector4> &W)
   return flag;
 }
 
-int ReBuildConvValue(const std::vector<Vector4> &W, std::vector<Vector4> &U)
-{
+int ReBuildConvValue(const std::vector<Vector4> &W, std::vector<Vector4> &U) {
 
   U.resize(size_grid);
   Vector4 cell;
 
-  for (size_t i = 0; i < size_grid; i++)
-  {
+  for (size_t i = 0; i < size_grid; i++) {
     const Type v = (W[i](1) * W[i](1) + W[i](2) * W[i](2));
     const Type d = W[i](0);
     const Type Gamma = 1. / sqrt(1 - v);
