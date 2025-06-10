@@ -16,5 +16,6 @@
 
 #include "vexpr_incl/Vector3.h"
 #include "vexpr_incl/Matrix3.h"
+#include "vexpr_incl/VectorX.h"
 
 #endif //! VEXPR_H

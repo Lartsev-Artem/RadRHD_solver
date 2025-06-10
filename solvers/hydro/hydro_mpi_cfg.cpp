@@ -16,22 +16,26 @@ using namespace rrhd;
 #define rhllc_mpi_log(...)
 #endif
 
-void hydro_mpi::StartPhysCast(mpi_hd_t *st, grid_t &grid) {
+void hydro_mpi::StartPhysCast(mpi_hd_t *st, grid_t &grid)
+{
   int np = get_mpi_np(st->comm);
   st->requests_cast_phys.resize(np);
 
-  for (int id = 0; id < np; id++) {
+  for (int id = 0; id < np; id++)
+  {
     int N = st->maps[id].cell.right_id - st->maps[id].cell.left_id;
     MPI_Ibcast(grid.cells.data() + st->maps[id].cell.left_id, N,
                MPI_phys_val_t, id, st->comm, &st->requests_cast_phys[id]);
   }
 }
 
-void hydro_mpi::SyncPhysCast(mpi_hd_t *st) {
+void hydro_mpi::SyncPhysCast(mpi_hd_t *st)
+{
   MPI_Waitall(st->requests_cast_phys.size(), st->requests_cast_phys.data(), MPI_STATUSES_IGNORE);
 }
 
-void hydro_mpi::SyncAndCalcPhysCast(grid_t &grid) {
+void hydro_mpi::SyncAndCalcPhysCast(grid_t &grid)
+{
 #if 0  
   int myid = get_mpi_id();
 
@@ -59,9 +63,11 @@ void hydro_mpi::SyncAndCalcPhysCast(grid_t &grid) {
 #endif
 }
 
-void hydro_mpi::StartExchangeBoundaryCells(mpi_hd_t *st) {
+void hydro_mpi::StartExchangeBoundaryCells(mpi_hd_t *st)
+{
   static bool was_sended = false;
-  if (LIKELY(was_sended)) {
+  if (LIKELY(was_sended))
+  {
     MPI_Waitall(st->requests_send_faces.size(), st->requests_send_faces.data(), MPI_STATUSES_IGNORE);
   }
   MPI_Startall(st->requests_send_faces.size(), st->requests_send_faces.data());
@@ -69,11 +75,13 @@ void hydro_mpi::StartExchangeBoundaryCells(mpi_hd_t *st) {
   was_sended = true;
 }
 
-void hydro_mpi::SyncExchangeBoundaryCells(mpi_hd_t *st) {
+void hydro_mpi::SyncExchangeBoundaryCells(mpi_hd_t *st)
+{
   MPI_Waitall(st->requests_rcv_faces.size(), st->requests_rcv_faces.data(), MPI_STATUSES_IGNORE);
 }
 
-void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MPI_Comm comm) {
+void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MPI_Comm comm)
+{
 
   const int np = get_mpi_np(comm);
   const int myid = get_mpi_id(comm);
@@ -98,11 +106,13 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
   // определение геометрической конфигурации соседей
   // привязка ячейка - узел, грань - узлы
   {
-    for (int id_cell = 0; id_cell < grid.size; id_cell++) {
+    for (int id_cell = 0; id_cell < grid.size; id_cell++)
+    {
       grid.cells[id_cell].geo.node = metis_id[id_cell];
     }
 
-    for (size_t id_faces = 0; id_faces < grid.faces.size(); id_faces++) {
+    for (size_t id_faces = 0; id_faces < grid.faces.size(); id_faces++)
+    {
       face_t *f = &grid.faces[id_faces];
       int idl = f->geo.id_l;
       int idr = f->geo.id_r;
@@ -110,7 +120,8 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
       f->geo.is_regular = 0;
       f->geo.id_l_node = metis_id[idl];
 
-      if (idr < 0) {
+      if (idr < 0)
+      {
         f->geo.id_r_node = idr;
         f->geo.is_regular = (metis_id[idl] == myid);
         continue;
@@ -118,7 +129,8 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
 
       f->geo.id_r_node = metis_id[idr];
 
-      if ((metis_id[idr] == metis_id[idl]) && (metis_id[idl] == myid)) {
+      if ((metis_id[idr] == metis_id[idl]) && (metis_id[idl] == myid))
+      {
         f->geo.is_regular = 1; // полностью у нас
         continue;
       }
@@ -138,24 +150,32 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
     int cur_left = left_max;
     int cur_right = right_min;
 
-    for (int curCell = cur_left; curCell < cur_right; curCell++) {
-      for (int j = 0; j < CELL_SIZE; j++) {
+    for (int curCell = cur_left; curCell < cur_right; curCell++)
+    {
+      for (int j = 0; j < CELL_SIZE; j++)
+      {
         int f_id = grid.cells[curCell].geo.id_faces[j];
         const geo_face_t *f = &grid.faces[f_id].geo;
 
         if (!f->is_regular) // эта ячейка не регулярная
         {
           int node = (f->id_l_node != myid) ? f->id_l_node : f->id_r_node;
-          if (node >= 0) {
+          if (node >= 0)
+          {
             DIE_IF(abs(node - myid) > 1);
 
-            if (node > myid) {
-              if ((right_np == -1) || (right_np == node)) {
+            if (node > myid)
+            {
+              if ((right_np == -1) || (right_np == node))
+              {
                 right_min = std::min(curCell, right_min);
                 right_np = node;
               }
-            } else {
-              if ((left_np == -1) || (left_np == node)) {
+            }
+            else
+            {
+              if ((left_np == -1) || (left_np == node))
+              {
                 left_max = std::max(curCell, left_max);
                 left_np = node;
               }
@@ -173,7 +193,8 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
   }
 
   // синхронизируем процессы (рассылаем карту всем узлам)
-  for (int i = 0; i < np; i++) {
+  for (int i = 0; i < np; i++)
+  {
     MPI_Bcast(&st->maps[i], 1, MPI_hllc_map_t, i, comm);
     // MPI_Bcast(st->maps.data() + i, sizeof(st->maps[0]) / sizeof(int64_t), MPI_INT64_T, i, MPI_COMM_WORLD);
   }
@@ -182,8 +203,10 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
   {
     int f_min = std::numeric_limits<int>::max();
     int f_max = -1;
-    for (size_t id = st->maps[myid].cell.left_id; id < st->maps[myid].cell.right_id; id++) {
-      for (size_t j = 0; j < CELL_SIZE; j++) {
+    for (size_t id = st->maps[myid].cell.left_id; id < st->maps[myid].cell.right_id; id++)
+    {
+      for (size_t j = 0; j < CELL_SIZE; j++)
+      {
         int f_id = grid.cells[id].geo.id_faces[j];
         f_min = std::min(f_min, f_id);
         f_max = std::max(f_max, f_id);
@@ -213,8 +236,10 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
     if (np_r >= 0)
       right = st->maps[np_r].cell.reg_l;
 
-    for (int id = left; id < right; id++) {
-      for (int j = 0; j < CELL_SIZE; j++) {
+    for (int id = left; id < right; id++)
+    {
+      for (int j = 0; j < CELL_SIZE; j++)
+      {
         int f_id = grid.cells[id].geo.id_faces[j];
         const geo_face_t *f = &grid.faces[f_id].geo;
 
@@ -223,9 +248,12 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
 
         if (!f->is_regular && node >= 0) // эта ячейка не регулярная
         {
-          if (node == st->maps[myid].np_l) {
+          if (node == st->maps[myid].np_l)
+          {
             f_reg_min = std::max(f_reg_min, f_id); // подходим слева
-          } else {
+          }
+          else
+          {
             f_reg_max = std::min(f_reg_max, f_id); // подходим справа
           }
         }
@@ -242,7 +270,8 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
 
   {
     // синхронизируем процессы (рассылаем карту всем узлам)
-    for (int i = 0; i < np; i++) {
+    for (int i = 0; i < np; i++)
+    {
       MPI_Bcast(&st->maps[i], 1, MPI_hllc_map_t, i, comm);
       // MPI_Bcast(st->maps.data() + i, sizeof(st->maps[0]) / sizeof(int64_t), MPI_INT64_T, i, MPI_COMM_WORLD);
 
@@ -275,8 +304,10 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
     int lr_len[2] = {static_cast<int>(st->maps[myid].cell.reg_l - lr_min[0]),
                      static_cast<int>(st->maps[myid].cell.right_id - lr_min[1])};
 
-    for (int i = 0; i < 2; i++) {
-      if (lr_len[i] > 0 && np_lr[i] >= 0) {
+    for (int i = 0; i < 2; i++)
+    {
+      if (lr_len[i] > 0 && np_lr[i] >= 0)
+      {
         MPI_Request rq;
         MPI_Send_init(&grid.cells[lr_min[i]], lr_len[i], MPI_flux_elem_t, np_lr[i], i,
                       st->comm, &rq);
@@ -288,11 +319,13 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
     }
 
     // сосед слева
-    if (np_lr[0] >= 0) {
+    if (np_lr[0] >= 0)
+    {
       int l_min = st->maps[np_lr[0]].cell.reg_r;
       int l_len = st->maps[np_lr[0]].cell.right_id - l_min;
 
-      if (l_len > 0) {
+      if (l_len > 0)
+      {
         MPI_Request rq;
         MPI_Recv_init(&grid.cells[l_min], l_len, MPI_flux_elem_t, np_lr[0], 1,
                       st->comm, &rq);
@@ -303,10 +336,12 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
     }
 
     // cосед справа
-    if (np_lr[1] >= 0) {
+    if (np_lr[1] >= 0)
+    {
       int r_min = st->maps[np_lr[1]].cell.left_id;
       int r_len = st->maps[np_lr[1]].cell.reg_l - r_min;
-      if (r_len > 0) {
+      if (r_len > 0)
+      {
         MPI_Request rq;
         MPI_Recv_init(&grid.cells[r_min], r_len, MPI_flux_elem_t, np_lr[1], 0,
                       st->comm, &rq);
@@ -317,8 +352,11 @@ void hydro_mpi::InitMpiConfig(const std::vector<int> &metis_id, grid_t &grid, MP
     }
   }
 
-  if (grid.mpi_cfg) {
+  if (grid.mpi_cfg)
+  {
     delete grid.mpi_cfg;
   }
   grid.mpi_cfg = st;
 }
+
+#endif //(defined RHLLC || defined HLLC) && defined USE_MPI

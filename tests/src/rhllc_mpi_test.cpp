@@ -30,22 +30,27 @@
 #include <omp.h>
 using namespace rrhd;
 
-static int init_state(grid_t &grid) {
+static int init_state(grid_t &grid)
+{
   {
     std::vector<Vector3> centers;
     if (files_sys::bin::ReadSimple(glb_files.base_address + F_CENTERS, centers))
       RETURN_ERR("Default rhllc value not set\n");
 
 #pragma omp parallel for
-    for (int i = 0; i < grid.size; i++) {
+    for (int i = 0; i < grid.size; i++)
+    {
       elem_t &el = grid.cells[i];
 
       Type x = centers[i][0];
-      if (x < 0.5) {
+      if (x < 0.5)
+      {
         el.phys_val.d = 1;
         el.phys_val.p = 1;
         el.phys_val.v = Vector3(0.9, 0, 0);
-      } else {
+      }
+      else
+      {
         el.phys_val.d = 1;
         el.phys_val.p = 10;
         el.phys_val.v = Vector3(0, 0, 0);
@@ -58,7 +63,8 @@ static int init_state(grid_t &grid) {
   return e_completion_success;
 }
 
-static int SingleRhllc(int argc, char **argv, grid_t &grid) {
+static int SingleRhllc(int argc, char **argv, grid_t &grid)
+{
   glb_files.solve_address += "_def";
   WRITE_LOG("Start SingleRhllc()\n");
 
@@ -66,7 +72,8 @@ static int SingleRhllc(int argc, char **argv, grid_t &grid) {
 
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, grid.faces);
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
-  if (err) {
+  if (err)
+  {
     RETURN_ERR("Error reading \n");
   }
   grid.InitMemory(grid.cells.size(), grid_directions_t(0));
@@ -86,13 +93,15 @@ static int SingleRhllc(int argc, char **argv, grid_t &grid) {
   Timer timer;
   Timer timer_all;
 
-  while (t < _hllc_cfg.T) {
+  while (t < _hllc_cfg.T)
+  {
     rhllc::Hllc3d(_hllc_cfg.tau, grid);
 
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
 
-    if (cur_timer >= _hllc_cfg.save_timer) {
+    if (cur_timer >= _hllc_cfg.save_timer)
+    {
       WRITE_LOG("t= %lf, step= %d, time_step=%lld ms\n", t, res_count, timer.get_delta_time_ms());
       DIE_IF(files_sys::bin::WriteSolution(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
       timer.start_timer();
@@ -110,12 +119,14 @@ static int SingleRhllc(int argc, char **argv, grid_t &grid) {
   return e_completion_success;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   MPI_START(argc, argv);
   INIT_ENVIRONMENT(argc, argv);
 
   grid_t default_grid;
-  if (get_mpi_id() == 0) {
+  if (get_mpi_id() == 0)
+  {
     SingleRhllc(argc, argv, default_grid);
   }
   MPI_BARRIER(MPI_COMM_WORLD);
@@ -127,7 +138,8 @@ int main(int argc, char **argv) {
   uint32_t err = 0;
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_faces, grid.faces);
   err |= files_sys::bin::ReadGridGeo(glb_files.name_file_geometry_cells, grid.cells);
-  if (err) {
+  if (err)
+  {
     RETURN_ERR("Error reading \n");
   }
   grid.InitMemory(grid.cells.size(), grid_directions_t(0));
@@ -162,13 +174,15 @@ int main(int argc, char **argv) {
   Timer timer;
   Timer timer_all;
 
-  while (t < _hllc_cfg.T) {
+  while (t < _hllc_cfg.T)
+  {
     rhllc_mpi::Hllc3d(_hllc_cfg.tau, grid);
 
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
 
-    if (cur_timer >= _hllc_cfg.save_timer) {
+    if (cur_timer >= _hllc_cfg.save_timer)
+    {
       WRITE_LOG("t= %lf, step= %d, time_step=%ld ms\n", t, res_count, timer.get_delta_time_ms());
       DIE_IF(files_sys::bin::WriteSolutionMPI(glb_files.solve_address + std::to_string(res_count++), grid) != e_completion_success);
       timer.start_timer();
@@ -184,9 +198,11 @@ int main(int argc, char **argv) {
 
   hydro_mpi::StartPhysCast(grid.mpi_cfg, grid);
   hydro_mpi::SyncPhysCast(grid.mpi_cfg);
-  if (get_mpi_id() == 0) {
+  if (get_mpi_id() == 0)
+  {
     Vector3 sum = Vector3::Zero();
-    for (size_t i = 0; i < grid.size; i++) {
+    for (size_t i = 0; i < grid.size; i++)
+    {
       sum[0] += fabs(grid.cells[i].phys_val.d - default_grid.cells[i].phys_val.d);
       sum[1] += (grid.cells[i].phys_val.v - default_grid.cells[i].phys_val.v).norm();
       sum[2] += fabs(grid.cells[i].phys_val.p - default_grid.cells[i].phys_val.p);

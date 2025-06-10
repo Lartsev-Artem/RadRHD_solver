@@ -37,7 +37,7 @@ TESTS_BIN 			= $(BUILD_DIR)/tests
 
 ## Пути к исходным файлам
 LIB_SRC_DIR 	= lib/files_sys/src/ lib/geometry/src/ lib/json/src/ lib/mpi_extension/src/ lib/physics/src/ lib/grids/src/
-SOLVERS_SRC_DIR = solvers/illum/src/ solvers/hllc/src/ solvers/rhllc/src/ solvers/ray_tracing/src/  solvers/RadRHD/src/
+SOLVERS_SRC_DIR = solvers/illum/src/ solvers/hydro solvers/hydro/hllc/src/ solvers/hydro/rhllc/src/ solvers/ray_tracing/src/  solvers/RadRHD/src/
 
 CXX_SRC_DIRS 	= graph/src/ make_trace/src/ ${LIB_SRC_DIR} ${SOLVERS_SRC_DIR}
 CUDA_SRC_DIRS 	= cuda/src/
@@ -45,7 +45,7 @@ CUDA_SRC_DIRS 	= cuda/src/
 ## Пути к заголовочным файлам
 LIB_EXTERNAL_DIR = lib/external lib/external/aligned_vec lib/external/gcem lib/external/vexpr
 LIB_INC_DIR 	= lib $(LIB_EXTERNAL_DIR) lib/files_sys/include lib/geometry/include lib/grids/include lib/json/include lib/mpi_extension/include lib/output_interface lib/physics/include
-SOLVERS_INC_DIR = solvers/illum/include/ solvers/hllc/include/ solvers/rhllc/include solvers/ray_tracing/include  solvers/RadRHD/include
+SOLVERS_INC_DIR = solvers/illum/include/ solvers/hydro solvers/hydro/hllc/include/ solvers/hydro/rhllc/include solvers/ray_tracing/include  solvers/RadRHD/include
 CUDALIB_INC_DIR = cuda/include
 
 CXX_INC_DIRS 	= $(shell find $(SOLVERS_INC_DIR) -mindepth 1 -type d)
