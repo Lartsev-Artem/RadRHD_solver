@@ -17,15 +17,17 @@
 #include "reader_txt.h"
 #include "reader_bin.h"
 
-#include "rhllc_flux_stab.h"
-#include "rhllc_init.h"
-#include "rhllc_mpi.h"
-#include "rhllc_calc.h"
+#include "rhllc_flux.h"
+#include "rhllc_ini_states.h"
+#include "rhllc_bound_cond.h"
 #include "rhllc_utils.h"
+#include "rhllc_3d_mpi.h"
+#include "rhllc_3d.h"
 
 #include "writer_bin.h"
 
 #include <omp.h>
+using namespace rrhd;
 
 static int init_state(grid_t &grid)
 {
@@ -54,7 +56,7 @@ static int init_state(grid_t &grid)
       }
     }
 
-    rhllc::HllcPhysToConv(grid.cells);
+    rhllc::HllcPhysToConv(grid);
   }
 
   return e_completion_success;
@@ -62,13 +64,6 @@ static int init_state(grid_t &grid)
 
 static int SingleRhllc(int argc, char **argv, grid_t &grid)
 {
-  std::string file_config = "config/directories_cfg.json";
-  if (argc > 1)
-    file_config = argv[1];
-
-  if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
-    return e_completion_fail;
-
   glb_files.solve_address += "_def";
   WRITE_LOG("Start SingleRhllc()\n");
 
@@ -88,7 +83,7 @@ static int SingleRhllc(int argc, char **argv, grid_t &grid)
   Type cur_timer = 0;
   int res_count = _solve_mode.start_point;
 
-  _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg, grid.cells);
+  _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg);
 
   WRITE_LOG("tau = %lf\n", _hllc_cfg.tau);
 
@@ -99,7 +94,7 @@ static int SingleRhllc(int argc, char **argv, grid_t &grid)
 
   while (t < _hllc_cfg.T)
   {
-    rhllc::Hllc3dStab(_hllc_cfg.tau, grid);
+    rhllc::Hllc3d(_hllc_cfg.tau, grid);
 
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
@@ -112,7 +107,7 @@ static int SingleRhllc(int argc, char **argv, grid_t &grid)
       cur_timer = 0;
     }
 
-    _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg, grid.cells);
+    _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg);
   }
 
   WRITE_LOG("Full_time= %lld ms\n", timer_all.get_delta_time_ms());
@@ -126,8 +121,7 @@ static int SingleRhllc(int argc, char **argv, grid_t &grid)
 int main(int argc, char **argv)
 {
   MPI_START(argc, argv);
-
-  WRITE_LOG("Start: %s\n", argv[0]);
+  INIT_ENVIRONMENT(argc, argv);
 
   grid_t default_grid;
   if (get_mpi_id() == 0)
@@ -136,14 +130,7 @@ int main(int argc, char **argv)
   }
   MPI_BARRIER(MPI_COMM_WORLD);
 
-  std::string file_config = "config/directories_cfg.json";
-  if (argc > 1)
-    file_config = argv[1];
-
-  if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
-    return e_completion_fail;
-
-  WRITE_LOG("Start TEST_RHLLC_MPI\n");
+  INIT_ENVIRONMENT(argc, argv);
 
   grid_t grid;
 
@@ -175,7 +162,7 @@ int main(int argc, char **argv)
   int res_count = _solve_mode.start_point;
 
   rhllc::max_signal_speed = 1;
-  _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg, grid.cells);
+  _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg);
 
   WRITE_LOG("tau = %lf\n", _hllc_cfg.tau);
 
@@ -188,7 +175,7 @@ int main(int argc, char **argv)
 
   while (t < _hllc_cfg.T)
   {
-    rhllc_mpi::Hllc3dStab(_hllc_cfg.tau, grid);
+    rhllc_mpi::Hllc3d(_hllc_cfg.tau, grid);
 
     t += _hllc_cfg.tau;
     cur_timer += _hllc_cfg.tau;
@@ -201,7 +188,7 @@ int main(int argc, char **argv)
       cur_timer = 0;
     }
 
-    _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg, grid.cells);
+    _hllc_cfg.tau = rhllc::GetTimeStep(_hllc_cfg);
     MPI_BARRIER(MPI_COMM_WORLD);
   }
 
@@ -223,6 +210,7 @@ int main(int argc, char **argv)
     WRITE_LOG("Result Sum_error (mpi vs single): %lf\n", sum.norm());
   }
 
+  DEINIT_ENVIRONMENT(argc, argv);
   MPI_END;
   return e_completion_success;
 }

@@ -12,6 +12,8 @@
 
 #include <numeric>
 
+using namespace rrhd;
+
 #ifdef RRHD_DEBUG
 // #define rhllc_mpi_log(...) WRITE_LOG(__VA_ARGS__)
 #define rhllc_mpi_log(...)
@@ -484,7 +486,7 @@ void rhllc_mpi::Hllc3d(const Type tau, grid_t &grid)
     for (int i = reg_f_begin; i < reg_f_end; i++)
     {
       face_t &f = grid.faces[i];
-      RRHD_ASSERT(!f.geo.is_regular);
+      RRHD_ASSERT(f.geo.is_regular);
       rhllc::BoundConditions(f, grid.cells, bound_val);
       max_speed = std::max(max_speed, rhllc::GetFlux(
                                           grid.cells[f.geo.id_l].conv_val, bound_val.conv_val,

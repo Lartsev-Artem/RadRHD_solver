@@ -130,9 +130,13 @@ prebuild:
 $(TESTS_BIN)/%: $(BUILD_OBJ)/$(TESTS_DIR)/%.cpp.o $(CXX_OBJS) $(CUDA_OBJS)
 	@echo "Linking $@"
 	@mkdir -p $(@D)
+ifneq ($(filter USE_CUDA,$(KEYS)),)
 	$(NVCC) -dlink $(addprefix -I ,$(CXX_INC_DIRS)) $(CUDA_OBJS) -o $(notdir $@)_link.o
 	$(CXX) -o $@ $^ $(notdir $@)_link.o $(LDFLAGS)
 	rm $(notdir $@)_link.o
+else
+	$(CXX) -o $@ $^ $(LDFLAGS)
+endif
 
 # Линковка исполняемых файлов
 $(BUILD_BIN)/%: $(BUILD_OBJ)/$(EXE_DIR)/%.cpp.o $(CXX_OBJS) $(CUDA_OBJS)

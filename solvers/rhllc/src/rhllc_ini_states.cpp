@@ -9,6 +9,8 @@
 #include "global_value.h"
 #include "reader_bin.h"
 
+using namespace rrhd;
+
 flux_t rhllc::ini::Soda(const Vector3 &x)
 {
     flux_t flx;

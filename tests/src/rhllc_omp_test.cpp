@@ -13,16 +13,18 @@
 
 #include "global_value.h"
 #include "reader_json.h"
-#include "rhllc_main.h"
 #include "solvers_struct.h"
 
 #include "reader_bin.h"
 
-#include "rhllc_flux_stab.h"
-#include "rhllc_init.h"
+#include "rhllc_flux.h"
+#include "rhllc_ini_states.h"
+#include "rhllc_bound_cond.h"
 #include "rhllc_utils.h"
 
 #include <omp.h>
+
+using namespace rrhd;
 
 static int Rhllc_test()
 {
@@ -37,7 +39,7 @@ static int Rhllc_test()
   }
   grid.InitMemory(grid.cells.size(), grid_directions_t(0));
 
-  DIE_IF(rhllc::Init(glb_files.hllc_init_value, grid.cells));
+  DIE_IF(rhllc::Init(glb_files.hllc_init_value, rhllc::ini::Soda, grid));
 
   Type t = 0.0;
   _hllc_cfg.tau = 0.001;
@@ -128,17 +130,8 @@ static int Rhllc_test()
 
 int main(int argc, char **argv)
 {
-
   MPI_START(argc, argv);
-
-  std::string file_config = "config/directories_cfg.json";
-  if (argc > 1)
-    file_config = argv[1];
-
-  if (files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg))
-    return e_completion_fail;
-
-  WRITE_LOG("Start: %s\n", argv[0]);
+  INIT_ENVIRONMENT(argc, argv);
 
 #pragma omp parallel default(none) shared(glb_files)
   {
@@ -154,6 +147,7 @@ int main(int argc, char **argv)
 
   Rhllc_test();
 
+  DEINIT_ENVIRONMENT(argc, argv);
   MPI_END;
   return e_completion_success;
 }

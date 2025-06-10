@@ -7,7 +7,9 @@
 
 #include <omp.h>
 
-Type rhllc::max_signal_speed = 1;
+Type rrhd::rhllc::max_signal_speed = 1;
+
+using namespace rrhd;
 
 void rhllc::HllcPhysToConv(grid_t &grid)
 {

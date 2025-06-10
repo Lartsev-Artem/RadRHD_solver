@@ -16,27 +16,29 @@
 /*! \addtogroup rhllc Модуль расчета газовой динамики в релятивистской постановке
     @{
 */
-namespace rhllc
+namespace rrhd
 {
-    namespace ini
+    namespace rhllc
     {
-        flux_t Soda(const Vector3 &x);
-        flux_t Jet(const Vector3 &x);
-        flux_t Uniform(const Vector3 &x);
-    }; // namespace ini
+        namespace ini
+        {
+            flux_t Soda(const Vector3 &x);
+            flux_t Jet(const Vector3 &x);
+            flux_t Uniform(const Vector3 &x);
+        }; // namespace ini
 
-    /**
-     * @brief Функция устанавливает начальное состояние газа
-     *
-     * @param file_init_value файл с предварительным газодинамическим состоянием
-     * @param ini_func функция инициализации
-     * @param grid  сетка
-     * @return int  ::e_type_completion
-     * @note в случае отсутствия файла инициализации будет установлено распределение по умолчанию
-     */
-    int Init(const std::string &file_init_value,
-             const std::function<flux_t(const Vector3 &)> ini_func,
-             grid_t &grid);
-};
-
+        /**
+         * @brief Функция устанавливает начальное состояние газа
+         *
+         * @param file_init_value файл с предварительным газодинамическим состоянием
+         * @param ini_func функция инициализации
+         * @param grid  сетка
+         * @return int  ::e_type_completion
+         * @note в случае отсутствия файла инициализации будет установлено распределение по умолчанию
+         */
+        int Init(const std::string &file_init_value,
+                 const std::function<flux_t(const Vector3 &)> ini_func,
+                 grid_t &grid);
+    };
+}; // namespace rrhd
 #endif // RHLLC_INI_STATES_H

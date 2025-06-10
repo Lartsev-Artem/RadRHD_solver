@@ -7,6 +7,8 @@
 #include "gas_state.h"
 #include "linear_alg.h"
 
+using namespace rrhd;
+
 void rhllc::bound::OutSrcBound(const elem_t &cell, flux_all_t &flx)
 {
 #if 0    
@@ -85,7 +87,7 @@ void rhllc::BoundConditions(const face_t &f, const std::vector<elem_t> &cells, f
     break;
 
     default:
-        RRHD_ASSERT(id_r < 0); // Err bound in RHLLC_3d
+        RRHD_ASSERT(id_r >= 0); // Err bound in RHLLC_3d
 
         bound.conv_val = cells[id_r].conv_val;
         bound.phys_val = cells[id_r].phys_val;

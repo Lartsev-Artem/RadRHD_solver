@@ -7,6 +7,8 @@
 
 #define MAX_ITER 40
 
+using namespace rrhd;
+
 flux_t rhllc::GetConvValue(const flux_t &W)
 {
   flux_t U;

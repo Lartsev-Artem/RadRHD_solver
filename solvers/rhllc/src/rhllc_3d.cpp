@@ -4,6 +4,7 @@
 #include "rhllc_flux.h"
 #include "rhllc_utils.h"
 #include "rhllc_bound_cond.h"
+using namespace rrhd;
 
 void rhllc::Hllc3d(const Type tau, grid_t &grid)
 {

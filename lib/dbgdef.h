@@ -65,9 +65,9 @@ extern global_files_t glb_files;
   }
 
 #ifdef RRHD_DEBUG
-#define RRHD_ASSERT(_cond) DIE_IF(!_cond)
+#define RRHD_ASSERT(_cond) DIE_IF(!(_cond))
 #else
-#define RRHD_ASSERT(_cond)
+#define RRHD_ASSERT(...)
 #endif
 
 #define DIE_IF_ACTION(_cond, _act) \

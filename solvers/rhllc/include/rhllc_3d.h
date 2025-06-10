@@ -12,21 +12,26 @@
     @{
 */
 
-/**
- * @brief Пространство имён модуля газовой динамики в релятивистской постановке
- *
- */
-namespace rhllc
+namespace rrhd
 {
 
     /**
-     * @brief Газодинамический расчёт на текущий момент времени с шагом tau
+     * @brief Пространство имён модуля газовой динамики в релятивистской постановке
      *
-     * @details PLUTO архитектура
-     * @param[in] tau шаг интегрирования
-     * @param[inout] grid сетка
      */
-    void Hllc3d(const Type tau, grid_t &grid);
+    namespace rhllc
+    {
 
-} // namespace rhllc
+        /**
+         * @brief Газодинамический расчёт на текущий момент времени с шагом tau
+         *
+         * @details PLUTO архитектура
+         * @param[in] tau шаг интегрирования
+         * @param[inout] grid сетка
+         */
+        void Hllc3d(const Type tau, grid_t &grid);
+
+    } // namespace rhllc
+
+} // namespace rrhd
 #endif //! RHLLC_3D_H

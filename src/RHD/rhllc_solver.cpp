@@ -10,6 +10,8 @@
 #include "reader_bin.h"
 #include "writer_bin.h"
 
+using namespace rrhd;
+
 int main(int argc, char *argv[])
 {
   MPI_START(argc, argv);

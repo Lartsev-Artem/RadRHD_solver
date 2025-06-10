@@ -101,13 +101,14 @@
     }                                                     \
   }
 
-#define INIT_ENVIRONMENT(_argc, _argv)                                                          \
-  std::string file_config = "config/directories_cfg.json";                                      \
-  if (_argc > 1)                                                                                \
-    file_config = _argv[1];                                                                     \
-  DIE_IF(files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg)); \
-  WRITE_LOG("Run: %s\n", _argv[0]);
-
+#define INIT_ENVIRONMENT(_argc, _argv)                                                            \
+  {                                                                                               \
+    std::string file_config = "config/directories_cfg.json";                                      \
+    if (_argc > 1)                                                                                \
+      file_config = _argv[1];                                                                     \
+    DIE_IF(files_sys::json::ReadStartSettings(file_config, glb_files, &_solve_mode, &_hllc_cfg)); \
+    WRITE_LOG("Run: %s\n", _argv[0]);                                                             \
+  }
 #define DEINIT_ENVIRONMENT(_argc, _argv) \
   WRITE_LOG("End: %s\n", _argv[0]);
 
