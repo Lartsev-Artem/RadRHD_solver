@@ -82,79 +82,79 @@ namespace vexpr
   ////////////////////////////////////////////////////////////
   /// \relates VectorX
   /// \brief Overload of unary `operator-`
-  template <typename T>
-  [[nodiscard]] constexpr VectorX<T> operator-(const VectorX<T> &left) noexcept;
+  template <typename T, size_t N>
+  [[nodiscard]] constexpr VectorX<T, N> operator-(const VectorX<T, N> &left) noexcept;
 
   ////////////////////////////////////////////////////////////
   /// \relates VectorX
   /// \brief Overload of binary `operator+`
-  template <typename T>
-  [[nodiscard]] constexpr VectorX<T> operator+(const VectorX<T> &left, const VectorX<T> &right) noexcept;
+  template <typename T, size_t N>
+  [[nodiscard]] constexpr VectorX<T, N> operator+(const VectorX<T, N> &left, const VectorX<T, N> &right) noexcept;
 
   /// \relates VectorX
   /// \brief Overload of binary `operator-`
-  template <typename T>
-  [[nodiscard]] constexpr VectorX<T> operator-(const VectorX<T> &left, const VectorX<T> &right) noexcept;
+  template <typename T, size_t N>
+  [[nodiscard]] constexpr VectorX<T, N> operator-(const VectorX<T, N> &left, const VectorX<T, N> &right) noexcept;
 
   /// \relates VectorX
   /// \brief Overload of binary `operator+`
-  template <typename T>
-  [[nodiscard]] constexpr VectorX<T> operator/(const VectorX<T> &left, const VectorX<T> &right) noexcept;
+  template <typename T, size_t N>
+  [[nodiscard]] constexpr VectorX<T, N> operator/(const VectorX<T, N> &left, const VectorX<T, N> &right) noexcept;
 
   /// \relates VectorX
   /// \brief Overload of binary `operator-`
-  template <typename T>
-  [[nodiscard]] constexpr VectorX<T> operator*(const VectorX<T> &left, const VectorX<T> &right) noexcept;
+  template <typename T, size_t N>
+  [[nodiscard]] constexpr VectorX<T, N> operator*(const VectorX<T, N> &left, const VectorX<T, N> &right) noexcept;
 
   ////////////////////////////////////////////////////////////
 
   /// \relates VectorX
   /// \brief Overload of binary `operator*`
-  template <typename T>
-  [[nodiscard]] constexpr VectorX<T> operator*(const VectorX<T> &left, T val) noexcept;
+  template <typename T, size_t N>
+  [[nodiscard]] constexpr VectorX<T, N> operator*(const VectorX<T, N> &left, T val) noexcept;
 
   /// \relates VectorX
   /// \brief Overload of binary `operator/`
-  template <typename T>
-  [[nodiscard]] constexpr VectorX<T> operator/(const VectorX<T> &left, T val);
+  template <typename T, size_t N>
+  [[nodiscard]] constexpr VectorX<T, N> operator/(const VectorX<T, N> &left, T val);
 
   /// \relates VectorX
   /// \brief Overload of binary `operator*`
-  template <typename T>
-  [[nodiscard]] constexpr VectorX<T> operator*(T val, const VectorX<T> &right) noexcept;
+  template <typename T, size_t N>
+  [[nodiscard]] constexpr VectorX<T, N> operator*(T val, const VectorX<T, N> &right) noexcept;
 
   ////////////////////////////////////////////////////////////
 
   /// \relates VectorX
-  template <typename T>
-  constexpr void operator*=(VectorX<T> &left, T val) noexcept;
+  template <typename T, size_t N>
+  constexpr void operator*=(VectorX<T, N> &left, T val) noexcept;
 
   /// \relates VectorX
   /// \brief Overload of binary `operator/=`
-  template <typename T>
-  constexpr void operator/=(VectorX<T> &left, T val);
+  template <typename T, size_t N>
+  constexpr void operator/=(VectorX<T, N> &left, T val);
 
   /// \relates VectorX
   /// \brief Overload of binary `operator+=`
-  template <typename T>
-  constexpr void operator+=(VectorX<T> &left, const VectorX<T> &right) noexcept;
+  template <typename T, size_t N>
+  constexpr void operator+=(VectorX<T, N> &left, const VectorX<T, N> &right) noexcept;
 
   /// \relates VectorX
   /// \brief Overload of binary `operator-=`
-  template <typename T>
-  constexpr void operator-=(VectorX<T> &left, const VectorX<T> &right) noexcept;
+  template <typename T, size_t N>
+  constexpr void operator-=(VectorX<T, N> &left, const VectorX<T, N> &right) noexcept;
 
   ////////////////////////////////////////////////////////////
 
   /// \relates VectorX
   /// \brief Overload of binary `operator==`
-  template <typename T>
-  [[nodiscard]] constexpr bool operator==(const VectorX<T> &left, const VectorX<T> &right) noexcept;
+  template <typename T, size_t N>
+  [[nodiscard]] constexpr bool operator==(const VectorX<T, N> &left, const VectorX<T, N> &right) noexcept;
 
   /// \relates VectorX
   /// \brief Overload of binary `operator!=`
-  template <typename T>
-  [[nodiscard]] constexpr bool operator!=(const VectorX<T> &left, const VectorX<T> &right) noexcept;
+  template <typename T, size_t N>
+  [[nodiscard]] constexpr bool operator!=(const VectorX<T, N> &left, const VectorX<T, N> &right) noexcept;
 
   ////////////////////////////////////////////////////////////
 
