@@ -159,7 +159,8 @@ namespace vexpr
     for (size_t i = 0; i < N; i++)
     {
       assert(right[i] != 0 && "VectorX::componentWiseDiv() cannot divide by 0");
-      x[i] = left[i] / right[i];
+      const T inv = 1. / right[i];
+      x[i] = left[i] * inv;
     }
     return x;
   }
@@ -203,9 +204,10 @@ namespace vexpr
   {
     assert(val != 0 && "VectorX::operator/ cannot divide by 0");
     VectorX<T, N> x;
+    const T inv_val = 1. / val;
     for (size_t i = 0; i < N; i++)
     {
-      x[i] = left[i] / val;
+      x[i] = left[i] * inv_val;
     }
     return x;
   }
@@ -225,9 +227,10 @@ namespace vexpr
   constexpr void operator/=(VectorX<T, N> &left, T val)
   {
     assert(val != 0 && "VectorX::operator/= cannot divide by 0");
+    const T inv_val = 1. / val;
     for (size_t i = 0; i < N; i++)
     {
-      left[i] /= val;
+      left[i] *= inv_val;
     }
   }
 

@@ -20,6 +20,7 @@
  *
  */
 
+/// \todo: !RRHD_DEBUG -> -DNDEBUG
 /** namespace Rrhd - Relativistic radiation hydrodynamic  */
 
 #ifndef PRJ_CONFIG

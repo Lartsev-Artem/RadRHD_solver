@@ -179,9 +179,10 @@ namespace vexpr
     constexpr Vector3<T> operator/(const Vector3<T> &left, T val)
     {
         assert(val != 0 && "Vector3::operator/ cannot divide by 0");
-        return Vector3<T>(left.x() / val,
-                          left.y() / val,
-                          left.z() / val);
+        const T inv_val = 1. / val;
+        return Vector3<T>(left.x() * inv_val,
+                          left.y() * inv_val,
+                          left.z() * inv_val);
     }
 
     ////////////////////////////////////////////////////////////
@@ -198,9 +199,10 @@ namespace vexpr
     constexpr void operator/=(Vector3<T> &left, T val)
     {
         assert(val != 0 && "Vector3::operator/= cannot divide by 0");
-        left.x() /= val;
-        left.y() /= val;
-        left.z() /= val;
+        const T inv_val = 1. / val;
+        left.x() *= inv_val;
+        left.y() *= inv_val;
+        left.z() *= inv_val;
     }
 
     template <typename T>
